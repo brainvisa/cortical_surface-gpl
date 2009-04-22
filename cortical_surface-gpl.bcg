@@ -1,0 +1,10 @@
+#-----------------------------------------------------------------------------
+class Component_corticalSurfaceGPL( GenericMakerComponent ):
+  _name = 'cortical_surface-gpl'
+
+  def dependencies( self ):
+    return [ 'axon' ]
+
+  def _libraries( self ):
+    return []
+
