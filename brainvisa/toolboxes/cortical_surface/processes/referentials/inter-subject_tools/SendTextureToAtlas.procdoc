@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This process send a texture from one mesh to another. Both meshes have to be parameterised (i.e. cortical surface or sulcus mesh) with 2D coordinates. The x coordinate is the periodic one (i.e. longitude for cortical surfaces, period=360, or x-coord for sulci, period=200). Mesh is the source mesh associated to the texture, atlas is the target mesh. </xhtml>
+    <d name="parameters">
+      <xhtml name="textureOut"/>
+      <xhtml name="atlas_y"/>
+      <xhtml name="atlas_x"/>
+      <xhtml name="period_x"/>
+      <xhtml name="texture"/>
+      <xhtml name="mesh_x"/>
+      <xhtml name="mesh_y"/>
+      <xhtml name="mesh"/>
+      <xhtml name="atlasMesh"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

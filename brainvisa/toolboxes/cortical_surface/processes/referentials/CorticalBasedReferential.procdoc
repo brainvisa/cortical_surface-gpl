@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="fr">
+    <xhtml name="short">L'objectif est de paramétrer la surface de chaque hémisphère, c'est-à-dire d'y définir un système de coordonnées.</xhtml>
+    <xhtml name="long">Ce processus construit un système de coordonnées surfaciques sur la surface de chaque hémisphère. Il parcellise également chaque hémisphère en utiluisant le système de coordonnées. une documentation détaillée est disponible sur la <a href="http://pages-perso.esil.univmed.fr/~coulon.o/Cortical_surface_parameterization.html">page d'Olivier</a> (Si le lien ne fonctionne pas, choisissez votre navigateur dans les préférences et redémarrez Brainvisa).</xhtml>
+    <d name="parameters">
+      <xhtml name="Rgraph"/>
+      <xhtml name="Lgraph"/>
+    </d>
+  </d>
+  <d name="en">
+    <xhtml name="short">This process provide a complete parameterisation of the cortical surface (grey/white interface), i.e. it defines a coordinate system on the surface. This coordinate system provides inter-subject matching.</xhtml>
+    <d name="parameters">
+      <xhtml name="Rgraph"/>
+      <xhtml name="Lgraph"/>
+    </d>
+    <xhtml name="long">The process builds a surface-based coordinate system on each hemisphere. It also parcellates the surface of each hemisphere on the basis of the coordinate system. A detailed documentation is available on <a href="http://pages-perso.esil.univmed.fr/~coulon.o/Cortical_surface_parameterization.html">Olivier's page</a> (if the link does not work, chose your browser in the preferences and restart Brainvisa).</xhtml>
+  </d>
+</d>
+</minf>

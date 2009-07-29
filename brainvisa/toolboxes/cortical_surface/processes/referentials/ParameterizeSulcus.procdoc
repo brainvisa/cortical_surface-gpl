@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="fr">
+    <xhtml name="short">Définition d'un système de coordonnées sur un sillon.</xhtml>
+    <d name="parameters">
+      <xhtml name="texture_param2">texture de coordonnée y</xhtml>
+      <xhtml name="texture_param1">texture de coordonnée x </xhtml>
+      <xhtml name="orientation">Orientation générale du silllon.</xhtml>
+      <xhtml name="graph">Graphe à l'intérieur duquel les morceaux du sillon sont identifiés</xhtml>
+      <xhtml name="dilation">Paramètre de dilatation (garder valeur par défaut).</xhtml>
+      <xhtml name="coordinates_grid">maillage de la grille de coordonnées.</xhtml>
+      <xhtml name="mri">IRM T1 (corrigée du biais ou non) associée.</xhtml>
+      <xhtml name="label_attributes">Le sillon est identifié dans le graphe par son "label" ou son "name".</xhtml>
+      <xhtml name="sulcus_mesh">Maillage final du sillon</xhtml>
+      <xhtml name="label_values">valeur du sillon dans le graphe.</xhtml>
+    </d>
+    <xhtml name="long">L'objectif est de paramétrer (définir un système de coordonnées sur) un sillon. Ce sillon peut-être identifié par nom ou label dans un graphe. En sortie on obtient un maillage du sillon, deux textures de coordonnées, et une "grille" de coordonnées.
+Documentation plus détaillée sur <a href="http://pages-perso.esil.univmed.fr/~coulon.o/sulcal_parameterization.html">la page d'Olivier</a> (si le lien ne marche pas choisissez votre navigateur dans les préférences et redémarrez Brainvisa).
+
+
+</xhtml>
+  </d>
+  <d name="en">
+    <xhtml name="short">Parameterization of a sulcus, i.e. definition of a coordinate system on the sulcus. This is a way, amongst other things, to normalize sulci and compare them through individuals.</xhtml>
+    <d name="parameters">
+      <xhtml name="texture_param2">2nd parameter texture (y)</xhtml>
+      <xhtml name="texture_param1">1rst parameter texture (x)</xhtml>
+      <xhtml name="orientation">Main orientatiuon of the sulcus</xhtml>
+      <xhtml name="graph">Input graph</xhtml>
+      <xhtml name="dilation">Dilation parameter. Keep the default value.</xhtml>
+      <xhtml name="coordinates_grid">Mesh of the coordinate grid (to be uses for visualization only)</xhtml>
+      <xhtml name="mri">subject's T1 MRI</xhtml>
+      <xhtml name="label_attributes">The sulcus can be identified by name or label</xhtml>
+      <xhtml name="sulcus_mesh">output mesh</xhtml>
+      <xhtml name="label_values">value of the name/label to extract the sulcus</xhtml>
+    </d>
+    <xhtml name="long">The point is to define a coordinate system on a sulcus. This sulcus is identified by name or label ina graph. As an output, one gets a mesh of the sulcus, two coordinate textures, and one coordinate "grid" .
+A detailed documentation is available on  <a href="http://pages-perso.esil.univmed.fr/~coulon.o/sulcal_parameterization.html">Olivier's page</a> (if the link does not work, chose your browser in the opreferences and restart Brainvisa).</xhtml>
+  </d>
+</d>
+</minf>

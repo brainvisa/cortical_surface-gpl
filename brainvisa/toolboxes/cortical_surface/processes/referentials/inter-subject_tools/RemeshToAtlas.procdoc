@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This process takes one parameterized mesh (e.g. sulcus or cortical surface) and remesh it such that there is a node-to-node correspondance with another parameterized mesh (the atlas). So far it works well only with sulci surfaces and still needs some work for cortical surfaces. </xhtml>
+    <d name="parameters">
+      <xhtml name="meshOut"/>
+      <xhtml name="atlas_y"/>
+      <xhtml name="atlas_x"/>
+      <xhtml name="period_x"/>
+      <xhtml name="mesh_x"/>
+      <xhtml name="mesh_y"/>
+      <xhtml name="mesh"/>
+      <xhtml name="atlasMesh"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>
