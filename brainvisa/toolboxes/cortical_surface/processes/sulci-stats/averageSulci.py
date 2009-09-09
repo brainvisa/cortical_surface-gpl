@@ -21,7 +21,6 @@ from neuroProcesses import *
 import shfjGlobals
 from soma import aims
 import sys
-from qt import *
 import os
 import numpy
 import operator
