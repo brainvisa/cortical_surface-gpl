@@ -31,7 +31,8 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from neuroProcesses import *
-import shfjGlobals     
+import shfjGlobals
+from neuroHierarchy import databases
 
 name = 'Gyral Parcellation'
 
@@ -43,7 +44,7 @@ signature = Signature(
     'Parcellation',Choice("White Matter Surface","Cortical Ribbon"),
     'Lgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
     'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
-    'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'GIS image' ),
+    'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'aims readable volume formats' ),
     'sulcus_identification',Choice('label','name'),
     'translation',ReadDiskItem('Label Translation','Label Translation' ),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
@@ -54,18 +55,21 @@ signature = Signature(
                                     shfjGlobals.aimsMeshFormats),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' ,
                                      shfjGlobals.aimsMeshFormats),
-    'left_hemi_mesh', WriteDiskItem( 'Left Hemisphere Mesh', 'MESH mesh' ),
-    'right_hemi_mesh', WriteDiskItem( 'Right Hemisphere Mesh', 'MESH mesh' ),
-    'left_grey_white', ReadDiskItem( 'Left Grey White Mask', 'GIS Image' ),
-    'right_grey_white', ReadDiskItem( 'Right Grey White Mask', 'GIS Image' ),
-    'left_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'Texture',
+    'left_hemi_mesh', WriteDiskItem( 'Left Hemisphere Mesh', 'aims mesh formats' ),
+    'right_hemi_mesh', WriteDiskItem( 'Right Hemisphere Mesh', 'aims mesh formats' ),
+    'left_grey_white', ReadDiskItem( 'Left Grey White Mask', 'aims readable volume formats' ),
+    'right_grey_white', ReadDiskItem( 'Right Grey White Mask', 'aims readable volume formats' ),
+    'left_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'aims texture formats',
                                       requiredAttributes={ 'side': 'left' } ),
-    'right_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'Texture',
+    'right_white_sulci',WriteDiskItem( 'Sulci White Texture',
+                                       'aims texture formats',
                                        requiredAttributes= \
                                        { 'side': 'right' } ),
-    'left_white_gyri',WriteDiskItem( 'Gyri White Texture' ,'Texture',
+    'left_white_gyri',WriteDiskItem( 'Gyri White Texture',
+                                     'aims texture formats',
                                      requiredAttributes={ 'side': 'left' } ),
-    'right_white_gyri',WriteDiskItem( 'Gyri White Texture' ,'Texture',
+    'right_white_gyri',WriteDiskItem( 'Gyri White Texture',
+                                      'aims texture formats',
                                       requiredAttributes={ 'side': 'right' } ),
     'left_gyri_graph',WriteDiskItem( 'Gyri Graph' ,'Graph',
                                            requiredAttributes= \
@@ -73,10 +77,12 @@ signature = Signature(
     'right_gyri_graph',WriteDiskItem( 'Gyri Graph' ,'Graph',
                                             requiredAttributes= \
                                             { 'side': 'right' } ),
-    'left_white_gyri_volume',WriteDiskItem( 'Gyri White Volume' ,'GIS Image',
+    'left_white_gyri_volume',WriteDiskItem( 'Gyri White Volume',
+                                            'aims writable volume formats',
                                             requiredAttributes= \
                                             { 'side': 'left' } ),
-    'right_white_gyri_volume',WriteDiskItem( 'Gyri White Volume' ,'GIS Image', 
+    'right_white_gyri_volume',WriteDiskItem( 'Gyri White Volume',
+                                             'aims writable volume formats',
                                              requiredAttributes= \
                                              { 'side': 'right' } ),
 )
@@ -98,9 +104,9 @@ def initialization( self ):
      self.linkParameters( 'right_white_gyri_volume', 'Rgraph' )
      self.linkParameters( 'left_grey_white', 'Lgraph' )
      self.linkParameters( 'right_grey_white', 'Rgraph' )
-     self.linkParameters( 'sulci_label_to_sulci_name', 'mri_corrected' )
-     self.linkParameters( 'left_gyri_label_to_gyri_name', 'mri_corrected' )
-     self.linkParameters( 'right_gyri_label_to_gyri_name', 'mri_corrected' )
+     self.linkParameters( 'sulci_label_to_sulci_name', 'Lgraph' )
+     self.linkParameters( 'left_gyri_label_to_gyri_name', 'Lgraph' )
+     self.linkParameters( 'right_gyri_label_to_gyri_name', 'Rgraph' )
      self.sulcus_identification = 'label'
      self.setOptional('right_grey_white','left_grey_white', 
                       'left_white_gyri_volume','right_white_gyri_volume', 
@@ -110,8 +116,8 @@ def initialization( self ):
                       'left_hemi_mesh','right_hemi_mesh', 
                       'left_gyri_graph','right_gyri_graph',
                       'left_white_sulci','right_white_sulci' )
-     self.translation = '/home/appli/shared-main/nomenclature/translation/gyri.trl'
-     self.gyri_model = '/home/appli/shared-main/models/gyrus/gyri.gyr'
+     self.translation = ReadDiskItem('Label Translation','Label Translation' ).findValue( { 'filename_variable' : 'gyri' } )
+     self.gyri_model = databases.getDiskItemFromUuid( '172c4168-a9d3-dc41-464c-1226ad07c19c' )
      self.Projection = 'Yes'
 
 def execution( self, context ): 

@@ -31,6 +31,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 include( 'base' )
+include( 'sulci' )
 
 insert( 'nomenclature','surfaceanalysis',
   SetContent(
@@ -46,3 +47,10 @@ insert( 'hemitemplate',
   "*PoleLeft", SetType( "Left Cingular Pole Template" ), 
   "*PoleRight", SetType( "Right Cingular Pole Template" ), 
 )
+
+insertFirst( 'models/{graph_version}', 'gyrus', SetContent(
+    'gyri', SetType( 'Gyri Model' ),
+    "*", SetType( 'Model graph' ),
+  )
+)
+
