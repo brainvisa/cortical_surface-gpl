@@ -1,7 +1,9 @@
-#  This software and supporting documentation are distributed by
-#      Institut Federatif de Recherche 49
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
+# Copyright CEA and IFR 49 (2000-2005)
+#
+#  This software and supporting documentation were developed by
+#      CEA/DSV/SHFJ and IFR 49
+#      4 place du General Leclerc
+#      91401 Orsay cedex
 #      France
 #
 # This software is governed by the CeCILL license version 2 under
@@ -40,25 +42,23 @@ userLevel = 2
 signature = Signature(
     'texture', ReadDiskItem( 'Texture','Texture'),
     'white', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh'),
-    'primalsketch', WriteDiskItem( 'Primalsketch graph', 'Graph' ),
+    'primalsketch', WriteDiskItem( 'Primal Sketch', 'Graph and data' ),
     'tMin', Float(),
     'tMax', Float(),
     'whiteAux', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh'),
-    'subject', String(),
     'filterout', Float(),
     'intersectioncriterium', Integer(),
-    'textureAux', ReadDiskItem( 'Texture','Texture'),
     'latitude', ReadDiskItem( 'Latitude coordinate texture','Texture'),
     'longitude', ReadDiskItem('Longitude coordinate texture','Texture')
     )
 
 def initialization( self ):
-     self.setOptional('whiteAux','subject','filterout','intersectioncriterium','latitude','longitude','textureAux')
-     self.linkParameters( 'primalsketch', 'texture' )
+     self.setOptional('whiteAux','filterout','intersectioncriterium','latitude','longitude')
+     self.linkParameters( 'primalsketch', 'white' )
      self.linkParameters( 'white', 'texture' )
      self.linkParameters( 'whiteAux', 'white' )
-     self.linkParameters( 'latitude', 'texture' )
-     self.linkParameters( 'longitude', 'texture' )
+     self.linkParameters( 'latitude', 'white' )
+     self.linkParameters( 'longitude', 'white' )
      self.tMin = 1.0
      self.tMax = 64.0
      self.filterout = 2.0
@@ -67,7 +67,8 @@ def initialization( self ):
 def execution( self, context ):
      scales=context.temporary( 'Texture' )
      blobs=context.temporary( 'Texture' )
-
+     s = self.white.get( 'sujet', None )
+     
      call_list = [ 'AimsTexturePrimalSketch',
                    '-t', self.texture,
                    '-o', self.primalsketch,
@@ -76,15 +77,11 @@ def execution( self, context ):
                    '-ob', blobs,
                    '-t1', self.tMin,
                    '-t2', self.tMax,
+		   '-sj', s
 		   ]
      if (self.whiteAux is not None):
 	     call_list += ['-mX', self.whiteAux]
-     if (self.subject):
-	     call_list += ['-sj', self.subject]
-     else:
-       s = self.white.get( 'subject', None )
-       if s is not None:
-         call_list += ['-sj', s]
+     
      if (self.filterout is not ""):
 	     call_list += ['-f', self.filterout]
      if (self.latitude is not None):
@@ -93,8 +90,6 @@ def execution( self, context ):
 	     call_list += ['-L', self.longitude]
      if (self.intersectioncriterium is not ""):
 	     call_list += ['-iP', self.intersectioncriterium]
-     if (self.textureAux is not None):
-       call_list += ['-tX', self.textureAux.fullPath()]
 
      context.write('Starting primal sketch computation')
      apply( context.system, call_list )
