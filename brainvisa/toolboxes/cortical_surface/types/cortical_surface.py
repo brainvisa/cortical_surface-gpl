@@ -63,6 +63,8 @@ FileType( 'Left hemisphere longitude texture', 'Longitude coordinate texture' )
 FileType( 'Left hemisphere latitude texture', 'Latitude coordinate texture' )
 FileType( 'Right hemisphere longitude texture', 'Longitude coordinate texture' )
 FileType( 'Right hemisphere latitude texture', 'Latitude coordinate texture' )
+FileType( 'Conformal longitude texture', 'Longitude coordinate texture' )
+FileType( 'Conformal latitude texture', 'Latitude coordinate texture' )
 
 FileType( 'Hemisphere gyri parcellation texture', 'Gyri White Texture' )
 FileType( 'Left hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
@@ -99,6 +101,9 @@ FileType( 'Left Gyri Volume', '4D Volume' )
 FileType( 'Right Gyri Volume', '4D Volume' )
 
 ## Projection using convolution kernels
+FileType( 'Labeled Functional Blobs Texture', 'Label Texture' )
+
+## Projection using convolution kernels
 
 FileType( 'Projection convolution kernels', '4D Volume' )
 FileType( 'Functional texture', 'Texture' )
@@ -108,6 +113,9 @@ FileType( 'Functional texture', 'Texture' )
 FileType( 'Cortical thickness', 'Texture' )
 
 FileType( 'Surface Label Translation', 'Label Translation' )
+
+FileType( 'Curvature Blobs Graph', 'Graph' )
+FileType( 'Curvature Blobs Texture', 'White Curvature Texture' )
 
 # Sulci parameterizations
 
