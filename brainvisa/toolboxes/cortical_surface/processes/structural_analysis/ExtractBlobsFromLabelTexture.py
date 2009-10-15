@@ -43,6 +43,7 @@ signature = Signature(
     'texture', ReadDiskItem( 'Texture','Texture'),
     'white', ReadDiskItem( 'Inflated Hemisphere White Mesh', 'MESH mesh'),
     'graph', WriteDiskItem( 'Graph', 'Graph and data' ),
+    'flat', WriteDiskItem( 'Curvature Blobs Graph Flat Map', 'MESH mesh' ),  
     'mode', Integer(),
     'latitude', ReadDiskItem( 'Latitude coordinate texture','Texture'),
     'longitude', ReadDiskItem( 'Longitude coordinate texture','Texture')
@@ -51,22 +52,24 @@ signature = Signature(
 
 def initialization( self ):
   self.linkParameters( 'white', 'texture' )
-  self.setOptional('latitude','longitude')
+  self.linkParameters( 'flat', 'texture' )
+  
+  self.setOptional('flat')
   self.linkParameters( 'latitude', 'texture' )
   self.linkParameters( 'longitude', 'texture' )
   self.mode=1
 
 def execution( self, context ):
-     
+     s = self.white.get( 'sujet', None )
      call_list = [ 'surfLabelsTex2Graph',
                    '-m', self.white,
-                   '-t', self.texture,
+                   '-t', self.texture,                   
                    '-o', self.graph,
-                   '-M', self.mode]
-     if (self.mode == 1):
-       assert(self.latitude!="")
-       assert(self.longitude!="")
-       call_list += ['--lat', self.latitude, '--lon', self.longitude]
+                   '-M', self.mode,
+                   '-s', s]
+     call_list += ['--lat', self.latitude, '--lon', self.longitude]
+     if (self.flat!=None):
+       call_list += ['--flat', self.flat]
      context.write('Generating graph')
      apply( context.system, call_list )
      context.write('Finished')

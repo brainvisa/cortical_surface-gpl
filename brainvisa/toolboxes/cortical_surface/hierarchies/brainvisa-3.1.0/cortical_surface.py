@@ -60,7 +60,9 @@ insert( '{protocol}/{subject}',
     "<subject>_L_curv_blobs", SetType( 'Curvature Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_R_curv_blobs", SetType( 'Curvature Blobs Texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_L_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'right' )
+    "<subject>_R_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_L_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_R_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'right' )
   ),
 )
 

@@ -115,6 +115,7 @@ FileType( 'Cortical thickness', 'Texture' )
 FileType( 'Surface Label Translation', 'Label Translation' )
 
 FileType( 'Curvature Blobs Graph', 'Graph' )
+FileType( 'Curvature Blobs Graph Flat Map', 'Mesh')
 FileType( 'Curvature Blobs Texture', 'White Curvature Texture' )
 
 # Sulci parameterizations

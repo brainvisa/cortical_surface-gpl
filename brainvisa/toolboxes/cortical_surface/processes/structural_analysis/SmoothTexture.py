@@ -10,7 +10,7 @@ signature = Signature(
   'mesh', ReadDiskItem('Mesh','MESH Mesh'),
   'dt', Float(),
   's', Float(),
-  'outfile', WriteDiskItem('Test Texture', 'Texture'))
+  'outfile', WriteDiskItem('Curvature Blobs Texture', 'Texture'))
 
 
 def initialization( self ):
