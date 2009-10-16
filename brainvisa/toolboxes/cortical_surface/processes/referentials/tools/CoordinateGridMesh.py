@@ -52,21 +52,27 @@ def initialization( self ):
   self.linkParameters( 'longitude', 'mesh' )
   self.linkParameters( 'grid', 'mesh' )
   
+  
+  
+  
+
 def execution( self, context ):
-  call_list = [ 'AimsCoordinateMesh',
+  
+
+  command = [ 'AimsCoordinateGridMesh', 
                 '-m', self.mesh,
                 '-x', self.latitude,
                 '-y', self.longitude,
                 '-o', self.grid]
                 #'-c', "c" ]
-  #if (self.mode == "Constraints"):
-    #call_list += ['-c', "c"]     
-  #if (self.mode == "Regular"):
-    #call_list += ['-c', 'r']     
-  #if (self.mode == "Sulcus"):
-    #call_list += ['-c', 's']     
-
+  if (self.mode == "Constraints"):
+    command += ['-c', 'c']     
+  if (self.mode == "Regular"):
+    command += ['-c', 'r']     
+  if (self.mode == "Sulcus"):
+    command += ['-c', 's']     
+  
   context.write('Generating grid')
-  context.system(*call_list )
+  context.system(*command)
   context.write('Finished')
 
