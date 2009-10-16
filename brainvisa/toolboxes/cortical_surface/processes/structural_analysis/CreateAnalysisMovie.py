@@ -43,7 +43,7 @@ def execution( self, context ):
       nodes_list = v['nodes_list']
       label = int(v['label'])
       if (label>0):
-        print str(label) + " " + str(v['tValue']) + " " + str(v['lifeTime']) + " " + str(v['t'])
+        print str(label) + " " + str(v['tValue'])  #+ " " + str(v['lifeTime']) + " " + str(v['t'])
         nbblobsnonnuls = nbblobsnonnuls + 1
         for node in nodes_list:
           texture[0][node] =int(v['label'])+1

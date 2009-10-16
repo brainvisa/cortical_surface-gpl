@@ -60,7 +60,8 @@ def initialization( self ):
   self.mode=1
 
 def execution( self, context ):
-     s = self.white.get( 'sujet', None )
+     s = self.white.get( 'subject')
+     context.write(s)
      call_list = [ 'surfLabelsTex2Graph',
                    '-m', self.white,
                    '-t', self.texture,                   
