@@ -7,7 +7,7 @@ userLevel = 2
 signature = Signature(
     'texture', ReadDiskItem( 'Texture','Texture'),
     'white', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh'),
-    'primalsketch', WriteDiskItem( 'Primalsketch graph', 'Graph' ),
+    'primalsketch', WriteDiskItem( 'Primal Sketch', 'Graph' ),
     'tMin', Float(),
     'tMax', Float(),
     'whiteAux', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh'),
@@ -18,7 +18,7 @@ signature = Signature(
     )
 
 def initialization( self ):
-     self.setOptional('whiteAux','subject','filterout','intersectioncriterium','latitude','longitude','textureAux')
+     self.setOptional('whiteAux','filterout','intersectioncriterium','latitude','longitude')
      self.linkParameters( 'primalsketch', 'texture' )
      self.linkParameters( 'white', 'texture' )
      self.linkParameters( 'whiteAux', 'white' )
@@ -44,7 +44,7 @@ def execution( self, context ):
        ]
      if (self.whiteAux is not None):
        call_list += ['-mX', self.whiteAux]
-     s = self.white.get( 'subject', None )
+     s = self.white.get( 'subject')
      assert(s!=None)
      call_list += ['-sj', s]
          
@@ -56,8 +56,7 @@ def execution( self, context ):
        call_list += ['-L', self.longitude]
      if (self.intersectioncriterium is not ""):
        call_list += ['-iP', self.intersectioncriterium]
-     if (self.textureAux is not None):
-       call_list += ['-tX', self.textureAux.fullPath()]
+
 
      context.write('Starting primal sketch computation')
      apply( context.system, call_list )
