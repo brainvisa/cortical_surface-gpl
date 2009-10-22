@@ -66,6 +66,15 @@ FileType( 'Right hemisphere latitude texture', 'Latitude coordinate texture' )
 FileType( 'Conformal longitude texture', 'Longitude coordinate texture' )
 FileType( 'Conformal latitude texture', 'Latitude coordinate texture' )
 
+
+#ATTENTION THE FOLLOWING TYPES ARE BEING ADDED FOR MY EXPERIMENTAL WORK (21.10.09 OPERTO)
+FileType( 'FreeSurfer longitude texture', 'Longitude coordinate texture' )
+FileType( 'FreeSurfer latitude texture', 'Latitude coordinate texture' )
+FileType( 'FreeSurfer White Mesh', 'Hemisphere White Mesh' )
+FileType( 'FreeSurfer Inflated Hemisphere White Mesh', 'Inflated Hemisphere White Mesh' )
+FileType( 'Connection Density Parcels Texture', 'Label Texture' )
+
+
 FileType( 'Hemisphere gyri parcellation texture', 'Gyri White Texture' )
 FileType( 'Left hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
 FileType( 'Right hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )

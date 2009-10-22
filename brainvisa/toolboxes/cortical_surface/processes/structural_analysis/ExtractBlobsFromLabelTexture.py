@@ -42,7 +42,7 @@ userLevel = 2
 signature = Signature(
     'texture', ReadDiskItem( 'Texture','Texture'),
     'white', ReadDiskItem( 'Inflated Hemisphere White Mesh', 'MESH mesh'),
-    'graph', WriteDiskItem( 'Graph', 'Graph and data' ),
+    'graph', WriteDiskItem( 'Curvature Blobs Graph', 'Graph and data' ),
     'flat', WriteDiskItem( 'Curvature Blobs Graph Flat Map', 'MESH mesh' ),  
     'mode', Integer(),
     'latitude', ReadDiskItem( 'Latitude coordinate texture','Texture'),

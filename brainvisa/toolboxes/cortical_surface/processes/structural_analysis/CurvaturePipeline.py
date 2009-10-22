@@ -4,8 +4,8 @@ import shfjGlobals
 name = 'Curvature Pipeline'
 userLevel = 2
 
-signature = Signature(  'mesh', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' ), 
-  'texture', ReadDiskItem( 'White Curvature Texture', 'Texture' ), 
+signature = Signature(  'mesh', ReadDiskItem( 'Mesh', 'MESH mesh' ), 
+  'texture', ReadDiskItem( 'Texture', 'Texture' ), 
     'graph', WriteDiskItem( 'Curvature Blobs Graph', 'Graph and data' ), 
   )
 

@@ -3,7 +3,7 @@ import shfjGlobals
 from soma import aims
 
 
-name = 'Create Analysis Movie'
+name = 'Create Results Labels Textures'
 userLevel = 2
 
 signature = Signature(

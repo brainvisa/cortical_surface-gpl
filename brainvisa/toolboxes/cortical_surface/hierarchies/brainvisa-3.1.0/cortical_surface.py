@@ -62,10 +62,25 @@ insert( '{protocol}/{subject}',
     "<subject>_L_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_R_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_L_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'right' )
+    "<subject>_R_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_L_watOnConnectionsLengthHistoSumSup6cmNormed_and", SetType( 'Connection Density Parcels Texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_R_watOnConnectionsLengthHistoSumSup6cmNormed_and", SetType( 'Connection Density Parcels Texture' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_L_lon_freeSurf", SetType( 'FreeSurfer longitude texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_R_lon_freeSurf", SetType( 'FreeSurfer longitude texture' ), SetWeakAttr( 'side', 'right' )		        
   ),
 )
+#ATTENTION THE FOLLOWING TYPES ARE BEING ADDED FOR MY EXPERIMENTAL WORK (21.10.09 OPERTO)
+insert( '{protocol}/{subject}/t1mri/<acquisition>/<analysis>/segmentation/',
+	'mesh', SetContent(
+    "<subject>_L_lat_freeSurf", SetType( 'FreeSurfer latitude texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_R_lat_freeSurf", SetType( 'FreeSurfer latitude texture' ), SetWeakAttr( 'side', 'right'),
+    "<subject>_Lwhite_freeSurf", SetType( 'FreeSurfer Inflated Hemisphere White Mesh' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_freeSurf", SetType( 'FreeSurfer Inflated Hemisphere White Mesh' ), SetWeakAttr( 'side', 'right' )
 
+        ),
+)
+    
+    
 # Add To white texture translation and Gyri Graph under sulci_recognition_session
 def _insertWhiteTextureGraph( recognition_type ):
   return ('{protocol}/{subject}/t1mri/{acquisition}/{analysis}/folds/{graph_version}/{sulci_recognition_session}_' + recognition_type,
