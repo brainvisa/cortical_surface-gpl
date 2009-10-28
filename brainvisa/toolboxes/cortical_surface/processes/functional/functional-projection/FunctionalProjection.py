@@ -41,23 +41,28 @@ signature = Signature(
       'white_mesh', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' ),
       'kernels', ReadDiskItem('Projection convolution kernels', 'GIS Image'),
       'functional_volumes', ListOf(ReadDiskItem('4D Volume', 'BrainVISA volume formats')),
-      'projection_texture', ListOf(WriteDiskItem( 'Functional texture', 'Texture'))
+      'projection_textures', ListOf(WriteDiskItem( 'Functional Texture', 'Texture'))
 )
 
-#def volumemesh( values, process ):
-    #result = None
-    #if values.white_mesh is not None and values.functional_volumes is not None:
-      #result = []
-      #for functional in values.functional_volumes:
-         #attributes = values.white_mesh.hierarchyAttributes()
-         #attributes[ 'volume' ] = functional.name
-         #result.append( process.signature[ 'projection_texture' ].contentType.findValue( attributes ) )
-    #return result
+def volumemesh( values, process ):
+    result = None
+    import os
+    if values.white_mesh is not None and values.functional_volumes is not None:
+      result = []
+      for functional in values.functional_volumes:
+         attributes = values.white_mesh.hierarchyAttributes()
+         attributes[ 'volume' ] = os.path.basename(functional.name)
+         print attributes[ 'volume' ]
+         res = process.signature[ 'projection_textures' ].findValue( attributes )
+         print res[0]
+         result.append( res[0] )
+    return result
 
 
 def initialization( self ):
       self.linkParameters('kernels', 'white_mesh')
-      self.linkParameters('projection_texture', 'white_mesh')
+      self.linkParameters('projection_textures', 'functional_volumes', self.volumemesh)
+      
 
 def execution( self, context ):
       i=0
@@ -67,7 +72,7 @@ def execution( self, context ):
             '-m', self.white_mesh,
             '-d', self.kernels,
             '-d1', volume,
-            '-o', self.projection_texture[i],
+            '-o', self.projection_textures[i],
             '-op', '1'
          ]
          i=i+1

@@ -101,6 +101,11 @@ FileType( 'Longitude Constraint Gyri Model', 'Gyri Model' )
 FileType( 'Talairach To Subject Transformation', 'Transformation matrix' )
 FileType( 'Subject To Template Transformation', 'Transformation matrix' )
 
+## Tranformation matrices for registration between function and anatomy
+
+FileType( 'Anatomy To Mean Functional Volume Transformation', 'Transformation matrix' )
+FileType( 'Mean Functional Volume To Anatomy Transformation', 'Transformation matrix' )
+
 ## Gyri files
 
 FileType( 'Left Gyri Graph', 'Data graph' )
@@ -115,7 +120,8 @@ FileType( 'Labeled Functional Blobs Texture', 'Label Texture' )
 ## Projection using convolution kernels
 
 FileType( 'Projection convolution kernels', '4D Volume' )
-FileType( 'Functional texture', 'Texture' )
+FileType( 'Functional Texture', 'Texture' )
+FileType( 'Functional Time Texture', 'Functional Texture' )
 
 # Cortical thickness
 

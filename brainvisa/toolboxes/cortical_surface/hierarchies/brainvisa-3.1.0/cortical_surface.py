@@ -33,14 +33,14 @@ insert( '{protocol}/{subject}',
     '<subject>_Rhippo_Volume', SetType( 'Right Cingular Pole Template Subject' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Talairach_To_Subject_Transformation', SetType( 'Talairach To Subject Transformation'),
     '<subject>_Subject_To_Template_Transformation', SetType( 'Subject To Template Transformation' ),
+    
     #'<subject>_L_gyriGraph', SetType( 'Left Gyri Graph' ), SetWeakAttr( 'side', 'left' ),
     #'<subject>_R_gyriGraph', SetType( 'Right Gyri Graph' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_L_gyriVolume', SetType( 'Left Gyri Volume' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_R_gyriVolume', SetType( 'Right Gyri Volume' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lwhite_KERNEL', SetType( 'Projection convolution kernels'), SetWeakAttr( 'side', 'left' ) ,
     '<subject>_Rwhite_KERNEL', SetType( 'Projection convolution kernels'), SetWeakAttr( 'side', 'right' ) ,
-    '{volume}_<subject>_Lwhite_projection', SetType( 'Functional texture'), SetWeakAttr( 'side', 'left' ) ,
-    '{volume}_<subject>_Rwhite_projection', SetType( 'Functional texture'), SetWeakAttr( 'side', 'right' ),
+
     '<subject>_Lwhite_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'left', 'mesh', 'white'),
     '<subject>_Rwhite_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'right', 'mesh', 'white'),
     '<subject>_Lhemi_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'left', 'mesh', 'hemi'),
@@ -55,8 +55,7 @@ insert( '{protocol}/{subject}',
     "<subject>_Rwhite_curv_blob", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
-    "<subject>_L_labels", SetType( 'Labeled Functional Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_labels", SetType( 'Labeled Functional Blobs Texture' ), SetWeakAttr( 'side', 'right' ),
+
     "<subject>_L_curv_blobs", SetType( 'Curvature Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_R_curv_blobs", SetType( 'Curvature Blobs Texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_L_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'left' ),
@@ -79,6 +78,23 @@ insert( '{protocol}/{subject}/t1mri/<acquisition>/<analysis>/segmentation/',
 
         ),
 )
+
+# Cortical Surface Functional-related Types
+
+insert( '{protocol}/{subject}/surface/',
+  'functional', SetContent(
+      '<subject>_Anatomy_To_Mean_Function_Transformation', SetType( 'Anatomy To Mean Functional Volume Transformation' ),
+      '<subject>_Mean_Function_To_Anatomy_Transformation', SetType( 'Mean Functional Volume To Anatomy Transformation' ),
+    "<subject>_L_labels", SetType( 'Labeled Functional Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_R_labels", SetType( 'Labeled Functional Blobs Texture' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_{volume}_Lwhite_proj', SetType( 'Functional Texture'), SetWeakAttr( 'side', 'left' ) ,
+    '<subject>_{volume}_Rwhite_proj', SetType( 'Functional Texture'), SetWeakAttr( 'side', 'right' ),
+    '<subject>_{volume}_Lwhite', SetType( 'Functional Time Texture'), SetWeakAttr( 'side', 'left' ) ,
+    '<subject>_{volume}_Rwhite', SetType( 'Functional Time Texture'), SetWeakAttr( 'side', 'right' ),
+          
+   ),
+)
+
     
     
 # Add To white texture translation and Gyri Graph under sulci_recognition_session

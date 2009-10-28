@@ -1,0 +1,138 @@
+#  This software and supporting documentation are distributed by
+#      Institut Federatif de Recherche 49
+#      CEA/NeuroSpin, Batiment 145,
+#      91191 Gif-sur-Yvette cedex
+#      France
+#
+# This software is governed by the CeCILL license version 2 under
+# French law and abiding by the rules of distribution of free software.
+# You can  use, modify and/or redistribute the software under the 
+# terms of the CeCILL license version 2 as circulated by CEA, CNRS
+# and INRIA at the following URL "http://www.cecill.info". 
+#
+# As a counterpart to the access to the source code and  rights to copy,
+# modify and redistribute granted by the license, users are provided only
+# with a limited warranty  and the software's author,  the holder of the
+# economic rights,  and the successive licensors  have only  limited
+# liability.
+#
+# In this respect, the user's attention is drawn to the risks associated
+# with loading,  using,  modifying and/or developing or reproducing the
+# software by the user in light of its specific status of free software,
+# that may mean  that it is complicated to manipulate,  and  that  also
+# therefore means  that it is reserved for developers  and  experienced
+# professionals having in-depth computer knowledge. Users are therefore
+# encouraged to load and test the software's suitability as regards their
+# requirements in conditions enabling the security of their systems and/or 
+# data to be ensured and,  more generally, to use and operate it in the 
+# same conditions as regards security.
+#
+# The fact that you are presently reading this means that you have had
+# knowledge of the CeCILL license version 2 and that you accept its terms.
+
+from neuroProcesses import *
+import shfjGlobals     
+
+name = 'Create Surface-Based Functional Data'
+userLevel = 2
+
+signature = Signature(  'intmesh', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' ), 
+        'functional_volumes', ListOf(ReadDiskItem('3D Volume', 'BrainVISA volume formats')),
+        'timetexture', WriteDiskItem('Functional Time Texture', 'Texture'),
+  )
+
+def getResolutionX(self,data):
+  if (len(data) > 0):
+    voxel_size  = data[0]['voxel_size']
+    return voxel_size[0]
+  return None
+
+def getResolutionY(self,data):
+  if (len(data) > 0):
+    voxel_size  = data[1]['voxel_size']
+    return voxel_size[1]
+  return None
+
+def getResolutionZ(self,data):
+  if (len(data) > 0):
+    voxel_size  = data[2]['voxel_size']
+    return voxel_size[2]
+  return None
+
+def getName(self,data):
+  print len(self.functional_volumes)
+  if (len(self.functional_volumes) > 0 and self.intmesh is not None):
+    dial = defaultContext().dialog( 1, 'Enter a value', Signature( 'param', String() ), _t_( 'OK' ), _t_( 'Cancel' ) )
+    dial.setValue( 'param', "" )
+    r = dial.call()
+    if r == 0:
+      v=dial.getValue( 'param' )
+      print v
+      result = None
+      attributes = self.intmesh.hierarchyAttributes()
+      attributes[ 'volume' ] = str(v)
+      result = self.signature[ 'timetexture' ].findValue( attributes )
+      return result
+    
+  return None
+
+
+
+
+def initialization( self ):
+  
+  
+  
+    from neuroHierarchy import databases
+    from copy import copy
+
+    eNode = SerialExecutionNode( self.name, parameterized=self )
+    
+    eNode.addChild( 'Average', ProcessExecutionNode( 'AverageVolumes', optional = 1 ) )
+    eNode.addChild( 'Registration', ProcessExecutionNode( 'Register3DMutualInformation', optional = 1 ) )
+
+    eNode.addChild( 'Kernels', ProcessExecutionNode( 'CreateKernelsForProjection', optional = 1 ) )
+    eNode.addChild( 'Projection', ProcessExecutionNode( 'FunctionalProjection', optional = 1 ) )
+    eNode.addChild( 'FusionTextures', ProcessExecutionNode( 'TexturesAsTimeTexture', optional = 1 ) )
+
+    eNode.addLink('Average.input','functional_volumes')
+    eNode.addLink('Registration.source_image','intmesh')
+    eNode.addLink('Registration.reference_image','Average.output')
+    eNode.addLink('Kernels.intmesh','intmesh')
+    eNode.addLink('Kernels.resolutionX','functional_volumes',self.getResolutionX)
+    eNode.addLink('Kernels.resolutionY','functional_volumes',self.getResolutionY)
+    eNode.addLink('Kernels.resolutionZ','functional_volumes',self.getResolutionZ)
+    eNode.addLink('timetexture','functional_volumes', self.getName)
+    eNode.addLink('timetexture','intmesh', self.getName)
+
+
+    for k in  eNode.childrenNames():
+      print k
+
+    
+    outAver = defaultContext().temporary("GIS Image")
+    
+
+    
+    eNode.Average.setValue('output',outAver )
+    signat = copy( eNode.Registration.signature )
+    signat[ 'source_image' ] = ReadDiskItem( 'T1 MRI Bias Corrected', 'GIS Image' )
+    signat[ 'source_to_reference' ] = WriteDiskItem( 'Mean Functional Volume To Anatomy Transformation', 'Transformation matrix' )
+    signat[ 'reference_to_source' ] = WriteDiskItem( 'Anatomy To Mean Functional Volume Transformation', 'Transformation matrix')
+    eNode.Registration.changeSignature( signat )
+    eNode.addLink('Registration.source_to_reference','intmesh')
+    eNode.addLink('Registration.reference_to_source','intmesh')
+    eNode.addLink('Projection.white_mesh','intmesh')
+    eNode.addLink('Projection.functional_volumes','functional_volumes')
+    eNode.addLink('Projection.kernels','Kernels.output')
+
+    signat = copy( eNode.FusionTextures.signature )
+    signat[ 'output' ] = WriteDiskItem( 'Functional Time Texture', 'Texture' )
+    eNode.FusionTextures.changeSignature( signat )
+    eNode.addLink('FusionTextures.input','Projection.projection_textures')
+    eNode.addLink('FusionTextures.output','timetexture')
+
+
+    self.setExecutionNode( eNode )
+
+
