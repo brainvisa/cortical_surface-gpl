@@ -35,37 +35,43 @@ import shfjGlobals
 name = 'Surface-Based Structural Analysis Pipeline'
 userLevel = 2
 
-signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )), 
-        'surfacebased_data', ListOf(ReadDiskItem('Texture', 'Texture')),
+signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )),
+        'surfacebased_data', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
+        'surfacebased_SPMt_maps', ListOf(WriteDiskItem('Surface-Based SPMt Map', 'Texture')),
+        'primal_sketches', ListOf(WriteDiskItem( 'Primal Sketch', 'Graph')),
+        'contrast', String(),
+        'contrast_name', String(),
+        'protocol_text', ReadDiskItem( 'Text File', 'Text File' )
         
-        
-        'primal_sketches', ListOf(WriteDiskItem( 'Graph', 'Graph')),
+          
   )
+
 
 
 def initialization( self ):
     eNode = SerialExecutionNode( self.name, parameterized=self )
-    #self.setOptional('beta')
+
     
     eNode.addChild( 'SPMtMaps', ProcessExecutionNode( 'CreateSurfaceBasedSPMtMaps', optional = 1 ) )
     eNode.addChild( 'PrimalSketches', ProcessExecutionNode( 'CreateSurfaceBasedPrimalSketches', optional = 1 ) )
     eNode.addChild( 'GroupAnalysis', ProcessExecutionNode( 'PerformGroupAnalysis', optional = 1 ) )
     eNode.addChild( 'LabelsTexture', ProcessExecutionNode( 'CreateResultsLabelsTexture', optional = 1 ) )
-    #eNode.addLink('Kernels.intmesh','intmesh')
-    #eNode.addLink('Kernels.output','Projection.kernels')
-    #eNode.addLink('FusionTextures.input', 'Projection.projection_texture')
-    #eNode.addLink('Projection.white_mesh','intmesh')
-    #eNode.addLink('Projection.functional_volumes','functional_volumes')
-    #eNode.addLink('FusionTextures.output','timetexture')
-    #eNode.addLink('StatisticalAnalysis.projection_texture','FusionTextures.output')
-    #eNode.addLink('StatisticalAnalysis.spmt_texture','spmt_texture')
-    #eNode.addLink('StatisticalAnalysis.contraste', 'contraste')
-    #eNode.addLink('StatisticalAnalysis.beta', 'beta')
-    #eNode.addLink('StatisticalAnalysis.protocol_text', 'protocol_text')
     
+    
+    eNode.addLink('SPMtMaps.intmesh', 'intmesh')
+    eNode.addLink('surfacebased_SPMt_maps', 'SPMtMaps.spmt_maps')
+    eNode.addLink('PrimalSketches.intmesh', 'intmesh')
+    eNode.addLink('SPMtMaps.contrast', 'contrast')
+    eNode.addLink('SPMtMaps.contrast_name', 'contrast_name')
+    eNode.addLink('surfacebased_data', 'SPMtMaps.time_texture')
+    eNode.addLink('primal_sketches','PrimalSketches.primal_sketch')
+    eNode.addLink('GroupAnalysis.primalsketches','PrimalSketches.primal_sketch')
+    eNode.addLink('GroupAnalysis.labeled_primalsketches','PrimalSketches.primal_sketch')
+    eNode.addLink('SPMtMaps.protocol_text', 'protocol_text')
+    eNode.addLink('SPMtMaps.protocol_text', 'protocol_text')
+    eNode.PrimalSketches.removeLink( 'surfacebased_activmap', 'intmesh' )
+    eNode.addLink('PrimalSketches.surfacebased_activmap','SPMtMaps.spmt_maps')
+
     self.setExecutionNode( eNode )
     
-    
-    
-def execution (self, context):
-  context.write("test")
+

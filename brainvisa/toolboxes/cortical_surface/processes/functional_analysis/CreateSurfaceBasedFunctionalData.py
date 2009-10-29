@@ -98,6 +98,7 @@ def initialization( self ):
     eNode.addLink('Average.input','functional_volumes')
     eNode.addLink('Registration.source_image','intmesh')
     eNode.addLink('Registration.reference_image','Average.output')
+    
     eNode.addLink('Kernels.intmesh','intmesh')
     eNode.addLink('Kernels.resolutionX','functional_volumes',self.getResolutionX)
     eNode.addLink('Kernels.resolutionY','functional_volumes',self.getResolutionY)
@@ -120,10 +121,12 @@ def initialization( self ):
     signat[ 'source_to_reference' ] = WriteDiskItem( 'Mean Functional Volume To Anatomy Transformation', 'Transformation matrix' )
     signat[ 'reference_to_source' ] = WriteDiskItem( 'Anatomy To Mean Functional Volume Transformation', 'Transformation matrix')
     eNode.Registration.changeSignature( signat )
+    eNode.addLink('Projection.registration_transformation','Registration.source_to_reference')
     eNode.addLink('Registration.source_to_reference','intmesh')
     eNode.addLink('Registration.reference_to_source','intmesh')
     eNode.addLink('Projection.white_mesh','intmesh')
     eNode.addLink('Projection.functional_volumes','functional_volumes')
+    eNode.Projection.removeLink('kernels', 'white_mesh')
     eNode.addLink('Projection.kernels','Kernels.output')
 
     signat = copy( eNode.FusionTextures.signature )

@@ -32,36 +32,70 @@
 from neuroProcesses import *
 import shfjGlobals     
 
-name = 'Create Surface-Based Primal Sketches'
+name = 'Create Surface-Based Primal Sketch'
 userLevel = 2
 
 signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )), 
-        'surfacebased_activmaps', ListOf(ReadDiskItem('Texture', 'Texture')),
+        'surfacebased_activmap', ListOf(ReadDiskItem('Surface-Based SPMt Map', 'Texture')),
         
         
-        'primal_sketches', ListOf(WriteDiskItem( 'Graph', 'Graph')),
+        'primal_sketch', ListOf(WriteDiskItem( 'Primal Sketch', 'Graph')),
+          
+        #'texture', ReadDiskItem( 'Texture','Texture'),
+        #'white', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh'),
+        #'primalsketch', WriteDiskItem( 'Primal Sketch', 'Graph' ),
+        'tMin', Float(),
+        'tMax', Float(),
+        'whiteAux', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh')),
+        'filterout', Float(),
+        'intersectioncriterium', Integer(),
+        'latitude', ListOf(ReadDiskItem( 'Latitude coordinate texture','Texture')),
+        'longitude', ListOf(ReadDiskItem('Longitude coordinate texture','Texture'))
   )
 
 
 def initialization( self ):
-    #eNode = SerialExecutionNode( self.name, parameterized=self )
-    #self.setOptional('beta')
-    pass
-    #eNode.addChild( 'StatisticalAnalysis', ProcessExecutionNode( 'SurfaceBasedSPMtMap', optional = 1 ) )
-    #eNode.addLink('Kernels.intmesh','intmesh')
-    #eNode.addLink('Kernels.output','Projection.kernels')
-    #eNode.addLink('FusionTextures.input', 'Projection.projection_texture')
-    #eNode.addLink('Projection.white_mesh','intmesh')
-    #eNode.addLink('Projection.functional_volumes','functional_volumes')
-    #eNode.addLink('FusionTextures.output','timetexture')
-    #eNode.addLink('StatisticalAnalysis.projection_texture','FusionTextures.output')
-    #eNode.addLink('StatisticalAnalysis.spmt_texture','spmt_texture')
-    #eNode.addLink('StatisticalAnalysis.contraste', 'contraste')
-    #eNode.addLink('StatisticalAnalysis.beta', 'beta')
-    #eNode.addLink('StatisticalAnalysis.protocol_text', 'protocol_text')
-    
-    #self.setExecutionNode( eNode )
-    
+     self.setOptional('whiteAux')
+     self.linkParameters( 'surfacebased_activmap', 'intmesh' )
+     self.linkParameters( 'primal_sketch', 'intmesh' )
+     self.linkParameters( 'whiteAux', 'intmesh' )
+     self.linkParameters( 'latitude', 'intmesh' )
+     self.linkParameters( 'longitude', 'intmesh' )
+     self.tMin = 1.0
+     self.tMax = 64.0
+     self.filterout = 2.0
+     self.intersectioncriterium = 10    
     
 def execution( self, context ):
-  pass
+     scales=context.temporary( 'Texture' )
+     blobs=context.temporary( 'Texture' )
+     assert(len(self.intmesh)==len(self.surfacebased_activmap) and len(self.intmesh)==len(self.primal_sketch))
+     for i in xrange(self.intmesh):
+        call_list = [ 'AimsTexturePrimalSketch',
+                      '-t', self.surfacebased_activmap[i],
+                      '-o', self.primal_sketch[i],
+                      '-m', self.intmesh[i],
+                      '-os', scales,
+                      '-ob', blobs,
+                      '-t1', self.tMin,
+                      '-t2', self.tMax,
+          ]
+        if (self.whiteAux[i] is not None):
+          call_list += ['-mX', self.whiteAux[i]]
+        s = self.intmesh[i].get( 'subject')
+        assert(s!=None)
+        call_list += ['-sj', s]
+            
+        if (self.filterout is not ""):
+          call_list += ['-f', self.filterout]
+        if (self.latitude is not None):
+          call_list += ['-l', self.latitude]
+        if (self.longitude is not None):
+          call_list += ['-L', self.longitude]
+        if (self.intersectioncriterium is not ""):
+          call_list += ['-iP', self.intersectioncriterium]
+    
+    
+        context.write('Starting primal sketch computation for subject ' + str(i))
+        apply( context.system, call_list )
+     context.write('Finished')

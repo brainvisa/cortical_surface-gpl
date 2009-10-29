@@ -61,7 +61,7 @@ def initialization( self ):
     self.linkParameters( 'left_longitude','left_white_mesh')
     self.setOptional( 'origin_mer', 'stop_criterium', 'time_step', 'process', 'constraint_attach', 'left_latitude', 'left_longitude', 'left_white_sulci_par', 'left_white_sulci_mer','type_beta' )
     self.stop_criterium = 1e-6
-    self.time_step = 0.2
+    self.time_step = 0.1
     self.constraint_attach = 0.2
     self.origin_mer = 0
 

@@ -40,7 +40,8 @@ userLevel = 2
 signature = Signature(
       'white_mesh', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' ),
       'kernels', ReadDiskItem('Projection convolution kernels', 'GIS Image'),
-      'functional_volumes', ListOf(ReadDiskItem('4D Volume', 'BrainVISA volume formats')),
+      'functional_volumes', ListOf(ReadDiskItem('3D Volume', 'BrainVISA volume formats')),
+      'registration_transformation', ReadDiskItem('Anatomy To Mean Functional Volume Transformation', 'Transformation matrix'),
       'projection_textures', ListOf(WriteDiskItem( 'Functional Texture', 'Texture'))
 )
 
@@ -60,21 +61,38 @@ def volumemesh( values, process ):
 
 
 def initialization( self ):
+      self.setOptional('registration_transformation')
       self.linkParameters('kernels', 'white_mesh')
       self.linkParameters('projection_textures', 'functional_volumes', self.volumemesh)
       
 
 def execution( self, context ):
       i=0
+      #print self.functional_volumes[0].format
+      volumetemp= context.temporary(self.functional_volumes[0].format)
       for volume in self.functional_volumes:         
+         if (self.registration_transformation is not None):
+             context.write('Registrating ' + str(volume) + " with anatomy (tmpfile : " + str(volumetemp) +")")
+
+             regis = [ 
+              'AimsResample', 
+              '-i', volume,
+              '-m', self.registration_transformation,
+              '-t', '1',
+              '-o', volumetemp,
+             ]
+             apply(context.system, regis)
          context.write('Creating a projection texture for ' + str(volume) + "...")
          projection = [ 'AimsFunctionProjection', 
             '-m', self.white_mesh,
             '-d', self.kernels,
-            '-d1', volume,
             '-o', self.projection_textures[i],
             '-op', '1'
          ]
+         if (self.registration_transformation is not None):
+             projection += ['-d1', volumetemp]
+         else :
+             projection += ['-d1', volume]
          i=i+1
          apply( context.system, projection)
       context.write('Adding mesh info in textures .minf files..')

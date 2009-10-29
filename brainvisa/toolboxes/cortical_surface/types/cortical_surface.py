@@ -121,7 +121,9 @@ FileType( 'Labeled Functional Blobs Texture', 'Label Texture' )
 
 FileType( 'Projection convolution kernels', '4D Volume' )
 FileType( 'Functional Texture', 'Texture' )
-FileType( 'Functional Time Texture', 'Functional Texture' )
+FileType( 'Functional Time Texture', 'Texture' )
+FileType( 'Surface-Based SPMt Map', 'Texture' )
+FileType( 'Surface-Based Beta Map', 'Texture' )
 
 # Cortical thickness
 

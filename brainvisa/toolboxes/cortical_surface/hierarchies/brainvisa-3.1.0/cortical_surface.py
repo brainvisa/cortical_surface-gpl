@@ -91,7 +91,10 @@ insert( '{protocol}/{subject}/surface/',
     '<subject>_{volume}_Rwhite_proj', SetType( 'Functional Texture'), SetWeakAttr( 'side', 'right' ),
     '<subject>_{volume}_Lwhite', SetType( 'Functional Time Texture'), SetWeakAttr( 'side', 'left' ) ,
     '<subject>_{volume}_Rwhite', SetType( 'Functional Time Texture'), SetWeakAttr( 'side', 'right' ),
-          
+    '<subject>_Lwhite_spmT_{contrast}', SetType( 'Surface-Based SPMt Map'), SetWeakAttr( 'side', 'left' ) ,
+    '<subject>_Rwhite_spmT_{contrast}', SetType( 'Surface-Based SPMt Map'), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_beta_{contrast}', SetType( 'Surface-Based Beta Map'), SetWeakAttr( 'side', 'left' ) ,
+    '<subject>_Rwhite_beta_{contrast}', SetType( 'Surface-Based Beta Map'), SetWeakAttr( 'side', 'right' ),
    ),
 )
 

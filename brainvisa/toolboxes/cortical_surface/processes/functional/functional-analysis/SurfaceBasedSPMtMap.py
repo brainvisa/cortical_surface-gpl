@@ -67,9 +67,9 @@ def processtag(reader):
       return testi
 
 def streamFile(filename):
-    import libxml2
+    import xml
     try:
-        reader = libxml2.newTextReaderFilename(filename)
+        reader = xml.newTextReaderFilename(filename)
     except Exception, e:
         print e
         print "unable to open %s" % (filename)
