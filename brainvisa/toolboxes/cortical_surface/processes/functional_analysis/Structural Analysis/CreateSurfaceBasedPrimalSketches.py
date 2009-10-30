@@ -32,7 +32,7 @@
 from neuroProcesses import *
 import shfjGlobals     
 
-name = 'Create Surface-Based Primal Sketch'
+name = '2 - Create Surface-Based Primal Sketch'
 userLevel = 2
 
 signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )), 
@@ -70,7 +70,7 @@ def execution( self, context ):
      scales=context.temporary( 'Texture' )
      blobs=context.temporary( 'Texture' )
      assert(len(self.intmesh)==len(self.surfacebased_activmap) and len(self.intmesh)==len(self.primal_sketch))
-     for i in xrange(self.intmesh):
+     for i in xrange(len(self.intmesh)):
         call_list = [ 'AimsTexturePrimalSketch',
                       '-t', self.surfacebased_activmap[i],
                       '-o', self.primal_sketch[i],
@@ -89,9 +89,9 @@ def execution( self, context ):
         if (self.filterout is not ""):
           call_list += ['-f', self.filterout]
         if (self.latitude is not None):
-          call_list += ['-l', self.latitude]
+          call_list += ['-l', self.latitude[i]]
         if (self.longitude is not None):
-          call_list += ['-L', self.longitude]
+          call_list += ['-L', self.longitude[i]]
         if (self.intersectioncriterium is not ""):
           call_list += ['-iP', self.intersectioncriterium]
     

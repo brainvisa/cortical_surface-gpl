@@ -1,7 +1,7 @@
 from neuroProcesses import *
 import shfjGlobals     
 
-name = 'Perform Group Analysis'
+name = '3 - Perform Group Analysis'
 userLevel = 2
 
 signature = Signature(
@@ -16,7 +16,6 @@ signature = Signature(
   'ddh', Float(),
   'run', Boolean(),
   'save', Boolean(),
-  'valid', Boolean(),
   'energypath', ReadDiskItem('Text File', 'Text File'),
   'recuitpath', ReadDiskItem('Text File', 'Text File'))
 
@@ -30,9 +29,8 @@ def initialization( self ):
   self.intrapsweight = 4.0
   self.lsweight = 1.0
   self.ddh = 0.0001
-  self.run = False
-  self.valid = True
-  self.save = False
+  self.run = True
+  self.save = True
   
      
 
@@ -60,7 +58,6 @@ def execution( self, context ):
   '--lsw', self.lsweight,
   '--ddh', self.ddh,  
   '--run', int(self.run),
-  '--valid', int(self.valid),
   '--save', int(self.save)]
 
 

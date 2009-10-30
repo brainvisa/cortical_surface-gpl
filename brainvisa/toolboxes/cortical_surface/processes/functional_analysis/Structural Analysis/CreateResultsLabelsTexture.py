@@ -3,14 +3,14 @@ import shfjGlobals
 from soma import aims
 
 
-name = 'Create Results Labels Textures'
+name = '5 - Create Results Labels Textures'
 userLevel = 2
 
 signature = Signature(
   'labeled_primalsketches', ListOf(ReadDiskItem('Primal Sketch', 'Graph and data')),
   'meshes', ListOf(ReadDiskItem('Hemisphere White Mesh', 'MESH Mesh')),
   'textures', ListOf(WriteDiskItem('Labeled Functional Blobs Texture', 'Texture')),
-  'mode', Choice('all','more than <threshold> subjects'),
+  'mode', Choice('all','more than <threshold> subjects','over 95.% significance'),
   'threshold', Integer()  
     )
 

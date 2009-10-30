@@ -32,7 +32,7 @@
 from neuroProcesses import *
 import shfjGlobals     
 
-name = 'Create Surface-Based Statistical Parametric Maps'
+name = '1 - Create Surface-Based Statistical Parametric Maps'
 userLevel = 2
 
 signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )), 

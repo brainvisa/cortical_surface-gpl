@@ -55,14 +55,18 @@ def initialization( self ):
     eNode.addChild( 'SPMtMaps', ProcessExecutionNode( 'CreateSurfaceBasedSPMtMaps', optional = 1 ) )
     eNode.addChild( 'PrimalSketches', ProcessExecutionNode( 'CreateSurfaceBasedPrimalSketches', optional = 1 ) )
     eNode.addChild( 'GroupAnalysis', ProcessExecutionNode( 'PerformGroupAnalysis', optional = 1 ) )
+    eNode.addChild( 'Significance', ProcessExecutionNode( 'ResultsSignificance', optional = 1 ) )
     eNode.addChild( 'LabelsTexture', ProcessExecutionNode( 'CreateResultsLabelsTexture', optional = 1 ) )
     
     
     eNode.addLink('SPMtMaps.intmesh', 'intmesh')
     eNode.addLink('surfacebased_SPMt_maps', 'SPMtMaps.spmt_maps')
     eNode.addLink('PrimalSketches.intmesh', 'intmesh')
+    eNode.addLink('intmesh', 'PrimalSketches.intmesh')
     eNode.addLink('SPMtMaps.contrast', 'contrast')
+    eNode.addLink('contrast','SPMtMaps.contrast')
     eNode.addLink('SPMtMaps.contrast_name', 'contrast_name')
+    eNode.addLink('contrast_name','SPMtMaps.contrast_name')
     eNode.addLink('surfacebased_data', 'SPMtMaps.time_texture')
     eNode.addLink('primal_sketches','PrimalSketches.primal_sketch')
     eNode.addLink('GroupAnalysis.primalsketches','PrimalSketches.primal_sketch')
@@ -71,6 +75,16 @@ def initialization( self ):
     eNode.addLink('SPMtMaps.protocol_text', 'protocol_text')
     eNode.PrimalSketches.removeLink( 'surfacebased_activmap', 'intmesh' )
     eNode.addLink('PrimalSketches.surfacebased_activmap','SPMtMaps.spmt_maps')
+    eNode.addLink('Significance.ddx1', 'GroupAnalysis.ddx1')
+    eNode.addLink('Significance.ddx2', 'GroupAnalysis.ddx2')
+    eNode.addLink('Significance.simweight', 'GroupAnalysis.simweight')
+    eNode.addLink('Significance.datadrivenweight', 'GroupAnalysis.datadrivenweight')
+    eNode.addLink('Significance.intrapsweight', 'GroupAnalysis.intrapsweight')
+    eNode.addLink('Significance.lsweight', 'GroupAnalysis.lsweight')
+    eNode.addLink('Significance.ddh', 'GroupAnalysis.ddh')
+    eNode.addLink('Significance.labeled_primalsketches', 'GroupAnalysis.labeled_primalsketches')
+    
+    
 
     self.setExecutionNode( eNode )
     

@@ -63,8 +63,8 @@ FileType( 'Left hemisphere longitude texture', 'Longitude coordinate texture' )
 FileType( 'Left hemisphere latitude texture', 'Latitude coordinate texture' )
 FileType( 'Right hemisphere longitude texture', 'Longitude coordinate texture' )
 FileType( 'Right hemisphere latitude texture', 'Latitude coordinate texture' )
-FileType( 'Conformal longitude texture', 'Longitude coordinate texture' )
-FileType( 'Conformal latitude texture', 'Latitude coordinate texture' )
+FileType( 'Conformal longitude texture', 'Coordinate texture' )
+FileType( 'Conformal latitude texture', 'Coordinate texture' )
 
 
 #ATTENTION THE FOLLOWING TYPES ARE BEING ADDED FOR MY EXPERIMENTAL WORK (21.10.09 OPERTO)
@@ -117,7 +117,7 @@ FileType( 'Right Gyri Volume', '4D Volume' )
 ## Projection using convolution kernels
 FileType( 'Labeled Functional Blobs Texture', 'Label Texture' )
 
-## Projection using convolution kernels
+## Types related to surface-based functional analysis
 
 FileType( 'Projection convolution kernels', '4D Volume' )
 FileType( 'Functional Texture', 'Texture' )

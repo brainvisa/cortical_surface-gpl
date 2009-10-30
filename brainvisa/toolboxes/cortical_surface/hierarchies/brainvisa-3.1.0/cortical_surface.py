@@ -49,6 +49,8 @@ insert( '{protocol}/{subject}',
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface
     "<subject>_Rwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_labeled_primal",SetType( 'Labeled Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
+    "<subject>_Lwhite_labeled_primal",SetType( 'Labeled Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_GLB",SetType( 'Grey Level Blob Graph' ),SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_GLB",SetType( 'Grey Level Blob Graph' ),SetWeakAttr( 'side', 'left' ),
     "<subject>_Lwhite_curv_blob", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
@@ -69,7 +71,7 @@ insert( '{protocol}/{subject}',
   ),
 )
 #ATTENTION THE FOLLOWING TYPES ARE BEING ADDED FOR MY EXPERIMENTAL WORK (21.10.09 OPERTO)
-insert( '{protocol}/{subject}/t1mri/<acquisition>/<analysis>/segmentation/',
+insert( '{protocol}/{subject}/t1mri/<acquisition>/<analysis>/segmentation',
 	'mesh', SetContent(
     "<subject>_L_lat_freeSurf", SetType( 'FreeSurfer latitude texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_R_lat_freeSurf", SetType( 'FreeSurfer latitude texture' ), SetWeakAttr( 'side', 'right'),
@@ -81,8 +83,8 @@ insert( '{protocol}/{subject}/t1mri/<acquisition>/<analysis>/segmentation/',
 
 # Cortical Surface Functional-related Types
 
-insert( '{protocol}/{subject}/surface/',
-  'functional', SetContent(
+insert( '{protocol}/{subject}/surface',
+  'functional', SetDefaultAttributeValue( 'contrast', 'con' ), SetDefaultAttributeValue( 'volume', 'vol' ), SetContent(
       '<subject>_Anatomy_To_Mean_Function_Transformation', SetType( 'Anatomy To Mean Functional Volume Transformation' ),
       '<subject>_Mean_Function_To_Anatomy_Transformation', SetType( 'Mean Functional Volume To Anatomy Transformation' ),
     "<subject>_L_labels", SetType( 'Labeled Functional Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
