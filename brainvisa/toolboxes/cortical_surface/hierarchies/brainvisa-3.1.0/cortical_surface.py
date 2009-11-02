@@ -49,8 +49,8 @@ insert( '{protocol}/{subject}',
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface
     "<subject>_Rwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
-    "<subject>_Rwhite_labeled_primal",SetType( 'Labeled Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
-    "<subject>_Lwhite_labeled_primal",SetType( 'Labeled Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_labelled_primal",SetType( 'Labelled Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
+    "<subject>_Lwhite_labelled_primal",SetType( 'Labelled Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_GLB",SetType( 'Grey Level Blob Graph' ),SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_GLB",SetType( 'Grey Level Blob Graph' ),SetWeakAttr( 'side', 'left' ),
     "<subject>_Lwhite_curv_blob", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
@@ -65,20 +65,8 @@ insert( '{protocol}/{subject}',
     "<subject>_L_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_R_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_L_watOnConnectionsLengthHistoSumSup6cmNormed_and", SetType( 'Connection Density Parcels Texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_watOnConnectionsLengthHistoSumSup6cmNormed_and", SetType( 'Connection Density Parcels Texture' ), SetWeakAttr( 'side', 'right' ),
-    "<subject>_L_lon_freeSurf", SetType( 'FreeSurfer longitude texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_lon_freeSurf", SetType( 'FreeSurfer longitude texture' ), SetWeakAttr( 'side', 'right' )		        
+    "<subject>_R_watOnConnectionsLengthHistoSumSup6cmNormed_and", SetType( 'Connection Density Parcels Texture' ), SetWeakAttr( 'side', 'right' ),		        
   ),
-)
-#ATTENTION THE FOLLOWING TYPES ARE BEING ADDED FOR MY EXPERIMENTAL WORK (21.10.09 OPERTO)
-insert( '{protocol}/{subject}/t1mri/<acquisition>/<analysis>/segmentation',
-	'mesh', SetContent(
-    "<subject>_L_lat_freeSurf", SetType( 'FreeSurfer latitude texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_lat_freeSurf", SetType( 'FreeSurfer latitude texture' ), SetWeakAttr( 'side', 'right'),
-    "<subject>_Lwhite_freeSurf", SetType( 'FreeSurfer Inflated Hemisphere White Mesh' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_Rwhite_freeSurf", SetType( 'FreeSurfer Inflated Hemisphere White Mesh' ), SetWeakAttr( 'side', 'right' )
-
-        ),
 )
 
 # Cortical Surface Functional-related Types
@@ -87,8 +75,8 @@ insert( '{protocol}/{subject}/surface',
   'functional', SetDefaultAttributeValue( 'contrast', 'con' ), SetDefaultAttributeValue( 'volume', 'vol' ), SetContent(
       '<subject>_Anatomy_To_Mean_Function_Transformation', SetType( 'Anatomy To Mean Functional Volume Transformation' ),
       '<subject>_Mean_Function_To_Anatomy_Transformation', SetType( 'Mean Functional Volume To Anatomy Transformation' ),
-    "<subject>_L_labels", SetType( 'Labeled Functional Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_labels", SetType( 'Labeled Functional Blobs Texture' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_L_labels", SetType( 'Labelled Functional Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_R_labels", SetType( 'Labelled Functional Blobs Texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_{volume}_Lwhite_proj', SetType( 'Functional Texture'), SetWeakAttr( 'side', 'left' ) ,
     '<subject>_{volume}_Rwhite_proj', SetType( 'Functional Texture'), SetWeakAttr( 'side', 'right' ),
     '<subject>_{volume}_Lwhite', SetType( 'Functional Time Texture'), SetWeakAttr( 'side', 'left' ) ,
