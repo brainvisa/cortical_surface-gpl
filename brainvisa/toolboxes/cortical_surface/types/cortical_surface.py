@@ -67,11 +67,7 @@ FileType( 'Conformal longitude texture', 'Coordinate texture' )
 FileType( 'Conformal latitude texture', 'Coordinate texture' )
 
 
-#ATTENTION THE FOLLOWING TYPES ARE BEING ADDED FOR MY EXPERIMENTAL WORK (21.10.09 OPERTO)
-FileType( 'FreeSurfer longitude texture', 'Longitude coordinate texture' )
-FileType( 'FreeSurfer latitude texture', 'Latitude coordinate texture' )
-FileType( 'FreeSurfer White Mesh', 'Hemisphere White Mesh' )
-FileType( 'FreeSurfer Inflated Hemisphere White Mesh', 'Inflated Hemisphere White Mesh' )
+
 FileType( 'Connection Density Parcels Texture', 'Label Texture' )
 
 
@@ -115,7 +111,7 @@ FileType( 'Left Gyri Volume', '4D Volume' )
 FileType( 'Right Gyri Volume', '4D Volume' )
 
 ## Projection using convolution kernels
-FileType( 'Labeled Functional Blobs Texture', 'Label Texture' )
+FileType( 'Labelled Functional Blobs Texture', 'Label Texture' )
 
 ## Types related to surface-based functional analysis
 
