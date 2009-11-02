@@ -7,32 +7,33 @@ name = '5 - Create Results Labels Textures'
 userLevel = 2
 
 signature = Signature(
-  'labeled_primalsketches', ListOf(ReadDiskItem('Primal Sketch', 'Graph and data')),
+  'labelled_primalsketches', ListOf(ReadDiskItem('Primal Sketch', 'Graph and data')),
   'meshes', ListOf(ReadDiskItem('Hemisphere White Mesh', 'MESH Mesh')),
-  'textures', ListOf(WriteDiskItem('Labeled Functional Blobs Texture', 'Texture')),
+  'textures', ListOf(WriteDiskItem('Labelled Functional Blobs Texture', 'Texture')),
   'mode', Choice('all','more than <threshold> subjects','over 95.% significance'),
   'threshold', Integer()  
     )
 
 def initialization( self ):
   self.setOptional('threshold')
+  self.linkParameters("textures", "labelled_primalsketches")
   
      
 
 def execution( self, context ):
-  assert(len(self.labeled_primalsketches) == len(self.meshes))
+  assert(len(self.labelled_primalsketches) == len(self.meshes))
   assert(len(self.meshes) == len(self.textures))
   
-  for j in xrange(len(self.labeled_primalsketches)):
-    context.write(self.labeled_primalsketches[j])
+  for j in xrange(len(self.labelled_primalsketches)):
+    context.write(self.labelled_primalsketches[j])
     reader = aims.Reader()
-    graph = reader.read(str(self.labeled_primalsketches[j]))
+    graph = reader.read(str(self.labelled_primalsketches[j]))
     meshreader = aims.Reader()
     mesh = meshreader.read(str(self.meshes[j]))
 
     if (self.mode == 'all'):
-      texture = aims.TimeTexture_FLOAT(len(self.labeled_primalsketches)+1,mesh.vertex().size())
-    if (self.mode == 'more than <threshold> subjects'):
+      texture = aims.TimeTexture_FLOAT(len(self.labelled_primalsketches)+1,mesh.vertex().size())
+    elif (self.mode == 'more than <threshold> subjects' or self.mode == 'over 95.% significance'):
       texture = aims.TimeTexture_FLOAT(1,mesh.vertex().size())
     for k in xrange(texture.size()):
       for i in xrange(len(texture[k])):
@@ -51,15 +52,20 @@ def execution( self, context ):
       nodes_list = v['nodes_list']
       label = int(v['label'])
       lon = int(v['label_occur_number'])
+      signif = float(v['significance'])
       ok = 0
-      if (lon>len(self.labeled_primalsketches)):
-        lon = len(self.labeled_primalsketches)
+      if (lon>len(self.labelled_primalsketches)):
+        lon = len(self.labelled_primalsketches)
       if (self.mode == 'more than <threshold> subjects'):
         if (lon > int(self.threshold)):
           lon=0
           ok = 1
-      if (self.mode == 'all'):
+      elif (self.mode == 'all'):
         ok = 1
+      elif (self.mode == 'over 95.% significance'):
+        if (signif > 95.0):
+          lon=0
+          ok = 1
       if (ok == 1 and label>0):
         for node in nodes_list:
           texture[lon][node] =int(v['label_occur_number'])
