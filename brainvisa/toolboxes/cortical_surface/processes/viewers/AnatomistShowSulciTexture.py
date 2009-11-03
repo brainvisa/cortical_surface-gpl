@@ -52,7 +52,7 @@ def initialization( self ):
 def execution( self, context ):
   a = anatomist.Anatomist()
   if self.sulci_texture is not None \
-     and self.sulci_texture.type().isA( 'Label Texture' ):
+     and self.sulci_texture.type.isA( 'Label Texture' ):
       intp = 'rgb'
   else:
       intp = None
