@@ -32,8 +32,9 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+
 from neuroProcesses import *
-import shfjGlobals
+import shfjGlobals, csv, numpy as np
 
 name = 'Plot Curvature Connex Components'
 
@@ -45,26 +46,76 @@ signature = Signature(
     )
 
 def initialization( self ):
+  pass
 
 def execution( self, context ):
-     sujet = self.white.get( 'subject')
-     context.write(sujet)
+    sujet = self.white.get( 'subject')
+    context.write(sujet)
 
-    # on lit la texture d'espace échelle et on crée un fichier temporaire
+    # on lit la texture d'espace echelle et on cree un fichier temporaire
     scale_space = aims.read(str(self.scale_space))
-    curvature_texfile = context.temporary("Texture")
+    curvature_tmp_texfile = '/volatile/operto/testtex.tex' #context.temporary("Texture")
+    context.write( "temporary : " + str (curvature_tmp_texfile) )
+    nb_scales = scale_space.size()
+    context.write( str(nb_scales) + " scales" )
 
-    nb_scales = len(scale_space)
-    print str(nb_scales) + " scales"
 
-    # pour chaque niveau d'échelle
-    for _ in xrange(nb_scales) :
-      # on recupere la texture
-      
+    data = []
+    
+    # pour chaque niveau d'echelle
+    for scale in xrange(nb_scales) :
+
+      max_list = []
+      # on recupere la texture du niveau d'echelle courant
+      scale_texture = aims.TimeTexture_FLOAT(1,len(scale_space[scale]))
+      scale_texture[0] = scale_space[scale]
+      wtex = aims.Writer()
+      wtex.write(scale_texture, str(curvature_tmp_texfile) )
+
+
       # on calcule une carte seuillee
+      command = [ 'AimsTextureThreshold', '-i', str(curvature_tmp_texfile), '-o', str(curvature_tmp_texfile), '-m', "le", '-t', '-0.0' ]
+      apply(context.system, command)
+      context.write("seuillage realise")
 
+      # on convertit en FLOAT texture
+      command = [ 'AimsFileConvert', '-i', str(curvature_tmp_texfile), '-o', str(curvature_tmp_texfile), '-t', 'FLOAT' ]
+      apply(context.system, command)
+      context.write("conversion realisee")
+      
+      # on calcule les composantes connexes
+      command = [ 'AimsMeshConnectedComponent', '-t', str(curvature_tmp_texfile), '-i', self.white, '-o', str(curvature_tmp_texfile), '-m', '1', '-T', '0']
+      apply(context.system, command)
+      context.write("compconn realises")
+
+      # on compte combien de composantes connexes
+      compconn_texture = aims.read(str(curvature_tmp_texfile))
+      
+      label_max = 0
+      for i in xrange(len(compconn_texture[0])):
+        if (compconn_texture[0][i] > label_max):
+          label_max = compconn_texture[0][i]
+
+      context.write( "label_max : " + str (label_max) )
+      max_list.append(int(label_max))
+
+      item = []
+      item.append(scale)
+      item.extend(max_list)
+      data.append(item)      
 
     
+    csv_file = "/volatile/operto/test.csv"
+    writer = csv.writer( open(str(csv_file),'w') )
+    writer.writerows(data)
+    data = np.recfromcsv( str(csv_file) )
+    #print "test"
+    #for scale, max_list in reader:
+      #for i in max_list:
+        #print ("echelle:" + str(scale) + "max:" + str( i))
+
+      
+
      
      #call_list = [ 'surfLabelsTex2Graph',
                 #'-m', self.white,
@@ -74,7 +125,7 @@ def execution( self, context ):
                 #'--lon', self.longitude,
                 #'-s', s,
                 #'--repM', self.repMesh]
-     context.write ( "Executing process.." )
-     apply(context.system, call_list)
-     context.write('Finished')
+     #context.write ( "Executing process.." )
+     #apply(context.system, call_list)
+     #context.write('Finished')
 
