@@ -34,7 +34,10 @@
 
 
 from neuroProcesses import *
-import shfjGlobals, csv, numpy as np
+import shfjGlobals
+import csv
+import numpy as np
+import os
 
 name = 'Plot Curvature Connex Components'
 
@@ -42,7 +45,8 @@ userLevel = 3
 
 signature = Signature(
     'white', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh'),
-    'scale_space', ReadDiskItem( 'Scale Space White Curvature Texture', 'Texture')
+    'scale_space', ReadDiskItem( 'Scale Space White Curvature Texture', 'Texture'),
+    'csv_file', WriteDiskItem('Text File', 'Text File')
     )
 
 def initialization( self ):
@@ -54,61 +58,83 @@ def execution( self, context ):
 
     # on lit la texture d'espace echelle et on cree un fichier temporaire
     scale_space = aims.read(str(self.scale_space))
-    curvature_tmp_texfile = '/volatile/operto/testtex.tex' #context.temporary("Texture")
+    curvature_tmp_texfile = context.temporary("Texture")
     context.write( "temporary : " + str (curvature_tmp_texfile) )
     nb_scales = scale_space.size()
     context.write( str(nb_scales) + " scales" )
 
 
     data = []
-    
+    data.append(["scale_number", "threshold", "cc"])
     # pour chaque niveau d'echelle
-    for scale in xrange(nb_scales) :
+    for scale_number in xrange(nb_scales) :
+      context.write( "scale :" + str(scale_number) )
+      threshold = 0.0
+      label_max = 1
 
-      max_list = []
-      # on recupere la texture du niveau d'echelle courant
-      scale_texture = aims.TimeTexture_FLOAT(1,len(scale_space[scale]))
-      scale_texture[0] = scale_space[scale]
-      wtex = aims.Writer()
-      wtex.write(scale_texture, str(curvature_tmp_texfile) )
-
-
-      # on calcule une carte seuillee
-      command = [ 'AimsTextureThreshold', '-i', str(curvature_tmp_texfile), '-o', str(curvature_tmp_texfile), '-m', "le", '-t', '-0.0' ]
-      apply(context.system, command)
-      context.write("seuillage realise")
-
-      # on convertit en FLOAT texture
-      command = [ 'AimsFileConvert', '-i', str(curvature_tmp_texfile), '-o', str(curvature_tmp_texfile), '-t', 'FLOAT' ]
-      apply(context.system, command)
-      context.write("conversion realisee")
+      all_thresholds_cc_tex = []
+      iteration = 0
       
-      # on calcule les composantes connexes
-      command = [ 'AimsMeshConnectedComponent', '-t', str(curvature_tmp_texfile), '-i', self.white, '-o', str(curvature_tmp_texfile), '-m', '1', '-T', '0']
-      apply(context.system, command)
-      context.write("compconn realises")
+      while (label_max != 0):
+        
+        # on recupere la texture du niveau d'echelle courant
+        scale_texture = aims.TimeTexture_FLOAT(1,len(scale_space[scale_number]))
+        scale_texture[0] = scale_space[scale_number]
+        wtex = aims.Writer()
+        wtex.write(scale_texture, str(curvature_tmp_texfile) )
 
-      # on compte combien de composantes connexes
-      compconn_texture = aims.read(str(curvature_tmp_texfile))
-      
-      label_max = 0
-      for i in xrange(len(compconn_texture[0])):
-        if (compconn_texture[0][i] > label_max):
-          label_max = compconn_texture[0][i]
 
-      context.write( "label_max : " + str (label_max) )
-      max_list.append(int(label_max))
+        # on calcule une carte seuillee
+        command = [ 'AimsTextureThreshold', '-i', str(curvature_tmp_texfile), '-o', str(curvature_tmp_texfile), '-m', "le", '-t', str(threshold) ]
+        threshold -= 0.05
+        apply(context.system, command)
 
-      item = []
-      item.append(scale)
-      item.extend(max_list)
-      data.append(item)      
+        # on convertit en FLOAT texture
+        command = [ 'AimsFileConvert', '-i', str(curvature_tmp_texfile), '-o', str(curvature_tmp_texfile), '-t', 'FLOAT' ]
+        apply(context.system, command)
+        
+        # on calcule les composantes connexes
+        command = [ 'AimsMeshConnectedComponent', '-t', str(curvature_tmp_texfile), '-i', self.white, '-o', str(curvature_tmp_texfile), '-m', '1', '-T', '0']
+        apply(context.system, command)
+
+        ##on calcule un voronoi pour tester
+        #command = [ 'AimsTextureVoronoi', '-m', self.white, '-t', str(curvature_tmp_texfile), '-o', "/volatile/operto/voronoi.tex"]
+        #apply(context.system, command)
+
+        
+        # on compte combien de composantes connexes
+        compconn_texture = aims.read(str(curvature_tmp_texfile))
+
+        all_thresholds_cc_tex.append(compconn_texture)
+        
+        label_max = 0
+        for i in xrange(len(compconn_texture[0])):
+          if (compconn_texture[0][i] > label_max):
+            label_max = compconn_texture[0][i]
+
+        #context.write( "scale :" + str(scale_number) + " thresh : "+ str(threshold) +
+           #" label_max : " + str (label_max) )
+        
+
+        item = []
+        item.append(scale_number)
+        item.append(-threshold)
+        item.append(label_max)
+        data.append(item)
+        iteration = iteration + 1
+
+      # ecriture de la texture all thresholds cc
+      temptexture = aims.TimeTexture_FLOAT(len(all_thresholds_cc_tex), 
+         len(scale_space[scale_number]))
+      for i in xrange(len(all_thresholds_cc_tex)):
+        temptexture[i] = all_thresholds_cc_tex[i][0]
+      wtex.write(temptexture, "/volatile/operto/temp/temp_tex/%s_%i.tex" % (sujet,scale_number))
 
     
-    csv_file = "/volatile/operto/test.csv"
+    csv_file = self.csv_file
     writer = csv.writer( open(str(csv_file),'w') )
     writer.writerows(data)
-    data = np.recfromcsv( str(csv_file) )
+    #data = np.recfromcsv( str(csv_file) )
     #print "test"
     #for scale, max_list in reader:
       #for i in max_list:
