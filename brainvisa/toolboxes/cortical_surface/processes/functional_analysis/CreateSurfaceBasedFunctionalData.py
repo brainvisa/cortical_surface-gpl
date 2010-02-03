@@ -62,7 +62,7 @@ def getResolutionZ(self,data):
 def getName(self,data):
   print len(self.functional_volumes)
   if (len(self.functional_volumes) > 0 and self.intmesh is not None):
-    dial = defaultContext().dialog( 1, 'Enter a value', Signature( 'param', String() ), _t_( 'OK' ), _t_( 'Cancel' ) )
+    dial = defaultContext().dialog( 1, 'Enter a short name for the sequence to be projected - it will be included in the filenames :', Signature( 'param', String() ), _t_( 'OK' ), _t_( 'Cancel' ) )
     dial.setValue( 'param', "" )
     r = dial.call()
     if r == 0:
@@ -112,9 +112,7 @@ def initialization( self ):
 
     
     outAver = defaultContext().temporary("GIS Image")
-    
 
-    
     eNode.Average.setValue('output',outAver )
     signat = copy( eNode.Registration.signature )
     signat[ 'source_image' ] = ReadDiskItem( 'T1 MRI Bias Corrected', 'GIS Image' )
