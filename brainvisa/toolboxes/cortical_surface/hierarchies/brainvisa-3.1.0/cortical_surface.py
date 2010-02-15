@@ -45,27 +45,15 @@ insert( '{protocol}/{subject}',
     '<subject>_Rwhite_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'right', 'mesh', 'white'),
     '<subject>_Lhemi_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'left', 'mesh', 'hemi'),
     '<subject>_Rhemi_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'right', 'mesh', 'hemi'), 
+        
     ## Arnaud -> analyse de surface et structurelle -> a verifier
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface
     "<subject>_Rwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
-    "<subject>_Rwhite_labelled_primal",SetType( 'Labelled Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
-    "<subject>_Lwhite_labelled_primal",SetType( 'Labelled Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
-    "<subject>_Rwhite_GLB",SetType( 'Grey Level Blob Graph' ),SetWeakAttr( 'side', 'right' ),
-    "<subject>_Lwhite_GLB",SetType( 'Grey Level Blob Graph' ),SetWeakAttr( 'side', 'left' ),
-    "<subject>_Lwhite_curv_blob", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_Rwhite_curv_blob", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_Lwhite_curv_blobs", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_curv_blobs", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
-
-    "<subject>_L_curv_blobs", SetType( 'Curvature Blobs Texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_curv_blobs", SetType( 'Curvature Blobs Texture' ), SetWeakAttr( 'side', 'right' ),
-    "<subject>_L_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_curv_blobs", SetType( 'Curvature Blobs Graph' ), SetWeakAttr( 'side', 'right' ),
-    "<subject>_L_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_curv_flat", SetType( 'Curvature Blobs Graph Flat Map' ), SetWeakAttr( 'side', 'right' ),
-    "<subject>_L_watOnConnectionsLengthHistoSumSup6cmNormed_and", SetType( 'Connection Density Parcels Texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_R_watOnConnectionsLengthHistoSumSup6cmNormed_and", SetType( 'Connection Density Parcels Texture' ), SetWeakAttr( 'side', 'right' ),		        
   ),
 )
 

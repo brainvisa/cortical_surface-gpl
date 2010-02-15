@@ -68,8 +68,6 @@ FileType( 'Conformal latitude texture', 'Coordinate texture' )
 
 
 
-FileType( 'Connection Density Parcels Texture', 'Label Texture' )
-
 
 FileType( 'Hemisphere gyri parcellation texture', 'Gyri White Texture' )
 FileType( 'Left hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
@@ -127,9 +125,6 @@ FileType( 'Cortical thickness', 'Texture' )
 
 FileType( 'Surface Label Translation', 'Label Translation' )
 
-FileType( 'Curvature Blobs Graph', 'Graph' )
-FileType( 'Curvature Blobs Graph Flat Map', 'Mesh')
-FileType( 'Curvature Blobs Texture', 'White Curvature Texture' )
 
 # Sulci parameterizations
 
