@@ -37,12 +37,12 @@ name = '1 - Create Surface-Based Statistical Parametric Maps'
 userLevel = 2
 
 signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )), 
-        'time_texture', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
-        'protocol_text', ReadDiskItem( 'Text File', 'Text File' ),
-        'contrast', String(),
-        'contrast_name', String(),
-        'beta', ListOf(WriteDiskItem('Surface-Based Beta Map', 'Texture')),
-        'spmt_maps', ListOf(WriteDiskItem( 'Surface-Based SPMt Map', 'Texture')),
+    'time_texture', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
+    'protocol_text', ReadDiskItem( 'Text File', 'Text File' ),
+    'contrast', String(),
+    'contrast_name', String(),
+    'beta', ListOf(WriteDiskItem('Surface-Based Beta Map', 'Texture')),
+    'spmt_maps', ListOf(WriteDiskItem( 'Surface-Based SPMt Map', 'Texture')),
   )
 
 DEF_TINY = 1e-50
@@ -51,265 +51,265 @@ DEF_DOFMAX = 1e10
 models = {'spherical':['ols']}
 
 def ols(Y, X, axis=0):
-        import numpy as np
-	"""
-	beta, nvbeta, s2, dof = ols(Y, X, axis=0)
+    import numpy as np
+    """
+    beta, nvbeta, s2, dof = ols(Y, X, axis=0)
 
-        Essentially, compute pinv(X)*Y
-	"""
-	ndims = len(Y.shape)
-	pX = np.linalg.pinv(X)
-	beta = np.rollaxis(np.inner(pX, np.rollaxis(Y, axis, ndims)), 0, axis+1)
-	nvbeta = np.inner(pX, pX)
-	res = Y - np.rollaxis(np.inner(X, np.rollaxis(beta, axis, ndims)), 0, axis+1)
-	n = res.shape[axis]
-	s2 = (res**2).sum(axis) / float(n-X.shape[1])
-	dof = float(X.shape[0] - X.shape[1])
-	return beta, nvbeta, s2, dof  
+    Essentially, compute pinv(X)*Y
+    """
+    ndims = len(Y.shape)
+    pX = np.linalg.pinv(X)
+    beta = np.rollaxis(np.inner(pX, np.rollaxis(Y, axis, ndims)), 0, axis+1)
+    nvbeta = np.inner(pX, pX)
+    res = Y - np.rollaxis(np.inner(X, np.rollaxis(beta, axis, ndims)), 0, axis+1)
+    n = res.shape[axis]
+    s2 = (res**2).sum(axis) / float(n-X.shape[1])
+    dof = float(X.shape[0] - X.shape[1])
+    return beta, nvbeta, s2, dof
 
 class glm:
-	def __init__(self, Y=None, X=None, formula=None, axis=0, 
-		     model='spherical', method=None, niter=2):
+    def __init__(self, Y=None, X=None, formula=None, axis=0,
+              model='spherical', method=None, niter=2):
 
-		# Check dimensions
-		if Y == None:
-			return
-		else:
-			self.fit(Y, X, formula, axis, model, method, niter)
+        # Check dimensions
+        if Y == None:
+            return
+        else:
+            self.fit(Y, X, formula, axis, model, method, niter)
 
-	def fit(self, Y, X, formula=None, axis=0, model='spherical', method=None, niter=2):
-		
-		if Y.shape[axis] != X.shape[0]:
-			raise ValueError, 'Response and predictors are inconsistent'
-		
-		# Find model type
-		self._axis = axis
-		if isinstance(formula, str):
-			model = 'mfx'
-		if models.has_key(model):
-			self.model = model
-			if method == None: 
-				self.method = models[model][0]
-			elif models[model].count(method):
-				self.method = method
-			else: 
-				raise ValueError, 'Unknown method'
-		else:
-			raise ValueError, 'Unknown model'
-			
-		# Initialize fields
-		constants = []
-		a = 0
-		
-		# Switch on models / methods 
-		if self.model == 'spherical': 
-			constants = ['nvbeta', 'a']
-			if self.method == 'ols':
-				out = ols(Y, X, axis=axis)
-			#elif self.method == 'kalman':
-				#out = kalman.ols(Y, X, axis=axis)
-                #elif self.model == 'ar1':
-			#constants = ['a']
-			#out = kalman.ar1(Y, X, axis=axis, niter=niter)
-			#a = out[4]
-			#out = out[0:4]
-			
+    def fit(self, Y, X, formula=None, axis=0, model='spherical', method=None, niter=2):
 
-		# Finalize
-		self.beta, self.nvbeta, self.s2, self.dof = out 
-		self.s2 = self.s2.squeeze()
-		self.a = a
-		self._constants = constants
+        if Y.shape[axis] != X.shape[0]:
+            raise ValueError, 'Response and predictors are inconsistent'
 
-	"""
-	Save fit into a .npz file 
-	"""
-	def save(self, file): 
-		np.savez(file, 
-			 beta=self.beta, 
-			 nvbeta=self.nvbeta, 
-			 s2=self.s2, 
-			 dof=self.dof, 
-			 a=self.a, 
-			 model=self.model,
-			 method=self.method,
-			 axis=self._axis, 
-			 constants=self._constants)
+        # Find model type
+        self._axis = axis
+        if isinstance(formula, str):
+            model = 'mfx'
+        if models.has_key(model):
+            self.model = model
+            if method == None:
+                self.method = models[model][0]
+            elif models[model].count(method):
+                self.method = method
+            else:
+                raise ValueError, 'Unknown method'
+        else:
+            raise ValueError, 'Unknown model'
+
+        # Initialize fields
+        constants = []
+        a = 0
+
+        # Switch on models / methods
+        if self.model == 'spherical':
+            constants = ['nvbeta', 'a']
+            if self.method == 'ols':
+                out = ols(Y, X, axis=axis)
+            #elif self.method == 'kalman':
+                #out = kalman.ols(Y, X, axis=axis)
+        #elif self.model == 'ar1':
+            #constants = ['a']
+            #out = kalman.ar1(Y, X, axis=axis, niter=niter)
+            #a = out[4]
+            #out = out[0:4]
 
 
-        """
-        c must be a numpy.ndarray (or anything that numpy.asarray
-        can cast to a ndarray).
-        For a F contrast, c must be q x p where q is the number of contrast vectors and
-        p is the total number of regressors. 
-        """
-	def contrast(self, c, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
-                import numpy as np
-		c = np.asarray(c)
-		#dim = len(c.shape)
-		if c.ndim == 1:
-			dim=1
-		else:
-			dim = c.shape[0]
-		axis = self._axis
-		ndims = len(self.beta.shape)
-                
-		# Compute the contrast estimate: c*B
-		B = np.rollaxis(self.beta, axis, ndims)
-		con = np.inner(c, B) # q, X
-                
-		# Compute the variance of the contrast estimate: s2 * (c' * nvbeta * c)
-		# Two cases are considered: either the input effect variance
-		# is position-dependent (output by RKF_fit), or it is a global
-		# one (output by KF_fit)
-		s2 = self.s2.squeeze()
-		nvbeta = self.nvbeta
-		if not 'nvbeta' in self._constants: 
-			nvbeta = np.rollaxis(nvbeta, axis, ndims+1)
-			nvbeta = np.rollaxis(nvbeta, axis, ndims+1) # X, p, p
-		if dim == 1:
-			vcon = np.inner(c, np.inner(c, nvbeta))
-			vcon = vcon.squeeze()*s2
-		else: 
-			vcon = np.dot(c, np.inner(nvbeta, c)) # q, X, q or q, q
-			if not 'nvbeta' in self._constants: 
-				vcon = np.rollaxis(vcon, ndims, 1)*s2 # q, q, X
-			else:
-				aux = vcon.shape # q, q
-				vcon = np.resize(vcon, s2.shape+aux) # X, q, q
-				vcon = vcon.transpose().reshape(aux+(s2.size,))*s2.reshape((s2.size,)) # q, q, Xflat
-				vcon = vcon.reshape(aux+s2.shape) # q, q, X
-		# Create contrast instance
-		c = contrast(dim, type, tiny, dofmax)
-		c.effect = con
-		c.variance = vcon
-		c.dof = self.dof
-		return c
-                
+        # Finalize
+        self.beta, self.nvbeta, self.s2, self.dof = out
+        self.s2 = self.s2.squeeze()
+        self.a = a
+        self._constants = constants
+
+    """
+    Save fit into a .npz file
+    """
+    def save(self, file):
+        np.savez(file,
+            beta=self.beta,
+            nvbeta=self.nvbeta,
+            s2=self.s2,
+            dof=self.dof,
+            a=self.a,
+            model=self.model,
+            method=self.method,
+            axis=self._axis,
+            constants=self._constants)
+
+
+    """
+    c must be a numpy.ndarray (or anything that numpy.asarray
+    can cast to a ndarray).
+    For a F contrast, c must be q x p where q is the number of contrast vectors and
+    p is the total number of regressors.
+    """
+    def contrast(self, c, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
+        import numpy as np
+        c = np.asarray(c)
+        #dim = len(c.shape)
+        if c.ndim == 1:
+            dim=1
+        else:
+            dim = c.shape[0]
+        axis = self._axis
+        ndims = len(self.beta.shape)
+
+        # Compute the contrast estimate: c*B
+        B = np.rollaxis(self.beta, axis, ndims)
+        con = np.inner(c, B) # q, X
+
+        # Compute the variance of the contrast estimate: s2 * (c' * nvbeta * c)
+        # Two cases are considered: either the input effect variance
+        # is position-dependent (output by RKF_fit), or it is a global
+        # one (output by KF_fit)
+        s2 = self.s2.squeeze()
+        nvbeta = self.nvbeta
+        if not 'nvbeta' in self._constants:
+            nvbeta = np.rollaxis(nvbeta, axis, ndims+1)
+            nvbeta = np.rollaxis(nvbeta, axis, ndims+1) # X, p, p
+        if dim == 1:
+            vcon = np.inner(c, np.inner(c, nvbeta))
+            vcon = vcon.squeeze()*s2
+        else:
+            vcon = np.dot(c, np.inner(nvbeta, c)) # q, X, q or q, q
+            if not 'nvbeta' in self._constants:
+                vcon = np.rollaxis(vcon, ndims, 1)*s2 # q, q, X
+            else:
+                aux = vcon.shape # q, q
+                vcon = np.resize(vcon, s2.shape+aux) # X, q, q
+                vcon = vcon.transpose().reshape(aux+(s2.size,))*s2.reshape((s2.size,)) # q, q, Xflat
+                vcon = vcon.reshape(aux+s2.shape) # q, q, X
+        # Create contrast instance
+        c = contrast(dim, type, tiny, dofmax)
+        c.effect = con
+        c.variance = vcon
+        c.dof = self.dof
+        return c
+
 
 
 class contrast:
 
-	def __init__(self, dim, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
-		"""
-		tiny is a numerical constant for computations. 
-		"""
-		self.dim = dim
-		self.effect = None
-		self.variance = None
-		self.dof = None
-		if dim > 1: 
-			if type is 't':
-				type = 'F'
-		self.type = type
-		self._stat = None
-		self._pvalue = None
-		self._baseline = 0 
-		self._tiny = tiny
-		self._dofmax = dofmax
+    def __init__(self, dim, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
+        """
+        tiny is a numerical constant for computations.
+        """
+        self.dim = dim
+        self.effect = None
+        self.variance = None
+        self.dof = None
+        if dim > 1:
+            if type is 't':
+                type = 'F'
+        self.type = type
+        self._stat = None
+        self._pvalue = None
+        self._baseline = 0
+        self._tiny = tiny
+        self._dofmax = dofmax
 
-	def summary(self):
-		"""
-		Return a dictionary containing the estimated contrast effect,
-		the associated ReML-based estimation variance, and the estimated
-		degrees	of freedom (variance of the variance).
-		"""
-		return {'effect':self.effect, 'variance':self.variance, 'dof':self.dof}
-	     
-	def stat(self, baseline=0.0):
-                import numpy as np
-		"""
-		Return the decision statistic associated with the test of the
-		null hypothesis: (H0) 'contrast equals baseline'
-	        """
-		self._baseline = baseline
-		
-		# Case: one-dimensional contrast ==> t or t**2
-		if self.dim == 1: 
-			# avoids division by zero
-			t = (self.effect-baseline) / np.sqrt(np.maximum(self.variance, self._tiny)) 
-			if self.type == 'F':
-				t = t**2
-		# Unknwon stat
-		else:
-			raise ValueError, 'Unknown statistic type'
+    def summary(self):
+        """
+        Return a dictionary containing the estimated contrast effect,
+        the associated ReML-based estimation variance, and the estimated
+        degrees	of freedom (variance of the variance).
+        """
+        return {'effect':self.effect, 'variance':self.variance, 'dof':self.dof}
 
-		self._stat = t
-		return t
+    def stat(self, baseline=0.0):
+        import numpy as np
+        """
+        Return the decision statistic associated with the test of the
+        null hypothesis: (H0) 'contrast equals baseline'
+        """
+        self._baseline = baseline
+
+        # Case: one-dimensional contrast ==> t or t**2
+        if self.dim == 1:
+            # avoids division by zero
+            t = (self.effect-baseline) / np.sqrt(np.maximum(self.variance, self._tiny))
+            if self.type == 'F':
+                t = t**2
+        # Unknwon stat
+        else:
+            raise ValueError, 'Unknown statistic type'
+
+        self._stat = t
+        return t
 
 
-	def pvalue(self, baseline=0.0):
-                import scipy.stats as sps
-                import numpy as np
+    def pvalue(self, baseline=0.0):
+        import scipy.stats as sps
+        import numpy as np
 
-		"""
-		Return a parametric approximation of the p-value associated
-		with the null hypothesis: (H0) 'contrast equals baseline'
-	        """
-		if self._stat == None or not self._baseline == baseline: 
-			self._stat = self.stat(baseline)
-		# Valid conjunction as in Nichols et al, Neuroimage 25, 2005. 
-		if self.type in ['t', 'tmin']:
-			p = sps.t.sf(self._stat, np.minimum(self.dof, self._dofmax))
-		elif self.type == 'F':
-			p = sps.f.sf(self._stat, self.dim, np.minimum(self.dof, self._dofmax))
-		else:
-			raise ValueError, 'Unknown statistic type'
-		self._pvalue = p 
-		return p 
+        """
+        Return a parametric approximation of the p-value associated
+        with the null hypothesis: (H0) 'contrast equals baseline'
+        """
+        if self._stat == None or not self._baseline == baseline:
+            self._stat = self.stat(baseline)
+        # Valid conjunction as in Nichols et al, Neuroimage 25, 2005.
+        if self.type in ['t', 'tmin']:
+            p = sps.t.sf(self._stat, np.minimum(self.dof, self._dofmax))
+        elif self.type == 'F':
+            p = sps.f.sf(self._stat, self.dim, np.minimum(self.dof, self._dofmax))
+        else:
+            raise ValueError, 'Unknown statistic type'
+        self._pvalue = p
+        return p
 
-	def __add__(self, other):
-		if self.dim != other.dim:
-			return None
-		con = contrast(self.dim)
-		con.type = self.type
-		con.effect = self.effect + other.effect
-		con.variance = self.variance + other.variance
-		con.dof = self.dof + other.dof 
-		return con
+    def __add__(self, other):
+        if self.dim != other.dim:
+            return None
+        con = contrast(self.dim)
+        con.type = self.type
+        con.effect = self.effect + other.effect
+        con.variance = self.variance + other.variance
+        con.dof = self.dof + other.dof
+        return con
 
-	def __rmul__(self, other):
-		k = float(other)
-		con = contrast(self.dim)
-		con.type = self.type
-		con.effect = k * self.effect
-		con.variance = k**2 * self.variance
-		con.dof = self.dof
-		return con
+    def __rmul__(self, other):
+        k = float(other)
+        con = contrast(self.dim)
+        con.type = self.type
+        con.effect = k * self.effect
+        con.variance = k**2 * self.variance
+        con.dof = self.dof
+        return con
 
-	__mul__ = __rmul__
+    __mul__ = __rmul__
 
-	def __div__(self, other):
-		return self.__rmul__(1/float(other))
+    def __div__(self, other):
+        return self.__rmul__(1/float(other))
 
 
 
 def getContrastName(self, data):
-  if (self.contrast_name is not None and len(self.intmesh) == len(self.time_texture) and len(self.intmesh)>0):
-      result = []
-      for mesh in self.intmesh:
-         attributes = mesh.hierarchyAttributes()
-         attributes[ 'contrast' ] = str(self.contrast_name)
-         print attributes[ 'contrast' ]
-         res = self.signature[ 'spmt_maps' ].findValue( attributes )
-         print res[0]
-         result.append( res[0] )
-      return result
-  return None
-      
+    if (self.contrast_name is not None and len(self.intmesh) == len(self.time_texture) and len(self.intmesh)>0):
+        result = []
+        for mesh in self.intmesh:
+            attributes = mesh.hierarchyAttributes()
+            attributes[ 'contrast' ] = str(self.contrast_name)
+            print attributes[ 'contrast' ]
+            res = self.signature[ 'spmt_maps' ].findValue( attributes )
+            print res[0]
+            result.append( res[0] )
+        return result
+    return None
+
 def getBetaName(self, data):
-  if (self.contrast_name is not None and len(self.intmesh) == len(self.time_texture) and len(self.intmesh)>0):
-      result = []
-      for mesh in self.intmesh:
-         attributes = mesh.hierarchyAttributes()
-         attributes[ 'contrast' ] = str(self.contrast_name)
-         print attributes[ 'contrast' ]
-         res = self.signature[ 'beta' ].findValue( attributes )
-         print res[0]
-         result.append( res[0] )
-      return result
-  return None
-  
+    if (self.contrast_name is not None and len(self.intmesh) == len(self.time_texture) and len(self.intmesh)>0):
+        result = []
+        for mesh in self.intmesh:
+            attributes = mesh.hierarchyAttributes()
+            attributes[ 'contrast' ] = str(self.contrast_name)
+            print attributes[ 'contrast' ]
+            res = self.signature[ 'beta' ].findValue( attributes )
+            print res[0]
+            result.append( res[0] )
+        return result
+    return None
+
 
 def initialization( self ):
     self.setOptional('beta')
@@ -318,8 +318,8 @@ def initialization( self ):
     self.addLink('spmt_maps','contrast_name',self.getContrastName)
     self.addLink('beta','intmesh',self.getBetaName)
     self.addLink('beta','contrast_name',self.getBetaName)
-    
-    
+
+
 
 
 def LogGamma(x): 
@@ -344,126 +344,126 @@ def LogGamma(x):
     return t + math.log( stp * ( r + one ) )
 
 def gammapdf(in1, g):
-  import numpy as N
-  import math
-  terme1 = N.log(N.array(in1))* (g-1)
-  terme2 =  N.array(in1) + LogGamma(g)
-  out = terme1-terme2
-  out = N.exp(out)
-  return out
-    
+    import numpy as N
+    import math
+    terme1 = N.log(N.array(in1))* (g-1)
+    terme2 =  N.array(in1) + LogGamma(g)
+    out = terme1-terme2
+    out = N.exp(out)
+    return out
+
 def get_hrf(TR, longueur):
-   import numpy as N
-   
-   tp1 = 6.0
-   tp2 = 12.5
-   fwhm1 = 1.0
-   fwhm2 = 1.0
-   alp = .16
-   
-   dxA = N.arange(1,longueur+1,1)
-   dxA = dxA*TR
-   dxB = N.arange(1,longueur+1,1)
-   dxB = dxB*TR
-   #print dxA
-   
-   A = gammapdf(dxA, tp1)
-   B = gammapdf(dxB, tp2)
-   
-   maxA = max(A)
-   maxB = max(B)
+    import numpy as N
 
-   hf = A/maxA - alp*B/maxB
-   return hf
-  
+    tp1 = 6.0
+    tp2 = 12.5
+    fwhm1 = 1.0
+    fwhm2 = 1.0
+    alp = .16
+
+    dxA = N.arange(1,longueur+1,1)
+    dxA = dxA*TR
+    dxB = N.arange(1,longueur+1,1)
+    dxB = dxB*TR
+    #print dxA
+
+    A = gammapdf(dxA, tp1)
+    B = gammapdf(dxB, tp2)
+
+    maxA = max(A)
+    maxB = max(B)
+
+    hf = A/maxA - alp*B/maxB
+    return hf
+
 def creer_prereg(condition, maxtime, hrfduration, types, times):
-  import numpy as np
-  prereg = np.zeros(int((maxtime + hrfduration)/100), float)
-  for j in range(0,len(types)):
-     if int(types[j]) == int(condition)+1:
-        prereg[int(times[j]/100)] = 1
-  return prereg
+    import numpy as np
+    prereg = np.zeros(int((maxtime + hrfduration)/100), float)
+    for j in range(0,len(types)):
+        if int(types[j]) == int(condition)+1:
+            prereg[int(times[j]/100)] = 1
+    return prereg
 
-     
+
 def execution( self, context ):
-  assert (len(self.intmesh) == len(self.time_texture) and len(self.time_texture) == len(self.spmt_maps) and len(self.time_texture) == len(self.beta))
-  from soma import aims
-  
-  import numpy as np
-  import sys,os,imp
-  execfile(self.protocol_text.fullPath())
+    assert (len(self.intmesh) == len(self.time_texture) and len(self.time_texture) == len(self.spmt_maps) and len(self.time_texture) == len(self.beta))
+    from soma import aims
 
-  texture = aims.read(str(self.time_texture[0].fullPath()))
-  nb_nodes = int(texture[0].nItem())
-  nb_scans = int(texture.size())
- 
-  tab = np.arange(float(nb_nodes*nb_scans))
-  k=0
-  baseline = np.zeros(nb_scans)
-  
-  for i in range(0,nb_nodes):
-     for j in range(0,nb_scans):
-        tab[k] = texture[j][i]
-        k=k+1 
-        baseline[j] += texture[j][i]
-     
-  baseline /= nb_nodes
-  
-  tab = tab.reshape(nb_nodes,nb_scans)
-  print types
-  print times
-  nb_cond = types.max()
-  maxtime = times.max()
-  lentype = len(types)
-  print nb_cond
-  print maxtime
-  print lentype
-  
-  hrf = get_hrf(0.1, 250)
+    import numpy as np
+    import sys,os,imp
+    execfile(self.protocol_text.fullPath())
 
-  
-  print hrf
-  reg = np.zeros((nb_cond+1)*nb_scans, float)
-  reg = reg.reshape(nb_scans, (nb_cond+1))
-  
-  for i in range(0,nb_cond):
-     prereg = creer_prereg(i,maxtime, 250, types, times)
+    texture = aims.read(str(self.time_texture[0].fullPath()))
+    nb_nodes = int(texture[0].nItem())
+    nb_scans = int(texture.size())
 
-     hrf_aux = np.convolve(prereg,hrf)
-     
-     for j in range(0,nb_scans):
-         
+    tab = np.arange(float(nb_nodes*nb_scans))
+    k=0
+    baseline = np.zeros(nb_scans)
 
-         a = float(hrf_aux[int(j*TR)])
-         reg[j,i] = a
-   
-  reg[:,nb_cond] = baseline
+    for i in range(0,nb_nodes):
+        for j in range(0,nb_scans):
+            tab[k] = texture[j][i]
+            k=k+1
+            baseline[j] += texture[j][i]
+
+    baseline /= nb_nodes
+
+    tab = tab.reshape(nb_nodes,nb_scans)
+    print types
+    print times
+    nb_cond = types.max()
+    maxtime = times.max()
+    lentype = len(types)
+    print nb_cond
+    print maxtime
+    print lentype
+
+    hrf = get_hrf(0.1, 250)
 
 
-  data = tab
-  reg = reg
-  data= data.transpose()
+    print hrf
+    reg = np.zeros((nb_cond+1)*nb_scans, float)
+    reg = reg.reshape(nb_scans, (nb_cond+1))
 
-  print data.shape
-  print reg.shape
-  
-  m = glm(data,reg,0)
-  b = m.beta
-  v = m.s2
+    for i in range(0,nb_cond):
+        prereg = creer_prereg(i,maxtime, 250, types, times)
 
-  print self.contrast
-  c = [int(i) for i in string.split(str(self.contrast))]
-  print len(c),nb_cond
-  c.extend(np.zeros(max(nb_cond+1-len(c),0)))
-  print len(c),nb_cond
-  tcon = m.contrast(c)
+        hrf_aux = np.convolve(prereg,hrf)
 
-  tex = aims.TimeTexture_FLOAT()
-  tmap = tcon.stat()
-  tex[0] = aims.Texture_FLOAT(len(tmap))
-  for i in range(0,len(tmap)):
-     tex[0][i] = float(tmap[i])
-  print self.spmt_maps[0].fullPath()
-  aims.write(tex, self.spmt_maps[0].fullPath())
+        for j in range(0,nb_scans):
 
-  context.write("Finished")
+
+            a = float(hrf_aux[int(j*TR)])
+            reg[j,i] = a
+
+    reg[:,nb_cond] = baseline
+
+
+    data = tab
+    reg = reg
+    data= data.transpose()
+
+    print data.shape
+    print reg.shape
+
+    m = glm(data,reg,0)
+    b = m.beta
+    v = m.s2
+
+    print self.contrast
+    c = [int(i) for i in string.split(str(self.contrast))]
+    print len(c),nb_cond
+    c.extend(np.zeros(max(nb_cond+1-len(c),0)))
+    print len(c),nb_cond
+    tcon = m.contrast(c)
+
+    tex = aims.TimeTexture_FLOAT()
+    tmap = tcon.stat()
+    tex[0] = aims.Texture_FLOAT(len(tmap))
+    for i in range(0,len(tmap)):
+        tex[0][i] = float(tmap[i])
+    print self.spmt_maps[0].fullPath()
+    aims.write(tex, self.spmt_maps[0].fullPath())
+
+    context.write("Finished")
