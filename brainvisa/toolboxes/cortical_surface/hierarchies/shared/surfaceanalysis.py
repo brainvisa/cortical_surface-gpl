@@ -48,7 +48,7 @@ insert( 'hemitemplate',
   "*PoleRight", SetType( "Right Cingular Pole Template" ), 
 )
 
-insertFirst( 'models/{graph_version}', 'gyrus', SetContent(
+insertFirst( 'models/discriminative_models/{graph_version}', 'gyrus', SetContent(
     'gyri', SetType( 'Gyri Model' ),
     "*", SetType( 'Model graph' ),
   )

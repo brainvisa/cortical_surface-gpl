@@ -55,7 +55,7 @@ def initialization( self ):
     eNode.addChild( 'StatisticalAnalysis', ProcessExecutionNode( 'SurfaceBasedSPMtMap', optional = 1 ) )
     eNode.addLink('Kernels.intmesh','intmesh')
     eNode.addLink('Kernels.output','Projection.kernels')
-    eNode.addLink('FusionTextures.input', 'Projection.projection_texture')
+    eNode.addLink('FusionTextures.input', 'Projection.projection_textures')
     eNode.addLink('Projection.white_mesh','intmesh')
     eNode.addLink('Projection.functional_volumes','functional_volumes')
     eNode.addLink('FusionTextures.output','timetexture')
