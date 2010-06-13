@@ -58,8 +58,7 @@ def initialization( self ):
     self.two_windows = "No"
     self.linkParameters( 'mri_corrected', 'graph' )
     self.linkParameters( 'hemi_mesh', 'graph' )
-    #self.nomenclature = self.signature[ 'nomenclature' ].findValue( {} )
-    self.nomenclature = "/home/appli/shared-main/nomenclature/hierarchy/gyri.hie"
+    self.nomenclature = self.signature[ 'nomenclature' ].findValue( { 'filename_variable' : 'gyri' } )
 
 def execution( self, context ):
     a = anatomist.Anatomist()
@@ -77,6 +76,7 @@ def execution( self, context ):
             selfdestroy.append( anat )
     if self.hemi_mesh is not None:
         mesh = a.loadObject( self.hemi_mesh )
+        mesh.setMaterial( diffuse=[ 0.8, 0.8, 0.8, 0.4 ] )
         selfdestroy.append( mesh )
     win3 = a.createWindow( '3D' )
     win3.assignReferential( graph.referential )
