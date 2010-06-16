@@ -33,6 +33,7 @@
 from neuroProcesses import *
 import shfjGlobals
 from neuroHierarchy import databases
+import registration
 
 name = 'Gyral Parcellation'
 
@@ -42,8 +43,10 @@ signature = Signature(
     'Side', Choice("Both","Left","Right"),
     'Projection',Choice("Yes","No"),
     'Parcellation',Choice("White Matter Surface","Cortical Ribbon"),
-    'Lgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
-    'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
+    'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',
+                            requiredAttributes={ 'side': 'left' } ),
+    'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',
+                            requiredAttributes={ 'side': 'right' } ),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'aims readable volume formats' ),
     'sulcus_identification',Choice('label','name'),
     'translation',ReadDiskItem('Label Translation','Label Translation' ),
@@ -55,8 +58,8 @@ signature = Signature(
                                     shfjGlobals.aimsMeshFormats),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' ,
                                      shfjGlobals.aimsMeshFormats),
-    'left_hemi_mesh', WriteDiskItem( 'Left Hemisphere Mesh', 'aims mesh formats' ),
-    'right_hemi_mesh', WriteDiskItem( 'Right Hemisphere Mesh', 'aims mesh formats' ),
+    'left_hemi_mesh', ReadDiskItem( 'Left Hemisphere Mesh', 'aims mesh formats' ),
+    'right_hemi_mesh', ReadDiskItem( 'Right Hemisphere Mesh', 'aims mesh formats' ),
     'left_grey_white', ReadDiskItem( 'Left Grey White Mask', 'aims readable volume formats' ),
     'right_grey_white', ReadDiskItem( 'Right Grey White Mask', 'aims readable volume formats' ),
     'left_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'aims texture formats',
@@ -88,37 +91,37 @@ signature = Signature(
 )
 
 def initialization( self ):
-     self.linkParameters( 'left_white_mesh', 'Lgraph' )
-     self.linkParameters( 'left_hemi_mesh', 'Lgraph' )
-     self.linkParameters( 'Rgraph', 'Lgraph' )
-     self.linkParameters( 'mri_corrected', 'Lgraph' )
-     self.linkParameters( 'right_white_mesh', 'Rgraph' )
-     self.linkParameters( 'right_hemi_mesh', 'Rgraph' )
-     self.linkParameters( 'left_white_sulci', 'Lgraph' )
-     self.linkParameters( 'right_white_sulci', 'Rgraph' )
-     self.linkParameters( 'left_white_gyri', 'Lgraph' )
-     self.linkParameters( 'right_white_gyri', 'Rgraph' )
-     self.linkParameters( 'right_gyri_graph', 'Rgraph' )
-     self.linkParameters( 'left_gyri_graph', 'Lgraph' )
-     self.linkParameters( 'left_white_gyri_volume', 'Lgraph' )
-     self.linkParameters( 'right_white_gyri_volume', 'Rgraph' )
-     self.linkParameters( 'left_grey_white', 'Lgraph' )
-     self.linkParameters( 'right_grey_white', 'Rgraph' )
-     self.linkParameters( 'sulci_label_to_sulci_name', 'Lgraph' )
-     self.linkParameters( 'left_gyri_label_to_gyri_name', 'Lgraph' )
-     self.linkParameters( 'right_gyri_label_to_gyri_name', 'Rgraph' )
-     self.sulcus_identification = 'label'
-     self.setOptional('right_grey_white','left_grey_white', 
-                      'left_white_gyri_volume','right_white_gyri_volume', 
-                      'Rgraph', 'Lgraph',
-                      'left_white_mesh','right_white_mesh',
-                      'left_white_gyri','right_white_gyri',
-                      'left_hemi_mesh','right_hemi_mesh', 
-                      'left_gyri_graph','right_gyri_graph',
-                      'left_white_sulci','right_white_sulci' )
-     self.translation = ReadDiskItem('Label Translation','Label Translation' ).findValue( { 'filename_variable' : 'gyri' } )
-     self.gyri_model = databases.getDiskItemFromUuid( '172c4168-a9d3-dc41-464c-1226ad07c19c' )
-     self.Projection = 'Yes'
+    self.linkParameters( 'left_white_mesh', 'Lgraph' )
+    self.linkParameters( 'left_hemi_mesh', 'Lgraph' )
+    self.linkParameters( 'Rgraph', 'Lgraph' )
+    self.linkParameters( 'mri_corrected', 'Lgraph' )
+    self.linkParameters( 'right_white_mesh', 'Rgraph' )
+    self.linkParameters( 'right_hemi_mesh', 'Rgraph' )
+    self.linkParameters( 'left_white_sulci', 'Lgraph' )
+    self.linkParameters( 'right_white_sulci', 'Rgraph' )
+    self.linkParameters( 'left_white_gyri', 'Lgraph' )
+    self.linkParameters( 'right_white_gyri', 'Rgraph' )
+    self.linkParameters( 'right_gyri_graph', 'Rgraph' )
+    self.linkParameters( 'left_gyri_graph', 'Lgraph' )
+    self.linkParameters( 'left_white_gyri_volume', 'Lgraph' )
+    self.linkParameters( 'right_white_gyri_volume', 'Rgraph' )
+    self.linkParameters( 'left_grey_white', 'Lgraph' )
+    self.linkParameters( 'right_grey_white', 'Rgraph' )
+    self.linkParameters( 'sulci_label_to_sulci_name', 'Lgraph' )
+    self.linkParameters( 'left_gyri_label_to_gyri_name', 'Lgraph' )
+    self.linkParameters( 'right_gyri_label_to_gyri_name', 'Rgraph' )
+    self.sulcus_identification = 'label'
+    self.setOptional('right_grey_white','left_grey_white',
+                    'left_white_gyri_volume','right_white_gyri_volume',
+                    'Rgraph', 'Lgraph',
+                    'left_white_mesh','right_white_mesh',
+                    'left_white_gyri','right_white_gyri',
+                    'left_hemi_mesh','right_hemi_mesh',
+                    'left_gyri_graph','right_gyri_graph',
+                    'left_white_sulci','right_white_sulci' )
+    self.translation = ReadDiskItem('Label Translation','Label Translation' ).findValue( { 'filename_variable' : 'gyri' } )
+    self.gyri_model = databases.getDiskItemFromUuid( '172c4168-a9d3-dc41-464c-1226ad07c19c' )
+    self.Projection = 'Yes'
 
 def execution( self, context ): 
 
@@ -152,13 +155,18 @@ def execution( self, context ):
                 '-b', self.left_hemi_mesh.fullPath(),
                 '--sulcitraduction', self.sulci_label_to_sulci_name.fullPath() ,
                 '--gyritraduction', self.left_gyri_label_to_gyri_name.fullPath() ]
-     
-          
+
           if self.Parcellation == 'Cortical Ribbon':
-               io += ['-V',self.left_grey_white.fullPath()]
-          
+              if self.left_grey_white is None \
+                or self.left_white_gyri_volume is None:
+                raise ValueError( _t_( 'In Cortical Ribbon mode, ' \
+                'left_grey_white and left_white_gyri_volume parameters ' \
+                'are mandatory' ) )
+              io += ['-V',self.left_grey_white.fullPath()]
+
           apply( context.system, call_list+io )
-          
+          tm = registration.getTransformationManager()
+          tm.copyReferential( self.Lgraph, self.left_gyri_graph )
 
      if self.Side in ('Right','Both'):
           if ( self.Projection == 'Yes' ):
@@ -186,7 +194,13 @@ def execution( self, context ):
                 '--gyritraduction', self.right_gyri_label_to_gyri_name.fullPath() ]
 
           if self.Parcellation == 'Cortical Ribbon':
-               io += ['-V',self.right_grey_white.fullPath()]
-               
+              if self.left_grey_white is None \
+                or self.left_white_gyri_volume is None:
+                raise ValueError( _t_( 'In Cortical Ribbon mode, ' \
+                'right_grey_white and right_white_gyri_volume parameters ' \
+                'are mandatory' ) )
+              io += ['-V',self.right_grey_white.fullPath()]
+
           apply( context.system, call_list+io )
-    
+          tm = registration.getTransformationManager()
+          tm.copyReferential( self.Rgraph, self.right_gyri_graph )
