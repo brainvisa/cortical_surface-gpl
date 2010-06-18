@@ -53,6 +53,8 @@ def initialization( self ):
                     ProcessExecutionNode( 'ParameterizeHemisphereRight', optional = 1 ) )
     eNode.addChild( 'CorticalSurfaceParcellationRight',
                     ProcessExecutionNode( 'ParcellationRight', optional = 1 ) )
+    eNode.addChild( 'RegularizeParcellationRight',
+                    ProcessExecutionNode( 'GyriRegularizationRight', optional = 1 ) )
 
     eNode.addLink( 'ChangeTemplateReferentialRight.mri_corrected', 'Rgraph' )
 
@@ -84,5 +86,7 @@ def initialization( self ):
     eNode.addLink( 'CorticalSurfaceParameterizationRight.right_white_sulci_mer','ConstraintCleanerRight.right_white_sulci_mer_cleaned')
     
     eNode.addLink( 'CorticalSurfaceParcellationRight.right_longitude','CorticalSurfaceParameterizationRight.right_longitude')
+    
+    eNode.addLink( 'RegularizeParcellationRight.right_white_mesh','CorticalSurfaceParameterizationRight.right_white_mesh')
     
     self.setExecutionNode( eNode )

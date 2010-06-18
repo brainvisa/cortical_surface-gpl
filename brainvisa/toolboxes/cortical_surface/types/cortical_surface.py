@@ -72,6 +72,11 @@ FileType( 'Conformal latitude texture', 'Coordinate texture' )
 FileType( 'Hemisphere gyri parcellation texture', 'Gyri White Texture' )
 FileType( 'Left hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
 FileType( 'Right hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
+FileType( 'Left hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
+FileType( 'Right hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
+
+
+
 
 FileType( 'Coordinate grid', 'Mesh' )
 FileType( 'Left hemisphere coordinate grid', 'Coordinate grid')

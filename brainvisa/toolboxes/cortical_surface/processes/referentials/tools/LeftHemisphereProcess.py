@@ -53,6 +53,8 @@ def initialization( self ):
                     ProcessExecutionNode( 'ParameterizeHemisphereLeft', optional = 1 ) )
     eNode.addChild( 'CorticalSurfaceParcellationLeft',
                     ProcessExecutionNode( 'ParcellationLeft', optional = 1 ) )
+    eNode.addChild( 'RegularizeParcellationLeft',
+                    ProcessExecutionNode( 'GyriRegularizationLeft', optional = 1 ) )
 
     eNode.addLink( 'ChangeTemplateReferentialLeft.mri_corrected', 'Lgraph' )
     
@@ -84,5 +86,7 @@ def initialization( self ):
     eNode.addLink( 'CorticalSurfaceParameterizationLeft.left_white_sulci_mer','ConstraintCleanerLeft.left_white_sulci_mer_cleaned')
     
     eNode.addLink( 'CorticalSurfaceParcellationLeft.left_longitude','CorticalSurfaceParameterizationLeft.left_longitude')
+    
+    eNode.addLink( 'RegularizeParcellationLeft.left_white_mesh','CorticalSurfaceParameterizationLeft.left_white_mesh')
     
     self.setExecutionNode( eNode )
