@@ -55,6 +55,6 @@ def initialization( self ):
 
 def execution( self, context ):
     context.write('Right hemisphere Parcellation Regularization')
-    context.system('AimsGyriRegularization', '-m', self.right_white_mesh.fullPath() , '-i', self.right_gyri.fullPath() ,  '-o', self.right_regul_gyr.fullPath() ,  '-w', self.data_driven, '-a', '1', '-s', self.smooth )
+    context.system('AimsGyriRegularization', '-m', self.right_white_mesh.fullPath() , '-i', self.right_gyri.fullPath() ,  '-o', self.right_regul_gyri.fullPath() ,  '-w', self.data_driven, '-a', '1', '-s', self.smooth )
     context.write('Done')
      
