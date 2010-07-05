@@ -40,11 +40,11 @@ userLevel = 2
 
 signature = Signature(
     'Side', Choice("Right"),
-    'right_gyri',ReadDiskItem( 'Right hemisphere gyri parcellation texture','Texture',requiredAttributes={ 'side': 'left' } ),
+    'right_gyri',ReadDiskItem( 'Right hemisphere gyri parcellation texture','Texture',requiredAttributes={ 'side': 'right' } ),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'data_driven', Float(),
     'smooth', Integer(),
-	'right_regul_gyri',WriteDiskItem( 'Right hemisphere regularized parcellation texture', 'Texture', requiredAttributes={ 'side': 'left' } ),
+	'right_regul_gyri',WriteDiskItem( 'Right hemisphere regularized parcellation texture', 'Texture', requiredAttributes={ 'side': 'right' } ),
 )
 
 def initialization( self ):

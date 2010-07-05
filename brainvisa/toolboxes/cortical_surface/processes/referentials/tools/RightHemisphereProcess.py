@@ -86,7 +86,7 @@ def initialization( self ):
     eNode.addLink( 'CorticalSurfaceParameterizationRight.right_white_sulci_mer','ConstraintCleanerRight.right_white_sulci_mer_cleaned')
     
     eNode.addLink( 'CorticalSurfaceParcellationRight.right_longitude','CorticalSurfaceParameterizationRight.right_longitude')
-    
+        
     eNode.addLink( 'RegularizeParcellationRight.right_white_mesh','CorticalSurfaceParameterizationRight.right_white_mesh')
     
     self.setExecutionNode( eNode )
