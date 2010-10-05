@@ -33,26 +33,22 @@
 from neuroProcesses import *
 import shfjGlobals, neuroDiskItems, neuroHierarchy, neuroConfig
 
-name = 'Creation of Kernels for Volumes Projection'
+name = 'New Creation of Kernels for Volumes Projection'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
-      'intmesh', ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' ), 
-      'output', WriteDiskItem('Projection convolution kernels', 'GIS Image'),
+      'intmesh', ReadDiskItem( 'Hemisphere White Mesh', 'BrainVISA mesh formats'), 
+      'output', WriteDiskItem('Projection convolution kernels', 'BrainVISA volume formats'),
       'size', Integer(),
-      'resolutionX', Float(),
-      'resolutionY', Float(),
-      'resolutionZ', Float(),
+      'resolution', ListOf(Float()),
       'geod_decay', Float(),
       'norm_decay', Float()
 )
 def initialization( self ):
       self.linkParameters('output', 'intmesh')
       self.size = 7
-      self.resolutionX=3.0
-      self.resolutionY=3.0
-      self.resolutionZ=3.0
+      self.resolution = [3.0, 3.0, 3.0]
       self.geod_decay=5.0
       self.norm_decay=2.0
      
@@ -60,28 +56,31 @@ def initialization( self ):
 
 def execution( self, context ):
       from soma import aims
+      assert(len(self.resolution) == 3)
       context.write('Calculating the kernels...')
       projection = [ 'AimsFunctionProjection',
-         '-m', self.intmesh,
-         '-o', self.output,
-         '-i', self.size,
-         '-vx', self.resolutionX,
-         '-vy', self.resolutionY,
-         '-vz', self.resolutionZ,
-         '-g', self.geod_decay,
-         '-d', self.norm_decay,
-         '-op', '0',
-         '-t', 0
+          '-m', self.intmesh,
+          '-o', self.output,
+          '-i', self.size,
+          '-vx', self.resolution[0],
+          '-vy', self.resolution[1],
+          '-vz', self.resolution[2],
+          '-g', self.geod_decay,
+          '-d', self.norm_decay,
+          '-op', '0',
+          '-t', 0
       ]
+      context.write( projection )
       apply( context.system, projection)
+      context.write( 'Adding decay parameters in the header...' )
       reader = aims.Reader()
-      object = reader.read( str(self.output) )
+      object = reader.read ( str(self.output) )
       print 'file:', object
       h = object.header()
-      h['geod_decay']=str(self.geod_decay) 
-      h['norm_decay']=str(self.norm_decay) 
+      h['geod_decay'] = str(self.geod_decay) 
+      h['norm_decay'] = str(self.norm_decay) 
       writer = aims.Writer()
-      writer.write(object, str(self.output))
+      writer.write ( object, str(self.output) )
       context.write('Finished')
       
 
