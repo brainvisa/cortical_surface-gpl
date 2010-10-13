@@ -33,17 +33,16 @@
 from neuroProcesses import *
 import shfjGlobals
 
-name = 'Projection of Functional Volumes'
+name = 'Projection using Convolution Kernels'
 
 userLevel = 0
 
 signature = Signature(
-      #'anatomy', ReadDiskItem ( 'T1 MRI Bias Corrected', 'NIFTI-1 image'),
       'white_mesh', ReadDiskItem( 'Hemisphere White Mesh', 'BrainVISA mesh formats' ),
       'kernels', ReadDiskItem('Projection convolution kernels', 'BrainVISA volume formats'),
       'fMRI_3D_data', ReadDiskItem('4D Volume', 'NIFTI-1 image'),
       'registration_transformation', ReadDiskItem('Anatomy To Mean Functional Volume Transformation', 'Transformation matrix'),
-      'fMRI_surface_data', WriteDiskItem( 'Functional Texture', 'Texture')
+      'fMRI_surface_data', WriteDiskItem( 'Functional Time Texture', 'Texture')
 )
 
 

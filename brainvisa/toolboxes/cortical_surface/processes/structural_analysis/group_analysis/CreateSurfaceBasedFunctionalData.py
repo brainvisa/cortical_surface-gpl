@@ -34,7 +34,7 @@ from neuroProcesses import *
 import shfjGlobals     
 
 name = 'Create Surface-Based Functional Data'
-userLevel = 2
+userLevel = 0
 
 signature = Signature(  'white_mesh', ReadDiskItem( 'Hemisphere White Mesh', 'BrainVISA mesh formats' ), 
         'fmri_data', ReadDiskItem('4D Volume', 'BrainVISA volume formats'),
@@ -58,7 +58,7 @@ def getResolution( self, data):
   return [self.getResolutionX(data), self.getResolutionY(data), self.getResolutionZ(data)]
 
 
-#def getName(self,data):
+def getName(self,data):
   ##print len(self.fmri_data)
   ##if (len(self.functional_volumes) > 0 and self.intmesh is not None):
     #dial = defaultContext().dialog( 1, 'Enter a short name for the sequence to be projected - it will be included in the filenames :', Signature( 'param', String() ), _t_( 'OK' ), _t_( 'Cancel' ) )
@@ -68,10 +68,10 @@ def getResolution( self, data):
       #v = dial.getValue( 'param' )
       #print v
       #result = None
-      #attributes = self.intmesh.hierarchyAttributes()
-      #attributes[ 'volume' ] = str(v)
-      #result = self.signature[ 'timeserie_texture' ].findValue( attributes )
-      #return result
+    attributes = self.white_mesh.hierarchyAttributes()
+    attributes[ 'volume' ] = 'fMRI'
+    result = self.signature[ 'timeserie_texture' ].findValue( attributes )
+    return result
     
     #return None
 
@@ -84,6 +84,7 @@ def initialization( self ):
   
     from neuroHierarchy import databases
     from copy import copy
+    #self.signature['white_mesh']['volume'] = 'fMRI'
 
     eNode = SerialExecutionNode( self.name, parameterized=self )
     
@@ -102,12 +103,12 @@ def initialization( self ):
     eNode.addLink('Kernels.resolution','fmri_data',self.getResolution)
     #eNode.addLink('Kernels.resolutionY','functional_volumes',self.getResolutionY)
     #eNode.addLink('Kernels.resolutionZ','functional_volumes',self.getResolutionZ)
-    eNode.addLink('timeserie_texture', 'fmri_data')
-    eNode.addLink('timeserie_texture', 'white_mesh')
+    eNode.addLink('timeserie_texture', 'fmri_data', self.getName)
+    eNode.addLink('timeserie_texture', 'white_mesh', self.getName)
 
 
-    for k in  eNode.childrenNames():
-      print k
+    #for k in  eNode.childrenNames():
+      #print k
 
     
     outAver = defaultContext().temporary('Nifti-1 image')
@@ -125,6 +126,9 @@ def initialization( self ):
     eNode.addLink('Projection.fMRI_3D_data','fmri_data')
     eNode.Projection.removeLink('kernels', 'white_mesh')
     eNode.addLink('Projection.kernels','Kernels.output')
+    eNode.addLink('Projection.fMRI_3D_data','fmri_data')
+    eNode.addLink('Projection.fMRI_surface_data','timeserie_texture')
+
 
     #signat = copy( eNode.FusionTextures.signature )
     #signat[ 'output' ] = WriteDiskItem( 'Functional Time Texture', 'Texture' )

@@ -33,7 +33,7 @@
 from neuroProcesses import *
 import shfjGlobals, neuroDiskItems, neuroHierarchy, neuroConfig
 
-name = 'New Creation of Kernels for Volumes Projection'
+name = 'Creation of Kernels for fMRI data projection'
 
 userLevel = 0
 

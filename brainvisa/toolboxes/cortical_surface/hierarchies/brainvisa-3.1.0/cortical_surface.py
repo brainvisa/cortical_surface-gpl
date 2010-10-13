@@ -52,10 +52,18 @@ insert( '{protocol}/{subject}',
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface
     "<subject>_Rwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
+    "<subject>_Lwhite_primal_curv",SetType( 'Curvature Map Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_primal_curv",SetType( 'Curvature Map Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
+    "<subject>_Lwhite_primal_depth",SetType( 'Depth Map Primal Sketch' ),SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_primal_depth",SetType( 'Depth Map Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_curv_blobs", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_curv_blobs", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_Lwhite_depth_blobs", SetType( 'Blob White Depth Texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_depth_blobs", SetType( 'Blob White Depth Texture' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_Lwhite_depth_ss", SetType( 'Scale Space White Depth Texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_depth_ss", SetType( 'Scale Space White Depth Texture' ), SetWeakAttr( 'side', 'right' ),
   ),
 )
 
