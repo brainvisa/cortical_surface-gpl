@@ -63,7 +63,7 @@ insert( '{protocol}/{subject}',
     "<subject>_Lwhite_depth_blobs", SetType( 'Blob White Depth Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_depth_blobs", SetType( 'Blob White Depth Texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_depth_ss", SetType( 'Scale Space White Depth Texture' ), SetWeakAttr( 'side', 'left' ),
-    "<subject>_Rwhite_depth_ss", SetType( 'Scale Space White Depth Texture' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_Rwhite_depth_ss", SetType( 'Scale Space White Depth Texture' ), SetWeakAttr( 'side', 'right' ),    
   ),
 )
 
