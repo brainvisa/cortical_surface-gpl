@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -123,7 +124,7 @@ def initialization( self ):
     eNode.addLink('Registration.source_to_reference', 'white_mesh')
     eNode.addLink('Registration.reference_to_source', 'white_mesh')
     eNode.addLink('Projection.white_mesh','white_mesh')
-    eNode.addLink('Projection.fMRI_3D_data','fmri_data')
+    eNode.addLink('Projection.fMRI_4D_data','fmri_data')
     eNode.Projection.removeLink('kernels', 'white_mesh')
     eNode.addLink('Projection.kernels','Kernels.output')
     eNode.addLink('Projection.fMRI_3D_data','fmri_data')
