@@ -54,13 +54,13 @@ def initialization ( self ):
 
 def execution( self, context ):
 
-      context.write ( volume_path )
+      context.write ( self.fMRI_4D_data )
 
       projection = [ 
       'AimsFunctionProjection', 
       '-op', '1',
       '-d', self.kernels.fullPath(),
-      '-d1', volume_path,
+      '-d1', self.fMRI_4D_data.fullPath(),
       '-m', self.white_mesh.fullPath(),
       '-o', self.fMRI_surface_data.fullPath()
       ]
