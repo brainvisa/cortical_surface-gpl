@@ -42,13 +42,11 @@ signature = Signature(
       'white_mesh', ReadDiskItem( 'Hemisphere White Mesh', 'BrainVISA mesh formats' ),
       'kernels', ReadDiskItem('Projection convolution kernels', 'BrainVISA volume formats'),
       'fMRI_4D_data', ReadDiskItem('4D Volume', 'BrainVISA volume formats'),
-      'registration_transformation', ReadDiskItem('Anatomy To Mean Functional Volume Transformation', 'Transformation matrix'),
       'fMRI_surface_data', WriteDiskItem( 'Functional Time Texture', 'Texture')
 )
 
 
 def initialization ( self ):
-      self.setOptional('registration_transformation')
       #self.linkParameters('white_mesh', 'anatomy')
 
       self.linkParameters('kernels', 'white_mesh')
@@ -56,26 +54,6 @@ def initialization ( self ):
 
 def execution( self, context ):
 
-      
-  
-      if (self.registration_transformation is not None):
-	  volume_path = context.temporary( 'NIFTI-1 image' )
-          context.write('Registrating ' + str(self.fMRI_4D_data.fullPath()) + " with anatomy (tmpfile : " + str(volume_path) +")")
-  
-          regis = [ 
-          'AimsResample', 
-          '-i', self.fMRI_4D_data.fullPath(),
-          '-m', self.registration_transformation,
-          '-t', '1',
-          '-o', volume_path,
-          ]
-          apply(context.system, regis)
-      else :
-          volume_path = self.fMRI_4D_data.fullPath() 
-      
-      #from soma import aims
-      #import numpy as np
-      
       context.write ( volume_path )
 
       projection = [ 

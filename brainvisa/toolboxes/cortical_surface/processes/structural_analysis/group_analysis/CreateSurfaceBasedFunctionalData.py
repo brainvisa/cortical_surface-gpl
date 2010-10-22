@@ -42,101 +42,67 @@ signature = Signature(  'white_mesh', ReadDiskItem( 'Hemisphere White Mesh', 'Br
         'timeserie_texture', WriteDiskItem('Functional Time Texture', 'Texture'),
   )
 
-def getResolutionX(self,data):
-  voxel_size  = data['voxel_size']
-  return voxel_size[0]
-
-def getResolutionY(self,data):
-
-    voxel_size  = data['voxel_size']
-    return voxel_size[1]
-
-def getResolutionZ(self,data):
-    voxel_size  = data['voxel_size']
-    return voxel_size[2]
-
 def getResolution( self, data):
-  return [self.getResolutionX(data), self.getResolutionY(data), self.getResolutionZ(data)]
+  voxel_size  = data['voxel_size']
+  return [voxel_size[0:3]]
 
 
 def getName(self,data):
-  ##print len(self.fmri_data)
-  ##if (len(self.functional_volumes) > 0 and self.intmesh is not None):
-    #dial = defaultContext().dialog( 1, 'Enter a short name for the sequence to be projected - it will be included in the filenames :', Signature( 'param', String() ), _t_( 'OK' ), _t_( 'Cancel' ) )
-    #dial.setValue( 'param', "" )
-    #r = dial.call()
-    #if r == 0:
-      #v = dial.getValue( 'param' )
-      #print v
-      #result = None
+
     attributes = self.white_mesh.hierarchyAttributes()
     attributes[ 'volume' ] = 'fMRI'
     result = self.signature[ 'timeserie_texture' ].findValue( attributes )
     return result
-    
-    #return None
-
-
-
 
 def initialization( self ):
-  
-  
-  
     from neuroHierarchy import databases
     from copy import copy
-    #self.signature['white_mesh']['volume'] = 'fMRI'
 
-    eNode = SerialExecutionNode( self.name, parameterized=self )
+    eNode = SerialExecutionNode( self.name, parameterized = self )
     
     eNode.addChild( 'Average', ProcessExecutionNode( 'AverageVolumes', optional = 1 ) )
     eNode.addChild( 'Registration', ProcessExecutionNode( 'Register3DMutualInformation', optional = 1 ) )
+    eNode.addChild( 'MeshTransform', ProcessExecutionNode( 'ApplyTransformationToMesh', optional = 1 ) )
 
     eNode.addChild( 'Kernels', ProcessExecutionNode( 'CreateKernels', optional = 1 ) )
     eNode.addChild( 'Projection', ProcessExecutionNode( 'ProjectionUsingKernels', optional = 1 ) )
-    #eNode.addChild( 'FusionTextures', ProcessExecutionNode( 'TexturesAsTimeTexture', optional = 1 ) )
-
     eNode.addLink('Average.input','fmri_data')
     eNode.addLink('Registration.source_image','white_mesh')
     eNode.addLink('Registration.reference_image','Average.output')
-    
+    eNode.addLink('MeshTransform.input','white_mesh')
     eNode.addLink('Kernels.intmesh','white_mesh')
     eNode.addLink('Kernels.resolution','fmri_data',self.getResolution)
-    #eNode.addLink('Kernels.resolutionY','functional_volumes',self.getResolutionY)
-    #eNode.addLink('Kernels.resolutionZ','functional_volumes',self.getResolutionZ)
     eNode.addLink('timeserie_texture', 'fmri_data', self.getName)
     eNode.addLink('timeserie_texture', 'white_mesh', self.getName)
-
-
-    #for k in  eNode.childrenNames():
-      #print k
-
     
     outAver = defaultContext().temporary('Nifti-1 image')
+    outTransform = defaultContext().temporary('MESH mesh')
+    eNode.Average.setValue('output', outAver )
 
-    eNode.Average.setValue('output',outAver )
+
     signat = copy( eNode.Registration.signature )
     signat[ 'source_image' ] = ReadDiskItem( 'T1 MRI Bias Corrected', 'BrainVISA volume formats' )
     signat[ 'source_to_reference' ] = WriteDiskItem( 'Mean Functional Volume To Anatomy Transformation', 'Transformation matrix' )
     signat[ 'reference_to_source' ] = WriteDiskItem( 'Anatomy To Mean Functional Volume Transformation', 'Transformation matrix')
     eNode.Registration.changeSignature( signat )
-    eNode.addLink('Projection.registration_transformation','Registration.source_to_reference')
+
+    eNode.addLink('Projection.white_mesh', 'MeshTransform.output')
+
+    eNode.MeshTransform.setValue('output', outTransform)
+    eNode.Projection.setValue('white_mesh', outTransform)
+    eNode.addLink('MeshTransform.transformation','Registration.source_to_reference')
     eNode.addLink('Registration.source_to_reference', 'white_mesh')
     eNode.addLink('Registration.reference_to_source', 'white_mesh')
-    eNode.addLink('Projection.white_mesh','white_mesh')
-    eNode.addLink('Projection.fMRI_4D_data','fmri_data')
+
     eNode.Projection.removeLink('kernels', 'white_mesh')
+
+    #eNode.Projection.removeLink('fmri', 'white_mesh')
+    
+
     eNode.addLink('Projection.kernels','Kernels.output')
-    eNode.addLink('Projection.fMRI_3D_data','fmri_data')
+    eNode.addLink('Projection.fMRI_4D_data','fmri_data')
+
     eNode.addLink('Projection.fMRI_surface_data','timeserie_texture')
-
-
-    #signat = copy( eNode.FusionTextures.signature )
-    #signat[ 'output' ] = WriteDiskItem( 'Functional Time Texture', 'Texture' )
-    #eNode.FusionTextures.changeSignature( signat )
-    #eNode.addLink('FusionTextures.input','Projection.projection_textures')
-    #eNode.addLink('FusionTextures.output','timetexture')
-
 
     self.setExecutionNode( eNode )
 
