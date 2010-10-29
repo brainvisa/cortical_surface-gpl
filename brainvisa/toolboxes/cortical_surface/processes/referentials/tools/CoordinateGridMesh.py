@@ -44,14 +44,15 @@ signature = Signature(
     'latitude', ReadDiskItem( 'Latitude coordinate texture','Texture'),
     'longitude', ReadDiskItem( 'Longitude coordinate texture','Texture'),
     'grid', WriteDiskItem( 'Coordinate grid', 'MESH mesh' ),
-    'mode', Choice('Constraints', 'Regular', 'Sulcus')
+    'mode', Choice('Constraints', 'Regular', 'Sulcus'),
+    'tube_size', Float()
     )
 
 def initialization( self ):
   self.linkParameters( 'latitude', 'mesh' )
   self.linkParameters( 'longitude', 'mesh' )
   self.linkParameters( 'grid', 'mesh' )
-  
+  self.tube_size=0.25
   
   
   
@@ -63,7 +64,8 @@ def execution( self, context ):
                 '-m', self.mesh,
                 '-x', self.latitude,
                 '-y', self.longitude,
-                '-o', self.grid]
+                '-o', self.grid,
+                '-d', self.tube_size]
                 #'-c', "c" ]
   if (self.mode == "Constraints"):
     command += ['-c', 'c']     
