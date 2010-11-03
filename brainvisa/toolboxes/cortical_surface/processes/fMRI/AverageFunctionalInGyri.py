@@ -43,14 +43,17 @@ userLevel = 1
 signature = Signature(
      'GyriTexture', ReadDiskItem( 'Texture', 'Texture' ), 
      'FunctionalTexture',ReadDiskItem( 'Texture', 'Texture' ),
-     'ResultTextFile', WriteDiskItem( 'Text File', 'Text File')
+#     'ResultTextFile', WriteDiskItem( 'Text File', 'Text File')
 )
 
 def initialization( self ):
-
+     pass
+     
 def execution( self, context ): 
+     nameOut='%s_gyri.txt' %(self.FunctionalTexture.fullName())
+     context.write('The results will be written in ',nameOut)
      readerF = aims.Reader()
-     texF=readerF.read(str(self.Functionaltexture) )
+     texF=readerF.read(str(self.FunctionalTexture) )
 
      ni=texF.nItem()
      nt=texF.header()['nb_t_pos']
@@ -66,11 +69,13 @@ def execution( self, context ):
      gyri=array(gyriTex[0])
      nlab=gyri.max()
 
-     fileO=open(str(self.ResultTextFile) ,'w')
+     fileO=open(nameOut ,'w')
+#     fileO=open(str(self.ResultTextFile) ,'w')
      for i in range(0, int(nlab+1)):
           gyrus=matT[where( gyri==i )]
           if (gyrus.size != 0):
-               print str(i)+' '
+               #print str(i)+' '
+               context.write(str(i))
                meanG=mean(gyrus, axis=0)
                fileO.write(str(i)+'\n')
                sig = ""
