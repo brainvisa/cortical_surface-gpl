@@ -311,12 +311,12 @@ def getBetaName(self, data):
     return None
 
 def initialization( self ):
-    self.setOptional ( 'beta_maps' )
+    #self.setOptional ( 'beta_maps' )
     self.linkParameters ( 'BOLD_textures', 'meshes' )
-    self.addLink ( 'spmt_maps', 'meshes', self.getContrastName )
-    self.addLink ( 'spmt_maps', 'contrast_name', self.getContrastName )
-    self.addLink ( 'beta_maps', 'meshes', self.getBetaName )
-    self.addLink ( 'beta_maps', 'contrast_name', self.getBetaName )
+    #self.addLink ( 'spmt_maps', 'meshes', self.getContrastName )
+    #self.addLink ( 'spmt_maps', 'contrast_name', self.getContrastName )
+    #self.addLink ( 'beta_maps', 'meshes', self.getBetaName )
+    #self.addLink ( 'beta_maps', 'contrast_name', self.getBetaName )
 
 def LogGamma(x): 
     import math
@@ -393,82 +393,91 @@ def get_prereg ( condition, hrfduration, types, times ):
 
 
 def execution( self, context ):
-    assert (len(self.meshes) == len(self.BOLD_textures) and len(self.BOLD_textures) == len(self.spmt_maps) and len(self.BOLD_textures) == len(self.beta))
+    assert (len(self.meshes) == len(self.BOLD_textures) and len(self.BOLD_textures) == len(self.spmt_maps) and len(self.BOLD_textures) == len(self.beta_maps))
     from soma import aims
 
     import numpy as np
     import sys, os, imp
-    execfile ( self.protocol_text.fullPath(), globals = globals(), locals = locals() )
+    execfile ( self.protocol_text.fullPath(), locals(), globals() )
+    context.write ( 'TR:', TR )
+    context.write ( 'times:', times )
+    context.write ( 'types:', types )
 
-    texture = aims.read( str(self.BOLD_textures[0].fullPath() ) )
-    nb_nodes = int ( texture[0].nItem() )
-    nb_scans = int ( texture.size() )
+    for index in xrange (len(self.meshes) ) :
+        print 'texture number ', index
+        meshpath = self.meshes[index].fullPath()
+        boldtexpath = self.BOLD_textures[index].fullPath()
+        betapath = self.beta_maps[index].fullPath()
+        spmtpath = self.spmt_maps[index].fullPath()
 
-    tab = np.arange ( float ( nb_nodes * nb_scans ) )
-    k = 0
-    baseline = np.zeros ( nb_scans )
+        texture = aims.read( str( boldtexpath ) )
+        nb_nodes = int ( texture[0].nItem() )
+        nb_scans = int ( texture.size() )
 
-    for i in range ( 0, nb_nodes ) :
-        for j in range ( 0, nb_scans ) :
-            tab[k] = texture[j][i]
-            k = k + 1
-            baseline[j] += texture[j][i]
+        tab = np.arange ( float ( nb_nodes * nb_scans ) )
+        k = 0
+        baseline = np.zeros ( nb_scans )
 
-    baseline /= nb_nodes
+        for i in range ( 0, nb_nodes ) :
+            for j in range ( 0, nb_scans ) :
+                tab[k] = texture[j][i]
+                k = k + 1
+                baseline[j] += texture[j][i]
 
-    tab = tab.reshape ( nb_nodes, nb_scans )
-    print types
-    print times
-    nb_cond = types.max()
-    lentype = len(types)
-    print nb_cond
-    print lentype
-    sampling_rate = 0.1
-    number_of_samples = 250
+        baseline /= nb_nodes
 
-    hrf = get_hrf ( sampling_rate, number_of_samples )
+        tab = tab.reshape ( nb_nodes, nb_scans )
+        print types
+        print times
+        nb_cond = types.max()
+        lentype = len(types)
+        print nb_cond
+        print lentype
+        sampling_rate = 0.1
+        number_of_samples = 250
+        
 
-    reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float )
-    reg = reg.reshape ( nb_scans, ( nb_cond + 1 ) )
+        hrf = get_hrf ( sampling_rate, number_of_samples )
 
-    for condition_index in xrange ( nb_cond ):
-        prereg = get_prereg ( condition_index, number_of_samples, types, times )
-        hrf_aux = np.convolve(prereg,hrf)
-        for j in xrange ( nb_scans ):
-            a = float ( hrf_aux [ int ( j * TR ) ] )
-            reg[j, i] = a
+        reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float )
+        reg = reg.reshape ( nb_scans, ( nb_cond + 1 ) )
 
-    reg[:,nb_cond] = baseline
+        for condition_index in xrange ( nb_cond ):
+            prereg = get_prereg ( condition_index, number_of_samples, types, times )
+            hrf_aux = np.convolve(prereg,hrf)
+            for j in xrange ( nb_scans ):
+                a = float ( hrf_aux [ int ( j * (TR/sampling_rate) ) ] )
+                reg[j, condition_index] = a
 
-    data = tab
-    reg = reg
-    data = data.transpose()
+        reg[:,nb_cond] = baseline
 
-    print data.shape
-    print reg.shape
+        data = tab
+        reg = reg
+        data = data.transpose()
 
-    m = glm ( data, reg, 0 )
-    v = m.s2
-    b = m.beta
-    tex = aims.TimeTexture_FLOAT()    
-    tex[0] = aims.Texture_FLOAT ( len(beta) )
-    for i in xrange( len(beta) ):
-        tex[0][i] = float( beta[i] )
-    aims.write ( tex, self.beta_maps.fullPath() )
+        print data.shape
+        print reg.shape
 
-    print self.contrast
-    c = [int(i) for i in string.split(str(self.contrast))]
-    print len(c),nb_cond
-    c.extend ( np.zeros ( max( nb_cond + 1 - len(c), 0 ) ) )
-    print len(c), nb_cond
-    tcon = m.contrast(c)
+        m = glm ( data, reg, 0 )
+        v = m.s2
+        b = m.beta
+        tex = aims.TimeTexture_FLOAT()
+        t = tex[0]
+        t.assign(b)
+        aims.write ( tex, betapath )
 
-    tex = aims.TimeTexture_FLOAT()
-    tmap = tcon.stat()
-    tex[0] = aims.Texture_FLOAT ( len(tmap) )
-    for i in xrange( len(tmap) ):
-        tex[0][i] = float( tmap[i] )
+        print self.contrast
+        c = [int(i) for i in string.split(str(self.contrast))]
+        print len(c), nb_cond
+        c.extend ( np.zeros ( max( nb_cond + 1 - len(c), 0 ) ) )
+        print len(c), nb_cond
+        tcon = m.contrast(c)
 
-    print self.spmt_maps.fullPath()
-    aims.write ( tex, self.spmt_maps.fullPath() )
-    context.write("Finished")
+        tex = aims.TimeTexture_FLOAT()
+        tmap = tcon.stat()
+        t = tex[0]
+        t.assign( tmap )
+
+        #print spmtpath
+        aims.write ( tex, spmtpath )
+        context.write("Finished")

@@ -59,7 +59,7 @@ def initialization( self ):
     eNode.addChild( 'LabelsTexture', ProcessExecutionNode( 'CreateResultsLabelsTexture', optional = 1 ) )
     
     
-    eNode.addLink('SPMtMaps.intmesh', 'intmesh')
+    eNode.addLink('SPMtMaps.meshes', 'intmesh')
     eNode.addLink('surfacebased_SPMt_maps', 'SPMtMaps.spmt_maps')
     eNode.addLink('PrimalSketches.intmesh', 'intmesh')
     eNode.addLink('intmesh', 'PrimalSketches.intmesh')
@@ -67,7 +67,7 @@ def initialization( self ):
     eNode.addLink('contrast','SPMtMaps.contrast')
     eNode.addLink('SPMtMaps.contrast_name', 'contrast_name')
     eNode.addLink('contrast_name','SPMtMaps.contrast_name')
-    eNode.addLink('surfacebased_data', 'SPMtMaps.time_texture')
+    eNode.addLink('surfacebased_data', 'SPMtMaps.BOLD_textures')
     eNode.addLink('primal_sketches','PrimalSketches.primal_sketch')
     eNode.addLink('GroupAnalysis.primalsketches','PrimalSketches.primal_sketch')
     eNode.addLink('GroupAnalysis.labeled_primalsketches','PrimalSketches.primal_sketch')
