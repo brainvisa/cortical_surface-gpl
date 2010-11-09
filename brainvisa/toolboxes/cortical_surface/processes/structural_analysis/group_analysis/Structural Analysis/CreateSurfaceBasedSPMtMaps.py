@@ -36,12 +36,12 @@ import shfjGlobals
 name = '1 - Create Surface-Based Statistical Parametric Maps'
 userLevel = 2
 
-signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )), 
-    'time_texture', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
+signature = Signature(  'meshes', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )),
+    'BOLD_textures', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
     'protocol_text', ReadDiskItem( 'Text File', 'Text File' ),
     'contrast', String(),
     'contrast_name', String(),
-    'beta', ListOf(WriteDiskItem('Surface-Based Beta Map', 'Texture')),
+    'beta_maps', ListOf(WriteDiskItem('Surface-Based Beta Map', 'Texture')),
     'spmt_maps', ListOf(WriteDiskItem( 'Surface-Based SPMt Map', 'Texture')),
   )
 
@@ -285,9 +285,9 @@ class contrast:
 
 
 def getContrastName(self, data):
-    if (self.contrast_name is not None and len(self.intmesh) == len(self.time_texture) and len(self.intmesh)>0):
+    if (self.contrast_name is not None and len(self.meshes) == len(self.BOLD_textures) and len(self.meshes)>0):
         result = []
-        for mesh in self.intmesh:
+        for mesh in self.meshes:
             attributes = mesh.hierarchyAttributes()
             attributes[ 'contrast' ] = str(self.contrast_name)
             print attributes[ 'contrast' ]
@@ -298,9 +298,9 @@ def getContrastName(self, data):
     return None
 
 def getBetaName(self, data):
-    if (self.contrast_name is not None and len(self.intmesh) == len(self.time_texture) and len(self.intmesh)>0):
+    if (self.contrast_name is not None and len(self.meshes) == len(self.BOLD_textures) and len(self.meshes)>0):
         result = []
-        for mesh in self.intmesh:
+        for mesh in self.meshes:
             attributes = mesh.hierarchyAttributes()
             attributes[ 'contrast' ] = str(self.contrast_name)
             print attributes[ 'contrast' ]
@@ -310,17 +310,13 @@ def getBetaName(self, data):
         return result
     return None
 
-
 def initialization( self ):
-    self.setOptional('beta')
-    self.linkParameters('time_texture','intmesh')
-    self.addLink('spmt_maps','intmesh',self.getContrastName)
-    self.addLink('spmt_maps','contrast_name',self.getContrastName)
-    self.addLink('beta','intmesh',self.getBetaName)
-    self.addLink('beta','contrast_name',self.getBetaName)
-
-
-
+    self.setOptional ( 'beta_maps' )
+    self.linkParameters ( 'BOLD_textures', 'meshes' )
+    self.addLink ( 'spmt_maps', 'meshes', self.getContrastName )
+    self.addLink ( 'spmt_maps', 'contrast_name', self.getContrastName )
+    self.addLink ( 'beta_maps', 'meshes', self.getBetaName )
+    self.addLink ( 'beta_maps', 'contrast_name', self.getBetaName )
 
 def LogGamma(x): 
     import math
@@ -343,7 +339,7 @@ def LogGamma(x):
     t = ( x - half ) * math.log( s ) - s
     return t + math.log( stp * ( r + one ) )
 
-def gammapdf(in1, g):
+def gammapdf ( in1, g ):
     import numpy as N
     import math
     terme1 = N.log(N.array(in1))* (g-1)
@@ -352,7 +348,12 @@ def gammapdf(in1, g):
     out = N.exp(out)
     return out
 
-def get_hrf(TR, longueur):
+def get_hrf ( sampling_rate, number_of_samples ):
+    ''' get_hrf returns an array with estimated samples of a canonic Haemodynamic
+        Response Function (HRF)
+        sampling_rate is the time interval between two samples
+        number_of_samples is the size of the output array, hence allowing to tune the
+            time of sampling'''
     import numpy as N
 
     tp1 = 6.0
@@ -361,109 +362,113 @@ def get_hrf(TR, longueur):
     fwhm2 = 1.0
     alp = .16
 
-    dxA = N.arange(1,longueur+1,1)
-    dxA = dxA*TR
-    dxB = N.arange(1,longueur+1,1)
-    dxB = dxB*TR
-    #print dxA
+    dxA = N.arange ( 1, number_of_samples + 1, 1 )
+    dxA = dxA * sampling_rate
+    dxB = N.arange ( 1, number_of_samples + 1, 1 )
+    dxB = dxB * sampling_rate
 
-    A = gammapdf(dxA, tp1)
-    B = gammapdf(dxB, tp2)
+    A = gammapdf ( dxA, tp1 )
+    B = gammapdf ( dxB, tp2 )
 
-    maxA = max(A)
-    maxB = max(B)
+    maxA = max ( A )
+    maxB = max ( B )
 
-    hf = A/maxA - alp*B/maxB
+    hf = A / maxA - alp * B / maxB
     return hf
 
-def creer_prereg(condition, maxtime, hrfduration, types, times):
+def get_prereg ( condition, hrfduration, types, times ):
+    ''' builds and returns a pre-version of regressor according to :
+        - condition : a given condition index
+        - hrfduration : a number_of at which the HRF is supposed to be back to zero after the last onset
+        - types : the sequence of stimulations, by types
+        - times : the sequence of stimulations, by times'''            
+
     import numpy as np
-    prereg = np.zeros(int((maxtime + hrfduration)/100), float)
-    for j in range(0,len(types)):
-        if int(types[j]) == int(condition)+1:
-            prereg[int(times[j]/100)] = 1
+    maxtime = times.max()
+    prereg = np.zeros ( int ( ( maxtime + hrfduration ) / 100 ), float )
+    for j in range ( 0, len(types) ):
+        if int(types[j]) == int(condition) + 1:
+            prereg [int(times[j]/100)] = 1
     return prereg
 
 
 def execution( self, context ):
-    assert (len(self.intmesh) == len(self.time_texture) and len(self.time_texture) == len(self.spmt_maps) and len(self.time_texture) == len(self.beta))
+    assert (len(self.meshes) == len(self.BOLD_textures) and len(self.BOLD_textures) == len(self.spmt_maps) and len(self.BOLD_textures) == len(self.beta))
     from soma import aims
 
     import numpy as np
-    import sys,os,imp
-    execfile(self.protocol_text.fullPath())
+    import sys, os, imp
+    execfile ( self.protocol_text.fullPath(), globals = globals(), locals = locals() )
 
-    texture = aims.read(str(self.time_texture[0].fullPath()))
-    nb_nodes = int(texture[0].nItem())
-    nb_scans = int(texture.size())
+    texture = aims.read( str(self.BOLD_textures[0].fullPath() ) )
+    nb_nodes = int ( texture[0].nItem() )
+    nb_scans = int ( texture.size() )
 
-    tab = np.arange(float(nb_nodes*nb_scans))
-    k=0
-    baseline = np.zeros(nb_scans)
+    tab = np.arange ( float ( nb_nodes * nb_scans ) )
+    k = 0
+    baseline = np.zeros ( nb_scans )
 
-    for i in range(0,nb_nodes):
-        for j in range(0,nb_scans):
+    for i in range ( 0, nb_nodes ) :
+        for j in range ( 0, nb_scans ) :
             tab[k] = texture[j][i]
-            k=k+1
+            k = k + 1
             baseline[j] += texture[j][i]
 
     baseline /= nb_nodes
 
-    tab = tab.reshape(nb_nodes,nb_scans)
+    tab = tab.reshape ( nb_nodes, nb_scans )
     print types
     print times
     nb_cond = types.max()
-    maxtime = times.max()
     lentype = len(types)
     print nb_cond
-    print maxtime
     print lentype
+    sampling_rate = 0.1
+    number_of_samples = 250
 
-    hrf = get_hrf(0.1, 250)
+    hrf = get_hrf ( sampling_rate, number_of_samples )
 
+    reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float )
+    reg = reg.reshape ( nb_scans, ( nb_cond + 1 ) )
 
-    print hrf
-    reg = np.zeros((nb_cond+1)*nb_scans, float)
-    reg = reg.reshape(nb_scans, (nb_cond+1))
-
-    for i in range(0,nb_cond):
-        prereg = creer_prereg(i,maxtime, 250, types, times)
-
+    for condition_index in xrange ( nb_cond ):
+        prereg = get_prereg ( condition_index, number_of_samples, types, times )
         hrf_aux = np.convolve(prereg,hrf)
-
-        for j in range(0,nb_scans):
-
-
-            a = float(hrf_aux[int(j*TR)])
-            reg[j,i] = a
+        for j in xrange ( nb_scans ):
+            a = float ( hrf_aux [ int ( j * TR ) ] )
+            reg[j, i] = a
 
     reg[:,nb_cond] = baseline
 
-
     data = tab
     reg = reg
-    data= data.transpose()
+    data = data.transpose()
 
     print data.shape
     print reg.shape
 
-    m = glm(data,reg,0)
-    b = m.beta
+    m = glm ( data, reg, 0 )
     v = m.s2
+    b = m.beta
+    tex = aims.TimeTexture_FLOAT()    
+    tex[0] = aims.Texture_FLOAT ( len(beta) )
+    for i in xrange( len(beta) ):
+        tex[0][i] = float( beta[i] )
+    aims.write ( tex, self.beta_maps.fullPath() )
 
     print self.contrast
     c = [int(i) for i in string.split(str(self.contrast))]
     print len(c),nb_cond
-    c.extend(np.zeros(max(nb_cond+1-len(c),0)))
-    print len(c),nb_cond
+    c.extend ( np.zeros ( max( nb_cond + 1 - len(c), 0 ) ) )
+    print len(c), nb_cond
     tcon = m.contrast(c)
 
     tex = aims.TimeTexture_FLOAT()
     tmap = tcon.stat()
-    tex[0] = aims.Texture_FLOAT(len(tmap))
-    for i in range(0,len(tmap)):
-        tex[0][i] = float(tmap[i])
-    print self.spmt_maps[0].fullPath()
-    aims.write(tex, self.spmt_maps[0].fullPath())
+    tex[0] = aims.Texture_FLOAT ( len(tmap) )
+    for i in xrange( len(tmap) ):
+        tex[0][i] = float( tmap[i] )
 
+    print self.spmt_maps.fullPath()
+    aims.write ( tex, self.spmt_maps.fullPath() )
     context.write("Finished")
