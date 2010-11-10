@@ -312,6 +312,7 @@ def getBetaName(self, data):
 
 def initialization( self ):
     #self.setOptional ( 'beta_maps' )
+    #self.setOptional ( 'meshes' )
     self.linkParameters ( 'BOLD_textures', 'meshes' )
     #self.addLink ( 'spmt_maps', 'meshes', self.getContrastName )
     #self.addLink ( 'spmt_maps', 'contrast_name', self.getContrastName )
@@ -399,7 +400,7 @@ def execution( self, context ):
     import numpy as np
     import sys, os, imp
     execfile ( self.protocol_text.fullPath(), locals(), globals() )
-    context.write ( 'TR:', TR )
+    context.write ( 'TR (in s):', TR )
     context.write ( 'times:', times )
     context.write ( 'types:', types )
 
@@ -444,7 +445,7 @@ def execution( self, context ):
 
         for condition_index in xrange ( nb_cond ):
             prereg = get_prereg ( condition_index, number_of_samples, types, times )
-            hrf_aux = np.convolve(prereg,hrf)
+            hrf_aux = np.convolve ( prereg, hrf )
             for j in xrange ( nb_scans ):
                 a = float ( hrf_aux [ int ( j * (TR/sampling_rate) ) ] )
                 reg[j, condition_index] = a
@@ -462,8 +463,9 @@ def execution( self, context ):
         v = m.s2
         b = m.beta
         tex = aims.TimeTexture_FLOAT()
-        t = tex[0]
-        t.assign(b)
+        for j in xrange(b.shape[0]):
+            t = tex[j]
+            t.assign(list(b[j,:]))
         aims.write ( tex, betapath )
 
         print self.contrast
