@@ -467,7 +467,7 @@ def execution ( self, context ) :
             hrf_aux = np.convolve ( hrf, prereg )
             '''hrf_aux contains a convoluted version of prereg'''
             aux_x = np.linspace ( 0.0, len(hrf_aux), len(hrf_aux) )
-            '''aux_x is the sampling space of hrf_aux (normally [0.0, 0.1, 0.2, ...,'''
+            '''aux_x is the sampling space of hrf_aux (normally [0, 1, 2, 3, ...,'''
             reg_x = np.linspace ( 0.0, nb_scans * TR * conversion_rate, nb_scans, endpoint=False )
             reg_aux = np.interp ( reg_x, aux_x, hrf_aux ).tolist()
             reg[:, condition_index] = reg_aux
