@@ -31,32 +31,33 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from neuroProcesses import *
 import shfjGlobals     
-
+import numpy as np
+from soma import aims    
+import sys, os, imp#, kalman
+#from nipy.neurospin.glm.glm import glm
+#from nipy.neurospin.glm import kalman
 
 name = '1 - Create Surface-Based Statistical Parametric Maps'
 userLevel = 2
 
-signature = Signature(  'meshes', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )),
-    'BOLD_textures', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
-    'protocol_text', ReadDiskItem( 'Text File', 'Text File' ),
+signature = Signature(  #'meshes', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )),
+    'boldtextures', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
+    'protocolfile', ReadDiskItem( 'Text File', 'Text File' ),
     'contrast', String(),
-    'contrast_name', String(),
-    'beta_maps', ListOf(WriteDiskItem('Surface-Based Beta Map', 'Texture')),
-    'spmt_maps', ListOf(WriteDiskItem( 'Surface-Based SPMt Map', 'Texture')),
+    #'contrastname', String(),
+    'betamaps', ListOf(WriteDiskItem('Surface-Based Beta Map', 'Texture')),
+    'spmtmaps', ListOf(WriteDiskItem( 'Surface-Based SPMt Map', 'Texture')),
   )
 
 DEF_TINY = 1e-50
 DEF_DOFMAX = 1e10
 
 models = {'spherical':['ols']}
+#models =  {'spherical':['kalman']}
 
-def ols(Y, X, axis=0):
-    import numpy as np
-    """
-    beta, nvbeta, s2, dof = ols(Y, X, axis=0)
-
-    Essentially, compute pinv(X)*Y
-    """
+def ols ( Y, X, axis = 0 ) :
+    """ beta, nvbeta, s2, dof = ols(Y, X, axis=0)
+    Essentially, compute pinv(X)*Y """
     ndims = len(Y.shape)
     pX = np.linalg.pinv(X)
     beta = np.rollaxis(np.inner(pX, np.rollaxis(Y, axis, ndims)), 0, axis+1)
@@ -68,8 +69,8 @@ def ols(Y, X, axis=0):
     return beta, nvbeta, s2, dof
 
 class glm:
-    def __init__(self, Y=None, X=None, formula=None, axis=0,
-              model='spherical', method=None, niter=2):
+    def __init__ ( self, Y = None, X = None, formula = None, axis = 0,
+              model = 'spherical', method = None, niter = 2 ) :
 
         # Check dimensions
         if Y == None:
@@ -77,7 +78,7 @@ class glm:
         else:
             self.fit(Y, X, formula, axis, model, method, niter)
 
-    def fit(self, Y, X, formula=None, axis=0, model='spherical', method=None, niter=2):
+    def fit ( self, Y, X, formula = None, axis = 0, model = 'spherical', method = None, niter = 2 ) :
 
         if Y.shape[axis] != X.shape[0]:
             raise ValueError, 'Response and predictors are inconsistent'
@@ -186,8 +187,6 @@ class glm:
         c.dof = self.dof
         return c
 
-
-
 class contrast:
 
     def __init__(self, dim, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
@@ -282,8 +281,6 @@ class contrast:
     def __div__(self, other):
         return self.__rmul__(1/float(other))
 
-
-
 def getContrastName(self, data):
     if (self.contrast_name is not None and len(self.meshes) == len(self.BOLD_textures) and len(self.meshes)>0):
         result = []
@@ -311,15 +308,16 @@ def getBetaName(self, data):
     return None
 
 def initialization( self ):
+    pass
     #self.setOptional ( 'beta_maps' )
     #self.setOptional ( 'meshes' )
-    self.linkParameters ( 'BOLD_textures', 'meshes' )
+    #self.linkParameters ( 'boldtextures', 'meshes' )
     #self.addLink ( 'spmt_maps', 'meshes', self.getContrastName )
     #self.addLink ( 'spmt_maps', 'contrast_name', self.getContrastName )
     #self.addLink ( 'beta_maps', 'meshes', self.getBetaName )
     #self.addLink ( 'beta_maps', 'contrast_name', self.getBetaName )
 
-def LogGamma(x): 
+def LogGamma ( x ) : 
     import math
     coeff0 =  7.61800917300e+1
     coeff1 = -8.65053203300e+1
@@ -340,87 +338,96 @@ def LogGamma(x):
     t = ( x - half ) * math.log( s ) - s
     return t + math.log( stp * ( r + one ) )
 
-def gammapdf ( in1, g ):
-    import numpy as N
-    import math
-    terme1 = N.log(N.array(in1))* (g-1)
-    terme2 =  N.array(in1) + LogGamma(g)
-    out = terme1-terme2
-    out = N.exp(out)
+def GammaPdf ( in1, g ) :
+    terme1 = np.log ( np.array(in1) ) * (g-1)
+    terme2 =  np.array(in1) + LogGamma(g)
+    out = terme1 - terme2
+    out = np.exp ( out )
     return out
 
-def get_hrf ( sampling_rate, number_of_samples ):
+def HrfFunction ( sampling_rate ) :
     ''' get_hrf returns an array with estimated samples of a canonic Haemodynamic
         Response Function (HRF)
         sampling_rate is the time interval between two samples
         number_of_samples is the size of the output array, hence allowing to tune the
             time of sampling'''
-    import numpy as N
-
     tp1 = 6.0
     tp2 = 12.5
     fwhm1 = 1.0
     fwhm2 = 1.0
     alp = .16
+    duration_hrf = 25.0
+    number_of_samples = duration_hrf / sampling_rate
 
-    dxA = N.arange ( 1, number_of_samples + 1, 1 )
-    dxA = dxA * sampling_rate
-    dxB = N.arange ( 1, number_of_samples + 1, 1 )
-    dxB = dxB * sampling_rate
-
-    A = gammapdf ( dxA, tp1 )
-    B = gammapdf ( dxB, tp2 )
+    dxA = np.linspace ( 1.0, duration_hrf + 1, number_of_samples, endpoint=False)
+    dxB = np.linspace ( 1.0, duration_hrf + 1, number_of_samples, endpoint=False)
+    print dxA, dxB
+    A = GammaPdf ( dxA, tp1 )
+    B = GammaPdf ( dxB, tp2 )
 
     maxA = max ( A )
     maxB = max ( B )
-
+    
     hf = A / maxA - alp * B / maxB
     return hf
 
-def get_prereg ( condition, hrfduration, types, times, mode = 'EVENT' ):
-    ''' builds and returns a pre-version of regressor according to :
+def PreRegressor ( condition, types, times, conversion_rate ):
+    ''' builds and returns a pre-version of regressor (made of boxcars or diracs) according to :
         - condition : a given condition index
-        - hrfduration : a number_of at which the HRF is supposed to be back to zero after the last onset
         - types : the sequence of stimulations, by types
         - times : the sequence of stimulations, by times
-        - mode ('EVENT' or 'EPOCH') : switches between two modes for defining the regressors'''
-
-    import numpy as np
-    print mode
-    if (mode == 'EVENT'):        
-        maxtime = times.max()
-        prereg = np.zeros ( int ( ( maxtime / 100 + hrfduration ) ), float )
+        - conversion_rate gives the conversion factor to apply to onsets/durations
+            given in the protocol file. (for instance, if onsets are in ms and the
+            preregressor should be sampled in s, conversion_rate equals 0.001 )'''
+    assert (len(times)==len(types))
+    assert (len(times) > 0)
+    
+    try:
+        if ( len(times[0]) == 2 ) :
+            mode = 'EPOCH'
+    except TypeError :
+        mode = 'EVENT'
+    print 'mode:', mode
+    ''' A specific mode is triggered according to the syntax used in the protocol file
+        times = [(onset1,duration1), ...] triggers the EPOCH omde
+        times = [onset1, onset2, ...] triggers the EVENT mode'''
+    
+ 
+    if ( mode == 'EVENT' ) :
+        prereg = np.zeros ( int ( times[-1] * conversion_rate ) + 1 , float )
         for j in xrange( len(types) ):
-            if int(types[j]) == int(condition) + 1:
-                prereg [int(times[j]/100)] = 1        
-    elif (mode == 'EPOCH'):
-        maxtime = times.max()
-        prereg = np.zeros ( int ( ( maxtime / 100 + hrfduration ) ), float )
-        for j in xrange (len(types) ):
-            if int(types[j]) == int(condition) + 1:
-                for k in xrange ( times[j][1]/100 ) :
-                    prereg [int(times[j+k][0]/100)] = 1
+            if int(types[j]) == int(condition) :
+                prereg [ int(times[j] * conversion_rate ) ] = 1
+                
+    elif ( mode == 'EPOCH' ):
+        onsets = [ each[0] for each in times ]
+        durations = [ each[1] for each in times ]
+        size_prereg = int ( ( onsets[-1] + durations[-1] ) * conversion_rate ) + 1
+        prereg = np.zeros ( size_prereg, float )
+        for j in xrange ( len(types) ):
+            if int(types[j]) == int(condition) :
+                prereg [ int(onsets[j] * conversion_rate ) ] = 1
+                for k in xrange ( int( durations[j] * conversion_rate ) ) :
+                    prereg [ int(onsets[j] * conversion_rate + k ) ] = 1
     return prereg
         
 
+def execution ( self, context ) :
 
-def execution( self, context ):
-    assert (len(self.meshes) == len(self.BOLD_textures) and len(self.BOLD_textures) == len(self.spmt_maps) and len(self.BOLD_textures) == len(self.beta_maps))
-    from soma import aims
+    execfile ( self.protocolfile.fullPath(), locals(), globals() )
+    nptimes = np.array(times)
+    nptypes = np.array(types)
+    
+    context.write ( 'TR (must be in ms):', TR )
+    context.write ( 'times (must be in ms):', nptimes )
+    context.write ( 'types:', nptypes )
 
-    import numpy as np
-    import sys, os, imp
-    execfile ( self.protocol_text.fullPath(), locals(), globals() )
-    context.write ( 'TR (in s):', TR )
-    context.write ( 'times:', times )
-    context.write ( 'types:', types )
-
-    for index in xrange (len(self.meshes) ) :
+    for index in xrange (len(self.boldtextures) ) :
         print 'texture number ', index
-        meshpath = self.meshes[index].fullPath()
-        boldtexpath = self.BOLD_textures[index].fullPath()
-        betapath = self.beta_maps[index].fullPath()
-        spmtpath = self.spmt_maps[index].fullPath()
+        #meshpath = self.meshes[index].fullPath()
+        boldtexpath = self.boldtextures[index].fullPath()
+        betapath = self.betamaps[index].fullPath()
+        spmtpath = self.spmtmaps[index].fullPath()
 
         texture = aims.read( str( boldtexpath ) )
         nb_nodes = int ( texture[0].nItem() )
@@ -439,37 +446,38 @@ def execution( self, context ):
         baseline /= nb_nodes
 
         tab = tab.reshape ( nb_nodes, nb_scans )
-        print types
-        print times
-        nb_cond = types.max()
+        nb_cond = nptypes.max()
         lentype = len(types)
         print nb_cond
         print lentype
-        sampling_rate = 0.1
-        number_of_samples = 250
-        
-        hrf = get_hrf ( sampling_rate, number_of_samples )
+        sampling_rate = 0.1 #in (10x)seconds, depends on how the onsets are defined
+        # multiplying onsets by this factor should still give integers. If not,
+        # then the sampling_rate is too high.
+        conversion_rate = 0.001 / sampling_rate
+
+        hrf = HrfFunction ( sampling_rate )
+        ''' hrf contains the canonic HRF function sampled at sampling_rate (given in s)'''
 
         reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float )
         reg = reg.reshape ( nb_scans, ( nb_cond + 1 ) )
 
         for condition_index in xrange ( nb_cond ):
-            prereg = get_prereg ( condition_index, number_of_samples, types, times, mode )
-            hrf_aux = np.convolve ( prereg, hrf )
-            for j in xrange ( nb_scans ):
-                a = float ( hrf_aux [ int ( j * (TR / sampling_rate) ) ] )
-                reg[j, condition_index] = a
+            prereg = PreRegressor ( condition_index + 1, types, times, conversion_rate )
+            '''prereg contains a pre-version of the regressor made of boxcars or diracs'''
+            hrf_aux = np.convolve ( hrf, prereg )
+            '''hrf_aux contains a convoluted version of prereg'''
+            aux_x = np.linspace ( 0.0, len(hrf_aux), len(hrf_aux) )
+            '''aux_x is the sampling space of hrf_aux (normally [0.0, 0.1, 0.2, ...,'''
+            reg_x = np.linspace ( 0.0, nb_scans * TR * conversion_rate, nb_scans, endpoint=False )
+            reg_aux = np.interp ( reg_x, aux_x, hrf_aux ).tolist()
+            reg[:, condition_index] = reg_aux
 
         reg[:,nb_cond] = baseline
 
         data = tab
-        reg = reg
         data = data.transpose()
 
-        print data.shape
-        print reg.shape
-
-        m = glm ( data, reg, 0 )
+        m = glm ( data, reg, axis=0 )
         v = m.s2
         b = m.beta
         tex = aims.TimeTexture_FLOAT()
@@ -482,6 +490,7 @@ def execution( self, context ):
         c = [int(i) for i in string.split(str(self.contrast))]
         print len(c), nb_cond
         c.extend ( np.zeros ( max( nb_cond + 1 - len(c), 0 ) ) )
+        assert(len(c) == nb_cond + 1)
         print len(c), nb_cond
         tcon = m.contrast(c)
 
@@ -490,6 +499,5 @@ def execution( self, context ):
         t = tex[0]
         t.assign( tmap )
 
-        #print spmtpath
         aims.write ( tex, spmtpath )
         context.write("Finished")
