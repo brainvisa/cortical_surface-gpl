@@ -377,20 +377,31 @@ def get_hrf ( sampling_rate, number_of_samples ):
     hf = A / maxA - alp * B / maxB
     return hf
 
-def get_prereg ( condition, hrfduration, types, times ):
+def get_prereg ( condition, hrfduration, types, times, mode = 'EVENT' ):
     ''' builds and returns a pre-version of regressor according to :
         - condition : a given condition index
         - hrfduration : a number_of at which the HRF is supposed to be back to zero after the last onset
         - types : the sequence of stimulations, by types
-        - times : the sequence of stimulations, by times'''            
+        - times : the sequence of stimulations, by times
+        - mode ('EVENT' or 'EPOCH') : switches between two modes for defining the regressors'''
 
     import numpy as np
-    maxtime = times.max()
-    prereg = np.zeros ( int ( ( maxtime + hrfduration ) / 100 ), float )
-    for j in range ( 0, len(types) ):
-        if int(types[j]) == int(condition) + 1:
-            prereg [int(times[j]/100)] = 1
+    print mode
+    if (mode == 'EVENT'):        
+        maxtime = times.max()
+        prereg = np.zeros ( int ( ( maxtime / 100 + hrfduration ) ), float )
+        for j in xrange( len(types) ):
+            if int(types[j]) == int(condition) + 1:
+                prereg [int(times[j]/100)] = 1        
+    elif (mode == 'EPOCH'):
+        maxtime = times.max()
+        prereg = np.zeros ( int ( ( maxtime / 100 + hrfduration ) ), float )
+        for j in xrange (len(types) ):
+            if int(types[j]) == int(condition) + 1:
+                for k in xrange ( times[j][1]/100 ) :
+                    prereg [int(times[j+k][0]/100)] = 1
     return prereg
+        
 
 
 def execution( self, context ):
@@ -437,17 +448,16 @@ def execution( self, context ):
         sampling_rate = 0.1
         number_of_samples = 250
         
-
         hrf = get_hrf ( sampling_rate, number_of_samples )
 
         reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float )
         reg = reg.reshape ( nb_scans, ( nb_cond + 1 ) )
 
         for condition_index in xrange ( nb_cond ):
-            prereg = get_prereg ( condition_index, number_of_samples, types, times )
+            prereg = get_prereg ( condition_index, number_of_samples, types, times, mode )
             hrf_aux = np.convolve ( prereg, hrf )
             for j in xrange ( nb_scans ):
-                a = float ( hrf_aux [ int ( j * (TR/sampling_rate) ) ] )
+                a = float ( hrf_aux [ int ( j * (TR / sampling_rate) ) ] )
                 reg[j, condition_index] = a
 
         reg[:,nb_cond] = baseline
