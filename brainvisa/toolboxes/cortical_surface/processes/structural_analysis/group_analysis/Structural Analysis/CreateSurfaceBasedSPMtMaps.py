@@ -33,9 +33,9 @@ from neuroProcesses import *
 import shfjGlobals     
 import numpy as np
 from soma import aims    
-import sys, os, imp#, kalman
-#from nipy.neurospin.glm.glm import glm
-#from nipy.neurospin.glm import kalman
+import sys, os
+from nipy.neurospin.glm.glm import glm
+from nipy.neurospin.glm import kalman
 
 name = '1 - Create Surface-Based Statistical Parametric Maps'
 userLevel = 2
@@ -52,12 +52,13 @@ signature = Signature(  #'meshes', ListOf(ReadDiskItem( 'Hemisphere White Mesh',
 DEF_TINY = 1e-50
 DEF_DOFMAX = 1e10
 
-models = {'spherical':['ols']}
-#models =  {'spherical':['kalman']}
+models = {'spherical':['ols'],
+          'ar1':['kalman']}
 
-def ols ( Y, X, axis = 0 ) :
-    """ beta, nvbeta, s2, dof = ols(Y, X, axis=0)
-    Essentially, compute pinv(X)*Y """
+
+def ols(Y, X, axis=0):
+    """    beta, nvbeta, s2, dof = ols(Y, X, axis=0)
+        Essentially, compute pinv(X)*Y    """
     ndims = len(Y.shape)
     pX = np.linalg.pinv(X)
     beta = np.rollaxis(np.inner(pX, np.rollaxis(Y, axis, ndims)), 0, axis+1)
@@ -107,14 +108,13 @@ class glm:
             constants = ['nvbeta', 'a']
             if self.method == 'ols':
                 out = ols(Y, X, axis=axis)
-            #elif self.method == 'kalman':
-                #out = kalman.ols(Y, X, axis=axis)
-        #elif self.model == 'ar1':
-            #constants = ['a']
-            #out = kalman.ar1(Y, X, axis=axis, niter=niter)
-            #a = out[4]
-            #out = out[0:4]
-
+            elif self.method == 'kalman':
+                out = kalman.ols(Y, X, axis=axis)
+        elif self.model == 'ar1':
+            constants = ['a']
+            out = kalman.ar1(Y, X, axis=axis, niter=niter)
+            a = out[4]
+            out = out[0:4]
 
         # Finalize
         self.beta, self.nvbeta, self.s2, self.dof = out
@@ -122,9 +122,7 @@ class glm:
         self.a = a
         self._constants = constants
 
-    """
-    Save fit into a .npz file
-    """
+    """ Save fit into a .npz file """
     def save(self, file):
         np.savez(file,
             beta=self.beta,
@@ -138,14 +136,11 @@ class glm:
             constants=self._constants)
 
 
-    """
-    c must be a numpy.ndarray (or anything that numpy.asarray
+    """ c must be a numpy.ndarray (or anything that numpy.asarray
     can cast to a ndarray).
     For a F contrast, c must be q x p where q is the number of contrast vectors and
-    p is the total number of regressors.
-    """
+    p is the total number of regressors. """
     def contrast(self, c, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
-        import numpy as np
         c = np.asarray(c)
         #dim = len(c.shape)
         if c.ndim == 1:
@@ -188,11 +183,8 @@ class glm:
         return c
 
 class contrast:
-
     def __init__(self, dim, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
-        """
-        tiny is a numerical constant for computations.
-        """
+        """ tiny is a numerical constant for computations. """
         self.dim = dim
         self.effect = None
         self.variance = None
@@ -201,6 +193,7 @@ class contrast:
             if type is 't':
                 type = 'F'
         self.type = type
+        print type
         self._stat = None
         self._pvalue = None
         self._baseline = 0
@@ -208,19 +201,14 @@ class contrast:
         self._dofmax = dofmax
 
     def summary(self):
-        """
-        Return a dictionary containing the estimated contrast effect,
+        """ Return a dictionary containing the estimated contrast effect,
         the associated ReML-based estimation variance, and the estimated
-        degrees	of freedom (variance of the variance).
-        """
+        degrees	of freedom (variance of the variance). """
         return {'effect':self.effect, 'variance':self.variance, 'dof':self.dof}
 
     def stat(self, baseline=0.0):
-        import numpy as np
-        """
-        Return the decision statistic associated with the test of the
-        null hypothesis: (H0) 'contrast equals baseline'
-        """
+        """  Return the decision statistic associated with the test of the
+        null hypothesis: (H0) 'contrast equals baseline'  """
         self._baseline = baseline
 
         # Case: one-dimensional contrast ==> t or t**2
@@ -236,22 +224,16 @@ class contrast:
         self._stat = t
         return t
 
-
     def pvalue(self, baseline=0.0):
         import scipy.stats as sps
-        import numpy as np
 
-        """
-        Return a parametric approximation of the p-value associated
-        with the null hypothesis: (H0) 'contrast equals baseline'
-        """
+        """ Return a parametric approximation of the p-value associated
+        with the null hypothesis: (H0) 'contrast equals baseline' """
         if self._stat == None or not self._baseline == baseline:
             self._stat = self.stat(baseline)
         # Valid conjunction as in Nichols et al, Neuroimage 25, 2005.
-        if self.type in ['t', 'tmin']:
+        if self.type in ['t']:
             p = sps.t.sf(self._stat, np.minimum(self.dof, self._dofmax))
-        elif self.type == 'F':
-            p = sps.f.sf(self._stat, self.dim, np.minimum(self.dof, self._dofmax))
         else:
             raise ValueError, 'Unknown statistic type'
         self._pvalue = p
@@ -371,14 +353,14 @@ def HrfFunction ( sampling_rate ) :
     hf = A / maxA - alp * B / maxB
     return hf
 
-def PreRegressor ( condition, types, times, conversion_rate ):
+def PreRegressor ( condition, types, times, conversion_factor ):
     ''' builds and returns a pre-version of regressor (made of boxcars or diracs) according to :
         - condition : a given condition index
         - types : the sequence of stimulations, by types
         - times : the sequence of stimulations, by times
-        - conversion_rate gives the conversion factor to apply to onsets/durations
+        - conversion_factor gives the conversion factor to apply to onsets/durations
             given in the protocol file. (for instance, if onsets are in ms and the
-            preregressor should be sampled in s, conversion_rate equals 0.001 )'''
+            preregressor should be sampled in s, conversion_factor equals 0.001 )'''
     assert (len(times)==len(types))
     assert (len(times) > 0)
     
@@ -394,21 +376,21 @@ def PreRegressor ( condition, types, times, conversion_rate ):
     
  
     if ( mode == 'EVENT' ) :
-        prereg = np.zeros ( int ( times[-1] * conversion_rate ) + 1 , float )
+        prereg = np.zeros ( int ( times[-1] * conversion_factor ) + 1 , float )
         for j in xrange( len(types) ):
             if int(types[j]) == int(condition) :
-                prereg [ int(times[j] * conversion_rate ) ] = 1
+                prereg [ int(times[j] * conversion_factor ) ] = 1
                 
     elif ( mode == 'EPOCH' ):
         onsets = [ each[0] for each in times ]
         durations = [ each[1] for each in times ]
-        size_prereg = int ( ( onsets[-1] + durations[-1] ) * conversion_rate ) + 1
+        size_prereg = int ( ( onsets[-1] + durations[-1] ) * conversion_factor ) + 1
         prereg = np.zeros ( size_prereg, float )
         for j in xrange ( len(types) ):
             if int(types[j]) == int(condition) :
-                prereg [ int(onsets[j] * conversion_rate ) ] = 1
-                for k in xrange ( int( durations[j] * conversion_rate ) ) :
-                    prereg [ int(onsets[j] * conversion_rate + k ) ] = 1
+                prereg [ int(onsets[j] * conversion_factor ) ] = 1
+                for k in xrange ( int( durations[j] * conversion_factor ) ) :
+                    prereg [ int(onsets[j] * conversion_factor + k ) ] = 1
     return prereg
         
 
@@ -433,43 +415,44 @@ def execution ( self, context ) :
         nb_nodes = int ( texture[0].nItem() )
         nb_scans = int ( texture.size() )
 
-        tab = np.arange ( float ( nb_nodes * nb_scans ) )
-        k = 0
+        tab = np.zeros ( float ( nb_nodes * nb_scans ) ).reshape ( nb_nodes, nb_scans )
         baseline = np.zeros ( nb_scans )
 
-        for i in range ( 0, nb_nodes ) :
-            for j in range ( 0, nb_scans ) :
-                tab[k] = texture[j][i]
-                k = k + 1
+        for i in xrange ( nb_nodes ) :
+            for j in xrange ( nb_scans ) :
+                tab[i,j] = texture[j][i]
                 baseline[j] += texture[j][i]
 
         baseline /= nb_nodes
 
-        tab = tab.reshape ( nb_nodes, nb_scans )
-        nb_cond = nptypes.max()
+        nb_cond = nptypes.max() + 1
         lentype = len(types)
         print nb_cond
         print lentype
         sampling_rate = 0.1 #in (10x)seconds, depends on how the onsets are defined
         # multiplying onsets by this factor should still give integers. If not,
         # then the sampling_rate is too high.
-        conversion_rate = 0.001 / sampling_rate
+        conversion_factor = 0.001 / sampling_rate
 
         hrf = HrfFunction ( sampling_rate )
         ''' hrf contains the canonic HRF function sampled at sampling_rate (given in s)'''
 
-        reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float )
-        reg = reg.reshape ( nb_scans, ( nb_cond + 1 ) )
+        reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float ).reshape ( nb_scans, ( nb_cond + 1 ) )
 
         for condition_index in xrange ( nb_cond ):
-            prereg = PreRegressor ( condition_index + 1, types, times, conversion_rate )
+            prereg = PreRegressor ( condition_index, types, times, conversion_factor )
             '''prereg contains a pre-version of the regressor made of boxcars or diracs'''
             hrf_aux = np.convolve ( hrf, prereg )
             '''hrf_aux contains a convoluted version of prereg'''
-            aux_x = np.linspace ( 0.0, len(hrf_aux), len(hrf_aux) )
-            '''aux_x is the sampling space of hrf_aux (normally [0, 1, 2, 3, ...,'''
-            reg_x = np.linspace ( 0.0, nb_scans * TR * conversion_rate, nb_scans, endpoint=False )
+            aux_x = np.linspace ( 0.0, len(hrf_aux), len(hrf_aux), endpoint=False )
+            context.write( 'aux_x', aux_x, len(aux_x) )
+            '''aux_x is the sampling space of hrf_aux (normally [0, 1, 2, 3, ..., len(hrf_aux)-1])'''
+            reg_x = np.linspace ( 0.0, nb_scans * TR * conversion_factor, nb_scans, endpoint=False )
+            context.write( 'reg_x', reg_x, len(reg_x) )
+            '''reg_x is the sampling space of reg_aux (normally [0, 1*TR*conversion_factor,
+            2*TR*conversion_factor, 3*TR*conversion_factor, ..., (nb_scans-1)*TR*conversion_factor])'''
             reg_aux = np.interp ( reg_x, aux_x, hrf_aux ).tolist()
+            
             reg[:, condition_index] = reg_aux
 
         reg[:,nb_cond] = baseline
@@ -477,7 +460,7 @@ def execution ( self, context ) :
         data = tab
         data = data.transpose()
 
-        m = glm ( data, reg, axis=0 )
+        m = glm ( data, reg, axis=0 ) #, method="kalman", model="ar1" )
         v = m.s2
         b = m.beta
         tex = aims.TimeTexture_FLOAT()
@@ -487,6 +470,8 @@ def execution ( self, context ) :
         aims.write ( tex, betapath )
 
         print self.contrast
+        # motor contrast : 0 0 1 -1 -1 1
+        # audio - video contrast : 0 0 1 1 -1 -1 1 -1 -1 1
         c = [int(i) for i in string.split(str(self.contrast))]
         print len(c), nb_cond
         c.extend ( np.zeros ( max( nb_cond + 1 - len(c), 0 ) ) )
