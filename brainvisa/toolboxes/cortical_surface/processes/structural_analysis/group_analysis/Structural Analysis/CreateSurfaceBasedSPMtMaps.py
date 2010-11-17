@@ -34,8 +34,8 @@ import shfjGlobals
 import numpy as np
 from soma import aims    
 import sys, os
-from nipy.neurospin.glm.glm import glm
-from nipy.neurospin.glm import kalman
+#from nipy.neurospin.glm.glm import glm
+#from nipy.neurospin.glm import kalman
 
 name = '1 - Create Surface-Based Statistical Parametric Maps'
 userLevel = 2
@@ -108,13 +108,13 @@ class glm:
             constants = ['nvbeta', 'a']
             if self.method == 'ols':
                 out = ols(Y, X, axis=axis)
-            elif self.method == 'kalman':
-                out = kalman.ols(Y, X, axis=axis)
-        elif self.model == 'ar1':
-            constants = ['a']
-            out = kalman.ar1(Y, X, axis=axis, niter=niter)
-            a = out[4]
-            out = out[0:4]
+            #elif self.method == 'kalman':
+                #out = kalman.ols(Y, X, axis=axis)
+        #elif self.model == 'ar1':
+            #constants = ['a']
+            #out = kalman.ar1(Y, X, axis=axis, niter=niter)
+            #a = out[4]
+            #out = out[0:4]
 
         # Finalize
         self.beta, self.nvbeta, self.s2, self.dof = out
