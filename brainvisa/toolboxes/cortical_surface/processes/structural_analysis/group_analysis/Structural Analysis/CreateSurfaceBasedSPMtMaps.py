@@ -52,8 +52,8 @@ signature = Signature(  #'meshes', ListOf(ReadDiskItem( 'Hemisphere White Mesh',
 DEF_TINY = 1e-50
 DEF_DOFMAX = 1e10
 
-models = {'spherical':['ols'],
-          'ar1':['kalman']}
+models = { 'spherical':['ols'],
+          'ar1':['kalman'] }
 
 
 def ols(Y, X, axis=0):
@@ -463,6 +463,7 @@ def execution ( self, context ) :
         m = glm ( data, reg, axis=0 ) #, method="kalman", model="ar1" )
         v = m.s2
         b = m.beta
+        context.write ( 'DOF :', m.dof )
         tex = aims.TimeTexture_FLOAT()
         for j in xrange(b.shape[0]):
             t = tex[j]
