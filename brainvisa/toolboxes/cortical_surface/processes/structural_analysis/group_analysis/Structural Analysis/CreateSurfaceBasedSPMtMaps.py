@@ -34,17 +34,14 @@ import shfjGlobals
 import numpy as np
 from soma import aims    
 import sys, os
-#from nipy.neurospin.glm.glm import glm
-#from nipy.neurospin.glm import kalman
 
 name = '1 - Create Surface-Based Statistical Parametric Maps'
 userLevel = 2
 
-signature = Signature(  #'meshes', ListOf(ReadDiskItem( 'Hemisphere White Mesh', 'MESH mesh' )),
+signature = Signature(
     'boldtextures', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
     'protocolfile', ReadDiskItem( 'Text File', 'Text File' ),
     'contrast', String(),
-    #'contrastname', String(),
     'betamaps', ListOf(WriteDiskItem('Surface-Based Beta Map', 'Texture')),
     'spmtmaps', ListOf(WriteDiskItem( 'Surface-Based SPMt Map', 'Texture')),
   )
@@ -108,13 +105,6 @@ class glm:
             constants = ['nvbeta', 'a']
             if self.method == 'ols':
                 out = ols(Y, X, axis=axis)
-            #elif self.method == 'kalman':
-                #out = kalman.ols(Y, X, axis=axis)
-        #elif self.model == 'ar1':
-            #constants = ['a']
-            #out = kalman.ar1(Y, X, axis=axis, niter=niter)
-            #a = out[4]
-            #out = out[0:4]
 
         # Finalize
         self.beta, self.nvbeta, self.s2, self.dof = out
@@ -291,13 +281,6 @@ def getBetaName(self, data):
 
 def initialization( self ):
     pass
-    #self.setOptional ( 'beta_maps' )
-    #self.setOptional ( 'meshes' )
-    #self.linkParameters ( 'boldtextures', 'meshes' )
-    #self.addLink ( 'spmt_maps', 'meshes', self.getContrastName )
-    #self.addLink ( 'spmt_maps', 'contrast_name', self.getContrastName )
-    #self.addLink ( 'beta_maps', 'meshes', self.getBetaName )
-    #self.addLink ( 'beta_maps', 'contrast_name', self.getBetaName )
 
 def LogGamma ( x ) : 
     import math
