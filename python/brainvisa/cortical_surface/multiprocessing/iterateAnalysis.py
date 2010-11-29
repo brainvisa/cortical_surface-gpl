@@ -6,9 +6,10 @@ from brainvisa.cortical_surface.multiprocessing import MultiProcExecute, os_syst
 
 
 
-def IterateAnalysis ( groupgraphpath, tmpdir, analyze, nb_iter, params, number_of_proc = 2 ) :
+def IterateAnalysis ( groupgraphpath, tmppathes, analyze, params, number_of_proc = 2 ) :
     ''' Specific function allowing to run various structural analyses on various
     processors '''
+    nb_iter = len(tmppathes)
     [ddweight, intrapsweight, simweight, lsweight, ddx1, ddx2, simx1, simx2, ddh, globalweight ] = [float(params[i]) for i in range(0,10)]
 
     if ( not os.path.exists( tmpdir ) ):
@@ -16,7 +17,6 @@ def IterateAnalysis ( groupgraphpath, tmpdir, analyze, nb_iter, params, number_o
 
     energies = []
     jobs = []
-    tmppathes = [ str(os.path.join ( tmpdir, 'tmp_analysisgraph_%i.arg'%i ) ) for i in xrange(nb_iter) ]
     
     for i in xrange ( nb_iter ) :
         ana = [each for each in analyze]
@@ -32,5 +32,4 @@ def IterateAnalysis ( groupgraphpath, tmpdir, analyze, nb_iter, params, number_o
     print "JOBS:", len(jobs)
     results = MultiProcExecute ( os_system, jobs, number_of_proc )
 
-    return tmppathes
 

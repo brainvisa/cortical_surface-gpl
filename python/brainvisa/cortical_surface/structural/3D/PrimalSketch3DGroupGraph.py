@@ -7,24 +7,7 @@ import math
 import brainvisa.wip.operto.blobManip as oo
 from brainvisa.cortical_surface.multiprocessing import MultiProcExecute
 from brainvisa.cortical_surface.shell.inputParameters import *
-#import scipy as sp
-#import scipy.linalg as sli
 
-#def matrix_rank(arr,tol=1e-8):
-  #"""Return the matrix rank of an input array."""
-  #arr = scipy.asarray(arr)
-  #if len(arr.shape) != 2:
-    #raise ValueError('Input must be a 2-d array or Matrix object')
-  #svdvals = sli.svdvals(arr)
-  #return sum(scipy.where(svdvals>tol,1,0))
-
-#def median(array):
-  #mid = int(array.size/2.)
-  #ar_list = array.copy().tolist()
-  #ar_list.sort()
-  ##print mid
-  ##print len(ar_list)
-  #return ar_list[mid]
 
 
 def getfMRIPathes ( db, contrast, subjects = None ) :
@@ -42,82 +25,6 @@ def getfMRIPathes ( db, contrast, subjects = None ) :
 
     return pathes
 
-    
-def h(subset1, subset2, S_distMatrix):
-  subset1ToSubset2NearestPointsDistList = []
-  if subset1.size==0 or subset2.size==0:
-    return -1
-  for p1 in subset1.tolist():
-    subset1ToSubset2NearestPointsDistList.append(min(S_distMatrix[p1,subset2]))
-  return max(subset1ToSubset2NearestPointsDistList)
-  
-def h_mean(subset1, subset2, S_distMatrix):
-  subset1ToSubset2NearestPointsDistList = []
-  if subset1.size==0 or subset2.size==0:
-    return -1
-  for p1 in subset1.tolist():
-    subset1ToSubset2NearestPointsDistList.append(min(S_distMatrix[p1,subset2]))
-  return np.asarray(subset1ToSubset2NearestPointsDistList).mean()
-  
-def h_median(subset1, subset2, S_distMatrix):
-  subset1ToSubset2NearestPointsDistList = []
-  if subset1.size==0 or subset2.size==0:
-    return -1
-  for p1 in subset1.tolist():
-    subset1ToSubset2NearestPointsDistList.append(min(S_distMatrix[p1,subset2]))
-  return rmt.median(np.asarray(subset1ToSubset2NearestPointsDistList))
-
-#def h_list(subset1, subset2, S_distMatrix):
-  #subset1ToSubset2NearestPointsDistList = []
-  #if subset1.size==0 or subset2.size==0:
-    #return []
-  #for p1 in subset1.tolist():
-    #subset1ToSubset2NearestPointsDistList.append(min(S_distMatrix[p1,subset2]))
-  #return subset1ToSubset2NearestPointsDistList
-
-def hausdorff(subset1, subset2, S_distMatrix, mode = "max"):
-  """
-  S is a set of size n elements.
-  input:
-        subset1InS: np array of size nb of elements in subset1 of set S: index of the element in set S, size n1 <= n
-        subset2inS: idem for subset2, size n2 <= n
-        S_distMatrix: distance (geometrical) matrix between S elements, size (n,n)
-        mode: "max", "mean", "median"
-  """
-  #print "subset1:", subset1.size
-  #print "subset2:", subset2.size
-  if mode == "max":
-    return max(h(subset1,subset2, S_distMatrix), h(subset2,subset1, S_distMatrix))
-  if mode == "mean":
-    return max(h_mean(subset1,subset2, S_distMatrix), h_mean(subset2,subset1, S_distMatrix))
-  if mode == "median":
-    return max(h_median(subset1,subset2, S_distMatrix), h_median(subset2,subset1, S_distMatrix))
-
-def getDistanceMatrix ( ima ):
-
-    shape  = [ima.getSizeX(), ima.getSizeY(), ima.getSizeZ()]
-    size = math.pow( ( (long) (shape[0]) * (long) (shape[1]) * (long) (shape[2]) ) , 2 )
-    print shape, size
-    mat = np.zeros( size, dtype=long ).reshape( shape[0] * shape[1] * shape[2], shape[0] * shape[1] * shape[2] )
-
-    for x1 in xrange(shape[0]):
-        for y1 in xrange(shape[1]):
-            for z1 in xrange(shape[2]):
-                for x2 in range(x1, shape[0]):
-                    for y2 in range(y1, shape[1]):
-                        for z2 in range(z1, shape[2]):
-                            p1 = aims.Point3df(x1, y1, z1)
-                            p2 = aims.Point3df(x2, y2, z2)
-                            d = aims.Point3df(p1 - p2)
-                            i = x1 * shape[1] * shape[2] + y1 * shape[2] + z1
-                            j = y2 * shape[1] * shape[2] + y2 * shape[2] + z2
-                            dist = d.norm()
-                            mat[i, j] = dist
-                            mat[j, i] = dist
-
-    return mat
-    
-
 def computeOverlap ( blob1, blob2 ) :
     bucket1 = blob1['bucket']['voxel_list']
     bucket2 = blob2['bucket']['voxel_list']
@@ -127,8 +34,7 @@ def computeOverlap ( blob1, blob2 ) :
         for each2 in bucket2:
             if (each1[0] == each2[0] and each1[1] == each2[1] and each1[2] == each2[2]):
                 intersection.append(each1)
-    return float(2.0*float(len(intersection))/float(div))
-    #return hausdorff( getDistanceMatrix ( bucket1, bucket2 )  )
+    return float( 2.0 * float(len(intersection)) / float(div) )
 
 def convertCliques( rawcliques ) :
     cliques = []
@@ -146,7 +52,6 @@ class Clique:
         self.node2 = c['node2']
         self.overlap = c['overlap']
 
-        
 def getBucketFromVertex ( v ):
     if v.getSyntax() == 'glb':        
         bucketmap = v['aims_glb']
@@ -161,7 +66,7 @@ def getBucketFromVertex ( v ):
         bucket['voxel_list'].append([int(each[x]) for x in xrange(3)])
     assert(len(bucket['voxel_list']) > 0 )
     bucket['voxel_size'] = [bucketmap.sizeX(), bucketmap.sizeY(), bucketmap.sizeZ(), bucketmap.sizeT()]
-    #assert(bucket['voxel_size'] == [3.0,3.0,3.0,1.0]
+
     maxpoints = [ int(max([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
     minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
     return bucket, minpoints, maxpoints
@@ -175,21 +80,19 @@ def getAimsBucketFromBucket ( b ):
     bucketMap.setSizeXYZT (*b['voxel_size'])
     return bucketMap
     
-def getRepresentationFromSSB ( ssb ):
-    glb = []
-    for n in ssb.neighbours():
-        if n.getSyntax() == 'glb':
-            node = oo.Node(n)
-            node.bucket = getBucketFromVertex(n)
-            glb.append ( node )
-    scales = list(set([each.scale for each in glb]))
-    for each in glb:
-        if each.scale == scales[len(scales)/2]:
-            print each.scale
-            return getAimsBucketFromBucket (each.bucket)
-            
-    assert(False)
-    return None
+#def getRepresentationFromSSB ( ssb ):
+    #glb = []
+    #for n in ssb.neighbours():
+        #if n.getSyntax() == 'glb':
+            #node = oo.Node(n)
+            #node.bucket = getBucketFromVertex(n)
+            #glb.append ( node )
+    #scales = list(set([each.scale for each in glb]))
+    #for each in glb:
+        #if each.scale == scales[len(scales)/2]:
+            #print each.scale
+            #return getAimsBucketFromBucket (each.bucket)
+    #return None
     
         
 def getSSBFromGraph ( graph ) :
@@ -199,11 +102,8 @@ def getSSBFromGraph ( graph ) :
         if v.getSyntax() == 'ssb':
             ssb.append(v)
     return ssb
-    
-#i = 0
 
 def AddSSBBuckets ( graph ) :
-    #i = 0
     for v in graph.vertices():
         if v.getSyntax() == 'ssb':
             glb = []
@@ -225,15 +125,11 @@ def AddSSBBuckets ( graph ) :
                 if each.scale == scales[len(scales)/2]:
                     bucketMap = getAimsBucketFromBucket(each.bucket)
                     
-            assert( len(bucketMap[0].keys())>0)
+            assert ( len(bucketMap[0].keys()) > 0 )
             aims.GraphManip.storeAims( graph, v, 'aims_ssb', aims.rc_ptr_BucketMap_VOID(bucketMap) )
-            #print v
-            #v['index'] = i
-            #i = i + 1 
-            assert(v.has_key('aims_ssb'))
+            assert ( v.has_key('aims_ssb') )
 
 def ScaleSpaceBlobsFromOneSubject ( graph, sujet ) :
-
     blobs = []
     AddSSBBuckets( graph )
     for v in graph.vertices():
@@ -253,7 +149,7 @@ def GreyLevelBlobsFromOneSubject ( graph, sujet ) :
     for v in graph.vertices():
         if v.getSyntax() == 'glb':
             n = {}
-            for each in ['t', 'subject', 'scale']:#, 'index']:
+            for each in ['t', 'subject', 'scale'] : #, 'index']:
                 n[each] = v[each]
             n['bucket'], n['bbmin'], n['bbmax'] = getBucketFromVertex(v)
             print n['t'], n['bbmin'], n['bbmax']
