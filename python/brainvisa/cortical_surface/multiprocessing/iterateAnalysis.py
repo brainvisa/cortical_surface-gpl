@@ -2,18 +2,17 @@
 
 import os, string, shutil, sys 
 from soma import aims
-from brainvisa.cortical_surface.multiprocessing import MultiProcExecute, os_system
+from brainvisa.cortical_surface.multiprocessing.mproc import MultiProcExecute, os_system
 
 
-
-def IterateAnalysis ( groupgraphpath, tmppathes, analyze, params, number_of_proc = 2 ) :
+def IterateAnalysis ( groupgraphpath, tmppathes, analyze, number_of_proc = 2 ) :
     ''' Specific function allowing to run various structural analyses on various
     processors '''
     nb_iter = len(tmppathes)
-    [ddweight, intrapsweight, simweight, lsweight, ddx1, ddx2, simx1, simx2, ddh, globalweight ] = [float(params[i]) for i in range(0,10)]
+    #[ddweight, intrapsweight, simweight, lsweight, ddx1, ddx2, simx1, simx2, ddh ] = [float(params[i]) for i in range(0,9)]
 
-    if ( not os.path.exists( tmpdir ) ):
-        os.makedirs( tmpdir )
+    #if ( not os.path.exists( tmpdir ) ):
+        #os.makedirs( tmpdir )
 
     energies = []
     jobs = []
@@ -30,6 +29,9 @@ def IterateAnalysis ( groupgraphpath, tmppathes, analyze, params, number_of_proc
         jobs.append ( (analyze_command, i, 'test') )
 
     print "JOBS:", len(jobs)
+
+
     results = MultiProcExecute ( os_system, jobs, number_of_proc )
+
 
 
