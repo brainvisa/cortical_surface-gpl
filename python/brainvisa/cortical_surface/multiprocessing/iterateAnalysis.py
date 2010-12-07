@@ -29,9 +29,18 @@ def IterateAnalysis ( groupgraphpath, tmppathes, analyze, number_of_proc = 2 ) :
         jobs.append ( (analyze_command, i, 'test') )
 
     print "JOBS:", len(jobs)
-
-
     results = MultiProcExecute ( os_system, jobs, number_of_proc )
 
+def DistributeIndividualGraphs ( indiv_commands, number_of_proc = 2 ) :
+    ''' Specific function allowing to distribute the computation of individual
+    graphs on various processors '''
+    jobs = []
+    for i, indiv in enumerate( indiv_commands ) :
+        indiv_command = string.join( [ "'"+str(each)+"'" for each in indiv ], ' ' )
+        print indiv_command
+        jobs.append ( (indiv_command, i, 'test') )
+
+    print "JOBS:", len(jobs)
+    results = MultiProcExecute ( os_system, jobs, number_of_proc )
 
 
