@@ -43,4 +43,17 @@ def DistributeIndividualGraphs ( indiv_commands, number_of_proc = 2 ) :
     print "JOBS:", len(jobs)
     results = MultiProcExecute ( os_system, jobs, number_of_proc )
 
+def DistributeFilteringGraphs ( command, parameters, number_of_proc = 2 ) :
+    ''' Specific function allowing to distribute the computation of individual
+    graphs on various processors '''
+    jobs = []
+    for i, param in enumerate( parameters ) :
+        p = list(param)        
+        #p.extend([i, 'test'])
+        print param
+        jobs.append ( tuple(p) )
+
+    print "JOBS:", len(jobs)
+    results = MultiProcExecute ( command, jobs, number_of_proc )
+
 
