@@ -50,8 +50,8 @@ def execution( self, context ):
                     lon = len(self.labelled_primalsketches)
                 if (self.mode == 'more than <threshold> subjects'):
                     if ( lon > int(self.threshold) ):
-                    lon = 0
-                    ok = 1
+                        lon = 0
+                        ok = 1
                 elif (self.mode == 'all'):
                     ok = 1
                 elif (self.mode == 'over 95.% significance'):
