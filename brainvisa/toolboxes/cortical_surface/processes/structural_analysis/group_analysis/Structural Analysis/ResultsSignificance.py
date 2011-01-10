@@ -46,7 +46,6 @@ signature = Signature(  'labeled_primalsketches', ListOf(ReadDiskItem( 'Primal S
   'ddh', Float()
 )
 
-
 def initialization( self ):
   self.ddx1 = 8
   self.ddx2 = 4
@@ -57,9 +56,6 @@ def initialization( self ):
   self.ddh = 0.0001
   self.linkParameters('output','labeled_primalsketches')
 
-
-
-    
 def execution( self, context ):
         templist=''
         tempout=''
@@ -80,8 +76,7 @@ def execution( self, context ):
           '--lsw', self.lsweight,
           '--ddh', self.ddh
         ]
-    
-    
+
         context.write("Estimating results significance...")
         apply( context.system, call_list )
         context.write('Finished')

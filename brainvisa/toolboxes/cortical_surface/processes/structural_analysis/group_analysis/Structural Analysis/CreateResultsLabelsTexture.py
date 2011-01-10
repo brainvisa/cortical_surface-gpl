@@ -48,19 +48,19 @@ def execution( self, context ):
                 ok = 0
                 if ( lon > len(self.labelled_primalsketches) ):
                     lon = len(self.labelled_primalsketches)
-                if (self.mode == 'more than <threshold> subjects'):
+                if ( self.mode == 'more than <threshold> subjects' ):
                     if ( lon > int(self.threshold) ):
                         lon = 0
                         ok = 1
-                elif (self.mode == 'all'):
+                elif ( self.mode == 'all' ):
                     ok = 1
-                elif (self.mode == 'over 95.% significance'):
+                elif ( self.mode == 'over 95.% significance' ):
                     if (signif > 95.0):
-                        lon=0
+                        lon = 0
                         ok = 1
-                if (ok == 1 and label>0):
+                if ( ok == 1 and label > 0 ):
                     for node in nodes_list:
-                        texture[lon][node] =int(v['label_occur_number'])
+                        texture[lon][node] = int ( v['label_occur_number'] )
                 #print str(label) + " " + str(v['tValue'])  #+ " " + str(v['lifeTime']) + " " + str(v['t'])
                 nbblobsnonnuls = nbblobsnonnuls + 1
 
