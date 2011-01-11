@@ -17,6 +17,7 @@ class Node:
         return s
     
     def __init__ ( self ):
+        self.index = None
         self.nodes = None
         self.maxnode  = None
         self.subject = None
@@ -32,6 +33,7 @@ class Node:
     def defineFromVertex ( self, v ) :
         if v.has_key('nodes'):
             self.nodes = list(v['nodes'])
+        self.index = int( v['index'] )
         self.subject = str(v['subject'])
         self.t = float(v['t'])
         self.scale = float(v['scale'])
@@ -494,4 +496,147 @@ def ClustersOnSimulatedRegions ( db, radius = 25.0, hemis_side = 'L', data_type 
      
         
 
+def computeOverlap ( blob1, blob2 ) :
+    bucket1 = blob1['bucket']['voxel_list']
+    bucket2 = blob2['bucket']['voxel_list']
+    intersection = []
+    div = len(bucket1) + len(bucket2)
+    for each1 in bucket1:
+        for each2 in bucket2:
+            if (each1[0] == each2[0] and each1[1] == each2[1] and each1[2] == each2[2]):
+                intersection.append(each1)
+    return float(2.0*float(len(intersection))/float(div))
+    #return hausdorff( getDistanceMatrix ( bucket1, bucket2 )  )
+
+def convertCliques( rawcliques ) :
+    cliques = []
+    for each in rawcliques:
+        c = Clique()
+        c.define(each)
+        cliques.append(c)
+    return cliques
+
+class Clique:
+    def __init__( self ):
+        pass
+    def define ( self, c ):
+        self.node1 = c['node1']
+        self.node2 = c['node2']
+        self.overlap = c['overlap']
+
+        
+def getBucketFromVertex ( v ):
+    if v.getSyntax() == 'glb':        
+        bucketmap = v['aims_glb']
+    elif v.getSyntax() == 'ssb' :
+        bucketmap = v['aims_ssb']
+    print v.getSyntax(), v.keys()
+       
+    bucket = {}
+    bucket['voxel_list'] = []
+    assert(len(bucketmap[0].keys())>0)
+    for each in bucketmap[0].keys() :
+        bucket['voxel_list'].append([int(each[x]) for x in xrange(3)])
+    assert(len(bucket['voxel_list']) > 0 )
+    bucket['voxel_size'] = [bucketmap.sizeX(), bucketmap.sizeY(), bucketmap.sizeZ(), bucketmap.sizeT()]
+    #assert(bucket['voxel_size'] == [3.0,3.0,3.0,1.0]
+    maxpoints = [ int(max([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
+    minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
+    return bucket, minpoints, maxpoints
     
+def getAimsBucketFromBucket ( b ):
+    bucketMap = aims.BucketMap_VOID()
+    bucket = bucketMap[0]
+    for each in b['voxel_list']:
+        bucket[each] = 1
+    assert(len(bucket.keys())>0)
+    bucketMap.setSizeXYZT (*b['voxel_size'])
+    return bucketMap
+    
+def getRepresentationFromSSB ( ssb ):
+    glb = []
+    for n in ssb.neighbours():
+        if n.getSyntax() == 'glb':
+            node = oo.Node(n)
+            node.bucket = getBucketFromVertex(n)
+            glb.append ( node )
+    scales = list(set([each.scale for each in glb]))
+    for each in glb:
+        if each.scale == scales[len(scales)/2]:
+            print each.scale
+            return getAimsBucketFromBucket (each.bucket)
+            
+    assert(False)
+    return None
+    
+        
+def getSSBFromGraph ( graph ) :
+    ssb = []
+    print 'beware the result is a list of Vertex'
+    for v in graph.vertices():
+        if v.getSyntax() == 'ssb':
+            ssb.append(v)
+    return ssb
+    
+#i = 0
+
+def AddSSBBuckets ( graph ) :
+    #i = 0
+    for v in graph.vertices():
+        if v.getSyntax() == 'ssb':
+            glb = []
+            for n in v.neighbours():
+                if n.getSyntax() == 'glb':
+                    node = Node()
+                    node.defineFromVertex(n)
+                    bucketmap = n['aims_glb']
+                    node.bucket = {}
+                    node.bucket['voxel_list'] = []
+                    assert( len(bucketmap[0].keys()) > 0 )
+                    for each in bucketmap[0].keys() :
+                        node.bucket['voxel_list'].append(each)
+                    assert(len(node.bucket['voxel_list']) > 0 )
+                    node.bucket['voxel_size'] = [bucketmap.sizeX(), bucketmap.sizeY(), bucketmap.sizeZ(), bucketmap.sizeT()]
+                    glb.append ( node )
+            scales = list(set([each.scale for each in glb]))
+            for each in glb:
+                if each.scale == scales[len(scales)/2]:
+                    bucketMap = getAimsBucketFromBucket(each.bucket)
+                    
+            assert( len(bucketMap[0].keys())>0)
+            aims.GraphManip.storeAims( graph, v, 'aims_ssb', aims.rc_ptr_BucketMap_VOID(bucketMap) )
+            #print v
+            #v['index'] = i
+            #i = i + 1 
+            assert(v.has_key('aims_ssb'))
+
+def ScaleSpaceBlobsFromOneSubject ( graph, sujet ) :
+    blobs = []
+    AddSSBBuckets( graph )
+    for v in graph.vertices():
+        if v.getSyntax() == 'ssb':
+            n = {}
+            for each in ['t', 'subject', 'tmin', 'tmax', 'index']:
+                n[each] = v[each]
+            n['bucket'], n['bbmin'], n['bbmax'] = getBucketFromVertex(v)
+            print n['bbmin'], n['bbmax']
+            blobs.append(n)
+    return blobs
+    
+def ScaleSpaceBlobs ( db, contrast ) :
+    ''' Returns a dictionary containing for each subject a list of blobs, a blob
+        being a dictionary with some info like t, subject, tmin, tmax, index
+        and a bucket '''
+    subjects = oo.getSubjects ( db )
+    pathes = getfMRIPathes ( db, contrast )
+    
+    graphs_pathes = {}
+    graphs = {}
+    blobs = {}
+    
+    for sujet in subjects:
+        graphs[sujet] = aims.read(pathes[sujet]['primal'])
+    
+    for sujet in subjects :
+        blobs[sujet] = ScaleSpaceBlobsFromOneSubject ( graphs[sujet], sujet )
+    return blobs
