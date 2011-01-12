@@ -1,5 +1,7 @@
 import os
 from soma import aims
+from brainvisa.cortical_surface.shell import db
+
 
 class Node:
     ''' Node class (with node, subject and t fields)
@@ -37,50 +39,6 @@ class Node:
         self.subject = str(v['subject'])
         self.t = float(v['t'])
         self.scale = float(v['scale'])
-
-def SubjectsSubset(data, nb):  
-    from random import randrange
-    new_data = [d for d in data]
-    assert(nb<=len(data))
-    comp = []
-    for n in xrange(nb):
-        pos = randrange( len(new_data) )
-        elem = new_data[pos]
-        new_data[pos] = new_data[-1]
-        del new_data[-1]
-        comp.append( elem )
-    return comp
-
-def getSubjects ( db ) :
-    """Returns the list of subjects (dirnames) contained in the data base directory
-         (ignores any existing 'tmp')"""
-    sujets = []
-    for direc in os.listdir ( db ):
-        if os.path.isdir( os.path.join(db, direc) ) and direc != 'tmp':
-            sujets.append ( direc )
-    return sujets
-
-def getPathes ( db, hemis_side = 'L' , data_type = 'curv', subjects = None ) :
-    """Builds and returns the pathes according to the data base path, hemisphere side
-         and data type (curvature or depth)"""
-    pathes = {}
-    if subjects is None :
-        subjects = getSubjects ( db )
-    
-    for sujet in subjects :
-        pathes[sujet] = {}
-        
-        pathes[sujet]['mesh'] = os.path.join ( db, sujet, 't1mri/t1/default_analysis/segmentation/mesh/%s_%swhite.mesh' % ( sujet, hemis_side ))
-        pathes[sujet]['tex'] = os.path.join ( db, sujet, 't1mri/t1/default_analysis/segmentation/%s_%swhite_%s.tex' % ( sujet, hemis_side, data_type ) )
-        pathes[sujet]['primal'] = os.path.join( db, sujet, 'surface/%s_%swhite_primal_%s.arg' % ( sujet, hemis_side, data_type ) )
-        
-        pathes[sujet]['blobs'] = os.path.join( db, sujet, 'surface/%s_%swhite_%s_blobs.tex' % ( sujet, hemis_side, data_type ) )
-        pathes[sujet]['scalespace'] = os.path.join ( db, sujet, 'surface/%s_%swhite_%s_ss.tex' % ( sujet, hemis_side, data_type ) )
-        pathes[sujet]['lat'] = os.path.join ( db, sujet, 'surface/%s_%s_lat.tex' % ( sujet, hemis_side ) )
-        pathes[sujet]['lon'] = os.path.join ( db, sujet, 'surface/%s_%s_lon.tex' % ( sujet, hemis_side ) )
-        pathes[sujet]['gyri'] = os.path.join ( db, sujet, 'surface/%s_%s_gyri.tex' % ( sujet, hemis_side ) )
-        
-    return pathes
     
 def MaximaList ( db, hemis_side = 'L' , data_type = 'curv' ) :
     """ Computes a list of maxima based on a type of data (curv/depth)
@@ -104,10 +62,10 @@ def MaximaList ( db, hemis_side = 'L' , data_type = 'curv' ) :
                 nodes.append( node )
     return nodes
 
-def Distrib ( db, hemis_side = 'L' , data_type = 'curv' ) :
+def Distrib ( db_path, hemis_side = 'L' , data_type = 'curv' ) :
     """ Computes a distribution based on local maxima extracted from specific data 
         return distrib """
-    nodes = MaximaList ( db, hemis_side, data_type )
+    nodes = MaximaList ( db_path, hemis_side, data_type )
     distrib = [ n.t for n in nodes ]
     subjects = [ n.subject for n in nodes ]
     return distrib, subjects
@@ -126,24 +84,26 @@ def spotOutliers ( db, hemis_side = 'L' , data_type = 'curv' ) :
             if v.getSyntax() == 'glb':
                 if float(v['t']) > 50.0:
                     print v['t'], v['subject']
-                    
-def JointDistrib( db, hemis_side = 'L' ) :
+
+def JointDistrib ( db_path, hemis_side = 'L' ) :
     """ Get a joint distribution between curv and depth data. Are the deep max 
       the same as the curved ones ? 
       return curvlist, depthlist, nodes, sujets"""
-    sujets = getSubjects(db)
-    curvpathes = getPathes(db, hemis_side, 'curv')
-    depthpathes = getPathes(db, hemis_side, 'depth')
+    sujets = db.getSubjects ( db_path )
+    curvpathes = db.getPathes ( db_path, hemis_side, 'curv' )
+    depthpathes = db.getPathes ( db_path, hemis_side, 'depth' )
 
     curvgraphspathes = [curvpathes[sujet]['primal'] for sujet in sujets]
     depthgraphspathes = [depthpathes[sujet]['primal'] for sujet in sujets]
+    
     curvlist = []
     depthlist= []
     nodes = []
     sujets = []
-    for i, curvgraphpath in enumerate(curvgraphspathes) :
-        curvgraph = aims.read(curvgraphpath)
-        depthgraph = aims.read(depthgraphspathes[i])
+    
+    for i, curvgraphpath in enumerate ( curvgraphspathes ) :
+        curvgraph = aims.read ( curvgraphpath )
+        depthgraph = aims.read ( depthgraphspathes[i] )
         curvnodes = {}
         depthnodes = {}
         for v in curvgraph.vertices():
@@ -195,18 +155,18 @@ def getAges ( sujets ):
             res[i] = ages[i]
     return res
         
-def LocalMaximaCountPerSubject( db, data_type = 'curv' ):
+def LocalMaximaCountPerSubject ( db_path, data_type = 'curv' ) :
     ''' How many local maxima can we find per subject ? This allows to measure the
     relation between this number and age. Data_type can be curv, depth or joint'''
     import numpy as np
     if ( data_type in ['curv', 'depth'] ):
-        distribL, sujetsL =  getDistrib( db, 'L', data_type )
-        distribR, sujetsR =  getDistrib( db, 'R', data_type )
+        distribL, sujetsL =  Distrib ( db_path, 'L', data_type )
+        distribR, sujetsR =  Distrib ( db_path, 'R', data_type )
     elif ( data_type in ['joint'] ) :
-        curvlistL, depthlistL, nodesL, sujetsL =  JointDistrib( db, 'L')
-        curvlistR, depthlistR, nodesR, sujetsR =  JointDistrib( db, 'R')
+        curvlistL, depthlistL, nodesL, sujetsL =  JointDistrib( db_path, 'L')
+        curvlistR, depthlistR, nodesR, sujetsR =  JointDistrib( db_path, 'R')
     count = {}
-    sujets = getSubjects( db )
+    sujets = db.getSubjects( db_path )
     for sujet in sujets:
       count[sujet] = 0
       
@@ -219,204 +179,19 @@ def LocalMaximaCountPerSubject( db, data_type = 'curv' ):
     x = []
     y = []
     for each in sujets:
-        x.append( count[each] )
-        y.append( ages[each] )
-    np.corrcoef(x,y)
+        x.append ( count[each] )
+        y.append ( ages[each] )
+    np.corrcoef (x, y )
     return x, y
 
-def Graph ( db, nodes, hemis_side = 'L', data_type = 'curv' ):
-    ''' Creates an Aims Graph given a list of nodes (vertex indices + subjects)
-      and a file path. In this function a node is a Node'''
-    from soma import aims
-    import numpy as np 
-    sujets = getSubjects( db )
-    pathes = getPathes( db, hemis_side, data_type )
-    meshes = {}
-    textures = {}
-    for sujet in sujets:
-        meshes[sujet] = aims.read(pathes[sujet]['mesh'])
-        textures[sujet] = aims.read(pathes[sujet]['tex'])
-        
-    graph = aims.Graph('BlobsArg')
-    graph['boundingbox_min'] = [0.0, 0.0, 0.0]
-    graph['boundingbox_max'] = [10.0, 10.0, 10.0]
-    graph['voxel_size'] = [1.0, 1.0, 1.0]
-    graph['filename_base'] = "*"
-    
-    sujets = [n.subject for n in nodes]
-    set_sujets = list( set(sujets) )
-    if ( len(set_sujets) == 1 ):
-        sujet = set_sujets[0]
-        graph['mesh'] = pathes[sujet]['mesh']
-        graph['texture'] = pathes[sujet]['tex']
-        graph['subject'] = sujet
-        if (os.path.exists(pathes[sujet]['lat'])):
-            graph['latitude'] = pathes[sujet]['lat']
-        if (os.path.exists(pathes[sujet]['lon'])):
-            graph['longitude'] = pathes[sujet]['lon']
-    else :
-        graph['meshes'] = [pathes[sujet]['mesh'] for sujet in set_sujets]
-        graph['textures'] = [pathes[sujet]['tex'] for sujet in set_sujets]
-        graph['subjects'] = set_sujets
-        if (os.path.exists(pathes[set_sujets[0]]['lat'])):
-            graph['latitudes'] = [ pathes[sujet]['lat'] for sujet in set_sujets]
-        if (os.path.exists(pathes[set_sujets[0]]['lon'])):
-            graph['longitude'] = [ pathes[sujet]['lon'] for sujet in set_sujets]
-    
-    for i,n in enumerate(nodes) :
-        v = graph.addVertex('glb')
-        v['subject'] = n.subject        
-        v['nodes'] = n.nodes
-        v['scale'] = n.scale
-        v['name'] = str(sujets.index(n.subject) + 1)        
-        v['t'] = n.t
-        v['x'] = list(np.ones(len(n.nodes)))
-        v['y'] = list(np.ones(len(n.nodes)))
-        #assert( len(n.nodes) == 1 )
-        c = meshes[ n.subject ].vertex()[ n.maxnode ]
-        mesh = aims.SurfaceGenerator.sphere(c, 0.3, 10, True)
-        aims.GraphManip.storeAims( graph, v, 'glb', mesh )
-   
-    #aims.write( graph, graph_path )
-    return graph
-    
-    
-    
-def Clusters ( db, raw_max_nodes, clustering_distance, hemis_side = 'L', data_type = 'curv' ) :
-    """ Calls the surfCreateClustersFromGLB command, writes the output in a temporary graph_path
-          and returns the produced blobs and a list of clusters (list int) 
-          Works with Nodes From One Subject Only !"""
-    from soma import aims
-    import shutil, os 
-    sujets = [node.subject for node in raw_max_nodes]
-    set_sujets = list( set(sujets) )
-    assert ( len(set_sujets) == 1 )
-    
-    tmpdir = os.path.join(db, 'tmp')
-    if( os.path.exists( tmpdir ) ):
-        shutil.rmtree ( tmpdir )
-    os.mkdir( tmpdir )
-    
-    graph = Graph ( db, raw_max_nodes, hemis_side, data_type )
-    tex = aims.read( graph['texture'] )
-    clustergraphinpath = os.path.join ( tmpdir, 'clustergraph_in.arg' )
-    clustergraphoutpath = os.path.join ( tmpdir, 'clustergraph_out.arg' )
-    aims.write ( graph, clustergraphinpath )
-    
-    textoutputpath = '/tmp/blobsCountTable_' + str(set_sujets[0]) + '.py'
-    cluster_command = 'surfCreateClustersFromGLB -i  '+ str(clustergraphinpath) +'  -o '+ str(clustergraphoutpath) +' --dist '+ str(clustering_distance) + ' --textOutput ' + str(textouputpath)
-    os.system( cluster_command )
-    print cluster_command
-    
-    graph_out = aims.read ( clustergraphoutpath )
-    nodes_out = []
-    
-    for v in graph_out.vertices():
-        if v.getSyntax() == 'ssb':
-            node = Node()
-            #print v
-            node.defineFromArgs( nodes = v['nodes'], t = v['t'], subject = v['subject'], scale = max(v['scales']) - min(v['scales']) )
-            node.maxnode = node.MaximumNode( tex )
-            neigh = []
-            for n in v.neighbours():
-                if n.getSyntax() == 'glb':
-                    glb_node = Node ()
-                    #print n
-                    glb_node.defineFromArgs ( nodes = n['nodes'], t = n['t'], subject = n['subject'], scale = n['scale'] )
-                    glb_node.maxnode = glb_node.MaximumNode ( tex )
-                    neigh.append( glb_node  )
-            nodes_out.append( {'ssb' : node, 'glbs' : neigh } )
-
-    return nodes_out
-
-def StatsClusters( clusters, db, hemis_side = 'L', data_type = 'curv' ):
-    """ returns a count table (how many glbs per ssb?) and a distances table (how
-           compact are the clusters?"""
-    from soma import aims
-    count = [ len(cluster['glbs'] ) for cluster in clusters]
-    sujets = [ cluster['ssb'].subject for cluster in clusters ]
-    set_sujets = list( set(sujets) )
-    assert( len( set_sujets ) == 1 )
-    sujet = set_sujets[0]
-    pathes = getPathes ( db, hemis_side, data_type )
-    mesh = aims.read ( pathes[sujet]['mesh'] )
-    distances = []
-    for cluster in clusters :
-        dist_moy = 0.0
-        if ( len( cluster['glbs'] ) > 1 ) :
-            n = 0.0
-            for i in range( 0, len( cluster['glbs'] ) - 1 ):
-                for j in range( i + 1, len( cluster['glbs'] ) ):
-                    a = mesh.vertex()[ cluster['glbs'][i].maxnode ]
-                    b = mesh.vertex()[ cluster['glbs'][j].maxnode ]
-                    c = a - b
-                    dist_moy = dist_moy + c.norm()
-                    n = n + 1.0
-            dist_moy = dist_moy / float(n)
-        distances.append( dist_moy )
-        
-    return count, distances
-                
-def SubjectNodes( nodes, subjects ):
+def SubjectNodes ( nodes, subjects ):
     """ returns a list of nodes belonging to a given list of subjects """
     nodes_subject = []
     for each in nodes:
-        #print each
         if each.subject in subjects:
             nodes_subject.append(each)
-            
-    return nodes_subject
-    
-def ClustersOneSubjectAtVariousDistances ( db, raw_max_subject_nodes, hemis_side = 'L', data_type = 'curv' ) :
-    '''The nodes taken in input are the result of MaximaList() that is a list
-        of raw local maxima extracted from specific data
-        return clusters, count, dist '''
-    import numpy as np
-    clusters = {}
-    stats = {}
-    for distance in list ( np.arange(0.5, 25.0, 0.5) ):
-        clusters[distance] = Clusters ( db, raw_max_subject_nodes, distance, hemis_side, data_type )
-        stats[distance] = StatsClusters ( clusters[distance], db, hemis_side, data_type )
-    count = {}
-    dist = {}
-    for distance in list( np.arange(0.5, 25.0, 0.5) ):
-        count[distance] = stats[distance][0]
-        dist[distance] = stats[distance][1]
-    return clusters, count, dist
-    
-def ClustersOneSubjectAtVariousDistances ( db, raw_max_subject_nodes, hemis_side = 'L', data_type = 'curv' ) :
-    """ Calls the surfCreateClustersFromGLB command, writes the output in a temporary graph_path
-          and returns the produced blobs and a list of clusters (list int) 
-          Works with Nodes From One Subject Only !"""
-    from soma import aims
-    import shutil, os, uuid
-    sujets = [node.subject for node in raw_max_subject_nodes]
-    set_sujets = list( set(sujets) )
-    assert ( len(set_sujets) == 1 )
-    
-    tmpdir = os.path.join( db, 'tmp' )
-    if( not os.path.exists( tmpdir ) ):
-        os.mkdir( tmpdir )
-    
-    graph = Graph ( db, raw_max_subject_nodes, hemis_side, data_type )
-    tex = aims.read( graph['texture'] )
-        
-    u = str(uuid.uuid1())[:6]
-    clustergraphinpath = os.path.join ( tmpdir, 'clustergraph_in_%s_%s.arg'%(str(set_sujets[0]), u) )
-    clustergraphoutpath = os.path.join ( tmpdir, 'clustergraph_out_%s_%s.arg'%(str(set_sujets[0]), u) )
-    aims.write ( graph, clustergraphinpath )
-    
-    textoutputpath = '/tmp/blobsCountTable_' + str(set_sujets[0]) + '_' + str(u) +'.py'
-    
-    cluster_command = 'surfCreateClustersFromGLB -i  '+ str(clustergraphinpath) +'  -o '+ str(clustergraphoutpath) + ' --textOutput ' + str(textoutputpath)
-    os.system ( cluster_command )
-    print cluster_command
-    charac_clusters = {}
-    count_glb = {}
-    execfile ( str(textoutputpath), locals(), globals() )
-    
-    return charac_clusters, count_glb
 
+    return nodes_subject
 
 def SimpleStatsFromCountTable ( count, subjects = None ) :
     import numpy as np
@@ -426,209 +201,19 @@ def SimpleStatsFromCountTable ( count, subjects = None ) :
         sujets = count.keys()
     else :
         sujets = subjects
-    distances = list(np.sort(count[sujets[0]].keys()))
+    distances = list ( np.sort(count[sujets[0]].keys()) )
     for dist in distances :
         ct_ave.append ( np.mean( [len(count[sujet][dist]) for sujet in sujets]) )
         ct_std.append ( np.std( [len(count[sujet][dist]) for sujet in sujets]) )
         
     return ct_ave, ct_std, distances
-    
 
-def closestNode ( mesh, point ):
-  import math
-  distance = 0.0
-  mini = 0
-  distmini = 1000.0
-  for v in xrange( len( mesh.vertex()) ):
-      vert = mesh.vertex()[v]
-      d = [ math.pow(each, 2) for each in [vert[i] - point[i] for i in xrange(3)] ]
-      distance = math.sqrt( d[0] + d[1] + d[2] )
-
-      if ( distance < distmini ):
-          distmini = distance
-          mini = v
-  return mini
-      
- 
-  
-def ClustersOnSimulatedRegions ( db, radius = 25.0, hemis_side = 'L', data_type = 'curv' ):
-    
-    clusters = {}
-    count = {}
-    dist = {}
-    import os, shutil, random
-    from soma import aims
-    pathes = getPathes( db, hemis_side, data_type )
-    sujets = getSubjects ( db )
-    mesh = aims.read( pathes[sujets[0]]['mesh'] )
-    #mesh = aims.read( pathes['Bor1']['mesh'] )
-    node = random.randint( 0, len(mesh.vertex()) )
-    #node = 303 #to aim at the central sulcus roughly
-    point = aims.Point3df(mesh.vertex()[node])
-
-    for sujet in sujets:
-
-        mesh = aims.read( pathes[sujet]['mesh'] )
-        node = closestNode( mesh, point )
-        #node = random.randint( 0, len(mesh.vertex()) ) # to renew the choice of noce from one subjet to another : the regions then become completely unrelated
-
-        #radius = 25.0
-        random_command = 'surfRandomROI -m ' + str(pathes[sujet]['mesh'])  +' -o '+ str(pathes[sujet]['lat']) + ' --node ' + str(node) +' --radius '+ str(radius)
-        os.system ( random_command )
-        print random_command
-        shutil.copy(pathes[sujet]['lat'], pathes[sujet]['lon'])
-        
-        primal_command = 'surfMesh2Graph -m  '+ str(pathes[sujet]['mesh']) +'  -t '+ str(pathes[sujet]['tex']) +' -g '+ str(pathes[sujet]['primal']) +' -s '+str(sujet) + \
-            ' --ss '+ str(pathes[sujet]['scalespace']) +' --recover False --blobs '+ str(pathes[sujet]['blobs']) 
-        if ( os.path.exists(pathes[sujet]['lat']) and os.path.exists(pathes[sujet]['lon']) ):
-            primal_command = primal_command + ' --lat '+ str(pathes[sujet]['lat']) +' --lon '+ str(pathes[sujet]['lon'])
-        os.system( primal_command )
-        
-    all_nodes = MaximaList ( db, hemis_side, data_type )
-    for sujet in sujets:
-        nodes = SubjectNodes ( all_nodes, [sujet])
-        #clusters[sujet], count[sujet], dist[sujet] = ClustersOneSubjectAtVariousDistances ( db, nodes, hemis_side, data_type )
-        print sujet
-        clus, coun = ClustersOneSubjectAtVariousDistances2 ( db, nodes, hemis_side, data_type )        
-        clusters[sujet] = clus[sujet]
-        count[sujet] = coun[sujet]
-    return clusters, count
-     
-        
-
-def computeOverlap ( blob1, blob2 ) :
-    bucket1 = blob1['bucket']['voxel_list']
-    bucket2 = blob2['bucket']['voxel_list']
-    intersection = []
-    div = len(bucket1) + len(bucket2)
-    for each1 in bucket1:
-        for each2 in bucket2:
-            if (each1[0] == each2[0] and each1[1] == each2[1] and each1[2] == each2[2]):
-                intersection.append(each1)
-    return float(2.0*float(len(intersection))/float(div))
-    #return hausdorff( getDistanceMatrix ( bucket1, bucket2 )  )
-
-def convertCliques( rawcliques ) :
-    cliques = []
-    for each in rawcliques:
-        c = Clique()
-        c.define(each)
-        cliques.append(c)
-    return cliques
-
-class Clique:
-    def __init__( self ):
-        pass
-    def define ( self, c ):
-        self.node1 = c['node1']
-        self.node2 = c['node2']
-        self.overlap = c['overlap']
-
-        
-def getBucketFromVertex ( v ):
-    if v.getSyntax() == 'glb':        
-        bucketmap = v['aims_glb']
-    elif v.getSyntax() == 'ssb' :
-        bucketmap = v['aims_ssb']
-    print v.getSyntax(), v.keys()
-       
-    bucket = {}
-    bucket['voxel_list'] = []
-    assert(len(bucketmap[0].keys())>0)
-    for each in bucketmap[0].keys() :
-        bucket['voxel_list'].append([int(each[x]) for x in xrange(3)])
-    assert(len(bucket['voxel_list']) > 0 )
-    bucket['voxel_size'] = [bucketmap.sizeX(), bucketmap.sizeY(), bucketmap.sizeZ(), bucketmap.sizeT()]
-    #assert(bucket['voxel_size'] == [3.0,3.0,3.0,1.0]
-    maxpoints = [ int(max([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
-    minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
-    return bucket, minpoints, maxpoints
-    
-def getAimsBucketFromBucket ( b ):
-    bucketMap = aims.BucketMap_VOID()
-    bucket = bucketMap[0]
-    for each in b['voxel_list']:
-        bucket[each] = 1
-    assert(len(bucket.keys())>0)
-    bucketMap.setSizeXYZT (*b['voxel_size'])
-    return bucketMap
-    
-def getRepresentationFromSSB ( ssb ):
-    glb = []
-    for n in ssb.neighbours():
-        if n.getSyntax() == 'glb':
-            node = oo.Node(n)
-            node.bucket = getBucketFromVertex(n)
-            glb.append ( node )
-    scales = list(set([each.scale for each in glb]))
-    for each in glb:
-        if each.scale == scales[len(scales)/2]:
-            print each.scale
-            return getAimsBucketFromBucket (each.bucket)
-            
-    assert(False)
-    return None
-    
-        
-def getSSBFromGraph ( graph ) :
-    ssb = []
-    print 'beware the result is a list of Vertex'
-    for v in graph.vertices():
-        if v.getSyntax() == 'ssb':
-            ssb.append(v)
-    return ssb
-    
-#i = 0
-
-def AddSSBBuckets ( graph ) :
-    #i = 0
-    for v in graph.vertices():
-        if v.getSyntax() == 'ssb':
-            glb = []
-            for n in v.neighbours():
-                if n.getSyntax() == 'glb':
-                    node = Node()
-                    node.defineFromVertex(n)
-                    bucketmap = n['aims_glb']
-                    node.bucket = {}
-                    node.bucket['voxel_list'] = []
-                    assert( len(bucketmap[0].keys()) > 0 )
-                    for each in bucketmap[0].keys() :
-                        node.bucket['voxel_list'].append(each)
-                    assert(len(node.bucket['voxel_list']) > 0 )
-                    node.bucket['voxel_size'] = [bucketmap.sizeX(), bucketmap.sizeY(), bucketmap.sizeZ(), bucketmap.sizeT()]
-                    glb.append ( node )
-            scales = list(set([each.scale for each in glb]))
-            for each in glb:
-                if each.scale == scales[len(scales)/2]:
-                    bucketMap = getAimsBucketFromBucket(each.bucket)
-                    
-            assert( len(bucketMap[0].keys())>0)
-            aims.GraphManip.storeAims( graph, v, 'aims_ssb', aims.rc_ptr_BucketMap_VOID(bucketMap) )
-            #print v
-            #v['index'] = i
-            #i = i + 1 
-            assert(v.has_key('aims_ssb'))
-
-def ScaleSpaceBlobsFromOneSubject ( graph, sujet ) :
-    blobs = []
-    AddSSBBuckets( graph )
-    for v in graph.vertices():
-        if v.getSyntax() == 'ssb':
-            n = {}
-            for each in ['t', 'subject', 'tmin', 'tmax', 'index']:
-                n[each] = v[each]
-            n['bucket'], n['bbmin'], n['bbmax'] = getBucketFromVertex(v)
-            print n['bbmin'], n['bbmax']
-            blobs.append(n)
-    return blobs
-    
-def ScaleSpaceBlobs ( db, contrast ) :
+def ScaleSpaceBlobs ( db_path, contrast ) :
     ''' Returns a dictionary containing for each subject a list of blobs, a blob
         being a dictionary with some info like t, subject, tmin, tmax, index
         and a bucket '''
-    subjects = oo.getSubjects ( db )
-    pathes = getfMRIPathes ( db, contrast )
+    subjects = db.getSubjects ( db_path )
+    pathes = db.getfMRIPathes ( db_path, contrast )
     
     graphs_pathes = {}
     graphs = {}
