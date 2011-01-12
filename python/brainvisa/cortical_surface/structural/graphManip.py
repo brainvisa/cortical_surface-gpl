@@ -4,8 +4,9 @@ from soma import aims
 import os
 
 def Graph ( db_path, nodes, hemis_side = 'L', data_type = 'curv' ):
-    ''' Creates an Aims Graph given a list of nodes (vertex indices + subjects)
-      and a file path. In this function a node is a Node'''
+    ''' Creates an Aims Graph given a list of nodes (vertex indices + subjects).
+    In this function a node is a Node. Allows to build a quick generic Aims graph
+    out from a nodes vector.'''
     #from soma import aims
     import numpy as np 
     sujets = db.getSubjects( db_path )
@@ -59,7 +60,11 @@ def Graph ( db_path, nodes, hemis_side = 'L', data_type = 'curv' ):
     #aims.write( graph, graph_path )
     return graph
 
-def BuildAimsGroupGraph ( blobs, cliques ):
+def BuildAimsGroupGraph ( blobs, cliques, graphs ):
+    ''' Creates an Aims Group Graph given a list of nodes (vertex indices + subjects)
+    and cliques previously computed by ComputeBliques. In this function a node is a Node.
+    The Graphs are given so as to store file paths in the group graph.'''
+    #from soma import aims
     graph = aims.Graph('BlobsArg')
     graph['boundingbox_min'] = [0.0, 0.0, 0.0]
     graph['boundingbox_max'] = [10.0, 10.0, 10.0]
@@ -68,6 +73,8 @@ def BuildAimsGroupGraph ( blobs, cliques ):
     sujets = blobs.keys()
     
     graph['subjects'] = sujets
+
+    #FIXME: add the filepaths from the graphs
     
     glb_indices = {}
     index = 0
@@ -90,6 +97,8 @@ def BuildAimsGroupGraph ( blobs, cliques ):
     return graph
 
 def groupGraphInfo ( graph ) :
+    '''Returns distances, overlaps and activation ('t' measures) contained in a
+    previously built groupgraph'''
     how_many_similarity_cliques = 0
     distances = []
     overlaps = []
@@ -106,7 +115,9 @@ def groupGraphInfo ( graph ) :
             measures.append ( v['t'] )
     return distances, overlaps, measures
 
-def getBucketFromVertex ( v ):
+def getBucketFromVertex ( v ) :
+    '''Returns the bucket associated with a given vertex plus its bounding box
+    (minimum point and maximum point)'''
     if v.getSyntax() == 'glb' :
         bucketmap = v['aims_glb']
     elif v.getSyntax() == 'ssb' :
@@ -125,7 +136,7 @@ def getBucketFromVertex ( v ):
     minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
     return bucket, minpoints, maxpoints
     
-def getAimsBucketFromBucket ( b ):
+def getAimsBucketFromBucket ( b ) :
     bucketMap = aims.BucketMap_VOID()
     bucket = bucketMap[0]
     for each in b['voxel_list']:
@@ -134,7 +145,7 @@ def getAimsBucketFromBucket ( b ):
     bucketMap.setSizeXYZT (*b['voxel_size'])
     return bucketMap
     
-def getRepresentationFromSSB ( ssb ):
+def getRepresentationFromSSB ( ssb ) :
     glb = []
     for n in ssb.neighbours():
         if n.getSyntax() == 'glb':
