@@ -51,6 +51,8 @@ signature = Signature(
     'dilation', Float(),
     'morpho_offset', Choice( '0.0', '0.5', '0.8', '1.0' ),
     'meshDecimation', Boolean(),
+    'deltaT', Float(),
+    'stop', Float(),
 )
 
 def initialization( self ):
@@ -63,6 +65,8 @@ def initialization( self ):
      self.label_attributes = 'name'
      self.dilation = 1.0
      self.morpho_offset = '0.0'
+     self.deltaT = 0.05
+     self.stop = 0.000003
      self.meshDecimation=0
 
 
@@ -164,7 +168,9 @@ def execution( self, context ):
                         '-o', orient,
                         '-ox', self.texture_param1.fullPath(),
                         '-oy', self.texture_param2.fullPath(),
-                        '-mo', self.morpho_offset ]
+                        '-mo', self.morpho_offset,
+                        '-d', self.deltaT,
+                        '-s', self.stop ]
 
      apply(context.system, parameterising )
 
