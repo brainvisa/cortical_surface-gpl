@@ -9,12 +9,13 @@ userLevel = 2
 signature = Signature(
     'labelled_primalsketches', ListOf(ReadDiskItem('Primal Sketch', 'Graph and data')),
     'textures', ListOf(WriteDiskItem('Labelled Functional Blobs Texture', 'Texture')),
-    'mode', Choice('all','more than <threshold> subjects','over 95.% significance'),
-    'threshold', Integer()  
+    'mode', Choice('all','more than <threshold> subjects','over 95.% significance','selected labels'),
+    'threshold', Integer(),
+    'selected_labels', ListOf(Integer())
     )
 
 def initialization( self ):
-  self.setOptional('threshold')
+  self.setOptional('threshold', 'selected_labels')
   self.linkParameters("textures", "labelled_primalsketches")
 
 def execution( self, context ):
@@ -23,7 +24,7 @@ def execution( self, context ):
 
     for j in xrange(len(self.labelled_primalsketches)):
         context.write(self.labelled_primalsketches[j])
-        if (self.mode == 'all'):
+        if (self.mode in ['all', 'selected labels']):
             #texture = aims.TimeTexture_S16( len(self.labelled_primalsketches) + 1, len(meshes[j].vertex()) )
             texture = aims.TimeTexture_S16( 1, len(meshes[j].vertex()) )
         elif (self.mode == 'more than <threshold> subjects' or self.mode == 'over 95.% significance'):
@@ -57,6 +58,9 @@ def execution( self, context ):
                             #ok = 1
                     if ( self.mode == 'all' ):
                         ok = 1
+                    elif ( self.mode == 'selected labels' ) :
+                        if ( label in list(self.selected_labels) ) :
+                            ok = 1
                     elif ( self.mode == 'over 95.% significance' ):
                         if (signif > 95.0):
                             lon = 0
