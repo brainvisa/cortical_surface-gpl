@@ -45,11 +45,29 @@ def initialization( self ):
   pass
 
 def execution( self, context ):
-	import numpy as np
-	from soma import aims
-	ima = aims.read(self.input.fullPath())
-	arr = np.array(ima, order='F')
-	arr = np.mean(arr, 0)
-	ima_out = aims.Volume(arr)
-	aims.write(ima_out, self.output.fullPath())
-	context.write("Finished")
+     import numpy as np
+     from soma import aims
+     ima = aims.read(self.input.fullPath())
+     arr = np.array(ima, order='F')
+     arr3 = np.mean(arr, 3)
+     sx=ima.getSizeX()
+     sy=ima.getSizeY()
+     sz=ima.getSizeZ()
+	
+     ima_out = aims.Volume_FLOAT(sx,sy,sz,1)
+     h=ima.header()
+     ho=ima_out.header()
+
+     ho['voxel_size']=[h['voxel_size'][0],h['voxel_size'][1],h['voxel_size'][2]]
+     ho['volume_dimension']=[sx, sy, sz, 1]
+     ho['transformations']=h['transformations']
+     ho['referentials']=h['referentials']
+	
+     for z in range(sz):
+	    for y in range(sy):
+	         for x in range(sx):
+	              ima_out.setValue(arr3[x,y,z], x, y, z)
+     
+     
+     aims.write(ima_out, self.output.fullPath())
+     context.write("Finished")
