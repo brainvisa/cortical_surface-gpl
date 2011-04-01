@@ -2,31 +2,35 @@
 <minf expander="minf_2.0">
 <d>
   <d name="fr">
-    <xhtml name="short"/>
+    <xhtml name="short">Afficheur pour la visualisation de résultats des contrastes surfaciques.</xhtml>
     <d name="parameters">
-      <xhtml name="activations_texture"/>
-      <xhtml name="iterations"/>
-      <xhtml name="save_inflate_sequence"/>
-      <xhtml name="input_mesh"/>
-      <xhtml name="inflated_mesh"/>
-      <xhtml name="compute_inflated_mesh"/>
-      <xhtml name="curvature_texture"/>
+      <xhtml name="iterations">Nombre d'itérations du gonflement (valeur par défaut : 500).</xhtml>
+      <xhtml name="activations_texture_1_red">Premier contraste, T map, z map, etc (.tex or .gii). Il apparaît en rouge.</xhtml>
+      <xhtml name="activations_texture_3_blue">Troisième contraste, T map, z map, etc (.tex or .gii). Il apparaît en bleu.</xhtml>
+      <xhtml name="activations_texture_2_green">Deuxième contraste, T map, z map, etc (.tex or .gii). Il apparaît en vert.</xhtml>
+      <xhtml name="save_inflate_sequence">True/False (valeur par défaut : False) - Si "True" est sélectionné, le traitement calcule et affiche les différentes étapes du gonflement du cerveau. Si "False" est sélectionné, seulement le cerveau gonflé est calculé et affiché.</xhtml>
+      <xhtml name="input_mesh">Maillage de la matière blanche.</xhtml>
+      <xhtml name="inflated_mesh">Maillage gonflé.</xhtml>
+      <xhtml name="compute_inflated_mesh">True/False (valeur par défaut : True) - Indique si le maillage du cerveau gonflé doit être calculé (s'il l'a déjà été ce n'est pas nécessaire).</xhtml>
+      <xhtml name="curvature_texture">Courbure du maillage d'entrée -matière blanche- (.tex/.gii).</xhtml>
     </d>
-    <xhtml name="long"/>
+    <xhtml name="long">Ce visualiseur affiche le cerveau (gonflé) avec la courbure du maillage de la matière blanche et les activations (contrastes, T map, etc). Il permet de changer le niveau de gonflement du cerveau et de changer les palettes de toutes les textures à volonté (le contraste de la courbure ou les seuils des activations). Un maximum de trois contrastes fonctionnels peut être affiché en trois couleurs : rouge, vert et bleu. Le mélange de ces trois couleurs donne trois couleurs différentes : rouge+vert=jaune, rouge+bleu=magenta, vert+bleu=cyan.</xhtml>
   </d>
   <d name="en">
-    <xhtml name="short">For the visualization of the surface results, this BrainVISA viewer may be used. It displays the (inflated) brain with the curvature of the white matter mesh and the activation (contrasts, T map, etc)
-This viewer allows to change the inflation of the brain and to change palettes of both textures at your will (contrast of the curvature or threshold of the activations)</xhtml>
+    <xhtml name="short">Viewer for the visualization of contrast surface results.</xhtml>
     <d name="parameters">
-      <xhtml name="activations_texture">(.tex or .gii) contrast, T map, z map, etc.</xhtml>
-      <xhtml name="iterations">(500 by default) inflation number of iterations</xhtml>
-      <xhtml name="save_inflate_sequence">True (in order to compute/display the different steps of the inflated brain) or False (if you only need/want to compute/display the maximum inflated brain)</xhtml>
-      <xhtml name="input_mesh">white matter mesh</xhtml>
-      <xhtml name="inflated_mesh">inflated mesh (automatically filled)</xhtml>
-      <xhtml name="compute_inflated_mesh">True (in order to compute the inflated brain mesh -if it has not been computed previously-) or False (if you do not need to compute the inflated brain mesh -if it has been computed previously-)</xhtml>
-      <xhtml name="curvature_texture">(.tex/.gii) curvature (automatically filled)</xhtml>
+      <xhtml name="iterations">Inflation number of iterations (default value: 500).</xhtml>
+      <xhtml name="activations_texture_1_red">First contrast, T map, z map, etc (.tex or .gii). It appears in red.</xhtml>
+      <xhtml name="activations_texture_3_blue">Third contrast, T map, z map, etc (.tex or .gii). It appears in blue.</xhtml>
+      <xhtml name="activations_texture_2_green">Second contrast, T map, z map, etc (.tex or .gii). It appears in green.</xhtml>
+      <xhtml name="save_inflate_sequence">True/False (default value: False) - If "True" is selected, the process computes and displays the different steps of the inflated brain. If "False" is selected, only the maximum inflated brain is computed/displayed.</xhtml>
+      <xhtml name="input_mesh">White matter mesh.</xhtml>
+      <xhtml name="inflated_mesh">Inflated mesh.</xhtml>
+      <xhtml name="compute_inflated_mesh">True/False (default value: True) - Indicates if the inflated brain mesh has to be computed (if it has not been computed previously).</xhtml>
+      <xhtml name="curvature_texture">Curvature of the input mesh -white matter- (.tex/.gii).</xhtml>
     </d>
-    <xhtml name="long"/>
+    <xhtml name="long">This viewer displays the (inflated) brain with the curvature of the white matter mesh and the activation (contrasts, T map, etc).
+It allows to change the inflation of the brain and to change palettes of all textures at your will (contrast of the curvature texture or thresholds of the activations). A maximum of three functional contrasts may be displayed in three colors: red, green and blue. The mix of these colors gives three different ones: red+green=yellow, red+blue=magenta, green+blue=cyan.</xhtml>
   </d>
 </d>
 </minf>

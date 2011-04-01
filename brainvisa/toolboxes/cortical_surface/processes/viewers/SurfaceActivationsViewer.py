@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -36,14 +37,19 @@
 from neuroProcesses import *
 from brainvisa import anatomist
 
-name = 'Surface Activations Viewer'
+name = 'Surface MultiActivations Viewer'
+roles = ('viewer',)
 userLevel = 0
 
 ################################################################################
 
 # Argument declaration
 signature = Signature(
-  'activations_texture',WriteDiskItem( 'Functional Time Texture',
+  'activations_texture_1_red',ReadDiskItem( 'Functional Time Texture',
+    'Aims texture formats' ),
+  'activations_texture_2_green',ReadDiskItem( 'Functional Time Texture',
+    'Aims texture formats' ),
+  'activations_texture_3_blue',ReadDiskItem( 'Functional Time Texture',
     'Aims texture formats' ),
   'input_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'Aims mesh formats' ),
   'compute_inflated_mesh', Boolean(),
@@ -57,12 +63,15 @@ signature = Signature(
 
 # Default values
 def initialization( self ):
-  self.linkParameters( 'input_mesh', 'activations_texture' )
+  self.linkParameters( 'input_mesh', 'activations_texture_1_red' )
+  self.linkParameters( 'input_mesh', 'activations_texture_2_green' )
+  self.linkParameters( 'input_mesh', 'activations_texture_3_blue' )
   self.linkParameters( 'inflated_mesh', 'input_mesh' )
   self.linkParameters( 'curvature_texture', 'input_mesh' )
   self.compute_inflated_mesh = 1
   self.iterations = 500
   self.save_inflate_sequence = 0
+  self.setOptional( 'activations_texture_2_green','activations_texture_3_blue' )
 
 
 # Surface activations viewer process
@@ -103,40 +112,82 @@ def execution( self, context ):
   #
   
   a = anatomist.Anatomist()
-  if (self.curvature_texture is not None and self.activations_texture is not None):
+  if (self.curvature_texture is not None and self.activations_texture_1_red is not None):
 
     # We get the different palettes...
-    palette_curvature = a.getPalette("B-W LINEAR") 
-    palette_activations = a.getPalette("Rainbow1-fusion") 
+    palette_curvature = a.getPalette("B-W LINEAR") #or "actif_ret"
+    palette_activations_1 = a.getPalette("RED TEMPERATURE") 
+    palette_activations_2 = a.getPalette("Green-White-linear") # or "Green-White-linear-fusion"
+    palette_activations_3 = a.getPalette("Blue-White") # or "Blue-White-fusion"
 
     mymesh = a.loadObject( self.inflated_mesh ) 
 
     if palette_curvature is not None:
       duplicate = True
     tex_curvature = a.loadObject( self.curvature_texture, duplicate=duplicate ) 
-    if palette_activations is not None:
+    if palette_activations_1 is not None:
       duplicate = True
-    tex_activations = a.loadObject( self.activations_texture, duplicate=duplicate ) 
+    tex_activations_1 = a.loadObject( self.activations_texture_1_red, duplicate=duplicate ) 
 
     # Setting textures palettes
     tex_curvature.setPalette( palette_curvature )
-    tex_activations.setPalette( palette_activations )
+    tex_activations_1.setPalette( palette_activations_1 )
 	# It is possible to impose the min and max values:
     #minValcurvature = 0.4
     #maxValcurvature = 0.6
     #minValactivations = 0.5
     #maxValactivations = 1
     #tex_curvature.setPalette( palette_curvature, minVal = minValcurvature, maxVal = maxValcurvature )
-    #tex_activations.setPalette( palette_activations, minVal = minValactivations, maxVal = maxValactivations )
+    #tex_activations_1.setPalette( palette_activations_1, minVal = minValactivations, maxVal = maxValactivations )
     # or
     #a.setObjectPalette([tex_curvature], palette_curvature, minVal=minValcurvature, maxVal=maxValcurvature) 
-    #a.setObjectPalette([tex_activations], palette_activations, minVal=minValactivations, maxVal=maxValactivations) 
+    #a.setObjectPalette([tex_activations_1], palette_activations_1, minVal=minValactivations, maxVal=maxValactivations) 
 
-    # Multitexture fusion of the two textures
-    fusionMultiTexture2textures = a.fusionObjects( [tex_curvature, tex_activations], method='FusionMultiTextureMethod' )
+    # Setting activations 2 and 3 if present
+    if self.activations_texture_2_green is not None:
+        if palette_activations_2 is not None:
+          duplicate = True
+        tex_activations_2 = a.loadObject( self.activations_texture_2_green, duplicate=duplicate ) 
+        tex_activations_2.setPalette( palette_activations_2 )
 
-    # TextSurf fusion of the multetexture with the mesh
-    fusionTexSurfFinal = a.fusionObjects( [mymesh, fusionMultiTexture2textures], method='FusionTexSurfMethod' )
+    if self.activations_texture_3_blue is not None:
+        if palette_activations_3 is not None:
+          duplicate = True
+        tex_activations_3 = a.loadObject( self.activations_texture_3_blue, duplicate=duplicate ) 
+        tex_activations_3.setPalette( palette_activations_3 )
+
+    # Multitexture fusion of the curvature texture with the 1, 2 or 3 activation textures
+    # Help found here:
+    # http://brainvisa.info/doc/anatomist/html/fr/programmation/commands.html#TexturingParams
+    # and here:
+    # http://www.brainvisa.info/doc/brainvisa-4.0/epydoc/brainvisa.anatomist-pysrc.html
+    if (self.activations_texture_2_green is not None) and (self.activations_texture_3_blue is not None):
+        fusionMultiTextureActivations = a.fusionObjects( [tex_curvature, tex_activations_1, tex_activations_2, tex_activations_3], method='FusionMultiTextureMethod' )
+#        a.execute( "FusionMultiTextureMethod", object=fusionMultiTextureActivations, texture=1, mode="add", rate = 1.0 )
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 3, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 2, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 1, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 0, mode = "geometric", rate = 1) 
+    elif self.activations_texture_2_green is not None:
+        fusionMultiTextureActivations = a.fusionObjects( [tex_curvature, tex_activations_1, tex_activations_2], method='FusionMultiTextureMethod' )
+#        a.execute( "FusionMultiTextureMethod", object=fusionMultiTextureActivations, texture=1, mode="add", rate = 1.0 )
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 2, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 1, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 0, mode = "geometric", rate = 1) 
+    elif self.activations_texture_3_blue is not None:
+        fusionMultiTextureActivations = a.fusionObjects( [tex_curvature, tex_activations_1, tex_activations_3], method='FusionMultiTextureMethod' )
+#        a.execute( "FusionMultiTextureMethod", object=fusionMultiTextureActivations, texture=1, mode="add", rate = 1.0 )
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 2, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 1, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 0, mode = "geometric", rate = 1) 
+    else:
+        fusionMultiTextureActivations = a.fusionObjects( [tex_curvature, tex_activations_1], method='FusionMultiTextureMethod' )
+#        a.execute( "FusionMultiTextureMethod", object=fusionMultiTextureActivations, mode="add", rate = 1.0 )
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 1, mode = "add", rate = 1) 
+        a.execute("TexturingParams", objects=[fusionMultiTextureActivations], texture_index = 0, mode = "geometric", rate = 1) 
+
+    # TextSurf fusion of the multitexture with the mesh
+    fusionTexSurfFinal = a.fusionObjects( [mymesh, fusionMultiTextureActivations], method='FusionTexSurfMethod' )
 
     # Creation of a 3D window
     mywindow = a.createWindow( '3D' )
@@ -147,16 +198,27 @@ def execution( self, context ):
 
     # Display palette control window
     a.execute("PopupPalette", objects=tex_curvature )
-    a.execute("PopupPalette", objects=tex_activations )
+    a.execute("PopupPalette", objects=tex_activations_1 )
+    if self.activations_texture_2_green is not None:
+        a.execute("PopupPalette", objects=tex_activations_2 )
+    if self.activations_texture_3_blue is not None:
+        a.execute("PopupPalette", objects=tex_activations_3 )
 
-    self._dontdestroy = [ mymesh, tex_curvature, tex_activations, fusionMultiTexture2textures, fusionTexSurfFinal, mywindow ]
+    if (self.activations_texture_2_green is not None) and (self.activations_texture_3_blue is not None):
+        self._dontdestroy = [ mymesh, tex_curvature, tex_activations_1, tex_activations_2, tex_activations_3, fusionMultiTextureActivations, fusionTexSurfFinal, mywindow ]
+    elif self.activations_texture_2_green is not None:
+        self._dontdestroy = [ mymesh, tex_curvature, tex_activations_1, tex_activations_2, fusionMultiTextureActivations, fusionTexSurfFinal, mywindow ]
+    elif self.activations_texture_3_blue is not None:
+        self._dontdestroy = [ mymesh, tex_curvature, tex_activations_1, tex_activations_3, fusionMultiTextureActivations, fusionTexSurfFinal, mywindow ]
+    else: # if both activations 2 and 3 are not None
+        self._dontdestroy = [ mymesh, tex_curvature, tex_activations_1, fusionMultiTextureActivations, fusionTexSurfFinal, mywindow ]
 
   else:
     if self.curvature_texture is not None:
       return a.viewTextureOnMesh( self.inflated_mesh, self.curvature_texture, 
                                   a.getPalette('B-W LINEAR'))
-    elif self.activations_texture is not None:
-      return a.viewTextureOnMesh( self.inflated_mesh, self.activations_texture, 
+    elif self.activations_texture_1_red is not None:
+      return a.viewTextureOnMesh( self.inflated_mesh, self.activations_texture_1_red, 
                                   a.getPalette('Rainbow1-fusion'))
     else:
       return a.viewMesh( self.inflated_mesh )
