@@ -55,12 +55,21 @@ def initialization ( self ):
 def execution( self, context ):
 
       context.write ( self.fMRI_4D_data )
+      
+      floatVer = defaultContext().temporary('Nifti-1 image')
+     
+      conversion = [ 
+      'AimsFileConvert',
+      '-i',  self.fMRI_4D_data.fullPath(),
+      '-o',  floatVer.fullPath(),
+      '-t',  'FLOAT'
+      ]
 
       projection = [ 
       'AimsFunctionProjection', 
       '-op', '1',
       '-d', self.kernels.fullPath(),
-      '-d1', self.fMRI_4D_data.fullPath(),
+      '-d1', self.fMRI_4D_data.fullPath(), #floatVer.fullPath(),
       '-m', self.white_mesh.fullPath(),
       '-o', self.fMRI_surface_data.fullPath()
       ]
