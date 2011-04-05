@@ -32,6 +32,7 @@
 
 from neuroProcesses import *
 import shfjGlobals
+from numpy import *
 
 name = 'Sulcus Parameterization'
 
@@ -79,6 +80,9 @@ def execution( self, context ):
      dilatedIm=context.temporary(  'GIS image' )
      isoL=context.temporary( 'MESH mesh')
      meshNonDec=context.temporary( 'MESH mesh')
+     
+     distToPlan=context.temporary( 'Texture' )
+     
      transform=''
 
      if (self.orientation=='Top->Bottom'):
@@ -225,11 +229,38 @@ def execution( self, context ):
           i=i+10
           
           
+     read=aims.Reader()
+     sulc=read.read(self.sulcus_mesh.fullPath())
+     mesh=array(sulc.vertex())
+     bary=mean(mesh, axis=0)
+     mesh=mesh-bary
+     tmesh=mesh.transpose()
+     coord=dot(tmesh,mesh)
+     val,vect=linalg.eig(coord)
+     i=argmin(val)
+     k=argmax(val)
+     for t in range(3):
+          if (t!=i) and (t!=k):
+               j=t
+        
+     u1=vect[:,i]
+     u2=vect[:,j]
+     u3=vect[:,k]
+
+     texturex=aims.TimeTexture_FLOAT() 
+     nn= mesh.shape[0]
+     for i in range(nn):
+          texturex.push_back(dot(mesh[i], -u1))
+    
+     w=aims.Writer()
+     w.write(texturex, distToPlan.fullPath())
+          
      context.write('Computing depth profile')
      depth = [ 'AimsSulcusNormalizeDepthProfile',
                '-m', self.sulcus_mesh.fullPath(),
                '-x', self.texture_param1.fullPath(),
                '-y', self.texture_param2.fullPath(),
+               '-d', distToPlan.fullPath(),
                '-o', self.depth_profile.fullPath() ]
      apply(context.system, depth)
 
