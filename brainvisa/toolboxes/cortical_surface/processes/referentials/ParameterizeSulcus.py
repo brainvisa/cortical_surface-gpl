@@ -75,7 +75,9 @@ def execution( self, context ):
      sulcusIm=context.temporary( 'GIS image' )
      closedIm=context.temporary( 'GIS image' )
      hullIm=context.temporary(  'GIS image' )
+#     dilHull=context.temporary(  'GIS image' )
      bottomIm=context.temporary(  'GIS image' )
+#     dilBottom=context.temporary(  'GIS image' )
      simplesurf=context.temporary( 'GIS image' )
      dilatedIm=context.temporary(  'GIS image' )
      isoL=context.temporary( 'MESH mesh')
@@ -131,6 +133,22 @@ def execution( self, context ):
                  '-e', self.dilation ]
 
      apply( context.system, dilating )
+
+#     context.write('Dilating ridges with 3.0')
+
+#     dilatingH = [ 'AimsDilation',
+#                 '-i', hullIm.fullPath(),
+#                 '-o', dilHull.fullPath(),
+#                 '-e', 3.0 ]
+
+#     apply( context.system, dilatingH )
+
+#     dilatingB = [ 'AimsDilation',
+#                 '-i', bottomIm.fullPath(),
+#                 '-o', dilBottom.fullPath(),
+#                 '-e', 3.0 ]
+#
+#     apply( context.system, dilatingB )
 
      closing = [ 'AimsClosing',
                  '-i', dilatedIm.fullPath(),
