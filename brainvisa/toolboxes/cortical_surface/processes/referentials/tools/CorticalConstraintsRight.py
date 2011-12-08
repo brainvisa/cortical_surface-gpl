@@ -45,7 +45,7 @@ signature = Signature(
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'right_white_sulci_mer',WriteDiskItem( 'Right hemisphere longitude constraints texture' ,'Texture',requiredAttributes={ 'side': 'right' } ),
     'right_white_sulci_par',WriteDiskItem( 'Right hemisphere latitude constraints texture' ,'Texture',requiredAttributes={ 'side': 'right' } ),
-    'translation',ReadDiskItem('Surface Label Translation','Label Translation' ),
+    'translation',ReadDiskItem('Label Translation','Label Translation' ),
     'ParModel',ReadDiskItem('Latitude Constraint Gyri Model','Gyri Model'),
     'MerModel',ReadDiskItem('Longitude Constraint Gyri Model','Gyri Model'),
     'right_sulci_label_to_sulci_name',WriteDiskItem( 'Sulci To White Texture Translation', 'Text File',requiredAttributes={ 'side': 'right' }),

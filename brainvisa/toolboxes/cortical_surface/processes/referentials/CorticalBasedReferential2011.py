@@ -1,4 +1,5 @@
 
+
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -30,28 +31,34 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
-include( 'base' )
-include( 'sulci' )
+from neuroProcesses import *
+import shfjGlobals     
 
-insert( 'nomenclature','surfaceanalysis',
-  SetContent(
-    'constraint_correspondance', SetType( 'Constraint coordinates values' ),SetWeakAttr( 'filename_variable', 'constraint_correspondance'),
-    'constraint_correspondance_2011', SetType( 'Constraint coordinates values' ),SetWeakAttr( 'filename_variable', 'constraint_correspondance_2011'),
-    'surfaceReferential', SetType( 'Label Translation' ),SetWeakAttr( 'filename_variable', 'surfaceReferential'),SetWeakAttr( 'category', 'translation'),
-    'surfaceRefModel_par', SetType( 'Latitude Constraint Gyri Model' ),
-    'surfaceRefModel_mer', SetType( 'Longitude Constraint Gyri Model' ),
+name = 'Cortical Surface Parameterization Pipeline 2011'
+userLevel = 2
+
+signature = Signature( 
+  'Lgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
+  'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
+  'sulcus_identification',Choice('name','label')
   )
-)
 
 
-insert( 'hemitemplate',
-  "*PoleLeft", SetType( "Left Cingular Pole Template" ), 
-  "*PoleRight", SetType( "Right Cingular Pole Template" ), 
-)
+def initialization( self ):
+    self.linkParameters( 'Lgraph','Rgraph')
+    self.linkParameters( 'Rgraph','Lgraph')
+    self.sulcus_identification='label'
+    eNode = SerialExecutionNode( self.name, parameterized=self )
 
-insertFirst( 'models/discriminative_models/{graph_version}', 'gyrus', SetContent(
-    'gyri', SetType( 'Gyri Model' ),
-    "*", SetType( 'Model graph' ),
-  )
-)
+    eNode.addChild( 'Hemisphere_Process_Left',
+                    ProcessExecutionNode( 'HemisphereProcessLeft2011', optional = 1 ) )
+    eNode.addChild( 'Hemisphere_Process_Right',
+                    ProcessExecutionNode( 'HemisphereProcessRight2011', optional = 1 ) )
+    
+    eNode.addLink( 'Hemisphere_Process_Left.Lgraph', 'Lgraph' )
+    eNode.addLink( 'Hemisphere_Process_Right.Rgraph', 'Rgraph' )
 
+    eNode.addLink( 'Hemisphere_Process_Left.SulcalinesExtractionLeft.sulcus_identification', 'sulcus_identification')
+    eNode.addLink( 'Hemisphere_Process_Right.SulcalinesExtractionRight.sulcus_identification', 'sulcus_identification')
+    
+    self.setExecutionNode( eNode )

@@ -33,7 +33,6 @@ include( 'builtin' )
 include( 'registration' )
 include( 'anatomy' )
 
-
 ## surface coordinates
 FileType( 'Hippocampus pole texture', 'Texture' )
 FileType( 'Left hippocampus pole texture', 'Hippocampus pole texture' )
@@ -66,16 +65,11 @@ FileType( 'Right hemisphere latitude texture', 'Latitude coordinate texture' )
 FileType( 'Conformal longitude texture', 'Coordinate texture' )
 FileType( 'Conformal latitude texture', 'Coordinate texture' )
 
-
-
-
 FileType( 'Hemisphere gyri parcellation texture', 'Gyri White Texture' )
 FileType( 'Left hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
 FileType( 'Right hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
 FileType( 'Left hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
 FileType( 'Right hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
-
-
 
 
 FileType( 'Coordinate grid', 'Mesh' )
@@ -91,7 +85,6 @@ FileType( 'Right Cingular Pole Template Subject', '3D Volume' )
 
 ## model files
 
-FileType( 'Surface Label Translation', 'Label Translation')
 FileType( 'Latitude Constraint Gyri Model', 'Gyri Model' )
 FileType( 'Longitude Constraint Gyri Model', 'Gyri Model' )
 
@@ -128,9 +121,6 @@ FileType( 'Surface-Based Beta Map', 'Texture' )
 
 FileType( 'Cortical thickness', 'Texture' )
 
-FileType( 'Surface Label Translation', 'Label Translation' )
-
-
 # Sulci parameterizations
 
 FileType( 'Sulcus mesh' , 'Mesh' )
@@ -138,3 +128,14 @@ FileType( 'Sulcus x coordinate texture', 'Texture' )
 FileType( 'Sulcus y coordinate texture', 'Texture' ) 
 FileType( 'Sulcus coordinate grid mesh', 'Mesh' )
 FileType( 'Sulcus depth profile', 'Text file' )
+
+# Sulcal lines extraction
+FileType( 'hemisphere Sulcal Lines texture', 'Texture' )
+FileType( 'Left hemisphere Sulcal Lines texture', 'hemisphere Sulcal Lines texture' )
+FileType( 'Right hemisphere Sulcal Lines texture', 'hemisphere Sulcal Lines texture' )
+
+FileType( 'Graph Label Translation', 'Text File' )
+FileType( 'Left Graph Label Translation', 'Graph Label Translation' )
+FileType( 'Right Graph Label Translation', 'Graph Label Translation' )
+
+

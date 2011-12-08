@@ -76,6 +76,11 @@ insert( '{protocol}/{subject}',
     "<subject>_Rwhite_curv_blobs", SetType( 'Blob White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_Lwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_Rwhite_curv_ss", SetType( 'Scale Space White Curvature Texture' ), SetWeakAttr( 'side', 'right' ),
+    
+    "<subject>_Lwhite_sulcalines", SetType( 'Left hemisphere Sulcal Lines texture' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_Rwhite_sulcalines", SetType( 'Right hemisphere Sulcal Lines texture' ), SetWeakAttr( 'side', 'right' ),
+    "<subject>_LgraphLabelBasins", SetType( 'Left Graph Label Translation' ), SetWeakAttr( 'side', 'left' ),
+    "<subject>_RgraphLabelBasins", SetType( 'Right Graph Label Translation' ), SetWeakAttr( 'side', 'right' ),
   ),
 )
 
