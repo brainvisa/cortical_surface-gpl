@@ -59,7 +59,7 @@ def initialization( self ):
     self.findValue( 'file_correspondance_constraint', {'filename_variable' : 'constraint_correspondance_2011'} )
     self.bucket_label_type = 'All'
     self.side = 'right'
-    self.sulcus_identification = 'name'
+    self.sulcus_identification = 'label'
     self.basin_min_size = 50.0
     self.constraint_weight = 15
     self.constraint_value = 'Basins Label'
