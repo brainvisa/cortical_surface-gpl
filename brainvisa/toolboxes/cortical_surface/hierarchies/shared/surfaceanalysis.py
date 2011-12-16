@@ -36,7 +36,7 @@ include( 'sulci' )
 insert( 'nomenclature','surfaceanalysis',
   SetContent(
     'constraint_correspondance', SetType( 'Constraint coordinates values' ),SetWeakAttr( 'filename_variable', 'constraint_correspondance'),
-    'constraint_correspondance_2011', SetType( 'Constraint coordinates values' ),SetWeakAttr( 'filename_variable', 'constraint_correspondance_2011'),
+    'constraint_correspondance_2012', SetType( 'Constraint coordinates values' ),SetWeakAttr( 'filename_variable', 'constraint_correspondance_2012'),
     'surfaceReferential', SetType( 'Label Translation' ),SetWeakAttr( 'filename_variable', 'surfaceReferential'),SetWeakAttr( 'category', 'translation'),
     'surfaceRefModel_par', SetType( 'Latitude Constraint Gyri Model' ),
     'surfaceRefModel_mer', SetType( 'Longitude Constraint Gyri Model' ),
