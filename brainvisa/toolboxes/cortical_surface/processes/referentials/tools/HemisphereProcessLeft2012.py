@@ -31,7 +31,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from neuroProcesses import *
 
-name = 'Pipeline 2011 parameterization left hemisphere'
+name = 'Pipeline 2012 parameterization left hemisphere'
 userLevel = 2
  
 signature = Signature(

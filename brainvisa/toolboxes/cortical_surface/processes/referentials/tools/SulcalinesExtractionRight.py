@@ -56,7 +56,7 @@ def initialization( self ):
     self.linkParameters( 'Rgraph_label_basins','Rwhite_mesh')
     self.linkParameters( 'Rgraph_label_basins','Rgraph')
     self.findValue( 'labels_translation_map', {'filename_variable' : 'sulci_model_2008'} )
-    self.findValue( 'file_correspondance_constraint', {'filename_variable' : 'constraint_correspondance_2011'} )
+    self.findValue( 'file_correspondance_constraint', {'filename_variable' : 'constraint_correspondance_2012'} )
     self.bucket_label_type = 'All'
     self.side = 'right'
     self.sulcus_identification = 'label'

@@ -34,7 +34,7 @@
 from neuroProcesses import *
 import shfjGlobals     
 
-name = 'Cortical Surface Parameterization Pipeline 2011'
+name = 'Cortical Surface Parameterization Pipeline 2012'
 userLevel = 2
 
 signature = Signature( 
@@ -51,9 +51,9 @@ def initialization( self ):
     eNode = SerialExecutionNode( self.name, parameterized=self )
 
     eNode.addChild( 'Hemisphere_Process_Left',
-                    ProcessExecutionNode( 'HemisphereProcessLeft2011', optional = 1 ) )
+                    ProcessExecutionNode( 'HemisphereProcessLeft2012', optional = 1 ) )
     eNode.addChild( 'Hemisphere_Process_Right',
-                    ProcessExecutionNode( 'HemisphereProcessRight2011', optional = 1 ) )
+                    ProcessExecutionNode( 'HemisphereProcessRight2012', optional = 1 ) )
     
     eNode.addLink( 'Hemisphere_Process_Left.Lgraph', 'Lgraph' )
     eNode.addLink( 'Hemisphere_Process_Right.Rgraph', 'Rgraph' )

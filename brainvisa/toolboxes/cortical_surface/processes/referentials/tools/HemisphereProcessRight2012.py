@@ -31,12 +31,11 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from neuroProcesses import *
 
-name = 'Pipeline 2011 parameterization right hemisphere'
-
+name = 'Pipeline 2012 parameterization right hemisphere'
 userLevel = 2
  
 signature = Signature(
-  'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'right' } )
+  'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'right' }  )
 )
 
 def initialization( self ):
@@ -46,28 +45,29 @@ def initialization( self ):
                     ProcessExecutionNode( 'ChangeTemplateReferentialRight', optional = 1 ) )
     eNode.addChild( 'CingularPoleRight',
                     ProcessExecutionNode( 'CingularPoleProjectionRight', optional = 1 ) )
-    
+
     eNode.addChild( 'SulcalinesExtractionRight',
                     ProcessExecutionNode( 'SulcalinesExtractionRight', optional = 1 ) )
-    
+
     eNode.addChild( 'ParameterizeUnconstrainedHarmonicRight',
-                ProcessExecutionNode( 'ParameterizeUnconstrainedHarmonicRight', optional = 1 ) )
-    
+                    ProcessExecutionNode( 'ParameterizeUnconstrainedHarmonicRight', optional = 1 ) )
+        
     eNode.addChild( 'HarmonicMappingOrthoRight',
                     ProcessExecutionNode( 'HarmonicMappingOrthoRight', optional = 1 ) )
-    
-    eNode.addLink( 'ChangeTemplateReferentialRight.mri_corrected', 'Rgraph' )    
+        
+    eNode.addLink( 'ChangeTemplateReferentialRight.mri_corrected', 'Rgraph' )
     eNode.addLink( 'ChangeTemplateReferentialRight.transformation_input', 'Rgraph' )
     
     eNode.addLink(  'CingularPoleRight.right_pole_template','ChangeTemplateReferentialRight.output_template' )
     eNode.addLink(  'CingularPoleRight.right_white_mesh','SulcalinesExtractionRight.Rwhite_mesh')
     eNode.addLink(  'CingularPoleRight.right_white_mesh','ParameterizeUnconstrainedHarmonicRight.Rwhite_mesh')
     eNode.addLink(  'CingularPoleRight.right_white_mesh','HarmonicMappingOrthoRight.Rwhite_mesh')
-    
+
     eNode.addLink(  'SulcalinesExtractionRight.Rwhite_mesh','CingularPoleRight.right_white_mesh')
-    eNode.addLink(  'SulcalinesExtractionRight.Rgraph','Rgraph' )      
+    eNode.addLink(  'SulcalinesExtractionRight.Rgraph','Rgraph' )        
     
     eNode.addLink(  'ParameterizeUnconstrainedHarmonicRight.Rwhite_mesh','SulcalinesExtractionRight.Rwhite_mesh')
     eNode.addLink(  'HarmonicMappingOrthoRight.Rwhite_mesh','SulcalinesExtractionRight.Rwhite_mesh')
     
+
     self.setExecutionNode( eNode )
