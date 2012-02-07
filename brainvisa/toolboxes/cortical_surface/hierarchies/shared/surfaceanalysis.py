@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
@@ -49,9 +50,7 @@ insert( 'hemitemplate',
   "*PoleRight", SetType( "Right Cingular Pole Template" ), 
 )
 
-insertFirst( 'models/discriminative_models/{graph_version}', 'gyrus', SetContent(
+insert( 'models/models_{sulci_database}/discriminative_models/{graph_version}/{model}',
     'gyri', SetType( 'Gyri Model' ),
-    "*", SetType( 'Model graph' ),
-  )
 )
 
