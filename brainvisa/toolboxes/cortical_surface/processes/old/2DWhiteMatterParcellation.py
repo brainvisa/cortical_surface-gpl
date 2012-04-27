@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -91,6 +92,12 @@ signature = Signature(
 )
 
 def initialization( self ):
+    def linkLabelAtt( self, dummy ):
+        if self.Lgraph is not None:
+            m = self.Lgraph.get( 'manually_labelled' )
+            if m and m == 'Yes':
+                return 'name'
+        return 'label'
     self.linkParameters( 'left_white_mesh', 'Lgraph' )
     self.linkParameters( 'left_hemi_mesh', 'Lgraph' )
     self.linkParameters( 'Rgraph', 'Lgraph' )
@@ -111,6 +118,7 @@ def initialization( self ):
     self.linkParameters( 'left_gyri_label_to_gyri_name', 'Lgraph' )
     self.linkParameters( 'right_gyri_label_to_gyri_name', 'Rgraph' )
     self.sulcus_identification = 'label'
+    self.linkParameters( 'sulcus_identification', 'Lgraph', linkLabelAtt )
     self.setOptional('right_grey_white','left_grey_white',
                     'left_white_gyri_volume','right_white_gyri_volume',
                     'Rgraph', 'Lgraph',
@@ -120,17 +128,19 @@ def initialization( self ):
                     'left_gyri_graph','right_gyri_graph',
                     'left_white_sulci','right_white_sulci' )
     self.translation = ReadDiskItem('Label Translation','Label Translation' ).findValue( { 'filename_variable' : 'gyri' } )
-    self.gyri_model = databases.getDiskItemFromUuid( '172c4168-a9d3-dc41-464c-1226ad07c19c' )
+    try:
+      self.gyri_model = databases.getDiskItemFromUuid( '172c4168-a9d3-dc41-464c-1226ad07c19c' )
+    except: pass
     self.Projection = 'Yes'
 
 def execution( self, context ): 
 
      call_list = ['siParcellation',
                   '-m', self.gyri_model.fullPath() ]
-          
+
      if self.Parcellation == 'Cortical Ribbon':
           call_list += ['--3D']
-         
+
      if self.Side in ('Left','Both'):
           if ( self.Projection == 'Yes' ):
                context.runProcess( 'CreateLabelTexture', 
