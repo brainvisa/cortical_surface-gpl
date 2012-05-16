@@ -34,7 +34,7 @@
 # By A.M. - 02-02-2011
 # Inpired from inflateCorticalSurface.py, AnatomistShowInflatedWhiteMesh.py
 
-from neuroProcesses import *
+from brainvisa.processes import *
 from brainvisa import anatomist
 
 name = 'Surface MultiActivations Viewer'

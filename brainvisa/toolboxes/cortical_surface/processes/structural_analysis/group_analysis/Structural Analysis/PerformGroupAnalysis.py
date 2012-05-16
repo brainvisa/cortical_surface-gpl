@@ -1,4 +1,4 @@
-from neuroProcesses import *
+from brainvisa.processes import *
 import shfjGlobals     
 
 name = '3 - Perform Group Analysis'

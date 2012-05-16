@@ -1,5 +1,5 @@
 
-from neuroProcesses import *
+from brainvisa.processes import *
 import shfjGlobals   
 
 name = 'Project Texture Onto Atlas'
