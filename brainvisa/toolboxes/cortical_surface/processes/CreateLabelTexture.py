@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -32,7 +33,7 @@
 
 from neuroProcesses import *
 import shfjGlobals
-from neuroHierarchy import databases
+from brainvisa.data.neuroHierarchy import databases
 
 name = 'Create Label Texture'
 

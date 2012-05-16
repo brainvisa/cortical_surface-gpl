@@ -32,7 +32,6 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from neuroProcesses import *
-import shfjGlobals     
 
 name = 'Create Surface-Based Functional Data'
 userLevel = 0
@@ -54,7 +53,6 @@ def getName(self,data):
 	return result
 
 def initialization( self ):
-	from neuroHierarchy import databases
 	from copy import copy
 
 	eNode = SerialExecutionNode( self.name, parameterized = self )

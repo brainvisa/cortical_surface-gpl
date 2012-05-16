@@ -32,9 +32,9 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from neuroProcesses import *
-import shfjGlobals
-from neuroHierarchy import databases
-import registration
+import brainvisa.tools.aimsGlobals as shfjGlobals
+from brainvisa.data.neuroHierarchy import databases
+from brainvisa import registration
 
 name = 'Gyral Parcellation'
 
