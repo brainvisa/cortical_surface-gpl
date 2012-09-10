@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -35,14 +36,14 @@ name = 'Pipeline 2012 parameterization left hemisphere'
 userLevel = 2
  
 signature = Signature(
-  'Lgraph', ReadDiskItem( 'Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'left' }  )
+  'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'left' }  )
 )
 
 def initialization( self ):
     eNode = SerialExecutionNode( self.name, parameterized=self )
 
-    eNode.addChild( 'ChangeTemplateReferentialLeft',
-                    ProcessExecutionNode( 'ChangeTemplateReferentialLeft', optional = 1 ) )
+    eNode.addChild( 'ChangeTemplateReferential',
+                    ProcessExecutionNode( 'ChangeTemplateReferential', optional = 1 ) )
     eNode.addChild( 'CingularPoleLeft',
                     ProcessExecutionNode( 'CingularPoleProjectionLeft', optional = 1 ) )
 
@@ -54,11 +55,14 @@ def initialization( self ):
         
     eNode.addChild( 'HarmonicMappingOrthoLeft',
                     ProcessExecutionNode( 'HarmonicMappingOrthoLeft', optional = 1 ) )
-        
-    eNode.addLink( 'ChangeTemplateReferentialLeft.mri_corrected', 'Lgraph' )
-    eNode.addLink( 'ChangeTemplateReferentialLeft.transformation_input', 'Lgraph' )
+
+    eNode.ChangeTemplateReferential.findValue( 'pole_template',
+        { 'side' : 'left' } )
+
+    eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'Lgraph' )
+    eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'Lgraph' )
     
-    eNode.addLink(  'CingularPoleLeft.left_pole_template','ChangeTemplateReferentialLeft.output_template' )
+    eNode.addLink(  'CingularPoleLeft.left_pole_template','ChangeTemplateReferential.output_template' )
     eNode.addLink(  'CingularPoleLeft.left_white_mesh','SulcalinesExtractionLeft.Lwhite_mesh')
     eNode.addLink(  'CingularPoleLeft.left_white_mesh','ParameterizeUnconstrainedHarmonicLeft.Lwhite_mesh')
     eNode.addLink(  'CingularPoleLeft.left_white_mesh','HarmonicMappingOrthoLeft.Lwhite_mesh')

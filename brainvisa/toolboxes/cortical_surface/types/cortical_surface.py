@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -77,11 +78,13 @@ FileType( 'Left hemisphere coordinate grid', 'Coordinate grid')
 FileType( 'Right hemisphere coordinate grid', 'Coordinate grid')
 
 ## template for poles
-FileType( 'Left Cingular Pole Template', '3D Volume' )
-FileType( 'Right Cingular Pole Template', '3D Volume' )
+FileType( 'Cingular Pole Template', '3D Volume' )
+FileType( 'Left Cingular Pole Template', 'Cingular Pole Template' )
+FileType( 'Right Cingular Pole Template', 'Cingular Pole Template' )
 
-FileType( 'Left Cingular Pole Template Subject', '3D Volume' )
-FileType( 'Right Cingular Pole Template Subject', '3D Volume' )
+FileType( 'Cingular Pole Template Subject', '3D Volume' )
+FileType( 'Left Cingular Pole Template Subject', 'Cingular Pole Template Subject' )
+FileType( 'Right Cingular Pole Template Subject', 'Cingular Pole Template Subject' )
 
 ## model files
 

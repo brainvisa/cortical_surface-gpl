@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -35,14 +36,14 @@ name = 'Pipeline 2012 parameterization right hemisphere'
 userLevel = 2
  
 signature = Signature(
-  'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'right' }  )
+  'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'right' }  )
 )
 
 def initialization( self ):
     eNode = SerialExecutionNode( self.name, parameterized=self )
 
-    eNode.addChild( 'ChangeTemplateReferentialRight',
-                    ProcessExecutionNode( 'ChangeTemplateReferentialRight', optional = 1 ) )
+    eNode.addChild( 'ChangeTemplateReferential',
+                    ProcessExecutionNode( 'ChangeTemplateReferential', optional = 1 ) )
     eNode.addChild( 'CingularPoleRight',
                     ProcessExecutionNode( 'CingularPoleProjectionRight', optional = 1 ) )
 
@@ -55,10 +56,13 @@ def initialization( self ):
     eNode.addChild( 'HarmonicMappingOrthoRight',
                     ProcessExecutionNode( 'HarmonicMappingOrthoRight', optional = 1 ) )
         
-    eNode.addLink( 'ChangeTemplateReferentialRight.mri_corrected', 'Rgraph' )
-    eNode.addLink( 'ChangeTemplateReferentialRight.transformation_input', 'Rgraph' )
+    eNode.ChangeTemplateReferential.findValue( 'pole_template',
+        { 'side' : 'right' } )
+
+    eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'Rgraph' )
+    eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'Rgraph' )
     
-    eNode.addLink(  'CingularPoleRight.right_pole_template','ChangeTemplateReferentialRight.output_template' )
+    eNode.addLink(  'CingularPoleRight.right_pole_template','ChangeTemplateReferential.output_template' )
     eNode.addLink(  'CingularPoleRight.right_white_mesh','SulcalinesExtractionRight.Rwhite_mesh')
     eNode.addLink(  'CingularPoleRight.right_white_mesh','ParameterizeUnconstrainedHarmonicRight.Rwhite_mesh')
     eNode.addLink(  'CingularPoleRight.right_white_mesh','HarmonicMappingOrthoRight.Rwhite_mesh')
