@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -86,7 +87,9 @@ def initialization( self ):
     eNode.addLink( 'CorticalSurfaceParameterizationLeft.left_white_sulci_mer','ConstraintCleanerLeft.left_white_sulci_mer_cleaned')
     
     eNode.addLink( 'CorticalSurfaceParcellationLeft.left_longitude','CorticalSurfaceParameterizationLeft.left_longitude')
-    
-    eNode.addLink( 'RegularizeParcellationLeft.left_white_mesh','CorticalSurfaceParameterizationLeft.left_white_mesh')
+
+    eNode.RegularizeParcellationLeft.removeLink( 'left_gyri', 'left_white_mesh' )
+    eNode.addDoubleLink( 'RegularizeParcellationLeft.left_gyri' , 'CorticalSurfaceParcellationLeft.left_gyri' )
+    eNode.addLink( 'RegularizeParcellationLeft.left_white_mesh','CorticalSurfaceParameterizationLeft.left_white_mesh' )
     
     self.setExecutionNode( eNode )

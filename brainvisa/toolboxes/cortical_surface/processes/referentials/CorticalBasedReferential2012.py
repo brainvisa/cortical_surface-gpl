@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 
 #  This software and supporting documentation are distributed by
@@ -38,8 +39,8 @@ name = 'Cortical Surface Parameterization Pipeline 2012'
 userLevel = 2
 
 signature = Signature( 
-  'Lgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
-  'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
+  'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
+  'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
   'sulcus_identification',Choice('name','label')
   )
 

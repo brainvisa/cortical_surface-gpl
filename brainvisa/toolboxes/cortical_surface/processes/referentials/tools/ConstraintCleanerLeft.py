@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
@@ -39,7 +40,6 @@ userLevel = 2
 
 
 signature = Signature(
-    'Side', Choice("Left"),
     'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'left_cingular_pole',ReadDiskItem( 'Left hippocampus pole texture'  , 'Texture',requiredAttributes={ 'side': 'left' } ),
     'left_white_sulci_mer',ReadDiskItem( 'Left hemisphere longitude constraints texture', 'Texture',requiredAttributes={ 'side': 'left' }  ),
@@ -69,7 +69,6 @@ def initialization( self ):
     #self.linkParameters( 'left_sulci_label_to_sulci_name', 'left_white_mesh' )
     self.setOptional( 'process', 'left_white_sulci_mer_cleaned', 'left_white_sulci_par_cleaned', 'constraint_dist_param', 'curvature_param', 'elasticity_param'  )
     self.findValue( 'file_correspondance_constraint', {} )
-    self.setOptional('file_correspondance_constraint')
 
     self.constraint_dist_param = 20
     self.curvature_param = 500
