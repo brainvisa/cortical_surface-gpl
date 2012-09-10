@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
@@ -31,7 +32,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
+import brainvisa.tools.aimsGlobals as shfjGlobals
+from brainvisa import registration
 
 name = 'Change Template Referential Left'
 
@@ -68,5 +70,7 @@ def execution( self, context ):
     context.system('AimsInvertTransformation', '-i', self.transformation_input.fullPath(), '-o', self.talairach_to_subject.fullPath() )
     context.system('AimsComposeTransformation', '-i', self.talairach_to_subject.fullPath(), '-j', self.template_pole_transformation.fullPath(), '-o', self.subject_to_template.fullPath() )
     context.system('VipSplineResamp', '-i', self.left_pole_template.fullPath(), '-o', self.output_template.fullPath(), '-t', self.mri_corrected, '-d', self.subject_to_template.fullPath(), '-ord', param )
-    
+    tm = registration.getTransformationManager()
+    tm.copyReferential( self.mri_corrected, self.output_template )
+
     context.write('Done')

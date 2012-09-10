@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
@@ -39,7 +40,6 @@ userLevel = 2
 
 
 signature = Signature(
-    'Side', Choice("Right"),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'right_cingular_pole',ReadDiskItem( 'Right hippocampus pole texture'  , 'Texture',requiredAttributes={ 'side': 'right' } ),
     'right_white_sulci_mer',ReadDiskItem( 'Right hemisphere longitude constraints texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),

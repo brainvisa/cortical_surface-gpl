@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
@@ -38,7 +39,6 @@ name = 'Create Right Hemisphere Cortical Constraints Texture'
 userLevel = 2
 
 signature = Signature(
-    'Side', Choice("Right"),
     'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
     'sulcus_identification',Choice('name','label'),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims readable volume formats' ),
@@ -59,10 +59,10 @@ def initialization( self ):
     self.linkParameters( 'right_white_sulci_mer', 'right_white_mesh' )
     self.linkParameters( 'right_white_sulci_par', 'right_white_mesh' )
     self.linkParameters( 'right_sulci_label_to_sulci_name', 'Rgraph' )
-    self.setOptional('Rgraph', 'right_white_mesh', 'right_white_sulci_mer', 'right_white_sulci_par'  )
+    self.setOptional( 'right_white_sulci_mer', 'right_white_sulci_par' )
     self.sulcus_identification = 'label'
-    self.findValue( 'translation', {} )
-    self.setOptional('translation')
+    self.translation = self.signature[ 'translation' ].findValue( \
+        { 'filename_variable' : 'surfaceReferential' } )
     self.findValue( 'ParModel', {} )
     self.setOptional('ParModel')
     self.findValue( 'MerModel', {} )
@@ -73,8 +73,8 @@ def execution( self, context ):
     context.write('Right hemisphere')
     if self.coord in ('Longitude','Both'):
         context.write('processing longitude constraints...')
-        context.system('siMeshSulciProjection', '-i', self.right_white_mesh.fullPath() ,  '-g' , self.Rgraph.fullPath(), '-l' , self.translation.fullPath() , '-m', self.MerModel.fullPath() , '-s' , self.sulcus_identification, '-v' , self.mri_corrected.fullPath(), '-o' ,self.right_white_sulci_mer.fullPath() ,'-V', 1,'-M',2,'-n',5,'-a', Affine_estimation_coef, '-e', 20,'-t',self.right_sulci_label_to_sulci_name.fullPath() ,'-p',1 )
+        context.system('siMeshSulciProjection', '-i', self.right_white_mesh,  '-g' , self.Rgraph, '-l' , self.translation, '-m', self.MerModel, '-s' , self.sulcus_identification, '-v' , self.mri_corrected, '-o' ,self.right_white_sulci_mer, '-V', 1,'-M',2,'-n',5,'-a', Affine_estimation_coef, '-e', 20,'-t',self.right_sulci_label_to_sulci_name, '-p',1 )
     if self.coord in ('Latitude','Both'):
         context.write('processing latitude constraints...')
-        context.system('siMeshSulciProjection', '-i', self.right_white_mesh.fullPath() ,  '-g' , self.Rgraph.fullPath(), '-l' , self.translation.fullPath() , '-m', self.ParModel.fullPath() , '-s' , self.sulcus_identification, '-v' , self.mri_corrected.fullPath(), '-o' ,self.right_white_sulci_par.fullPath() ,'-V', 1,'-M',2,'-n',5,'-a', Affine_estimation_coef, '-e', 20,'-t',self.right_sulci_label_to_sulci_name.fullPath() ,'-p',1 )
+        context.system('siMeshSulciProjection', '-i', self.right_white_mesh,  '-g' , self.Rgraph, '-l' , self.translation, '-m', self.ParModel, '-s' , self.sulcus_identification, '-v' , self.mri_corrected, '-o' ,self.right_white_sulci_par, '-V', 1,'-M',2,'-n',5,'-a', Affine_estimation_coef, '-e', 20,'-t',self.right_sulci_label_to_sulci_name, '-p',1 )
     context.write('Done')

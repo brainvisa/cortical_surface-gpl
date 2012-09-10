@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 
 #  This software and supporting documentation are distributed by
@@ -38,17 +39,16 @@ name = 'Cortical Surface Parameterization Pipeline'
 userLevel = 2
 
 signature = Signature( 
-  'Lgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
-  'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
+  'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
+  'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
   'sulcus_identification',Choice('name','label')
   )
 
 
 def initialization( self ):
-    self.linkParameters( 'Lgraph','Rgraph')
     self.linkParameters( 'Rgraph','Lgraph')
     self.sulcus_identification='label'
-    eNode = SerialExecutionNode( self.name, parameterized=self )
+    eNode = ParallelExecutionNode( self.name, parameterized=self )
 
     eNode.addChild( 'LeftHemisphere_Process',
                     ProcessExecutionNode( 'LeftHemisphereProcess', optional = 1 ) )
