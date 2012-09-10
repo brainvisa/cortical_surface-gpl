@@ -36,14 +36,14 @@ name = 'Right hemisphere'
 userLevel = 2
  
 signature = Signature(
-  'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'right' } )
+  'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph', requiredAttributes={ 'side': 'right' } )
 )
 
 def initialization( self ):
     eNode = SerialExecutionNode( self.name, parameterized=self )
 
-    eNode.addChild( 'ChangeTemplateReferentialRight',
-                    ProcessExecutionNode( 'ChangeTemplateReferentialRight', optional = 1 ) )
+    eNode.addChild( 'ChangeTemplateReferential',
+                    ProcessExecutionNode( 'ChangeTemplateReferential', optional = 1 ) )
     eNode.addChild( 'CingularPoleRight',
                     ProcessExecutionNode( 'CingularPoleProjectionRight', optional = 1 ) )
     eNode.addChild( 'ConstraintProjectionRight',
@@ -57,13 +57,16 @@ def initialization( self ):
     eNode.addChild( 'RegularizeParcellationRight',
                     ProcessExecutionNode( 'GyriRegularizationRight', optional = 1 ) )
 
-    eNode.addLink( 'ChangeTemplateReferentialRight.mri_corrected', 'Rgraph' )
+    eNode.ChangeTemplateReferential.findValue( 'pole_template',
+        { 'side' : 'right' } )
+
+    eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'Rgraph' )
 
     eNode.addLink( 'ConstraintProjectionRight.Rgraph', 'Rgraph' )
     
-    eNode.addLink( 'ChangeTemplateReferentialRight.transformation_input', 'Rgraph' )
+    eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'Rgraph' )
     
-    eNode.addLink(  'CingularPoleRight.right_pole_template','ChangeTemplateReferentialRight.output_template' )
+    eNode.addLink(  'CingularPoleRight.right_pole_template','ChangeTemplateReferential.output_template' )
     
     eNode.addLink(  'CingularPoleRight.right_white_mesh','ConstraintProjectionRight.Rgraph' )
     

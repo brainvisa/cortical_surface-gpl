@@ -35,41 +35,48 @@ from brainvisa.processes import *
 import brainvisa.tools.aimsGlobals as shfjGlobals
 from brainvisa import registration
 
-name = 'Change Template Referential Left'
+name = 'Change Template Referential'
 
 userLevel = 2
 
 
 signature = Signature(
-    'Side', Choice("Left"),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims readable volume formats' ),
     'transformation_input',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist',
     'Transformation matrix' ),
-    'left_pole_template',ReadDiskItem( 'Left Cingular Pole Template' , 'Aims readable volume formats' ),
+    'pole_template',ReadDiskItem( 'Cingular Pole Template' , 'Aims readable volume formats' ),
     'talairach_to_subject',WriteDiskItem( 'Talairach To Subject Transformation', 'Transformation matrix' ),
     'subject_to_template',WriteDiskItem( 'Subject To Template Transformation', 'Transformation matrix' ),
     'template_pole_transformation',ReadDiskItem( 'Template Pole To Talairach Tranformation', 'Transformation matrix' ),
-    'output_template', WriteDiskItem( 'Left Cingular Pole Template Subject' , 'Aims writable volume formats' ),
+    'output_template', WriteDiskItem( 'Cingular Pole Template Subject' , 'Aims writable volume formats' ),
 )
 
 def initialization( self ):
+    def linkSide( self, dummy ):
+        if self.pole_template is not None \
+            and self.mri_corrected is not None:
+            side = self.pole_template.get( 'side', None )
+            if side is not None:
+                wdi = WriteDiskItem( 'Cingular Pole Template Subject' ,
+                    'Aims writable volume formats',
+                    requiredAttributes={'side': side} )
+                return wdi.findValue( self.mri_corrected )
 #    self.linkParameters( 'left_cingular_pole','left_white_mesh')
     self.linkParameters( 'transformation_input','mri_corrected')
     self.linkParameters( 'subject_to_template','mri_corrected')
     self.linkParameters( 'talairach_to_subject','mri_corrected')
-    self.linkParameters( 'output_template','mri_corrected')
-    self.findValue( 'left_pole_template', {} )
-    self.setOptional('left_pole_template')
+    self.linkParameters( 'output_template',
+        ( 'mri_corrected', 'pole_template' ), linkSide )
+    self.findValue( 'pole_template', { 'side' : 'left' } )
     self.findValue( 'template_pole_transformation', {} )
-    self.setOptional('template_pole_transformation')
 
 def execution( self, context ):
     context.write('Changing Referential...')
     
     param = 0
-    context.system('AimsInvertTransformation', '-i', self.transformation_input.fullPath(), '-o', self.talairach_to_subject.fullPath() )
-    context.system('AimsComposeTransformation', '-i', self.talairach_to_subject.fullPath(), '-j', self.template_pole_transformation.fullPath(), '-o', self.subject_to_template.fullPath() )
-    context.system('VipSplineResamp', '-i', self.left_pole_template.fullPath(), '-o', self.output_template.fullPath(), '-t', self.mri_corrected, '-d', self.subject_to_template.fullPath(), '-ord', param )
+    context.system('AimsInvertTransformation', '-i', self.transformation_input, '-o', self.talairach_to_subject )
+    context.system('AimsComposeTransformation', '-i', self.talairach_to_subject, '-j', self.template_pole_transformation, '-o', self.subject_to_template )
+    context.system('VipSplineResamp', '-i', self.pole_template, '-o', self.output_template, '-t', self.mri_corrected, '-d', self.subject_to_template, '-ord', param )
     tm = registration.getTransformationManager()
     tm.copyReferential( self.mri_corrected, self.output_template )
 

@@ -46,8 +46,8 @@ insert( 'nomenclature','surfaceanalysis',
 
 
 insert( 'hemitemplate',
-  "*PoleLeft", SetType( "Left Cingular Pole Template" ), 
-  "*PoleRight", SetType( "Right Cingular Pole Template" ), 
+  "*PoleLeft", SetType( "Left Cingular Pole Template" ), SetWeakAttr( 'side', 'left' ),
+  "*PoleRight", SetType( "Right Cingular Pole Template" ), SetWeakAttr( 'side', 'right' ),
 )
 
 insert( 'models/models_{sulci_database}/discriminative_models/{graph_version}/{model}',
