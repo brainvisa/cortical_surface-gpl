@@ -21,7 +21,6 @@
 from brainvisa.processes import *
 import shfjGlobals   
 from brainvisa import anatomist
-import sigraph
 
 name = 'Sulcal Lines Extraction Right'
 

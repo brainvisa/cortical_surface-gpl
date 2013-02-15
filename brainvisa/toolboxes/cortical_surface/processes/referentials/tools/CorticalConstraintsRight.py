@@ -62,7 +62,7 @@ def initialization( self ):
     self.setOptional( 'right_white_sulci_mer', 'right_white_sulci_par' )
     self.sulcus_identification = 'label'
     self.translation = self.signature[ 'translation' ].findValue( \
-        { 'filename_variable' : 'surfaceReferential' } )
+        { 'filename_variable' : 'gyri' } )
     self.findValue( 'ParModel', {} )
     self.setOptional('ParModel')
     self.findValue( 'MerModel', {} )
