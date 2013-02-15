@@ -20,11 +20,10 @@
 from brainvisa.processes import *
 import shfjGlobals   
 from brainvisa import anatomist
-import sigraph
 
 name = 'Harmonic mapping under orthogonal constraints right hemisphere'
 
-userLevel = 2
+userLevel = 3
 
 def validation():
     anatomist.validation()
