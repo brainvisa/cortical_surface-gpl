@@ -41,6 +41,8 @@ FileType( 'Right hippocampus pole texture', 'Hippocampus pole texture' )
 FileType( 'Poles texture', 'Texture' )
 FileType( 'Left poles texture', 'Poles texture' )
 FileType( 'Right poles texture', 'Poles texture' )
+FileType( 'Left insula pole texture', 'Poles texture' )
+FileType( 'Right insula pole texture', 'Poles texture' )
 
 FileType( 'Constraints texture', 'Label Texture' )
 FileType( 'Latitude constraints texture', 'Constraints texture' )
@@ -76,6 +78,14 @@ FileType( 'Right hemisphere regularized parcellation texture', 'Hemisphere gyri 
 FileType( 'Coordinate grid', 'Mesh' )
 FileType( 'Left hemisphere coordinate grid', 'Coordinate grid')
 FileType( 'Right hemisphere coordinate grid', 'Coordinate grid')
+
+FileType( 'Spherical mesh', 'Mesh' )
+FileType( 'Left spherical mesh', 'Spherical mesh')
+FileType( 'Right spherical mesh', 'Spherical mesh')
+
+FileType( 'Remeshed mesh', 'Mesh' )
+FileType( 'Left remeshed mesh', 'Remeshed mesh')
+FileType( 'Right remeshed mesh', 'Remeshed mesh')
 
 ## template for poles
 FileType( 'Cingular Pole Template', '3D Volume' )

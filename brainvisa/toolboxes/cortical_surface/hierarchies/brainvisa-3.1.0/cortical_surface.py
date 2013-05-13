@@ -4,6 +4,12 @@ include( 'sulci' )
 insert( '{protocol}/{subject}',
   'surface', SetContent(
       ## que mettre dans les niveaux aquisition et analysis?
+    '<subject>_L_remeshed', SetType( 'Left remeshed mesh' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_R_remeshed', SetType( 'Right remeshed mesh' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_L_spherical', SetType( 'Left spherical mesh' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_R_spherical', SetType( 'Right spherical mesh' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Linsula', SetType( 'Left insula pole texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rinsula', SetType( 'Right insula pole texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lhippo', SetType( 'Left hippocampus pole texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rhippo', SetType( 'Right hippocampus pole texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_L_poles', SetType( 'Left poles texture' ), SetWeakAttr( 'side', 'left' ),
