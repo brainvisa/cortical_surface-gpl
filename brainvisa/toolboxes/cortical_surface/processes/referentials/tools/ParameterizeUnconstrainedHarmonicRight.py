@@ -18,29 +18,71 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
-from brainvisa import anatomist
+import shfjGlobals  
+from soma import aims
+import numpy as np
+ 
+#from brainvisa import anatomist
 
-name = 'Unconstrained harmonic parameterization right hemisphere'
+name = 'Harmonic Intrinsic Parameterization right hemisphere'
 
 userLevel = 3
 
-def validation():
-    anatomist.validation()
+#def validation():
+#    anatomist.validation()
     
 signature = Signature(
                       
-    'Side', Choice('right'),
-    'Rwhite_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    
+    'Side', Choice('right'),    
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats,requiredAttributes={ 'side': 'right' } ),    
+    'cingular_pole_texture',ReadDiskItem( 'Right hippocampus pole texture','Texture',requiredAttributes={ 'side': 'right' } ),
+    'insular_pole_texture',ReadDiskItem( 'Right insula pole texture','Texture',requiredAttributes={ 'side': 'right' } ),
+    'white_sulcalines',ReadDiskItem( 'Right hemisphere Sulcal Lines texture', 'Texture' ,requiredAttributes={ 'side': 'right' } ),
+    'sulcus_labels',ReadDiskItem( 'Right Graph Label Translation', 'Text File',requiredAttributes={ 'side': 'right' }),
+    'latitude',WriteDiskItem( 'Right hemisphere latitude texture','Texture',requiredAttributes={ 'side': 'right' } ),
+    'longitude',WriteDiskItem( 'Right hemisphere longitude texture','Texture',requiredAttributes={ 'side': 'right' })
 )
 
 def initialization( self ):
-      
-    self.side = 'right'
+    self.linkParameters( 'cingular_pole_texture','white_mesh')
+    self.linkParameters( 'insular_pole_texture','white_mesh')
+    self.linkParameters( 'white_sulcalines','white_mesh')
+    self.linkParameters( 'sulcus_labels','white_mesh')
+    self.linkParameters( 'latitude','white_mesh')
+    self.linkParameters( 'longitude','white_mesh')
+
     
 def execution( self, context ):
-        
+#    sys.path.append('/home/toz/workspace/MyTestProject/cortical_surface')
+    for p in sys.path:
+        print p
+    print np.__version__ 
+    import brainvisa.cortical_surface as cs
+    cs.parameterization.mapping.hipHop
+    from brainvisa.cortical_surface.parameterization import mapping
+    print 'mapping imported'
+    from brainvisa.cortical_surface.parameterization.mapping import hipHop
+    
+  
+    re = aims.Reader()
+    ws = aims.Writer()
+    context.write('Reading textures and mesh')
+    cing_pole = re.read(self.cingular_pole_texture.fullPath())
+    insula_pole = re.read(self.insular_pole_texture.fullPath())
+    texture_sulci = re.read(self.white_sulcalines.fullPath())
+    mesh = re.read(self.white_mesh.fullPath())
+    context.write('HIP-HOP')
+    lon, lat = hipHop(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), texture_sulci[0].arraydata())
+    context.write('Writing textures')
+    tex_lon = aims.TimeTexture_FLOAT()
+    tex_lon[0].assign(lon)
+    ws.write(tex_lon, self.longitude.fullPath())
+    tex_lat = aims.TimeTexture_FLOAT()
+    tex_lat[0].assign(lat)
+    ws.write(tex_lat, self.latitude.fullPath())
+
+#    spherical_verts = sphericalMeshFromCoords(lat, lon, 50):
+    
     context.write('Done')
             
       

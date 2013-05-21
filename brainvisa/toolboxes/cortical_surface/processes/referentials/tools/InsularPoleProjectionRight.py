@@ -32,7 +32,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
 import shfjGlobals
-#from brainvisa import anatomist
+from brainvisa import anatomist
 
 
 name = 'Right Insular Pole Projection'
