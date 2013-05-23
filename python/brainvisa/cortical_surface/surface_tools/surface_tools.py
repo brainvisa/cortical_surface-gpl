@@ -10,8 +10,12 @@ from scipy import sparse
 
 
 def ismember(ar1, ar2):
-    (uni, inds) = np.unique1d(ar1, False, True)
-    I = np.setmember1d(uni, ar2)
+    if np.__version__<1.6:
+        (uni, inds) = np.unique1d(ar1, False, True)## deprecated since numpy.__version__ > 1.6
+        I = np.setmember1d(uni, ar2)
+    else:
+        (uni, inds) = np.unique(ar1, False, True)
+        I = np.in1d(uni, ar2)
     return np.reshape(I[inds], ar1.shape)
 
 
@@ -321,7 +325,11 @@ def textureBoundary(mesh, atex, val, neigh=0):
             ne_i = np.array(neigh[i].list())
             #print ne_i.size
             #print np.intersect1d_nu(ne_i, tex_val_indices).size
-            if (np.intersect1d_nu(ne_i, tex_val_indices).size != ne_i.size):
+            if np.__version__<1.6:
+                inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
+            else:
+                inters_size = np.intersect1d(ne_i, tex_val_indices).size
+            if (inters_size != ne_i.size):
                 bound_verts.append(i)
 
         adja = meshAdjacencyMatrix(mesh)
@@ -728,7 +736,10 @@ def subCutMesh(mesh, atex, val):
     I = ismember(poly, tex_val_indices)
     poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
 #    print tex_val_indices
-    (uni, inds) = np.unique1d(poly_set, False, True)
+    if np.__version__<1.6:
+        (uni, inds) = np.unique1d(poly_set, False, True)
+    else:
+        (uni, inds) = np.unique(poly_set, False, True)        
     submesh = aims.AimsTimeSurface_3()
     vv = aims.vector_POINT3DF()
     for i in vert[uni, :]:

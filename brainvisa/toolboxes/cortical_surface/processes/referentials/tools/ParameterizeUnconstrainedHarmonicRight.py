@@ -57,12 +57,9 @@ def execution( self, context ):
     for p in sys.path:
         print p
     print np.__version__ 
-    import brainvisa.cortical_surface as cs
-    cs.parameterization.mapping.hipHop
-    from brainvisa.cortical_surface.parameterization import mapping
-    print 'mapping imported'
     from brainvisa.cortical_surface.parameterization.mapping import hipHop
-    
+    print 'mapping imported'
+   
   
     re = aims.Reader()
     ws = aims.Writer()

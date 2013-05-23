@@ -3,13 +3,13 @@ Created on Jan 15, 2013
 
 @author: toz
 '''
-from sulcalLine import *
-from sulcalLinesSet import *
-from model import *
-from tools import *
+from brainvisa.cortical_surface.parameterization import sulcalLine as sln
+from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
+from brainvisa.cortical_surface.parameterization import model
+from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 from scipy.sparse.linalg import spsolve, gmres, bicgstab, splu
 import numpy as np
-from soma import aims
+from soma import aims, aimsalgo
 import time
 
 #class Mapping(object):
@@ -69,7 +69,7 @@ def sphereConformalMapping(mesh):
 ####################################################################
 def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
     if boundary is None:
-        boundary = meshBoundary(mesh)
+        boundary = surfTls.meshBoundary(mesh)
         #print 'Boundary: ', boundary
     boundary = np.array(boundary)
     if boundary_coords is None:
@@ -137,7 +137,7 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
     Rx = np.zeros(Nbv)
     Ry = np.zeros(Nbv)
 
-    Lx = computeMeshLaplacian(mesh)
+    Lx = surfTls.computeMeshLaplacian(mesh)
 
     if fixed_boundary:
         for i in boundary[3]:
@@ -735,7 +735,7 @@ def invertedPolygon(mesh, shape=None):
     if shape is None:
         shape = 'square'
 #    norms = np.array(mesh.normal())
-    norms = meshPolygonNormal(mesh)
+    norms = surfTls.meshPolygonNormal(mesh)
     if shape is 'sphere':
         print 'sphere not available yet'
 #N(1,:)=FaceNormal(1,:)+FaceCenter(1,:);
@@ -905,23 +905,23 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
     tex_poles_clean[np.where(cingular_tex_clean == cingular_tex_value)[0]] = cingular_tex_value
     tex_poles_clean[np.where(insula_tex_clean == insula_tex_value)[0]] = insula_tex_value
     print '------------------CutMesh'
-    (sub_meshes, labels, sub_indexes) = cutMesh(mesh, tex_poles_clean)
+    (sub_meshes, labels, sub_indexes) = surfTls.cutMesh(mesh, tex_poles_clean)
     print labels
     neo_ind = labels.index(neocortex_tex_value)
     neoCortex_mesh = sub_meshes[neo_ind]
-    neoCortex_boundary = meshBoundary(sub_meshes[neo_ind])
+    neoCortex_boundary = surfTls.meshBoundary(sub_meshes[neo_ind])
     neocortex_indices = sub_indexes[neo_ind]
     ins_ind = labels.index(insula_tex_value)
     insula_mesh = sub_meshes[ins_ind]
-    insula_boundary = meshBoundary(sub_meshes[ins_ind])
+    insula_boundary = surfTls.meshBoundary(sub_meshes[ins_ind])
     insula_indices = sub_indexes[ins_ind]
     cing_ind = labels.index(cingular_tex_value)
     cingular_mesh = sub_meshes[cing_ind]
-    cingular_boundary = meshBoundary(sub_meshes[cing_ind])
+    cingular_boundary = surfTls.meshBoundary(sub_meshes[cing_ind])
     cingular_indices = sub_indexes[cing_ind]
     print '------------------poles path, always from insula to cingular pole'
-    cing_tex_boundary = textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
-    ins_tex_boundary = textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
+    cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
+    ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
     poles_path = getShortestPath(mesh, ins_tex_boundary[0], cing_tex_boundary[0])
     "poles_path to neocortex"
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
@@ -966,7 +966,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
 #    texture_sulci[np.where(insula_tex_clean == insula_tex_value)[0]]=0
     tex_cstr_square = texture2ROI(texture_sulci, neocortex_indices)
 
-    full_sulci = SulcalLinesSet()
+    full_sulci = slSet.SulcalLinesSet()
     full_sulci.extractFromTexture(texture_sulci, mesh)
 
     full_sulci.updateIndices(neocortex_indices)
@@ -992,10 +992,10 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
     model.printArgs()
 
 
-    Lx = computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
+    Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
-    (neoCortex_square_cstr, nb_inward_cstr_evol) = solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)
+    (neoCortex_square_cstr, nb_inward_cstr_evol) = surfTls.solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)
     print 'nb_inward_cstr_evol', nb_inward_cstr_evol
 
     lon, lat = computeCoordinates(mesh, neocortex_indices, neoCortex_square_cstr, neoCortex_open_boundary, poles_lat_insula, poles_lat_cingular)
