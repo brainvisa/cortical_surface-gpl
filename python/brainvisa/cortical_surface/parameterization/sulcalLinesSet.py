@@ -4,7 +4,8 @@ Created on 2 august 2012
 @author: toz
 '''
 from soma import aims
-from sulcalLine import *
+import numpy as np
+from brainvisa.cortical_surface.parameterization import sulcalLine as sln
 
 
 class SulcalLinesSet(object):
@@ -12,7 +13,7 @@ class SulcalLinesSet(object):
     classdocs
     '''
 
-    def __init__(self, sls=[SulcalLine()]):
+    def __init__(self, sls=[sln.SulcalLine()]):
         '''
         Constructor
         '''
@@ -25,7 +26,7 @@ class SulcalLinesSet(object):
 
         self.nbSulci = 0
         for sl in sls:
-            if isinstance(sl, SulcalConstraint):
+            if isinstance(sl, sln.SulcalConstraint):
                 if sl.axisID == []:
                     print 'should not happen!!'
                     sl.label2Axis()
@@ -43,7 +44,7 @@ class SulcalLinesSet(object):
         for lab in sl.labels:
             place = self.labels.index(lab)
             if place is None:
-                if isinstance(sl, SulcalConstraint):
+                if isinstance(sl, sln.SulcalConstraint):
                     if sl.axisID == []:
                         print 'should not happen!!'
                         sl.label2Axis()
@@ -103,7 +104,7 @@ class SulcalLinesSet(object):
             labels = np.unique(atex)
             labels = labels.tolist()
             labels.remove(0)
-        sls = [SulcalLine() for l in range(len(labels))]
+        sls = [sln.SulcalLine() for l in range(len(labels))]
         for l in range(len(labels)):
             sls[l].extractFromTexture(labels[l], tex, mesh, neigh)
         return self.__init__(sls)
@@ -122,11 +123,11 @@ class SulcalLinesSet(object):
                 else:
                     (axisID, isLon, isLat) = modele.label2Axis(lab)
                     if isLon:
-                        self.sulcalLines[place] = SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat)
+                        self.sulcalLines[place] = sln.SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat)
                         self.longitudeCstrIndex.append(place)
                         self.longitudeCstrAxis.append(axisID)
                     elif isLat:
-                        self.sulcalLines[place] = SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat)
+                        self.sulcalLines[place] = sln.SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat)
                         self.latitudeCstrIndex.append(place)
                         self.latitudeCstrAxis.append(axisID)
                     else:

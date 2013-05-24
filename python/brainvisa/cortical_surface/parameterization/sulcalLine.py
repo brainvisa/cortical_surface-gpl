@@ -132,7 +132,10 @@ class SulcalLine(object):
             C = sparse.lil_matrix((Nv, Nv))
             for v in tex_val_indices:
                 ne_i = np.array(neigh[v].list())
-                intersect = np.intersect1d_nu(ne_i, tex_val_indices)
+                if np.__version__<1.6:
+                    intersect = np.intersect1d_nu(ne_i, tex_val_indices)
+                else:
+                    intersect = np.intersect1d(ne_i, tex_val_indices)
                 if intersect is not None:
                     v_index = tex_val_indices.index(v)
                     for inter in intersect:

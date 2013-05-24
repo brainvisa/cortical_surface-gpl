@@ -5,8 +5,9 @@ Created on Jan 15, 2013
 '''
 from brainvisa.cortical_surface.parameterization import sulcalLine as sln
 from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
-from brainvisa.cortical_surface.parameterization import model
+from brainvisa.cortical_surface.parameterization import model as md
 from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+from scipy import sparse
 from scipy.sparse.linalg import spsolve, gmres, bicgstab, splu
 import numpy as np
 from soma import aims, aimsalgo
@@ -76,7 +77,7 @@ def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
         p = boundary.size
         t = np.arange(0, 2 * np.math.pi, (2 * np.math.pi / p))
         boundary_coords = np.array([np.cos(t), np.sin(t)])
-    L = computeMeshLaplacian(mesh)
+    L = surfTls.computeMeshLaplacian(mesh)
     #print 'Laplacian : ', L
     #vert = np.array(mesh.vertex())
     Nv = len(mesh.vertex())  # np.array(mesh.vertex()).shape[0]
@@ -385,23 +386,35 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 # load a rectangular mesh and extract the boundaries from coordinates
 #
 ####################################################################
-def readRectangularMesh(filename):
+def readRectangularMesh(mesh_filename,tex_filename):
     re = aims.Reader()
-    mesh = re.read(filename)
+    mesh = re.read(mesh_filename)
     vert = np.array(mesh.vertex())
-    m = np.amin(vert, axis = 0)
-    M = np.amax(vert, axis = 0)
-    inds_x_min = np.where(vert[:, 0] == m[0])[0]
-    inds_x_max = np.where(vert[:, 0] == M[0])[0]
-    inds_y_min = np.where(vert[0, :] == m[1])[0]
-    inds_y_max = np.where(vert[0, :] == M[1])[0]
+    tex = re.read(tex_filename)
+    "tex_filename[0] gives neocortex indices"
+    neocortex_indices = np.where(tex[0].arraydata() > 0)[0]
     boundary = []
-    boundary.append(inds_y_max)  # insula boundary
-    boundary.append(inds_x_min)
-    boundary.append(inds_y_min)  # cingular boundary
-    boundary.append(inds_x_max)
+    boundary.append(indsToROI(neocortex_indices, tex[1].arraydata()))  # insula boundary
+    boundary.append(indsToROI(neocortex_indices, tex[2].arraydata()))
+    boundary.append(indsToROI(neocortex_indices, tex[3].arraydata()))  # cingular boundary
+    "last boundary can be obtained from boundary[1]"
+    nb_new_verts = len(boundary[1])
+    new_verts_inds = range(vert.shape[0] - nb_new_verts, vert.shape[0])
+    boundary.append(new_verts_inds)
+
+#     m = np.amin(vert, axis = 0)
+#     M = np.amax(vert, axis = 0)
+#     inds_x_min = np.where(vert[:, 0] == m[0])[0]
+#     inds_x_max = np.where(vert[:, 0] == M[0])[0]
+#     inds_y_min = np.where(vert[0, :] == m[1])[0]
+#     inds_y_max = np.where(vert[0, :] == M[1])[0]
+#     boundary = []
+#     boundary.append(inds_y_max)  # insula boundary
+#     boundary.append(inds_x_min)
+#     boundary.append(inds_y_min)  # cingular boundary
+#     boundary.append(inds_x_max)
     print 'boundary not good'
-    return(mesh, boundary)
+    return(mesh, boundary, neocortex_indices)
 
 
 ####################################################################
@@ -895,7 +908,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
     neocortex_tex_value = 0
     insula_tex_value = 180
     cingular_tex_value = 1
-    SC_label = 25#44#25
+    SC_label = 44#25
     write_all_steps_to_disk = 0
     print 'max(cingular_tex_clean) : ', np.max(cingular_tex_clean)
     print 'max(insula_tex_clean) : ', np.max(insula_tex_clean)
@@ -981,7 +994,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
     neoCortex_square.updateNormals()
     full_sulci.updateVertices(vert)
 
-    model = Model()
+    model = md.Model()
     model.printArgs()
     full_sulci.sulcalLine2SulcalConstraint(model)
     full_sulci.printArgs()
@@ -995,7 +1008,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
     Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
-    (neoCortex_square_cstr, nb_inward_cstr_evol) = surfTls.solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)
+    (neoCortex_square_cstr, nb_inward_cstr_evol) = solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)
     print 'nb_inward_cstr_evol', nb_inward_cstr_evol
 
     lon, lat = computeCoordinates(mesh, neocortex_indices, neoCortex_square_cstr, neoCortex_open_boundary, poles_lat_insula, poles_lat_cingular)
