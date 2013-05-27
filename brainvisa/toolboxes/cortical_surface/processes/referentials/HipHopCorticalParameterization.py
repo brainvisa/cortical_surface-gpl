@@ -35,13 +35,13 @@
 from brainvisa.processes import *
 import shfjGlobals     
 
-name = 'Cortical Surface Parameterization Pipeline 2012'
+name = 'Hip-Hop Cortical Parameterization'
 userLevel = 2
 
 signature = Signature( 
   'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
   'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
-  'sulcus_identification',Choice('name','label')
+  'sulcus_identification', Choice('name','label')
   )
 
 
@@ -49,18 +49,21 @@ def initialization( self ):
     self.linkParameters( 'Lgraph','Rgraph')
     self.linkParameters( 'Rgraph','Lgraph')
     self.sulcus_identification='label'
+    
     eNode = SerialExecutionNode( self.name, parameterized=self )
-    eNode.addChild
 
     eNode.addChild( 'Hemisphere_Process_Left',
-                    ProcessExecutionNode( 'HemisphereProcessLeft2012', optional = 1 ) )
+                    ProcessExecutionNode( 'HemisphereProcess2012', optional = 1 ) )
     eNode.addChild( 'Hemisphere_Process_Right',
-                    ProcessExecutionNode( 'HemisphereProcessRight2012', optional = 1 ) )
+                    ProcessExecutionNode( 'HemisphereProcess2012', optional = 1 ) )
+               
+    eNode.Hemisphere_Process_Left.side='left'
+    eNode.Hemisphere_Process_Right.side='right'
     
-    eNode.addLink( 'Hemisphere_Process_Left.Lgraph', 'Lgraph' )
-    eNode.addLink( 'Hemisphere_Process_Right.Rgraph', 'Rgraph' )
+    eNode.addLink( 'Hemisphere_Process_Left.graph', 'Lgraph' )
+    eNode.addLink( 'Hemisphere_Process_Right.graph', 'Rgraph' )
 
-    eNode.addLink( 'Hemisphere_Process_Left.SulcalinesExtractionLeft.sulcus_identification', 'sulcus_identification')
-    eNode.addLink( 'Hemisphere_Process_Right.SulcalinesExtractionRight.sulcus_identification', 'sulcus_identification')
+    eNode.addLink( 'Hemisphere_Process_Left.sulcus_identification', 'sulcus_identification')
+    eNode.addLink( 'Hemisphere_Process_Right.sulcus_identification', 'sulcus_identification')
     
     self.setExecutionNode( eNode )

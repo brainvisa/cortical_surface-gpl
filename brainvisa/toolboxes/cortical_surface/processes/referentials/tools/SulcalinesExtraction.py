@@ -22,7 +22,7 @@ from brainvisa.processes import *
 import shfjGlobals   
 from brainvisa import anatomist
 
-name = 'Sulcal Lines Extraction Right'
+name = 'Sulcal Lines Extraction'
 
 userLevel = 2
 
@@ -31,16 +31,17 @@ def validation():
     
 signature = Signature(
                       
-    'Rwhite_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
-    'Rgrey_white_input', ReadDiskItem( 'Right Grey White Mask', shfjGlobals.anatomistVolumeFormats,requiredAttributes={ 'side': 'right' } ),
+    'side', Choice('left', 'right'),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'graph', ReadDiskItem( 'Cortical folds graph', 'Graph'),
+    'grey_white_input', ReadDiskItem( 'Right Grey White Mask', shfjGlobals.anatomistVolumeFormats),
     'sulcus_identification',Choice('name','label'),
     'labels_translation_map',ReadDiskItem( 'Label Translation' ,'Label Translation'),
-    'Rgraph_label_basins',WriteDiskItem( 'Right Graph Label Translation', 'Text File',requiredAttributes={ 'side': 'right' }),
+    'graph_label_basins',WriteDiskItem( 'Right Graph Label Translation', 'Text File'),
     'file_correspondance_constraint',ReadDiskItem( 'Constraint coordinates values', 'Text File'),
     'mri', ReadDiskItem( "Raw T1 MRI", shfjGlobals.vipVolumeFormats ),
     'bucket_label_type', Choice('All', 'aims_junction', 'aims_bottom', 'aims_ss', 'aims_other'),  
-    'Rwhite_sulcalines',WriteDiskItem( 'Right hemisphere Sulcal Lines texture', 'Texture' ,requiredAttributes={ 'side': 'right' } ),
+    'white_sulcalines',WriteDiskItem( 'Right hemisphere Sulcal Lines texture', 'Texture'),
     'basin_min_size', Float(),
     'constraint_weight', Integer(),
     'constraint_value', Choice('Basins Label','Lat/Lon'),
@@ -48,12 +49,12 @@ signature = Signature(
 
 def initialization( self ):
       
-    self.linkParameters( 'mri', 'Rwhite_mesh' )
-    self.linkParameters( 'Rgraph','Rwhite_mesh')
-    self.linkParameters( 'Rgrey_white_input','Rwhite_mesh')
-    self.linkParameters( 'Rwhite_sulcalines', 'Rwhite_mesh' )
-    self.linkParameters( 'Rgraph_label_basins','Rwhite_mesh')
-    self.linkParameters( 'Rgraph_label_basins','Rgraph')
+    self.linkParameters( 'mri', 'white_mesh' )
+    self.linkParameters( 'graph','white_mesh')
+    self.linkParameters( 'grey_white_input','white_mesh')
+    self.linkParameters( 'white_sulcalines', 'white_mesh' )
+    self.linkParameters( 'graph_label_basins','white_mesh')
+    self.linkParameters( 'graph_label_basins','graph')
     self.findValue( 'labels_translation_map', {'filename_variable' : 'sulci_model_2008'} )
     self.findValue( 'file_correspondance_constraint', {'filename_variable' : 'constraint_correspondance_2012'} )
     self.bucket_label_type = 'All'
@@ -69,7 +70,7 @@ def execution( self, context ):
 
     context.write('computing right curvature texture')
     curv = [ 'AimsMeshCurvature',
-                '-i', self.Rwhite_mesh.fullPath(),
+                '-i', self.white_mesh.fullPath(),
                 '-o', curvatureIm.fullPath(),
                 '-m', 'barycenter' ]
 
@@ -80,7 +81,7 @@ def execution( self, context ):
     smooth = [ 'AimsTextureSmoothing',
                 '-i', curvatureIm.fullPath(),
                 '-o', smoothIm.fullPath(),
-                '-m', self.Rwhite_mesh.fullPath(),
+                '-m', self.white_mesh.fullPath(),
                 '-s', 2,
                 '-t', 0.01
                 ]
@@ -91,8 +92,8 @@ def execution( self, context ):
 
     context.write('computing right depth texture')
     depth = [ 'AimsMeshGeodesicDepth',
-                '-v', self.Rgrey_white_input.fullPath(),
-                '-i', self.Rwhite_mesh.fullPath(),
+                '-v', self.grey_white_input.fullPath(),
+                '-i', self.white_mesh.fullPath(),
                 '-c', 10,
                 '-e', 8,
                 '-o', depthIm.fullPath()
@@ -105,19 +106,19 @@ def execution( self, context ):
     context.write('computing Graph Label')
 
     if (self.bucket_label_type=='aims_junction'):
-      graphBucketLabel = [ 'siGraph2Label','-g', self.Rgraph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_junction', '-ot', self.Rgraph_label_basins.fullPath()]
+      graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
+      '-b', 'aims_junction', '-ot', self.graph_label_basins.fullPath()]
     elif (self.bucket_label_type=='aims_bottom'):
-      graphBucketLabel = [ 'siGraph2Label','-g', self.Rgraph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_bottom', '-ot', self.Rgraph_label_basins.fullPath()]
+      graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
+      '-b', 'aims_bottom', '-ot', self.graph_label_basins.fullPath()]
     elif (self.bucket_label_type=='aims_ss'):
-      graphBucketLabel = [ 'siGraph2Label','-g', self.Rgraph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_ss', '-ot', self.Rgraph_label_basins.fullPath()]
+      graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
+      '-b', 'aims_ss', '-ot', self.graph_label_basins.fullPath()]
     elif (self.bucket_label_type=='aims_other'):
-      graphBucketLabel = [ 'siGraph2Label','-g', self.Rgraph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_other', '-ot', self.Rgraph_label_basins.fullPath()]
-    else : graphBucketLabel = [ 'siGraph2Label','-g', self.Rgraph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_junction','-b', 'aims_bottom','-b', 'aims_ss', '-b', 'aims_other', '-ot', self.Rgraph_label_basins.fullPath()]
+      graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
+      '-b', 'aims_other', '-ot', self.graph_label_basins.fullPath()]
+    else : graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
+      '-b', 'aims_junction','-b', 'aims_bottom','-b', 'aims_ss', '-b', 'aims_other', '-ot', self.graph_label_basins.fullPath()]
 #
     apply( context.system, graphBucketLabel )
 
@@ -134,14 +135,14 @@ def execution( self, context ):
     sulcalines = [ 'AimsSulcalLines',
                 '-d', depthIm.fullPath(),
                 '-c', smoothIm.fullPath(),
-                '-i', self.Rwhite_mesh.fullPath(),
+                '-i', self.white_mesh.fullPath(),
                 '-b', volumeGraphLabelBasins.fullPath(),
-                '-lb',self.Rgraph_label_basins.fullPath(),
+                '-lb',self.graph_label_basins.fullPath(),
                 '-ls',self.file_correspondance_constraint.fullPath(),
                 '-m', 3,
                 '-t', 2,
                 '-st', self.constraint_weight,
-                '-o', self.Rwhite_sulcalines.fullPath(),
+                '-o', self.white_sulcalines.fullPath(),
                 '-si', 'right', #self.side,
                 '-sb', self.basin_min_size,
                 '-cv', constraintValue

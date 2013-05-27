@@ -142,7 +142,7 @@ def execution( self, context ):
                 '-t', 2,
                 '-st', self.constraint_weight,
                 '-o', self.Lwhite_sulcalines.fullPath(),
-                '-si', self.side,
+                '-si', 'left', #self.side,
                 '-sb', self.basin_min_size,
                 '-cv', constraintValue
                 ]

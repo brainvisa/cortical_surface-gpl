@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
@@ -33,34 +31,31 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals     
+import shfjGlobals
+from brainvisa import anatomist
 
-name = 'Cortical Surface Parameterization Pipeline 2012'
+name = 'Cingular Pole Projection'
+
 userLevel = 2
 
-signature = Signature( 
-  'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
-  'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
-  'sulcus_identification',Choice('name','label')
-  )
+def validation():
+    anatomist.validation()
 
+signature = Signature(
+    'side', Choice('left', 'right'),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'pole_template',ReadDiskItem( 'Cingular Pole Template Subject' , 'Aims readable volume formats' ),
+    'pole',WriteDiskItem( 'Hippocampus pole texture','Texture' )
+)
 
 def initialization( self ):
-    self.linkParameters( 'Lgraph','Rgraph')
-    self.linkParameters( 'Rgraph','Lgraph')
-    self.sulcus_identification='label'
-    eNode = SerialExecutionNode( self.name, parameterized=self )
-    eNode.addChild
-
-    eNode.addChild( 'Hemisphere_Process_Left',
-                    ProcessExecutionNode( 'HemisphereProcessLeft2012', optional = 1 ) )
-    eNode.addChild( 'Hemisphere_Process_Right',
-                    ProcessExecutionNode( 'HemisphereProcessRight2012', optional = 1 ) )
-    
-    eNode.addLink( 'Hemisphere_Process_Left.Lgraph', 'Lgraph' )
-    eNode.addLink( 'Hemisphere_Process_Right.Rgraph', 'Rgraph' )
-
-    eNode.addLink( 'Hemisphere_Process_Left.SulcalinesExtractionLeft.sulcus_identification', 'sulcus_identification')
-    eNode.addLink( 'Hemisphere_Process_Right.SulcalinesExtractionRight.sulcus_identification', 'sulcus_identification')
-    
-    self.setExecutionNode( eNode )
+    self.linkParameters( 'pole', 'white_mesh' )
+    #self.findValue( 'pole_template', {} )
+    #self.setOptional('pole_template')
+     
+def execution( self, context ):
+    a = anatomist.Anatomist()
+    mesh = a.loadObject( self.white_mesh.fullPath() )
+    vol = a.loadObject( self.pole_template.fullPath() )
+    fusion = a.fusionObjects( [mesh, vol], method='Fusion3DMethod' )
+    fusion.exportTexture(filename=self.pole.fullPath())
