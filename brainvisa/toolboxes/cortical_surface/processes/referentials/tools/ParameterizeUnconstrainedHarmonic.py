@@ -22,14 +22,14 @@ import shfjGlobals
 from soma import aims
 import numpy as np
  
-#from brainvisa import anatomist
+from brainvisa import anatomist
 
 name = 'Harmonic Intrinsic Parameterization (HIP)'
 
-userLevel = 3
+userLevel = 2
 
-#def validation():
-#    anatomist.validation()
+def validation():
+    anatomist.validation()
     
 signature = Signature(
                       
@@ -44,10 +44,10 @@ signature = Signature(
 )
 
 def initialization( self ):
-    self.linkParameters( 'cingular_pole_texture','white_mesh')
-    self.linkParameters( 'insular_pole_texture','white_mesh')
-    self.linkParameters( 'white_sulcalines','white_mesh')
-    self.linkParameters( 'sulcus_labels','white_mesh')
+    self.linkParameters( 'cingular_pole_texture', 'white_mesh')
+    self.linkParameters( 'insular_pole_texture', 'white_mesh')
+    self.linkParameters( 'white_sulcalines', 'white_mesh')
+    self.linkParameters( 'sulcus_labels', 'white_mesh')
     self.linkParameters( 'latitude','white_mesh')
     self.linkParameters( 'longitude','white_mesh')
 

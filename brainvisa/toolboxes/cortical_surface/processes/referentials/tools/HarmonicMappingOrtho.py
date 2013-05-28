@@ -21,7 +21,7 @@ from brainvisa.processes import *
 import shfjGlobals   
 from brainvisa import anatomist
 
-name = 'Harmonic mapping under orthogonal constraints (HOP))'
+name = 'Harmonic Orthogonal Parameterization (HOP)'
 
 userLevel = 3
 
