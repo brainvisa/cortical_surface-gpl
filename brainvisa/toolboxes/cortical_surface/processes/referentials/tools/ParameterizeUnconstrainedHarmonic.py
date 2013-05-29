@@ -21,15 +21,16 @@ from brainvisa.processes import *
 import shfjGlobals  
 from soma import aims
 import numpy as np
- 
-from brainvisa import anatomist
+from brainvisa.cortical_surface.parameterization.mapping import hipHop
+
+#from brainvisa import anatomist
 
 name = 'Harmonic Intrinsic Parameterization (HIP)'
 
 userLevel = 2
 
-def validation():
-    anatomist.validation()
+# def validation():
+#     anatomist.validation()
     
 signature = Signature(
                       
@@ -53,12 +54,7 @@ def initialization( self ):
 
     
 def execution( self, context ):
-#    sys.path.append('/home/toz/workspace/MyTestProject/cortical_surface')
-    for p in sys.path:
-        print p
     print np.__version__ 
-    from brainvisa.cortical_surface.parameterization.mapping import hipHop
-    print 'mapping imported'
    
   
     re = aims.Reader()
