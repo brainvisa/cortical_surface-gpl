@@ -32,22 +32,24 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
 import shfjGlobals
-from brainvisa import anatomist
+from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+import numpy as np
+#from brainvisa import anatomist
 
 
 name = 'Right Insular Pole Projection'
 
 userLevel = 2
 
-def validation():
-    anatomist.validation()
+#def validation():
+#    anatomist.validation()
 
 signature = Signature(
     'Side', Choice("Right"),
     'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'aims readable volume formats' ),
     'sulcus_identification',Choice('name','label'),
-    'trl',ReadDiskItem( 'Label Translation' ,'Label Translation'),
+#    'trl',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
     'transformation', ReadDiskItem('Transformation matrix', 'Transformation matrix'),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
@@ -73,7 +75,7 @@ def initialization( self ):
     #self.setOptional('right_pole_template')
      
 def execution( self, context ):
-    context.write('projeter le spam de l insula')
+    context.write('TODO project the insula spam')
 #    tmp_white = '/tmp/tmp_white.gii'#context.temporary( 'GIFTI file' )
 #    context.system('AimsMeshTransform', '-i',self.right_white_mesh.fullPath(),'-o',tmp_white,'-t',self.transformation)
 #    context.write('Transormation to Talairach Done')
@@ -82,8 +84,12 @@ def execution( self, context ):
 #    context.write(*command)
 #    context.system(*command)
 #    context.write('Projection Done')
-    out_trsl_txt='/tmp/out_trsl_txt.txt'
-    command = ['siMeshSulciProjection','-i',self.right_white_mesh.fullPath(),'-g',self.Rgraph.fullPath(),'-l',self.trl.fullPath(),'-m',self.gyri_model.fullPath(),'-s',self.sulcus_identification,'-v',self.mri_corrected.fullPath(),'-o',self.right_pole.fullPath(),'-V','1','-M','2','-n','5','-a','0.9','-e','10','-t',out_trsl_txt,'-p','1']
+    tmp_trl = context.temporary(  'GIS image' )
+    f = open(tmp_trl.fullPath(),'w')
+    f.write('%INSULA\n')
+    f.close()
+    out_trsl_txt = context.temporary('Text File')
+    command = ['siMeshSulciProjection','-i',self.right_white_mesh.fullPath(),'-g',self.Rgraph.fullPath(),'-l',tmp_trl.fullPath(),'-m',self.gyri_model.fullPath(),'-s',self.sulcus_identification,'-v',self.mri_corrected.fullPath(),'-o',self.right_pole.fullPath(),'-V','1','-M','2','-n','5','-a','0.9','-e','10','-t',out_trsl_txt.fullPath(),'-p','1']
     context.system(*command)
    
     from soma import aims
@@ -99,16 +105,12 @@ def execution( self, context ):
     context.system('AimsTextureErosion', '-i',self.right_white_mesh.fullPath(), '-t',self.right_pole.fullPath(),'-o',self.right_pole.fullPath(),'-s','3','--connexity')
     context.system('AimsTextureDilation', '-i',self.right_white_mesh.fullPath(), '-t',self.right_pole.fullPath(),'-o',self.right_pole.fullPath(),'-s','2','--connexity')
     context.write('Dilation Erosion Done')
-    sys.path.append('/home/toz/workspace/MyTestProject/cortical_surface')
-    for p in sys.path:
-        print p
 
-    from tools import *
     mesh = re.read(self.right_white_mesh.fullPath())
     tex = re.read(self.right_pole.fullPath())
     context.write(max(tex[0].arraydata()))
     tmp_tex_value = 2
-    cingular_tex_clean, cing_tex_boundary = poleTextureClean(mesh, tex[0].arraydata(), tmp_tex_value)
+    cingular_tex_clean, cing_tex_boundary = surfTls.poleTextureClean(mesh, tex[0].arraydata(), tmp_tex_value)
     cingular_tex_clean[np.where(cingular_tex_clean == tmp_tex_value)[0]] = 180
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
