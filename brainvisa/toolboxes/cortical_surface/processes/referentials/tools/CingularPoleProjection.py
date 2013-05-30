@@ -32,14 +32,17 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
 import shfjGlobals
-from brainvisa import anatomist
+# from brainvisa import anatomist
+from soma import aims
+from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+import numpy as np
 
 name = 'Cingular Pole Projection'
 
 userLevel = 2
 
-def validation():
-    anatomist.validation()
+# def validation():
+#     anatomist.validation()
 
 signature = Signature(
     'side', Choice('left', 'right'),
@@ -54,8 +57,34 @@ def initialization( self ):
     #self.setOptional('pole_template')
      
 def execution( self, context ):
-    a = anatomist.Anatomist()
-    mesh = a.loadObject( self.white_mesh.fullPath() )
-    vol = a.loadObject( self.pole_template.fullPath() )
-    fusion = a.fusionObjects( [mesh, vol], method='Fusion3DMethod' )
-    fusion.exportTexture(filename=self.pole.fullPath())
+#     a = anatomist.Anatomist()
+#     mesh = a.loadObject( self.white_mesh.fullPath() )
+#     vol = a.loadObject( self.pole_template.fullPath() )
+#     fusion = a.fusionObjects( [mesh, vol], method='Fusion3DMethod' )
+#     fusion.exportTexture(filename=self.pole.fullPath())
+#    context.system('AimsMeshTransform', '-i',self.left_white_mesh.fullPath(),'-o',tmp_white,'-t',self.transformation)
+    command = [ 'AimsCreateTexture', '-m',self.white_mesh.fullPath(), '-v',self.pole_template.fullPath(), '-t', self.pole.fullPath() ]
+#    context.write(command)
+    context.system(*command)
+    context.write('Projection Done')
+
+    re = aims.Reader()
+    ws = aims.Writer()
+
+    texture_poles = re.read(self.pole.fullPath())
+    tex_S16 = aims.TimeTexture_S16()
+    tex_S16[0].assign(texture_poles[0])
+    ws.write(tex_S16, self.pole.fullPath())
+    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','8','--connexity')#10
+    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','12','--connexity')#10
+    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','3','--connexity')#10
+    context.write('Dilation Erosion Done')
+
+    mesh = re.read(self.white_mesh.fullPath())
+    tex = re.read(self.pole.fullPath())
+    cingular_tex_value = 1
+    cingular_tex_clean, cing_tex_boundary = surfTls.poleTextureClean(mesh, tex[0].arraydata(), cingular_tex_value)
+    tex_out = aims.TimeTexture_S16()
+    tex_out[0].assign(cingular_tex_clean)
+    ws.write(tex_out, self.pole.fullPath())
+    context.write('Topological correction Done')

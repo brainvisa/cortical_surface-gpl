@@ -99,7 +99,7 @@ def execution( self, context ):
     texture_poles = re.read(self.pole.fullPath())
     tex_S16 = aims.TimeTexture_S16()
     tex_S16[0].assign(texture_poles[0])
-    context.write(max(tex_S16[0].arraydata()))
+#    context.write(max(tex_S16[0].arraydata()))
     ws.write(tex_S16, self.pole.fullPath())
     context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','2','--connexity')
     context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','3','--connexity')
@@ -108,11 +108,17 @@ def execution( self, context ):
 
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
-    context.write(max(tex[0].arraydata()))
-    tmp_tex_value = 2
+#    context.write(max(tex[0].arraydata()))
+    context.write(self.Side)
+    if self.Side == 'right':
+        tmp_tex_value = 2
+    elif self.Side == 'left':
+        tmp_tex_value = 1
+    else:
+        context.write('side must be set to left or right!')                        
     cingular_tex_clean, cing_tex_boundary = surfTls.poleTextureClean(mesh, tex[0].arraydata(), tmp_tex_value)
     cingular_tex_clean[np.where(cingular_tex_clean == tmp_tex_value)[0]] = 180
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())
-    context.write('cleaning Done')
+    context.write('Topological correction Done')
