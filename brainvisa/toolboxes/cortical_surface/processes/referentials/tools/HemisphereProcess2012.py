@@ -63,7 +63,8 @@ def initialization( self ):
 
     eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'graph' )
     eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'graph' )
-    
+    eNode.addLink( 'ChangeTemplateReferential.side', 'side' )
+
     eNode.addLink( 'CingularPole.white_mesh', 'graph')
     eNode.addLink(  'SulcalinesExtraction.white_mesh','graph')
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.white_mesh','graph')

@@ -66,9 +66,9 @@ def initialization( self ):
     self.linkParameters( 'transformation_input','mri_corrected')
     self.linkParameters( 'subject_to_template','mri_corrected')
     self.linkParameters( 'talairach_to_subject','mri_corrected')
-    self.linkParameters( 'output_template',    # le 'mri_corrected') n'y était pas
-        ( 'mri_corrected', 'pole_template' ), linkSide )
-    self.findValue( 'pole_template', { 'side' : 'side' } )
+#    self.linkParameters( 'output_template',    # le 'mri_corrected') n'y était pas
+#        ( 'mri_corrected', 'pole_template' ), linkSide )
+    self.findValue( 'pole_template', { 'side' : self.side , 'filename_variable' : 'Template_icbm', '_ontology' : 'shared'} )
     self.findValue( 'template_pole_transformation', {} )
 
 def execution( self, context ):
