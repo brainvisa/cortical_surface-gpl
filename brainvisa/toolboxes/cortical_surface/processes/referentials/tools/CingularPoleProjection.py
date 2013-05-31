@@ -53,8 +53,6 @@ signature = Signature(
 
 def initialization( self ):
     self.linkParameters( 'pole', 'white_mesh' )
-    #self.findValue( 'pole_template', {} )
-    #self.setOptional('pole_template')
      
 def execution( self, context ):
 #     a = anatomist.Anatomist()

@@ -45,13 +45,13 @@ userLevel = 2
 #    anatomist.validation()
 
 signature = Signature(
-    'Side', Choice('left', 'right'),
+    'side', Choice('left', 'right'),
     'graph', ReadDiskItem( 'Cortical folds graph', 'Graph' ),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'aims readable volume formats' ),
     'sulcus_identification',Choice('name','label'),
 #    'trl',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
-    'transformation', ReadDiskItem('Transformation matrix', 'Transformation matrix'),
+    'transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist', 'Transformation matrix' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'pole',WriteDiskItem( 'insula pole texture','Texture' )
 )
@@ -65,11 +65,13 @@ def initialization( self ):
         return 'label'
     self.linkParameters( 'white_mesh','graph' )
     self.linkParameters( 'pole', 'white_mesh' )
+    self.linkParameters( 'transformation', 'white_mesh' )
     self.linkParameters( 'mri_corrected', 'white_mesh' )
-    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
-    try:
-      self.gyri_model = databases.getDiskItemFromUuid( '172c4168-a9d3-dc41-464c-1226ad07c19c' )
-    except: pass
+#    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
+    self.findValue('gyri_model', { 'sulci_database' : '2008', 'graph_version': '3.0', 'model' : 'gyrus' })
+#    try:
+#      self.findValue('gyri_model', {})
+#    except: pass
 
     #self.findValue( 'right_pole_template', {} )
     #self.setOptional('right_pole_template')

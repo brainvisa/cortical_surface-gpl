@@ -49,6 +49,9 @@ def initialization( self ):
     eNode.addChild( 'CingularPole',
                     ProcessExecutionNode( 'CingularPoleProjection', optional = 1 ) )
 
+    eNode.addChild( 'InsularPole',
+                    ProcessExecutionNode( 'InsularPoleProjection', optional = 1 ) )
+
     eNode.addChild( 'SulcalinesExtraction',
                     ProcessExecutionNode( 'SulcalinesExtraction', optional = 1 ) )
 
@@ -57,9 +60,6 @@ def initialization( self ):
         
     eNode.addChild( 'HarmonicMappingOrtho',
                     ProcessExecutionNode( 'HarmonicMappingOrtho', optional = 1 ) )
-
-    eNode.ChangeTemplateReferential.findValue( 'pole_template',
-        { 'side' : self.side } )
 
     eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'graph' )
     eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'graph' )
@@ -75,6 +75,11 @@ def initialization( self ):
 #    eNode.addLink(  'CingularPole.white_mesh','HarmonicMappingOrtho.white_mesh')
     eNode.addLink(  'CingularPole.side', 'side' )
 
+    eNode.addLink( 'InsularPole.side', 'side')
+    eNode.addLink( 'InsularPole.graph', 'graph')
+    eNode.addLink( 'InsularPole.sulcus_identification', 'sulcus_identification')
+
+
     eNode.addLink(  'SulcalinesExtraction.graph','graph' )        
     eNode.addLink(  'SulcalinesExtraction.side','side' )
     eNode.addLink(  'SulcalinesExtraction.sulcus_identification','sulcus_identification' )
@@ -85,7 +90,7 @@ def initialization( self ):
     eNode.ParameterizeUnconstrainedHarmonic.removeLink('white_sulcalines', 'white_mesh')
     eNode.ParameterizeUnconstrainedHarmonic.removeLink('sulcus_labels', 'white_mesh')
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.cingular_pole_texture', 'CingularPole.pole' )
-    #eNode.addLink(  'ParameterizeUnconstrainedHarmonic.insular_pole_texture', 'CingularPole.pole' )
+    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.insular_pole_texture', 'InsularPole.pole' )
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.cingular_pole_texture', 'CingularPole.pole' )
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.white_sulcalines','SulcalinesExtraction.white_sulcalines')
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.sulcus_labels','SulcalinesExtraction.graph_label_basins')
