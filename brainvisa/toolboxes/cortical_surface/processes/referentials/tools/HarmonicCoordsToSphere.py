@@ -55,15 +55,23 @@ def execution( self, context ):
     context.write('Reading textures and mesh')
     tex_lon = re.read(self.longitude.fullPath())
     tex_lat = re.read(self.latitude.fullPath())
-    spherical_verts = sphericalMeshFromCoords(tex_lat[0].arraydata(), tex_lon[0].arraydata(), self.sphere_ray)
-
+    spherical_verts = sphericalMeshFromCoords(tex_lat[0].arraydata(), tex_lon[0].arraydata(), self.sphere_ray, self.side)
     vv = aims.vector_POINT3DF()
     for x in spherical_verts:
         vv.append(x)
+#     for i in range(spherical_verts.shape[0]):
+#         vv.append([spherical_verts[i, 0], spherical_verts[i, 1], spherical_verts[i, 2]])
     mesh = re.read(self.white_mesh.fullPath())
-    mesh.vertex().assign(vv)
-    mesh.updateNormals()
-    ws.write( mesh, self.spherical_mesh.fullPath() )
+    print 'vv ok read mesh ok'
+    new_mesh = aims.AimsTimeSurface_3()
+    print 'vv ok read mesh ok'
+    new_mesh.vertex().assign(vv)
+    print 'vv ok read mesh ok'
+    new_mesh.polygon().assign(mesh.polygon())
+    print 'vv ok read mesh ok'
+    new_mesh.updateNormals()
+    print 'vv ok read mesh ok'
+    ws.write( new_mesh, self.spherical_mesh.fullPath() )
 
     context.write('Done')
             

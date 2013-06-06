@@ -54,8 +54,6 @@ def initialization( self ):
 
     
 def execution( self, context ):
-    print np.__version__ 
-   
   
     re = aims.Reader()
     ws = aims.Writer()
@@ -65,7 +63,13 @@ def execution( self, context ):
     texture_sulci = re.read(self.white_sulcalines.fullPath())
     mesh = re.read(self.white_mesh.fullPath())
     context.write('HIP-HOP')
-    lon, lat = hipHop(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), texture_sulci[0].arraydata())
+#     from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
+#     full_sulci = slSet.SulcalLinesSet()
+#     full_sulci.extractFromTexture(texture_sulci[0].arraydata(), mesh)
+#     full_sulci.printArgs()
+
+    
+    lon, lat = hipHop(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), texture_sulci[0].arraydata(), self.side)
     context.write('Writing textures')
     tex_lon = aims.TimeTexture_FLOAT()
     tex_lon[0].assign(lon)

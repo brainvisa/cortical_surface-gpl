@@ -34,6 +34,7 @@ from brainvisa.processes import *
 import shfjGlobals
 from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 import numpy as np
+from soma import aims
 #from brainvisa import anatomist
 
 
@@ -94,7 +95,6 @@ def execution( self, context ):
     command = ['siMeshSulciProjection','-i',self.white_mesh.fullPath(),'-g',self.graph.fullPath(),'-l',tmp_trl.fullPath(),'-m',self.gyri_model.fullPath(),'-s',self.sulcus_identification,'-v',self.mri_corrected.fullPath(),'-o',self.pole.fullPath(),'-V','1','-M','2','-n','5','-a','0.9','-e','10','-t',out_trsl_txt.fullPath(),'-p','1']
     context.system(*command)
    
-    from soma import aims
     re = aims.Reader()
     ws = aims.Writer()
 
@@ -111,10 +111,10 @@ def execution( self, context ):
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
 #    context.write(max(tex[0].arraydata()))
-    context.write(self.Side)
-    if self.Side == 'right':
+    context.write(self.side)
+    if self.side == 'right':
         tmp_tex_value = 2
-    elif self.Side == 'left':
+    elif self.side == 'left':
         tmp_tex_value = 1
     else:
         context.write('side must be set to left or right!')                        

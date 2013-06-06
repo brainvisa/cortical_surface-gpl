@@ -731,10 +731,12 @@ def texture2ROI(tex_cstr, neocortex_indices):
 def sphericalMeshFromCoords(tex_lat, tex_lon, ray):
     tex_lat = tex_lat * np.pi / 180
     tex_lon = tex_lon * np.pi / 180
+    print tex_lon
     spherical_verts = np.ndarray((tex_lat.shape[0], 3))
     spherical_verts[:, 1] = ray * np.cos(tex_lon) * np.sin(tex_lat)
     spherical_verts[:, 0] = ray * np.sin(tex_lon) * np.sin(tex_lat)
     spherical_verts[:, 2] = ray * np.cos(tex_lat)
+    print spherical_verts[:, 2]
     return spherical_verts
 
 
@@ -898,7 +900,7 @@ def buildModel(list_mesh, list_texture_poles, list_texture_sulci):
 # HIP-HOP
 #
 ####################################################################
-def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None):
+def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, side, model=None):
 #    square_ratio = 4.5
     length = 4.5
     width = 1
@@ -908,8 +910,11 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
     neocortex_tex_value = 0
     insula_tex_value = 180
     cingular_tex_value = 1
-    SC_label = 44#25
     write_all_steps_to_disk = 0
+    if side == 'right':
+        SC_label = 44#25
+    else:
+        SC_label = 43#25       
     print 'max(cingular_tex_clean) : ', np.max(cingular_tex_clean)
     print 'max(insula_tex_clean) : ', np.max(insula_tex_clean)
     neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
@@ -981,7 +986,6 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, model=None
 
     full_sulci = slSet.SulcalLinesSet()
     full_sulci.extractFromTexture(texture_sulci, mesh)
-
     full_sulci.updateIndices(neocortex_indices)
     vert = np.array(neoCortex_square.vertex())
     full_sulci.updateVertices(vert)

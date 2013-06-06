@@ -170,6 +170,7 @@ class SulcalLine(object):
 
     def clean(self):
         "clean the line using geodesic shortest path"
+        print 'TO DO : clean the line using geodesic shortest path!!!!'
         return self
 
     def plot(self, plt, color=None, modele=None):
