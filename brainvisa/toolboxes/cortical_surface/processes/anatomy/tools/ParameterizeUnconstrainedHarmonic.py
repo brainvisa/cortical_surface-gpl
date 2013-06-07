@@ -63,6 +63,7 @@ def execution( self, context ):
     texture_sulci = re.read(self.white_sulcalines.fullPath())
     mesh = re.read(self.white_mesh.fullPath())
     context.write('HIP-HOP')
+    context.write(np.unique(texture_sulci[0].arraydata()))
 #     from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
 #     full_sulci = slSet.SulcalLinesSet()
 #     full_sulci.extractFromTexture(texture_sulci[0].arraydata(), mesh)

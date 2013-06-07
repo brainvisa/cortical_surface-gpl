@@ -775,6 +775,67 @@ def invertedPolygon(mesh, shape=None):
         print 'nb_inward: ', nb_inward
     return(nb_inward, inward)
 
+# def parcelFromCoordinates(template_lat,template_lon,lon_cstr,lat_cstr):
+# 
+#     nb_vert = template_lat.shape[0]
+#     tex_parcels = np.zeros(nb_vert)
+#     lab_parcel = 1
+#     sort_axes_lon = [0,sort(lon_cstr)]
+#     sort_axes_lat = [0,sort(lat_cstr)]
+#     for t_lon=1:length(sort_axes_lon)-1:
+#         inds_lon=(template_lon>=sort_axes_lon(t_lon))&(template_lon<=sort_axes_lon(t_lon+1));
+#         for t_lat=1:length(sort_axes_lat)-1:
+#             inds_lat=(template_lat(inds_lon)>=sort_axes_lat(t_lat))&(template_lat(inds_lon)<=sort_axes_lat(t_lat+1));
+#             f_inds_lon=find(inds_lon);
+#             %f_inds_lat=find(inds_lat);
+#             tex_parcels(f_inds_lon(inds_lat))=lab_parcel;
+#             lab_parcel=lab_parcel+1;
+# 
+#     
+#     # concatenate some parcells
+#     # INSULA sup ant
+#     tex_parcels(tex_parcels==79)=1
+#     tex_parcels(tex_parcels==73)=1
+#     # INSULA sup post
+#     tex_parcels(tex_parcels==13)=25
+#     tex_parcels(tex_parcels==19)=25
+#     tex_parcels(tex_parcels==7)=25
+#     # INSULA inf
+#     tex_parcels(tex_parcels==43)=37
+#     tex_parcels(tex_parcels==49)=37
+#     tex_parcels(tex_parcels==55)=37
+#     tex_parcels(tex_parcels==61)=37
+#     tex_parcels(tex_parcels==67)=37
+#     # arround the path between the poles
+#     tex_parcels(tex_parcels==32)=31
+#     tex_parcels(tex_parcels==33)=31
+#     tex_parcels(tex_parcels==34)=31
+#     tex_parcels(tex_parcels==35)=31
+#     tex_parcels(tex_parcels==36)=31
+#     tex_parcels(tex_parcels==38)=31
+#     tex_parcels(tex_parcels==39)=31
+#     tex_parcels(tex_parcels==40)=31
+#     tex_parcels(tex_parcels==41)=31
+#     tex_parcels(tex_parcels==42)=31
+#     # temporal anterior
+#     tex_parcels(tex_parcels==45)=44
+#     tex_parcels(tex_parcels==46)=44
+#     tex_parcels(tex_parcels==47)=44
+#     tex_parcels(tex_parcels==48)=44
+#     
+#     uparcells=unique(tex_parcels)
+#     reord_parc=1
+#     for i_parc=2:length(uparcells):
+#         tex_parcels(tex_parcels==uparcells(i_parc))=reord_parc
+#         reord_parc=reord_parc+1
+#     print('nb parcells = %d\n',reord_parc-1)
+#     
+#     
+#     if R_L=='L':
+#         tex_parcels = tex_parcels + 100
+#     return tex_parcels
+
+
 
 ####################################################################
 #
