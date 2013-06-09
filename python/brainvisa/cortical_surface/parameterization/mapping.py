@@ -250,9 +250,13 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
 ##        print info
 #        print time.clock() - t0, "seconds process time"
 #        print 'error:',np.linalg.norm(x_ex-x1)
-        print 'using gmres'
         t0 = time.clock()
-        x, info = gmres(Lx, Rx, tol=1e-6)
+        try:
+            print 'using lgmres'
+            x, info = lgmres(Lx, Rx, tol=1e-6)
+        except:
+            print 'using gmres'
+            x, info = gmres(Lx, Rx, tol=1e-6)
 #        print info
         print time.clock() - t0, "seconds process time"
 #        print 'error:',np.linalg.norm(x_ex-x)
@@ -775,65 +779,72 @@ def invertedPolygon(mesh, shape=None):
         print 'nb_inward: ', nb_inward
     return(nb_inward, inward)
 
-# def parcelFromCoordinates(template_lat,template_lon,lon_cstr,lat_cstr):
-# 
-#     nb_vert = template_lat.shape[0]
-#     tex_parcels = np.zeros(nb_vert)
-#     lab_parcel = 1
-#     sort_axes_lon = [0,sort(lon_cstr)]
-#     sort_axes_lat = [0,sort(lat_cstr)]
-#     for t_lon=1:length(sort_axes_lon)-1:
-#         inds_lon=(template_lon>=sort_axes_lon(t_lon))&(template_lon<=sort_axes_lon(t_lon+1));
-#         for t_lat=1:length(sort_axes_lat)-1:
-#             inds_lat=(template_lat(inds_lon)>=sort_axes_lat(t_lat))&(template_lat(inds_lon)<=sort_axes_lat(t_lat+1));
-#             f_inds_lon=find(inds_lon);
-#             %f_inds_lat=find(inds_lat);
-#             tex_parcels(f_inds_lon(inds_lat))=lab_parcel;
-#             lab_parcel=lab_parcel+1;
-# 
-#     
+def parcelsFromCoordinates(template_lat,template_lon,model):
+
+    nb_vert = template_lat.shape[0]
+    tex_parcels = np.zeros(nb_vert)
+    lab_parcel = 1
+    sort_axes_lon = [0]
+    tmp_lon = [f for f in model.longitudeAxis]#[360 - f for f in model.longitudeAxis]
+    sort_axes_lon.extend(tmp_lon)
+    sort_axes_lon.sort()
+    sort_axes_lat = [0]
+    tmp_lat = [f + 30 for f in model.latitudeAxis]
+    sort_axes_lat.extend(tmp_lat)
+    sort_axes_lat.sort()
+    sort_axes_lat.append(180)
+    print sort_axes_lon
+    print sort_axes_lon
+    print sort_axes_lat
+    for t_lon in range(len(sort_axes_lon)-1):
+        print sort_axes_lon[t_lon]
+        inds_lon = np.where((template_lon >= sort_axes_lon[t_lon])&(template_lon<=sort_axes_lon[t_lon+1]))[0]
+        for t_lat in range(len(sort_axes_lat)-1):
+            print sort_axes_lat[t_lat]
+            inds_lat = np.where((template_lat[inds_lon]>=sort_axes_lat[t_lat])&(template_lat[inds_lon]<=sort_axes_lat[t_lat+1]))[0]
+            tex_parcels[inds_lon[inds_lat]]=lab_parcel
+            print 'lab_parcel', lab_parcel
+            lab_parcel = lab_parcel+1
+
 #     # concatenate some parcells
 #     # INSULA sup ant
-#     tex_parcels(tex_parcels==79)=1
-#     tex_parcels(tex_parcels==73)=1
+#     tex_parcels[tex_parcels == 79] = 1
+#     tex_parcels[tex_parcels == 73] = 1
 #     # INSULA sup post
-#     tex_parcels(tex_parcels==13)=25
-#     tex_parcels(tex_parcels==19)=25
-#     tex_parcels(tex_parcels==7)=25
+#     tex_parcels[tex_parcels == 13] = 25
+#     tex_parcels[tex_parcels == 19] = 25
+#     tex_parcels[tex_parcels == 7] = 25
 #     # INSULA inf
-#     tex_parcels(tex_parcels==43)=37
-#     tex_parcels(tex_parcels==49)=37
-#     tex_parcels(tex_parcels==55)=37
-#     tex_parcels(tex_parcels==61)=37
-#     tex_parcels(tex_parcels==67)=37
+#     tex_parcels[tex_parcels == 43] = 37
+#     tex_parcels[tex_parcels == 49] = 37
+#     tex_parcels[tex_parcels == 55] = 37
+#     tex_parcels[tex_parcels == 61] = 37
+#     tex_parcels[tex_parcels == 67] = 37
 #     # arround the path between the poles
-#     tex_parcels(tex_parcels==32)=31
-#     tex_parcels(tex_parcels==33)=31
-#     tex_parcels(tex_parcels==34)=31
-#     tex_parcels(tex_parcels==35)=31
-#     tex_parcels(tex_parcels==36)=31
-#     tex_parcels(tex_parcels==38)=31
-#     tex_parcels(tex_parcels==39)=31
-#     tex_parcels(tex_parcels==40)=31
-#     tex_parcels(tex_parcels==41)=31
-#     tex_parcels(tex_parcels==42)=31
+#     tex_parcels[tex_parcels ==32] = 31
+#     tex_parcels[tex_parcels ==33] = 31
+#     tex_parcels[tex_parcels ==34] = 31
+#     tex_parcels[tex_parcels ==35] = 31
+#     tex_parcels[tex_parcels ==36] = 31
+#     tex_parcels[tex_parcels ==38] = 31
+#     tex_parcels[tex_parcels ==39] = 31
+#     tex_parcels[tex_parcels ==40] = 31
+#     tex_parcels[tex_parcels ==41] = 31
+#     tex_parcels[tex_parcels ==42] = 31
 #     # temporal anterior
-#     tex_parcels(tex_parcels==45)=44
-#     tex_parcels(tex_parcels==46)=44
-#     tex_parcels(tex_parcels==47)=44
-#     tex_parcels(tex_parcels==48)=44
-#     
-#     uparcells=unique(tex_parcels)
+#     tex_parcels[tex_parcels ==45] = 44
+#     tex_parcels[tex_parcels ==46] = 44
+#     tex_parcels[tex_parcels ==47] = 44
+#     tex_parcels[tex_parcels ==48] = 44 
+#     uparcells=np.unique(tex_parcels)
+#     print uparcells
 #     reord_parc=1
-#     for i_parc=2:length(uparcells):
-#         tex_parcels(tex_parcels==uparcells(i_parc))=reord_parc
-#         reord_parc=reord_parc+1
+#     for u_parc in uparcells[2:]:
+#         tex_parcels[tex_parcels == u_parc] = reord_parc
+#         reord_parc = reord_parc+1
 #     print('nb parcells = %d\n',reord_parc-1)
-#     
-#     
-#     if R_L=='L':
-#         tex_parcels = tex_parcels + 100
-#     return tex_parcels
+
+    return tex_parcels
 
 
 
@@ -1068,7 +1079,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, side, mode
     model.printArgs()
     model.setAxisCoord(full_sulci)
     model.printArgs()
-
+    model.saveToFile('/home/toz/model_current.txt')
 
     Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 

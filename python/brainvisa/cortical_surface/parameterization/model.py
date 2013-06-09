@@ -58,9 +58,25 @@ class Model(object):
         self.top = top
         self.bottom = bottom
 
-    def save(self, fileName):
+    def saveToMesh(self, fileName):
         ws = aims.Writer()
         ws.write(self.toMesh(), fileName)
+
+    def saveToFile(self, fileName):
+        f = open(fileName, 'w')
+        txt = 'model ::\n'
+#         for col in data[index,:]:
+#             txt = txt+' '+str(col)
+        txt = txt + 'left = ' + str(self.left) + '\n'
+        txt = txt + 'right = ' + str(self.right) + '\n'
+        txt = txt + 'top = ' + str(self.top) + '\n'
+        txt = txt + 'bottom = ' + str(self.bottom) + '\n'
+        txt = txt + 'longitudeAxis = ' + str(self.longitudeAxis) + '\n'
+        txt = txt + 'longitudeAxisCoord = ' + str(self.longitudeAxisCoord) + '\n'
+        txt = txt + 'latitudeAxis = ' + str(self.latitudeAxis) + '\n'
+        txt = txt + 'latitudeAxisCoord = ' + str(self.latitudeAxisCoord) + '\n'
+        f.write(txt)
+        f.close()
 
     def toMesh(self, z_coord=None):
         if z_coord is None:
