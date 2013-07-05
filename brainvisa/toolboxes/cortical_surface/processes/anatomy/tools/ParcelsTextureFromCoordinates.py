@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # As a counterpart to the access to the source code and  rights to copy,
 # modify and redistribute granted by the license, users are provided only
 # with a limited warranty  and the software's author,  the holder of the
@@ -17,12 +18,23 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
+
+def validation():
+  try:
+    import brainvisa.cortical_surface.parameterization.mapping
+  except:
+    raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
+  
 from brainvisa.processes import *
 import shfjGlobals   
 import sigraph
 from soma import aims
 from brainvisa.cortical_surface.parameterization import model as md
-from brainvisa.cortical_surface.parameterization.mapping import parcelsFromCoordinates
+
+try :
+  from brainvisa.cortical_surface.parameterization.mapping import parcelsFromCoordinates
+except:
+  pass
 
 name = 'ParcelsTextureFromCoordinates'
 
