@@ -8,7 +8,16 @@ from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
 from brainvisa.cortical_surface.parameterization import model as md
 from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 from scipy import sparse
-from scipy.sparse.linalg import spsolve, lgmres, gmres, bicgstab, splu
+import scipy
+ver = [ int(x) for x in scipy.__version__.split( '.' ) ]
+if ver < [ 0, 9 ]:
+    print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower)'
+    from scipy.sparse.linalg import gmres
+    solver = 'gmres'
+else:
+    print 'HIP-HOP :: using lgmres for solving linear systems'
+    from scipy.sparse.linalg import lgmres
+    solver = 'lgmres'  
 import numpy as np
 from soma import aims, aimsalgo
 import time
@@ -97,9 +106,13 @@ def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
 
 #    Rx = sparse.lil_matrix(Rx).tocsr()
 #    Ry = sparse.lil_matrix(Ry).tocsr()
+    if solver == 'lgmres':
+        x, info = lgmres(L, Rx, tol=1e-6)
+        y, info = lgmres(L, Ry, tol=1e-6)
+    else:
+        x, info = gmres(L, Rx, tol=1e-6)
+        y, info = gmres(L, Ry, tol=1e-6)
 
-    x, info = lgmres(L, Rx, tol=1e-6)
-    y, info = lgmres(L, Ry, tol=1e-6)
 #    y = spsolve(L, Ry)
     z = np.zeros(Nv)
 
@@ -251,20 +264,16 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
 #        print time.clock() - t0, "seconds process time"
 #        print 'error:',np.linalg.norm(x_ex-x1)
         t0 = time.clock()
-        try:
+        if solver == 'lgmres':
             x, info = lgmres(Lx, Rx, tol=tol_in)
+            y, info = lgmres(Ly, Ry, tol=tol_in)#spsolve(Ly, Ry)
             print 'using lgmres'
-        except:
+        else:
             print 'using gmres'
-            x, info = lgmres(Lx, Rx, tol=tol_in)
+            x, info = gmres(Lx, Rx, tol=tol_in)
+            y, info = gmres(Ly, Ry, tol=tol_in)
 #        print info
         print time.clock() - t0, "seconds process time"
-#        print 'error:',np.linalg.norm(x_ex-x)
-        print 'solve for y'
-        t0 = time.clock()
-        y, info = lgmres(Ly, Ry, tol=tol_in)#spsolve(Ly, Ry)
-        print time.clock() - t0, "seconds process time"
-#        print y.shape
     print 'matrix inverted'
     z = np.zeros(Nbv)
     vv = aims.vector_POINT3DF()
@@ -367,11 +376,18 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 #    x = spsolve(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx)
 #    y = spsolve(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry)
     t0 = time.clock()
-    x, info = lgmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=tol_in)
-    print time.clock() - t0, "seconds process time for x"
-    t0 = time.clock()
-    y, info = lgmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=tol_in)
-    print time.clock() - t0, "seconds process time for y"
+    if solver == 'lgmres':
+        x, info = lgmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=tol_in)
+        print time.clock() - t0, "seconds process time for x"
+        t0 = time.clock()
+        y, info = lgmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=tol_in)
+        print time.clock() - t0, "seconds process time for y"
+    else:        
+        x, info = gmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=tol_in)
+        print time.clock() - t0, "seconds process time for x"
+        t0 = time.clock()
+        y, info = gmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=tol_in)
+        print time.clock() - t0, "seconds process time for y"
     print 'matrix inverted'
     z = np.zeros(Nbv)
     vv = aims.vector_POINT3DF()
