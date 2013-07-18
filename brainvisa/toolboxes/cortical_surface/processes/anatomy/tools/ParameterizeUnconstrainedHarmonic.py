@@ -32,7 +32,8 @@ from soma import aims
 import numpy as np
 
 try:
-  from brainvisa.cortical_surface.parameterization.mapping import hipHop
+  from brainvisa.cortical_surface.parameterization.mapping import hip#hipHop
+#  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 except:
   pass
 
@@ -48,22 +49,20 @@ userLevel = 2
 signature = Signature(
                       
     'side', Choice('right', 'left'),    
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),    
-    'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture','Texture'),
-    'insular_pole_texture',ReadDiskItem( 'Insula pole texture','Texture'),
-    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
-    'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
-    'latitude',WriteDiskItem( 'Latitude coordinate texture','Texture'),
-    'longitude',WriteDiskItem( 'Longitude coordinate texture','Texture')
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', shfjGlobals.aimsMeshFormats),    
+    'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'Texture'),
+    'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
+    'square_mesh',WriteDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
+    'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'Texture'),
+    'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture')
 )
 
 def initialization( self ):
     self.linkParameters( 'cingular_pole_texture', 'white_mesh')
     self.linkParameters( 'insular_pole_texture', 'white_mesh')
-    self.linkParameters( 'white_sulcalines', 'white_mesh')
-    self.linkParameters( 'sulcus_labels', 'white_mesh')
-    self.linkParameters( 'latitude','white_mesh')
-    self.linkParameters( 'longitude','white_mesh')
+    self.linkParameters( 'square_mesh','white_mesh')
+    self.linkParameters( 'boundary_texture','white_mesh')
+    self.linkParameters( 'corresp_indices_texture','white_mesh')
 
     
 def execution( self, context ):
@@ -73,24 +72,48 @@ def execution( self, context ):
     context.write('Reading textures and mesh')
     cing_pole = re.read(self.cingular_pole_texture.fullPath())
     insula_pole = re.read(self.insular_pole_texture.fullPath())
-    texture_sulci = re.read(self.white_sulcalines.fullPath())
     mesh = re.read(self.white_mesh.fullPath())
-    context.write('HIP-HOP')
-    context.write(np.unique(texture_sulci[0].arraydata()))
-#     from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
-#     full_sulci = slSet.SulcalLinesSet()
-#     full_sulci.extractFromTexture(texture_sulci[0].arraydata(), mesh)
-#     full_sulci.printArgs()
+    context.write('HIP')
+ 
+     
+    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
+    context.write('Writing meshes and textures')
+    tex_boundary = aims.TimeTexture_S16()
+    for ind,bound in enumerate(neoCortex_open_boundary):
+        tmp_tex = np.zeros(len(neoCortex_square.vertex()))
+        tmp_tex[bound] = ind + 1
+        tex_boundary[ind].assign(tmp_tex)
+    ws.write(tex_boundary, self.boundary_texture.fullPath())
+    ws.write( neoCortex_square, self.square_mesh.fullPath() )
+    tex_corresp_indices = aims.TimeTexture_S16()
+    tex_corresp_indices[0].assign(neocortex_indices)
+    tex_corresp_indices[1].assign(insula_indices)
+    tex_corresp_indices[2].assign(cingular_indices)
+    ws.write(tex_corresp_indices, self.corresp_indices_texture.fullPath())
 
-    
-    lon, lat = hipHop(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), texture_sulci[0].arraydata(), self.side)
-    context.write('Writing textures')
-    tex_lon = aims.TimeTexture_FLOAT()
-    tex_lon[0].assign(lon)
-    ws.write(tex_lon, self.longitude.fullPath())
-    tex_lat = aims.TimeTexture_FLOAT()
-    tex_lat[0].assign(lat)
-    ws.write(tex_lat, self.latitude.fullPath())
+#     re = aims.Reader()
+#     ws = aims.Writer()
+#     context.write('Reading textures and mesh')
+#     cing_pole = re.read(self.cingular_pole_texture.fullPath())
+#     insula_pole = re.read(self.insular_pole_texture.fullPath())
+#     texture_sulci = re.read(self.white_sulcalines.fullPath())
+#     mesh = re.read(self.white_mesh.fullPath())
+#     context.write('HIP-HOP')
+#     context.write(np.unique(texture_sulci[0].arraydata()))
+# #     from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
+# #     full_sulci = slSet.SulcalLinesSet()
+# #     full_sulci.extractFromTexture(texture_sulci[0].arraydata(), mesh)
+# #     full_sulci.printArgs()
+# 
+#     
+#     lon, lat = hipHop(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), texture_sulci[0].arraydata(), self.side)
+#     context.write('Writing textures')
+#     tex_lon = aims.TimeTexture_FLOAT()
+#     tex_lon[0].assign(lon)
+#     ws.write(tex_lon, self.longitude.fullPath())
+#     tex_lat = aims.TimeTexture_FLOAT()
+#     tex_lat[0].assign(lat)
+#     ws.write(tex_lat, self.latitude.fullPath())
 
 #    spherical_verts = sphericalMeshFromCoords(lat, lon, 50):
     
