@@ -105,6 +105,7 @@ FileType( 'Indices texture', 'Texture' )
 FileType( 'Rectangular flat indices texture', 'Indices texture' )
 FileType( 'Left rectangular flat indices texture', 'Rectangular flat indices texture' )
 FileType( 'Right rectangular flat indices texture', 'Rectangular flat indices texture' )
+FileType( 'Rectangular flat texture','Texture' )
 
 ## template for poles
 FileType( 'Cingular Pole Template', '3D Volume' )

@@ -78,17 +78,36 @@ def execution( self, context ):
      
     (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
     context.write('Writing meshes and textures')
+    
+    '''boundaries (see mapping.path2Boundary for details:"
+    boundary[0] == insula_boundary
+    boundary[1] == neocortex_poles_path always from insula to cingular pole
+    boundary[2] == cingular_boundary
+    boundary[3] == new vertices always from insula to cingular pole
+    '''
     tex_boundary = aims.TimeTexture_S16()
     for ind,bound in enumerate(neoCortex_open_boundary):
         tmp_tex = np.zeros(len(neoCortex_square.vertex()))
-        tmp_tex[bound] = ind + 1
+        tmp_tex[bound] = 1
         tex_boundary[ind].assign(tmp_tex)
     ws.write(tex_boundary, self.boundary_texture.fullPath())
     ws.write( neoCortex_square, self.square_mesh.fullPath() )
+    '''
+    tex_corresp_indices contains the indices of the vertices in white_mesh for:
+        neoCortex_square in time 0
+        insula_indices in time 1
+        cingular_indices in time 2
+    '''
     tex_corresp_indices = aims.TimeTexture_S16()
-    tex_corresp_indices[0].assign(neocortex_indices)
-    tex_corresp_indices[1].assign(insula_indices)
-    tex_corresp_indices[2].assign(cingular_indices)
+    tmp_tex = np.zeros(len(mesh.vertex()))
+    tmp_tex[neocortex_indices] = 1
+    tex_corresp_indices[0].assign(tmp_tex)
+    tmp_tex = np.zeros(len(mesh.vertex()))
+    tmp_tex[insula_indices] = 1
+    tex_corresp_indices[1].assign(tmp_tex)
+    tmp_tex = np.zeros(len(mesh.vertex()))
+    tmp_tex[cingular_indices] = 1
+    tex_corresp_indices[2].assign(tmp_tex)
     ws.write(tex_corresp_indices, self.corresp_indices_texture.fullPath())
 
 #     re = aims.Reader()

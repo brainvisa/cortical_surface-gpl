@@ -6,6 +6,7 @@ insert( '{center}/{subject}',
       ## que mettre dans les niveaux aquisition et analysis?
     '<subject>_L_remeshed', SetType( 'Left remeshed mesh' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_R_remeshed', SetType( 'Right remeshed mesh' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_rectangular_flat', SetType( 'Rectangular flat texture' ),
     '<subject>_L_rectangular_flat', SetType( 'Left rectangular flat mesh' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_R_rectangular_flat', SetType( 'Right rectangular flat mesh' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_L_rectangular_flat_indices', SetType( 'Left rectangular flat indices texture' ), SetWeakAttr( 'side', 'left' ),
