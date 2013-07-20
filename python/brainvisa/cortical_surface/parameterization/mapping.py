@@ -1065,6 +1065,55 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
 
 ####################################################################
 #
+# HOP
+#
+####################################################################
+def hop(neoCortex_square, neoCortex_open_boundary, texture_sulci, side, model=None):
+    cstrBalance = 200
+    if side == 'right':
+        SC_label = 44#25
+    else:
+        SC_label = 43#25       
+
+
+    full_sulci = slSet.SulcalLinesSet()
+#     tex_cstr_square = texture2ROI(texture_sulci, neocortex_indices)
+#     full_sulci.extractFromTexture(texture_sulci, mesh)
+#     full_sulci.updateIndices(neocortex_indices)
+    
+    full_sulci.extractFromTexture(texture_sulci, neoCortex_square)
+
+    vert = np.array(neoCortex_square.vertex())
+    full_sulci.updateVertices(vert)
+    print 'SC_label: ', SC_label
+    SC_ind = full_sulci.labels.index(SC_label)
+    full_sulci.sulcalLines[SC_ind].printArgs()
+    translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
+    vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
+    neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
+    neoCortex_square.updateNormals()
+    full_sulci.updateVertices(vert)
+
+    model = md.Model()
+    model.printArgs()
+    full_sulci.sulcalLine2SulcalConstraint(model)
+    full_sulci.printArgs()
+
+    model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
+    model.printArgs()
+    model.setAxisCoord(full_sulci)
+    model.printArgs()
+    model.saveToFile('/home/toz/model_current.txt')
+
+    Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
+
+    neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
+    (neoCortex_square_cstr, nb_inward_cstr_evol) = solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)
+    print 'nb_inward_cstr_evol', nb_inward_cstr_evol
+    return neoCortex_square_cstr
+
+####################################################################
+#
 # HIP-HOP
 #
 ####################################################################
