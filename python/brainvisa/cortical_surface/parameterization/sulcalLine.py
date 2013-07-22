@@ -6,6 +6,7 @@ Created on 2 august 2012
 import numpy as np
 from soma import aims
 from scipy import sparse
+np_ver = [ int(x) for x in np.__version__.split( '.' ) ]
 
 
 class SulcalLine(object):
@@ -13,7 +14,7 @@ class SulcalLine(object):
     classdocs
     '''
 
-    def __init__(self, label=None, indices=None, vertices=None, segm=None):
+    def __init__(self, label=None, indices=None, vertices=None, segm=None, sulc_labels_dict=None):
         '''
         Constructor
         '''
@@ -35,7 +36,10 @@ class SulcalLine(object):
             self.segm = segm
         self.color = label
         self.nbVertices = self.vertices.shape[0]
-        self.name = 'unknown'
+        if sulc_labels_dict is None:
+            self.name = 'unknown'
+        else:
+            self.name = sulc_labels_dict[self.label]
         self.computeAttributes()
 
     def printArgs(self):
@@ -53,6 +57,9 @@ class SulcalLine(object):
         self.vertices = np.vstack(self.vertices, sl.vertices)
         self.nbVertices = self.vertices.shape[0]
         self.computeAttributes()
+
+    def updateName(self, sulc_labels_dict):
+        self.name = sulc_labels_dict[self.label]
 
     def updateVertices(self, vertices=None):
         if vertices is None:
@@ -118,21 +125,21 @@ class SulcalLine(object):
     def next(self):
         return self
 
-    def extractFromTexture(self, label, tex, mesh, neigh=0):
+    def extractFromTexture(self, label, tex, mesh, sulc_labels_dict=None, neigh=None):
         atex = np.around(tex)
         tex_val_indices = list(np.where(atex == label)[0])
         Nv = len(tex_val_indices)
         if Nv is 0:
             print 'no value ' + str(label) + ' in the input texture, return empty sulcalLine!!'
         else:
-            if neigh is 0:
+            if neigh is None:
                 neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
             "build the segments that link the vertices"
             segm = []
             C = sparse.lil_matrix((Nv, Nv))
             for v in tex_val_indices:
                 ne_i = np.array(neigh[v].list())
-                if np.__version__<1.6:
+                if np_ver < [ 1, 6 ]:
                     intersect = np.intersect1d_nu(ne_i, tex_val_indices)
                 else:
                     intersect = np.intersect1d(ne_i, tex_val_indices)
@@ -145,8 +152,8 @@ class SulcalLine(object):
                             C[v_index, inter_index] = 1
                             C[inter_index, v_index] = 1
             verts = np.array(mesh.vertex())
-            return self.__init__(label, np.array(tex_val_indices, np.uint32), verts[tex_val_indices, :], np.array(segm, np.uint32))
-
+            return self.__init__(label, np.array(tex_val_indices, np.uint32), verts[tex_val_indices, :], np.array(segm, np.uint32), sulc_labels_dict)
+            
     def toMesh(self):
         out_mesh = aims.AimsTimeSurface_2()
 #        verts = aims.vector_POINT3DF()

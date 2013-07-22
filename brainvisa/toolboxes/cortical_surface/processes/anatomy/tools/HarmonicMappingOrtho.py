@@ -70,7 +70,13 @@ def execution( self, context ):
     tex_sulci = re.read(self.white_sulcalines.fullPath())
     tex_corresp_indices = re.read(self.corresp_indices_texture.fullPath())
     boundary_tex = re.read(self.boundary_texture.fullPath())
-
+    context.write(self.sulcus_labels.fullPath())
+    sulc_labels = []
+    with open(self.sulcus_labels.fullPath(),'r') as inf:
+        for line in inf:
+            sulc_labels.append(line.split())    
+    sulc_labels_dict = dict((int(value), key) for (key, value) in sulc_labels)
+    
     '''
     boundaries (see mapping.path2Boundary for details:"
     boundary[0] == insula_boundary
@@ -87,13 +93,15 @@ def execution( self, context ):
     tex_square_sulci_tmp = tex_sulci[0].arraydata()[square_mesh_indices]
     tex_square_sulci = np.hstack((tex_square_sulci_tmp, tex_square_sulci_tmp[boundary[1]]))
 
-    
-    context.write(np.unique(tex_square_sulci))
-
-    context.write('HIP')
+    labels = np.unique(tex_square_sulci)
+    context.write('found the following sulci in the texture :')
+    context.write([sulc_labels_dict[lab] for lab in labels])
+    context.write('associated to the following labels :')
+    context.write(labels)
+    context.write('HOP')
  
      
-    (cstr_mesh) = hop(mesh, boundary, tex_square_sulci, self.side)
+    (cstr_mesh) = hop(mesh, boundary, tex_square_sulci, sulc_labels_dict, self.side)
     context.write('Writing meshes and textures')
     
     ws.write( cstr_mesh, self.cstr_square_mesh.fullPath() )

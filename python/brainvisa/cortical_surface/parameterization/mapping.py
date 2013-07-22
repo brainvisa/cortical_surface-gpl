@@ -1068,25 +1068,22 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
 # HOP
 #
 ####################################################################
-def hop(neoCortex_square, neoCortex_open_boundary, texture_sulci, side, model=None):
+def hop(neoCortex_square, neoCortex_open_boundary, texture_sulci, sulci_dict, side, model=None):
     cstrBalance = 200
-    if side == 'right':
-        SC_label = 44#25
-    else:
-        SC_label = 43#25       
-
 
     full_sulci = slSet.SulcalLinesSet()
 #     tex_cstr_square = texture2ROI(texture_sulci, neocortex_indices)
 #     full_sulci.extractFromTexture(texture_sulci, mesh)
 #     full_sulci.updateIndices(neocortex_indices)
-    
-    full_sulci.extractFromTexture(texture_sulci, neoCortex_square)
+#     vert = np.array(neoCortex_square.vertex())
+#     full_sulci.updateVertices(vert)    
+    full_sulci.extractFromTexture(texture_sulci, neoCortex_square, sulci_dict)
 
     vert = np.array(neoCortex_square.vertex())
-    full_sulci.updateVertices(vert)
+    
+    SC_ind = full_sulci.names.index(('S.C._'+side))   
+    SC_label = full_sulci.labels[SC_ind]
     print 'SC_label: ', SC_label
-    SC_ind = full_sulci.labels.index(SC_label)
     full_sulci.sulcalLines[SC_ind].printArgs()
     translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
     vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])

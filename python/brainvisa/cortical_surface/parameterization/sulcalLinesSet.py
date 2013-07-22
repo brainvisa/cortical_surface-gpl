@@ -19,6 +19,7 @@ class SulcalLinesSet(object):
         '''
         self.sulcalLines = []
         self.labels = []
+        self.names = []
         self.longitudeCstrIndex = []
         self.latitudeCstrIndex = []
         self.longitudeCstrAxis = []
@@ -38,6 +39,7 @@ class SulcalLinesSet(object):
                     self.latitudeCstrAxis.append(sl.axisID)
             self.sulcalLines.append(sl)
             self.labels.append(sl.label)
+            self.names.append(sl.name)
             self.nbSulci += 1
 
     def cat(self, sl):
@@ -89,6 +91,7 @@ class SulcalLinesSet(object):
     def printArgs(self):
         print 'SulcalLinesSet ::'
         print '    labels = ', self.labels
+        print '    names = ', self.names
         print '    longitudeCstrIndex = ', self.longitudeCstrIndex
         print '    longitudeCstrAxis = ', self.longitudeCstrAxis
         print '    latitudeCstrIndex = ', self.latitudeCstrIndex
@@ -96,7 +99,7 @@ class SulcalLinesSet(object):
         print '    nbSulci = ', self.nbSulci
         print '    sulcalLines = ', self.sulcalLines
 
-    def extractFromTexture(self, tex, mesh, labels=None, neigh=None):
+    def extractFromTexture(self, tex, mesh, sulc_labels_dict=None, labels=None, neigh=None):
         if neigh is None:
             neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
         if labels is None:
@@ -106,7 +109,7 @@ class SulcalLinesSet(object):
             labels.remove(0)
         sls = [sln.SulcalLine() for l in range(len(labels))]
         for l in range(len(labels)):
-            sls[l].extractFromTexture(labels[l], tex, mesh, neigh)
+            sls[l].extractFromTexture(labels[l], tex, mesh, sulc_labels_dict, neigh)
         return self.__init__(sls)
 
     def sulcalLine2SulcalConstraint(self, modele=None, labels=None):
