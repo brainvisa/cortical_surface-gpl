@@ -52,7 +52,7 @@ signature = Signature(
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', shfjGlobals.aimsMeshFormats),    
     'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'Texture'),
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
-    'square_mesh',WriteDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
+    'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
     'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture')
 )
@@ -60,7 +60,7 @@ signature = Signature(
 def initialization( self ):
     self.linkParameters( 'cingular_pole_texture', 'white_mesh')
     self.linkParameters( 'insular_pole_texture', 'white_mesh')
-    self.linkParameters( 'square_mesh','white_mesh')
+    self.linkParameters( 'rectangular_mesh','white_mesh')
     self.linkParameters( 'boundary_texture','white_mesh')
     self.linkParameters( 'corresp_indices_texture','white_mesh')
 
@@ -91,7 +91,7 @@ def execution( self, context ):
         tmp_tex[bound] = 1
         tex_boundary[ind].assign(tmp_tex)
     ws.write(tex_boundary, self.boundary_texture.fullPath())
-    ws.write( neoCortex_square, self.square_mesh.fullPath() )
+    ws.write( neoCortex_square, self.rectangular_mesh.fullPath() )
     '''
     tex_corresp_indices contains the indices of the vertices in white_mesh for:
         neoCortex_square in time 0

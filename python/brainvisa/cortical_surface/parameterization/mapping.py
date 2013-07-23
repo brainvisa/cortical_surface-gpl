@@ -906,10 +906,11 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
         mesh.vertex().assign(vv)
         (nb_inward, inward) = invertedPolygon(mesh)
         nb_inward_evol.append(nb_inward)
-        if nb_inward_evol[-1] == nb_inward_evol[-2]:
-            count += 1
-        else:
-            count = 0
+        if len(nb_inward_evol)>3:
+            if nb_inward_evol[-1] == nb_inward_evol[-2] or nb_inward_evol[-1] == nb_inward_evol[-3]:
+                count += 1
+            else:
+                count = 0
         if count > 10:
             break
     return (mesh, nb_inward_evol)
@@ -1088,7 +1089,7 @@ def hop(neoCortex_square, neoCortex_open_boundary, texture_sulci, sulci_dict, si
     translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
     vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
     neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
-    neoCortex_square.updateNormals()
+#    neoCortex_square.updateNormals()
     full_sulci.updateVertices(vert)
 
     model = md.Model()

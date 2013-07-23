@@ -112,19 +112,19 @@ class SulcalLinesSet(object):
             sls[l].extractFromTexture(labels[l], tex, mesh, sulc_labels_dict, neigh)
         return self.__init__(sls)
 
-    def sulcalLine2SulcalConstraint(self, modele=None, labels=None):
+    def sulcalLine2SulcalConstraint(self, modele=None, names=None):
         if modele is None:
             print 'no modele given, nothing to do!'
             print 'try sulcalLine2SulcalConstraint(modele)'
         else:
-            if labels is None:
-                labels = self.labels
-            for lab in labels:
-                place = self.labels.index(lab)
+            if names is None:
+                names = self.names
+            for name in names:
+                place = self.names.index(name)
                 if place is None:
-                    print 'label ' + lab + ' not present in this Sulci object!!'
+                    print 'sulcus ' + name + ' not present in this Sulci object!!'
                 else:
-                    (axisID, isLon, isLat) = modele.label2Axis(lab)
+                    (axisID, isLon, isLat) = modele.sulcus2Axis(name)
                     if isLon:
                         self.sulcalLines[place] = sln.SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat)
                         self.longitudeCstrIndex.append(place)
@@ -134,7 +134,7 @@ class SulcalLinesSet(object):
                         self.latitudeCstrIndex.append(place)
                         self.latitudeCstrAxis.append(axisID)
                     else:
-                        print 'sulcalLine with label ', lab, 'is not a constraint'
+                        print 'sulcalLine with name ', name, 'is not a constraint'
 
     def toMesh(self):
         out_mesh = aims.AimsTimeSurface_2()

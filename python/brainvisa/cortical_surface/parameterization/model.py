@@ -124,6 +124,9 @@ class Model(object):
         plt.plot([self.left, self.right], [self.bottom, self.bottom], 'b')
         plt.plot([self.left, self.left], [self.top, self.bottom], 'm')
 
+##########################################################################
+# replaced by sulcus2Axis, should not be used anymore
+##########################################################################
     def label2Axis(self, label):
         isLat = False
         isLon = False
@@ -204,6 +207,94 @@ class Model(object):
             isLat = True
         else:
             print 'no axis defined for label ', label
+        return(axisID, isLon, isLat)
+    
+    def sulcus2Axis(self, sulc_name_in):
+        isLat = False
+        isLon = False
+        axisID = None
+        if sulc_name_in.find('left')>0:
+            sulc_name = sulc_name_in[:-5]
+        elif sulc_name_in.find('right')>0:
+            sulc_name = sulc_name_in[:-6]
+        else:
+            sulc_name = sulc_name_in
+        #  longitude labels
+        if sulc_name == 'F.C.L.r.asc.':
+            axisID = 40
+            isLon = True
+        elif sulc_name == 'F.Cal.ant.-Sc.Cal.':
+            axisID = 281
+            isLon = True
+        elif sulc_name == 'F.P.O.':
+            axisID = 297
+            isLon = True
+        elif sulc_name == 'S.C.':
+            axisID = 360
+            isLon = True
+        elif sulc_name == 'S.F.orbitaire.':
+            axisID = 61
+            isLon = True
+        elif sulc_name == 'S.F.marginal.':
+            axisID = 61
+            isLon = True
+        elif sulc_name == 'F.I.P.Po.C.inf.':
+            axisID = 339
+            isLon = True
+        elif sulc_name == 'S.Po.C.sup.':
+            axisID = 339
+            isLon = True
+        elif sulc_name == 'S.Pe.C.inf.':
+            axisID = 16
+            isLon = True
+        elif sulc_name == 'S.Pe.C.median.':
+            axisID = 16
+            isLon = True
+        elif sulc_name == 'S.Pe.C.sup.':
+            axisID = 16
+            isLon = True
+        #  latitude labels
+        elif sulc_name == 'F.C.M.ant.':
+            axisID = 55
+            isLat = True
+        elif sulc_name == 'F.Coll.':
+            axisID = 56  #55
+            isLat = True
+        elif sulc_name == 'S.Call.':
+            axisID = 1
+            isLat = True
+        elif sulc_name == 'S.F.inf.':
+            axisID = 106
+            isLat = True
+        elif sulc_name == 'S.F.inter.':
+            axisID = 92
+            isLat = True
+        elif sulc_name == 'S.F.sup.':
+            axisID = 81
+            isLat = True
+        elif sulc_name == 'S.O.T.lat.post.':
+            axisID = 81
+            isLat = True
+        elif sulc_name == 'S.Olf.':
+            axisID = 81
+            isLat = True
+        elif sulc_name == 'S.T.i.ant.':
+            axisID = 92
+            isLat = True
+        elif sulc_name == 'S.T.i.post.':
+            axisID = 92
+            isLat = True
+        elif sulc_name == 'S.T.s.':
+            axisID = 106
+            isLat = True
+        elif sulc_name == 'S.T.s.ter.asc.ant.':
+            axisID = 106
+            isLat = True
+        elif sulc_name == 'T.s.ter.asc.post.':
+            axisID = 92
+            isLat = True
+        else:
+            print 'no axis defined for sulcus ', sulc_name
         return(axisID, isLon, isLat)
 
     def setAxisCoord(self, sulci=None, method=None):

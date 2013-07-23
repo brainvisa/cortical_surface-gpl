@@ -43,20 +43,21 @@ userLevel = 2
 signature = Signature(
                       
     'side', Choice('right', 'left'),    
-    'square_mesh',ReadDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
+    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
+#    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
     'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
-    'cstr_square_mesh',WriteDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats)
+    'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats)
 )
 
 def initialization( self ):
-    self.linkParameters( 'boundary_texture','square_mesh')
-    self.linkParameters( 'corresp_indices_texture','square_mesh')
-    self.linkParameters( 'white_sulcalines', 'square_mesh')
-    self.linkParameters( 'sulcus_labels', 'square_mesh')
-    self.linkParameters( 'cstr_square_mesh','square_mesh')
+    self.linkParameters( 'boundary_texture','rectangular_mesh')
+    self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
+    self.linkParameters( 'white_sulcalines', 'rectangular_mesh')
+    self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
+    self.linkParameters( 'cstr_rectangular_mesh','rectangular_mesh')
 
     
 def execution( self, context ):
@@ -66,11 +67,12 @@ def execution( self, context ):
     re = aims.Reader()
     ws = aims.Writer()
     context.write('Reading textures and mesh')
-    mesh = re.read(self.square_mesh.fullPath())
+    mesh = re.read(self.rectangular_mesh.fullPath())
+    tex_square_sulci = re.read(self.white_sulcalines.fullPath())
     tex_sulci = re.read(self.white_sulcalines.fullPath())
     tex_corresp_indices = re.read(self.corresp_indices_texture.fullPath())
     boundary_tex = re.read(self.boundary_texture.fullPath())
-    context.write(self.sulcus_labels.fullPath())
+    context.write('Reading sulcus-label correspondences file')
     sulc_labels = []
     with open(self.sulcus_labels.fullPath(),'r') as inf:
         for line in inf:
@@ -99,12 +101,11 @@ def execution( self, context ):
     context.write('associated to the following labels :')
     context.write(labels)
     context.write('HOP')
- 
      
     (cstr_mesh) = hop(mesh, boundary, tex_square_sulci, sulc_labels_dict, self.side)
     context.write('Writing meshes and textures')
     
-    ws.write( cstr_mesh, self.cstr_square_mesh.fullPath() )
+    ws.write( cstr_mesh, self.cstr_rectangular_mesh.fullPath() )
    
     context.write('Done')
       

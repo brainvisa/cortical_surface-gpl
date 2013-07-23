@@ -46,11 +46,12 @@ userLevel = 2
 #     anatomist.validation()
     
 signature = Signature(
-                      
-    'input_texture',ReadDiskItem('Texture', 'Texture'),
+    'input_texture',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
+#    'input_texture',ReadDiskItem('Texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'output_texture',WriteDiskItem( 'Rectangular flat texture', 'Texture')
+    'output_texture',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
+    #'output_texture',WriteDiskItem( 'Rectangular flat texture', 'Texture')
 )
 
 def initialization( self ):
@@ -86,17 +87,17 @@ def execution( self, context ):
         insula_indices in time 1
         cingular_indices in time 2
     '''
-    square_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
-    print square_mesh_indices
-    print len(square_mesh_indices)
+    rectangular_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
+    print rectangular_mesh_indices
+    print len(rectangular_mesh_indices)
     print len(new_verts_indices)
-    nb_vert_square = len(square_mesh_indices) + len(new_verts_indices)
+    nb_vert_square = len(rectangular_mesh_indices) + len(new_verts_indices)
     print nb_vert_square
     print new_verts_indices
     print inv_new_verts_indices
     output_tex = aims.TimeTexture_FLOAT()
     for t in  xrange( input_tex.size() ):
-        output_tex_tmp = input_tex[t].arraydata()[square_mesh_indices]
+        output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
         tmp_tex = np.zeros(nb_vert_square)
         tmp_tex = np.hstack((output_tex_tmp, output_tex_tmp[inv_new_verts_indices]))
         output_tex[t].assign(tmp_tex)
