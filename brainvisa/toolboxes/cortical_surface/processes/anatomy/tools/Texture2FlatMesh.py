@@ -95,7 +95,7 @@ def execution( self, context ):
     print nb_vert_square
     print new_verts_indices
     print inv_new_verts_indices
-    output_tex = aims.TimeTexture_FLOAT()
+    output_tex = aims.TimeTexture_S16()
     for t in  xrange( input_tex.size() ):
         output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
         tmp_tex = np.zeros(nb_vert_square)

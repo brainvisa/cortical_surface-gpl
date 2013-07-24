@@ -32,7 +32,7 @@ import numpy as np
 
 try:
   from brainvisa.cortical_surface.parameterization.mapping import hop
-#  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 except:
   pass
     
@@ -46,8 +46,8 @@ signature = Signature(
     'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
-#    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
-    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
+    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
+#    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
     'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats)
 )
@@ -69,15 +69,12 @@ def execution( self, context ):
     context.write('Reading textures and mesh')
     mesh = re.read(self.rectangular_mesh.fullPath())
     tex_square_sulci = re.read(self.white_sulcalines.fullPath())
-    tex_sulci = re.read(self.white_sulcalines.fullPath())
+#    tex_sulci = re.read(self.white_sulcalines.fullPath())
     tex_corresp_indices = re.read(self.corresp_indices_texture.fullPath())
     boundary_tex = re.read(self.boundary_texture.fullPath())
     context.write('Reading sulcus-label correspondences file')
-    sulc_labels = []
-    with open(self.sulcus_labels.fullPath(),'r') as inf:
-        for line in inf:
-            sulc_labels.append(line.split())    
-    sulc_labels_dict = dict((int(value), key) for (key, value) in sulc_labels)
+    
+    sulc_labels_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
     
     '''
     boundaries (see mapping.path2Boundary for details:"
@@ -90,12 +87,15 @@ def execution( self, context ):
     for t in  xrange( boundary_tex.size() ):
         boundary.append(np.where(boundary_tex[t].arraydata()>0)[0])
 
-    square_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
-
-    tex_square_sulci_tmp = tex_sulci[0].arraydata()[square_mesh_indices]
-    tex_square_sulci = np.hstack((tex_square_sulci_tmp, tex_square_sulci_tmp[boundary[1]]))
-
+#     square_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
+# 
+#     tex_square_sulci_tmp = tex_sulci[0].arraydata()[square_mesh_indices]
+#     tex_square_sulci = np.hstack((tex_square_sulci_tmp, tex_square_sulci_tmp[boundary[1]]))
+    tex_square_sulci = tex_square_sulci[0].arraydata()
     labels = np.unique(tex_square_sulci)
+    context.write('associated to the following labels :')
+    context.write(labels)
+
     context.write('found the following sulci in the texture :')
     context.write([sulc_labels_dict[lab] for lab in labels])
     context.write('associated to the following labels :')
