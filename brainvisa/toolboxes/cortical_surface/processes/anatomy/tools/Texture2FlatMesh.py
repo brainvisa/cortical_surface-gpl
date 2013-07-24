@@ -80,7 +80,8 @@ def execution( self, context ):
     '''
     new_verts_indices = np.where(boundary_tex[3].arraydata()>0)[0]
     inv_new_verts_indices = np.where(boundary_tex[1].arraydata()>0)[0]
-    
+    boundary0_indices = np.where(boundary_tex[0].arraydata()>0)[0]
+    boundary1_indices = np.where(boundary_tex[2].arraydata()>0)[0]
     '''
     tex_corresp_indices contains the indices of the vertices in white_mesh for:
         neoCortex_square in time 0
@@ -96,10 +97,12 @@ def execution( self, context ):
     print new_verts_indices
     print inv_new_verts_indices
     output_tex = aims.TimeTexture_S16()
-    for t in  xrange( input_tex.size() ):
+    for t in  range( input_tex.size() ):
         output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
         tmp_tex = np.zeros(nb_vert_square)
-        tmp_tex = np.hstack((output_tex_tmp, output_tex_tmp[inv_new_verts_indices]))
+        tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
+        tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
+ #       tmp_tex = np.hstack((output_tex_tmp, output_tex_tmp[inv_new_verts_indices]))
         output_tex[t].assign(tmp_tex)
     ws.write(output_tex, self.output_texture.fullPath())
     
