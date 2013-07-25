@@ -1069,8 +1069,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
 # HOP
 #
 ####################################################################
-def hop(neoCortex_square, neoCortex_open_boundary, texture_sulci, sulci_dict, side, model=None):
-    cstrBalance = 200
+def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, sulci_dict, side, model=None):
 
     full_sulci = slSet.SulcalLinesSet()
 #     tex_cstr_square = texture2ROI(texture_sulci, neocortex_indices)

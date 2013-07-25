@@ -103,7 +103,11 @@ class SulcalLinesSet(object):
         if neigh is None:
             neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
         if labels is None:
-            atex = np.around(tex)
+            if tex.dtype != 'int16':
+                print 'warning :: sulci texture type is not int16'
+                atex = np.around(tex)
+            else:
+                atex = tex
             labels = np.unique(atex)
             labels = labels.tolist()
             labels.remove(0)

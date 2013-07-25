@@ -47,6 +47,7 @@ signature = Signature(
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
+    'cstrBalance', Float(),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
     'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats)
@@ -56,9 +57,9 @@ def initialization( self ):
     self.linkParameters( 'boundary_texture','rectangular_mesh')
     self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
     self.linkParameters( 'white_sulcalines', 'rectangular_mesh')
+    self.cstrBalance = 200
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
     self.linkParameters( 'cstr_rectangular_mesh','rectangular_mesh')
-
     
 def execution( self, context ):
 
@@ -84,25 +85,21 @@ def execution( self, context ):
     boundary[3] == new vertices always from insula to cingular pole
     '''
     boundary = []
-    for t in  xrange( boundary_tex.size() ):
+    for t in  range( boundary_tex.size() ):
         boundary.append(np.where(boundary_tex[t].arraydata()>0)[0])
 
 #     square_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
 # 
 #     tex_square_sulci_tmp = tex_sulci[0].arraydata()[square_mesh_indices]
 #     tex_square_sulci = np.hstack((tex_square_sulci_tmp, tex_square_sulci_tmp[boundary[1]]))
-    tex_square_sulci = tex_square_sulci[0].arraydata()
-    labels = np.unique(tex_square_sulci)
-    context.write('associated to the following labels :')
-    context.write(labels)
-
+    square_sulci = tex_square_sulci[0].arraydata()
+    labels = np.unique(square_sulci)
     context.write('found the following sulci in the texture :')
     context.write([sulc_labels_dict[lab] for lab in labels])
     context.write('associated to the following labels :')
     context.write(labels)
     context.write('HOP')
-     
-    (cstr_mesh) = hop(mesh, boundary, tex_square_sulci, sulc_labels_dict, self.side)
+    (cstr_mesh) = hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side)
     context.write('Writing meshes and textures')
     
     ws.write( cstr_mesh, self.cstr_rectangular_mesh.fullPath() )

@@ -31,10 +31,14 @@ import shfjGlobals
 from soma import aims
 import numpy as np
 
+try:
+  from brainvisa.cortical_surface.parameterization.mapping import computeCoordinates
+except:
+  pass
 
 #from brainvisa import anatomist
 
-name = 'Texture to Flat Mesh'
+name = 'CoordinatesFromHiphopMapping'
 
 userLevel = 2
 
@@ -58,44 +62,33 @@ def initialization( self ):
 
     
 def execution( self, context ):
-  
-    re = aims.Reader()
-    ws = aims.Writer()
-    context.write('Reading textures and mesh')
-    input_tex = re.read(self.input_texture.fullPath())
-    tex_corresp_indices = re.read(self.corresp_indices_texture.fullPath())
-    boundary_tex = re.read(self.boundary_texture.fullPath())
-    context.write('Texture to flat mesh')
     
-    '''
-    boundaries (see mapping.path2Boundary for details:"
-    boundary[0] == insula_boundary
-    boundary[1] == neocortex_poles_path always from insula to cingular pole
-    boundary[2] == cingular_boundary
-    boundary[3] == new vertices always from insula to cingular pole
-    '''
-    boundary = []
-    for t in  range( boundary_tex.size() ):
-        boundary.append(np.where(boundary_tex[t].arraydata()>0)[0])
-    '''
-    tex_corresp_indices contains the indices of the vertices in white_mesh for:
-        neoCortex_square in time 0
-        insula_indices in time 1
-        cingular_indices in time 2
-    '''
-    rectangular_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
-    nb_vert_square = len(rectangular_mesh_indices) + len(boundary[3])
-    output_tex = aims.TimeTexture_S16()
-    for t in  range( input_tex.size() ):
-        output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
-        tmp_tex = np.zeros(nb_vert_square, dtype=np.int16)
-        tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
-        for b in boundary:
-            tmp_tex[b] = 0
-        output_tex[t].assign(tmp_tex)
+    lon, lat = computeCoordinates(mesh, neocortex_indices, neoCortex_square_cstr, neoCortex_open_boundary, poles_lat_insula, poles_lat_cingular)
 
-    ws.write(output_tex, self.output_texture.fullPath())
-    context.write('Texture set to 0 on the boundary')
-    context.write('Done')
-            
-      
+    print 'param de l insula'
+    insula_lon = texture2ROI(lon, insula_indices)
+    insula_bound_rad = np.pi * (insula_lon[insula_boundary] - 180) / 180 
+    circle = np.array([np.cos(insula_bound_rad), np.sin(insula_bound_rad)])
+    insula_disk = diskConformalMapping(insula_mesh, insula_boundary, circle)
+    insula_lon, insula_lat = coordinatesFromDisk(insula_disk, poles_lat_insula)
+    lon[insula_indices] = insula_lon
+    lat[insula_indices] = insula_lat
+
+    cingular_lon = texture2ROI(lon, cingular_indices)
+    cingular_bound_rad = np.pi * (cingular_lon[cingular_boundary] - 180) / 180 
+    circle = np.array([np.cos(cingular_bound_rad), np.sin(cingular_bound_rad)])
+    cingular_disk = diskConformalMapping(cingular_mesh, cingular_boundary, circle)
+    cingular_lon, cingular_lat = coordinatesFromDisk(cingular_disk, poles_lat_cingular)
+    lon[cingular_indices] = cingular_lon
+    lat[cingular_indices] = 180 - cingular_lat
+    if write_all_steps_to_disk:
+        s_tex_cstr_square = aims.TimeTexture_S16()
+        s_tex_cstr_square[0].assign(tex_cstr_square)
+        for pt in neocortex_poles_path:
+            s_tex_cstr_square[0].append(0)
+        ws.write(s_tex_cstr_square, '/home/toz/ammon_Lwhite_neocortex_cstr.tex')
+        full_sulci.save('/home/toz/ammon_Lwhite_square_full_sulci')
+        model.save('/home/toz/model.mesh')
+        ws.write(neoCortex_square_cstr, '/home/toz/ammon_Lwhite_square_cstr_'+str(cstrBalance)+'.mesh')
+        ws.write(insula_disk, '/home/toz/ammon_Lwhite_insula_disk.mesh')
+        ws.write(cingular_disk, '/home/toz/ammon_Lwhite_cingular_disk.mesh')
