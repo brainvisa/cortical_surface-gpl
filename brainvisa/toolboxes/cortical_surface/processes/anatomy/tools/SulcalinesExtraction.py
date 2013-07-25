@@ -68,7 +68,7 @@ def execution( self, context ):
     curvatureIm=context.temporary(  'GIS image' )
     smoothIm=context.temporary( 'GIS image')
 
-    context.write('computing right curvature texture')
+    context.write('computing curvature texture')
     curv = [ 'AimsMeshCurvature',
                 '-i', self.white_mesh.fullPath(),
                 '-o', curvatureIm.fullPath(),
@@ -77,7 +77,7 @@ def execution( self, context ):
     apply( context.system, curv )
     context.write('Done')
 
-    context.write('smoothing right curvature texture')
+    context.write('smoothing curvature texture')
     smooth = [ 'AimsTextureSmoothing',
                 '-i', curvatureIm.fullPath(),
                 '-o', smoothIm.fullPath(),
@@ -90,7 +90,7 @@ def execution( self, context ):
 
     depthIm=context.temporary( 'GIS image')
 
-    context.write('computing right depth texture')
+    context.write('computing depth texture')
     depth = [ 'AimsMeshGeodesicDepth',
                 '-v', self.grey_white_input.fullPath(),
                 '-i', self.white_mesh.fullPath(),
@@ -143,7 +143,7 @@ def execution( self, context ):
                 '-t', 2,
                 '-st', self.constraint_weight,
                 '-o', self.white_sulcalines.fullPath(),
-                '-si', 'right', #self.side,
+                '-si', self.side,
                 '-sb', self.basin_min_size,
                 '-cv', constraintValue
                 ]
