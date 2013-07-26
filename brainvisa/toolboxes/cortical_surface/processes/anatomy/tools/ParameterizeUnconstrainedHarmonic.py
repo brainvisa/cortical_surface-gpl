@@ -54,7 +54,8 @@ signature = Signature(
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
     'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
     'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture')
+    'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture'),
+    'white_mesh_parts',WriteDiskItem( 'White Mesh Parts', shfjGlobals.aimsMeshFormats)
 )
 
 def initialization( self ):
@@ -63,6 +64,7 @@ def initialization( self ):
     self.linkParameters( 'rectangular_mesh','white_mesh')
     self.linkParameters( 'boundary_texture','white_mesh')
     self.linkParameters( 'corresp_indices_texture','white_mesh')
+    self.linkParameters( 'white_mesh_parts','white_mesh')
 
     
 def execution( self, context ):
@@ -78,7 +80,23 @@ def execution( self, context ):
      
     (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
     context.write('Writing meshes and textures')
-    
+    mesh_parts = aims.AimsTimeSurface_3()
+    '''
+    mesh_parts[0] = neoCortex
+    mesh_parts[1] = insula
+    mesh_parts[2] = cingular pole
+    '''
+    mesh_parts.vertex( 0 ).assign( neoCortex_mesh.vertex() )
+    mesh_parts.normal( 0 ).assign( neoCortex_mesh.normal() )
+    mesh_parts.polygon( 0 ).assign( neoCortex_mesh.polygon() )
+    mesh_parts.vertex( 1 ).assign( insula_mesh.vertex() )
+    mesh_parts.normal( 1 ).assign( insula_mesh.normal() )
+    mesh_parts.polygon( 1 ).assign( insula_mesh.polygon() )
+    mesh_parts.vertex( 2 ).assign( cingular_mesh.vertex() )
+    mesh_parts.normal( 2 ).assign( cingular_mesh.normal() )
+    mesh_parts.polygon( 2 ).assign( cingular_mesh.polygon() )
+    ws.write(mesh_parts, self.white_mesh_parts.fullPath())
+
     '''boundaries (see mapping.path2Boundary for details:"
     boundary[0] == insula_boundary
     boundary[1] == neocortex_poles_path always from insula to cingular pole

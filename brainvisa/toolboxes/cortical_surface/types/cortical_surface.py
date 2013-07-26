@@ -112,7 +112,9 @@ FileType( 'Rectangular flat texture','Texture' )
 FileType( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
 FileType( 'Left hemisphere Sulcal Lines Rectangular Flat texture', 'hemisphere Sulcal Lines Rectangular Flat texture' )
 FileType( 'Right hemisphere Sulcal Lines Rectangular Flat texture', 'hemisphere Sulcal Lines Rectangular Flat texture' )
-
+FileType( 'White mesh parts', 'Mesh' )
+FileType( 'Left white mesh parts', 'White mesh parts')
+FileType( 'Right white mesh parts', 'White mesh parts')
 
 ## template for poles
 FileType( 'Cingular Pole Template', '3D Volume' )

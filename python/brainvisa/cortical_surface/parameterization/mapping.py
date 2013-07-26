@@ -403,38 +403,40 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 
 ####################################################################
 #
-# load a rectangular mesh and extract the boundaries from coordinates
+# USELESS
+#
+#  load a rectangular mesh and extract the boundaries from coordinates
 #
 ####################################################################
-def readRectangularMesh(mesh_filename,tex_filename):
-    re = aims.Reader()
-    mesh = re.read(mesh_filename)
-    vert = np.array(mesh.vertex())
-    tex = re.read(tex_filename)
-    "tex_filename[0] gives neocortex indices"
-    neocortex_indices = np.where(tex[0].arraydata() > 0)[0]
-    boundary = []
-    boundary.append(indsToROI(neocortex_indices, tex[1].arraydata()))  # insula boundary
-    boundary.append(indsToROI(neocortex_indices, tex[2].arraydata()))
-    boundary.append(indsToROI(neocortex_indices, tex[3].arraydata()))  # cingular boundary
-    "last boundary can be obtained from boundary[1]"
-    nb_new_verts = len(boundary[1])
-    new_verts_inds = range(vert.shape[0] - nb_new_verts, vert.shape[0])
-    boundary.append(new_verts_inds)
-
-#     m = np.amin(vert, axis = 0)
-#     M = np.amax(vert, axis = 0)
-#     inds_x_min = np.where(vert[:, 0] == m[0])[0]
-#     inds_x_max = np.where(vert[:, 0] == M[0])[0]
-#     inds_y_min = np.where(vert[0, :] == m[1])[0]
-#     inds_y_max = np.where(vert[0, :] == M[1])[0]
+# def readRectangularMesh(mesh_filename,tex_filename):
+#     re = aims.Reader()
+#     mesh = re.read(mesh_filename)
+#     vert = np.array(mesh.vertex())
+#     tex = re.read(tex_filename)
+#     "tex_filename[0] gives neocortex indices"
+#     neocortex_indices = np.where(tex[0].arraydata() > 0)[0]
 #     boundary = []
-#     boundary.append(inds_y_max)  # insula boundary
-#     boundary.append(inds_x_min)
-#     boundary.append(inds_y_min)  # cingular boundary
-#     boundary.append(inds_x_max)
-    print 'boundary not good'
-    return(mesh, boundary, neocortex_indices)
+#     boundary.append(indsToROI(neocortex_indices, tex[1].arraydata()))  # insula boundary
+#     boundary.append(indsToROI(neocortex_indices, tex[2].arraydata()))
+#     boundary.append(indsToROI(neocortex_indices, tex[3].arraydata()))  # cingular boundary
+#     "last boundary can be obtained from boundary[1]"
+#     nb_new_verts = len(boundary[1])
+#     new_verts_inds = range(vert.shape[0] - nb_new_verts, vert.shape[0])
+#     boundary.append(new_verts_inds)
+# 
+# #     m = np.amin(vert, axis = 0)
+# #     M = np.amax(vert, axis = 0)
+# #     inds_x_min = np.where(vert[:, 0] == m[0])[0]
+# #     inds_x_max = np.where(vert[:, 0] == M[0])[0]
+# #     inds_y_min = np.where(vert[0, :] == m[1])[0]
+# #     inds_y_max = np.where(vert[0, :] == M[1])[0]
+# #     boundary = []
+# #     boundary.append(inds_y_max)  # insula boundary
+# #     boundary.append(inds_x_min)
+# #     boundary.append(inds_y_min)  # cingular boundary
+# #     boundary.append(inds_x_max)
+#     print 'boundary not good'
+#     return(mesh, boundary, neocortex_indices)
 
 
 ####################################################################
@@ -468,14 +470,15 @@ def coordinatesFromRect(mesh, poles_lat_insula, poles_lat_cingular):
 ####################################################################
 #
 # compute the coordinate textures for a mapped mesh
-# from the coordinates of the vertices in the parameterized space (disk, rectangle or sphere)
-#
+# from the coordinates of the vertices in the parameterized disk
+# lat is [0, 1]
+# lon is [0, 360]
 #
 ####################################################################
-def coordinatesFromDisk(mesh, boundary_lat):
+def coordinatesFromDisk(mesh):
     vert = np.array(mesh.vertex())
     r = np.sqrt(vert[:, 0] * vert[:, 0] + vert[:, 1] * vert[:, 1])
-    lat = r * boundary_lat
+    lat = r / np.max(r) ## lat is always in [0, 1]
     lon = 2 * np.arctan(vert[:, 1] / (vert[:, 0] + r)) * 180 / np.pi + 180
     return(lon, lat)
 
@@ -486,20 +489,16 @@ def coordinatesFromDisk(mesh, boundary_lat):
 #
 #
 ####################################################################
-def computeCoordinates(full_mesh, neocortex_indices, rect_mesh, rect_mesh_boundary, poles_lat_insula, poles_lat_cingular, insula_mesh=None, insula_boundary=None, insula_indices=None, cingular_mesh=None, cingular_boundary=None, cingular_indices=None):
+def computeCoordinates(nb_vert_full_mesh, neocortex_indices, rect_mesh, rect_mesh_boundary, poles_lat_insula, poles_lat_cingular, insula_mesh=None, insula_boundary=None, insula_indices=None, cingular_mesh=None, cingular_boundary=None, cingular_indices=None):
 
     rect_lon, rect_lat = coordinatesFromRect(rect_mesh, poles_lat_insula, poles_lat_cingular)
     "rect_mesh_boundary[3] == new vertices always from insula to cingular pole"
-    print len(rect_lon)
-    print rect_mesh_boundary[3]
     rect_lon = np.delete(rect_lon, rect_mesh_boundary[3], None)
     rect_lat = np.delete(rect_lat, rect_mesh_boundary[3], None)
-    print len(rect_lon)
-    print len(neocortex_indices)
     ar_neocortex_indices = np.array(neocortex_indices)
-    lon = np.zeros(len(full_mesh.vertex()))
+    lon = np.zeros(nb_vert_full_mesh)
     lon[ar_neocortex_indices] = rect_lon
-    lat = np.zeros(len(full_mesh.vertex()))
+    lat = np.zeros(nb_vert_full_mesh)
     lat[ar_neocortex_indices] = rect_lat
     return(lon, lat)
 
@@ -509,8 +508,6 @@ def computeCoordinates(full_mesh, neocortex_indices, rect_mesh, rect_mesh_bounda
 # on a mesh
 #
 ####################################################################
-
-
 def getShortestPath(mesh, ind1, ind2):
     gp = aimsalgo.GeodesicPath(mesh, 3, 0)
     v = aims.vector_U32(ind2)
@@ -539,15 +536,15 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     print 'neigh_verts : ', neigh_verts
     other_verts = neigh_verts.difference(neoCortex_open_boundary[1])
     print 'other_verts : ', other_verts
-    tex_out = aims.TimeTexture_S16()
-    tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
-    for i in xrange(neoCortex_mesh.vertex().size()):
-        if i in other_verts:
-            tex_out[0].append(1)
-        else:
-            tex_out[0].append(0)
-    ws = aims.Writer()
-    ws.write(tex_out, '/home/toz/ammon_Lwhite_neocortex_other_verts.tex')
+#     tex_out = aims.TimeTexture_S16()
+#     tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(neoCortex_mesh.vertex().size()):
+#         if i in other_verts:
+#             tex_out[0].append(1)
+#         else:
+#             tex_out[0].append(0)
+#     ws = aims.Writer()
+#     ws.write(tex_out, '/home/toz/ammon_Lwhite_neocortex_other_verts.tex')
 
     "group other verts into two connected sets, one on each side of the link"
     l_other_verts = list(other_verts)
@@ -1034,35 +1031,34 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     (neoCortex_square, nb_inward_evol) = solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, 100)
     print nb_inward_evol
     return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh)
-    print 'HIP done!'
-    if write_all_steps_to_disk:
-        print '------------------textureBoundary'
-        ws = aims.Writer()
-        ws.write(neoCortex_mesh, '/home/toz/ammon_Lwhite_neocortex_cut_mesh.mesh')
-        ws.write(insula_mesh, '/home/toz/ammon_Lwhite_insula_cut_mesh.mesh')
-        ws.write(cingular_mesh, '/home/toz/ammon_Lwhite_cingular_cut_mesh.mesh')
-        ws.write(meshBoundaryMesh(mesh, cing_tex_boundary), '/home/toz/ammon_Lwhite_decim_cing_boundary.mesh' )
-        ws.write(meshBoundaryMesh(mesh, ins_tex_boundary), '/home/toz/ammon_Lwhite_decim_ins_boundary.mesh' )
-        print poles_path
-        tex_out = aims.TimeTexture_S16()
-        tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-        for i in xrange(mesh.vertex().size()):
-            if i in poles_path:
-                tex_out[0].append(1)
-            else:
-                tex_out[0].append(0)
-        ws.write(tex_out, '/home/toz/ammon_Lwhite_decim_poles_link.tex')
-        print neocortex_poles_path
-        tex_out = aims.TimeTexture_S16()
-        tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
-        for i in xrange(neoCortex_mesh.vertex().size()):
-            if i in neocortex_poles_path:
-                tex_out[0].append(1)
-            else:
-                tex_out[0].append(0)
-        ws.write(tex_out, '/home/toz/ammon_Lwhite_neocortex_poles_link.tex')
-        ws.write(neoCortex_square, '/home/toz/ammon_Lwhite_square.mesh')
-    "open_neocortex_indices = neocortex_indices....................plus path???"
+#     if write_all_steps_to_disk:
+#         print '------------------textureBoundary'
+#         ws = aims.Writer()
+#         ws.write(neoCortex_mesh, '/home/toz/ammon_Lwhite_neocortex_cut_mesh.mesh')
+#         ws.write(insula_mesh, '/home/toz/ammon_Lwhite_insula_cut_mesh.mesh')
+#         ws.write(cingular_mesh, '/home/toz/ammon_Lwhite_cingular_cut_mesh.mesh')
+#         ws.write(meshBoundaryMesh(mesh, cing_tex_boundary), '/home/toz/ammon_Lwhite_decim_cing_boundary.mesh' )
+#         ws.write(meshBoundaryMesh(mesh, ins_tex_boundary), '/home/toz/ammon_Lwhite_decim_ins_boundary.mesh' )
+#         print poles_path
+#         tex_out = aims.TimeTexture_S16()
+#         tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
+#         for i in xrange(mesh.vertex().size()):
+#             if i in poles_path:
+#                 tex_out[0].append(1)
+#             else:
+#                 tex_out[0].append(0)
+#         ws.write(tex_out, '/home/toz/ammon_Lwhite_decim_poles_link.tex')
+#         print neocortex_poles_path
+#         tex_out = aims.TimeTexture_S16()
+#         tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
+#         for i in xrange(neoCortex_mesh.vertex().size()):
+#             if i in neocortex_poles_path:
+#                 tex_out[0].append(1)
+#             else:
+#                 tex_out[0].append(0)
+#         ws.write(tex_out, '/home/toz/ammon_Lwhite_neocortex_poles_link.tex')
+#         ws.write(neoCortex_square, '/home/toz/ammon_Lwhite_square.mesh')
+#     "open_neocortex_indices = neocortex_indices....................plus path???"
 
 ####################################################################
 #
@@ -1108,7 +1104,19 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     (neoCortex_square_cstr, nb_inward_cstr_evol) = solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)
     print 'nb_inward_cstr_evol', nb_inward_cstr_evol
     return neoCortex_square_cstr
-
+####################################################################
+#
+# compute comformal mapping of a mesh to a disk
+#
+####################################################################
+def mesh2Disk(insula_mesh, insula_boundary, insula_lon):
+    insula_bound_rad = np.pi * (insula_lon[insula_boundary] - 180) / 180 
+    circle = np.array([np.cos(insula_bound_rad), np.sin(insula_bound_rad)])
+    insula_disk = diskConformalMapping(insula_mesh, insula_boundary, circle)
+    insula_lon, insula_lat = coordinatesFromDisk(insula_disk)
+    return (insula_lon, insula_lat, insula_disk)
+    
+    
 ####################################################################
 #
 # HIP-HOP
