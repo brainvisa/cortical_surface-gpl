@@ -4,8 +4,8 @@ include( 'sulci' )
 insert( '{center}/{subject}',
   'surface', SetContent(
       ## que mettre dans les niveaux aquisition et analysis?
-    '<subject>_L_remeshed', SetType( 'Left remeshed mesh' ), SetWeakAttr( 'side', 'left' ),
-    '<subject>_R_remeshed', SetType( 'Right remeshed mesh' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_remeshed', SetType( 'Left remeshed mesh' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_remeshed', SetType( 'Right remeshed mesh' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_rectangular_flat', SetType( 'Rectangular flat texture' ),
     '<subject>_Lwhite_sulcalines_rectangular_flat', SetType( 'Left hemisphere Sulcal Lines Rectangular Flat texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_sulcalines_rectangular_flat', SetType( 'Right hemisphere Sulcal Lines Rectangular Flat texture' ), SetWeakAttr( 'side', 'right' ),

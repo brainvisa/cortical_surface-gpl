@@ -39,7 +39,7 @@ except :
 
 name = 'Spherical mesh from HIP-HOP parameterization coordinates'
 
-userLevel = 3
+userLevel = 2
     
 signature = Signature(
                       
@@ -52,7 +52,6 @@ signature = Signature(
 )
 
 def initialization( self ):
-    self.side='left'
     self.linkParameters( 'latitude','white_mesh')
     self.linkParameters( 'longitude','white_mesh')
     self.linkParameters( 'spherical_mesh','white_mesh')
@@ -65,7 +64,7 @@ def execution( self, context ):
     context.write('Reading textures and mesh')
     tex_lon = re.read(self.longitude.fullPath())
     tex_lat = re.read(self.latitude.fullPath())
-    spherical_verts = sphericalMeshFromCoords(tex_lat[0].arraydata(), tex_lon[0].arraydata(), self.sphere_ray, self.side)
+    spherical_verts = sphericalMeshFromCoords(tex_lat[0].arraydata(), tex_lon[0].arraydata(), self.sphere_ray)#, self.side)
     vv = aims.vector_POINT3DF()
     for x in spherical_verts:
         vv.append(x)
