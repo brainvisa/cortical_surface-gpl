@@ -1,23 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <minf expander="brainvisa-tree_2.0">
-<l length="2">
+<l length="1">
   <f type="ProcessTree">
     <s name="name">cortical_surface</s>
     <true name="editable"/>
-    <l length="1" name="content">
-      <f type="ProcessTree.Branch">
-        <l length="1" name="content">
-          <f type="ProcessTree.Leaf">
-            <true name="editable"/>
-            <s name="id">CreateSurfaceBasedFunctionalData</s>
-            <none name="name"/>
-          </f>
-        </l>
-        <true name="editable"/>
-        <s name="name">fMRI</s>
-        <s name="id">cortical_surface/fmri</s>
-      </f>
-    </l>
     <true name="user"/>
     <s name="id">Cortical Surface</s>
   </f>
