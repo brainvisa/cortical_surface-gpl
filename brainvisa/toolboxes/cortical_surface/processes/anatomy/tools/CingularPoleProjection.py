@@ -73,8 +73,8 @@ def execution( self, context ):
     tex_S16 = aims.TimeTexture_S16()
     tex_S16[0].assign(texture_poles[0])
     ws.write(tex_S16, self.pole.fullPath())
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','8','--connexity')#10
-    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','12','--connexity')#10
+    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','15','--connexity')#10
+    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','18','--connexity')#10
     context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','3','--connexity')#10
     context.write('Dilation Erosion Done')
 

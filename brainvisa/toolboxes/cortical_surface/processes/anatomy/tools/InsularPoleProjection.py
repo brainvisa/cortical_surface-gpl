@@ -52,7 +52,7 @@ signature = Signature(
     'sulcus_identification',Choice('name','label'),
 #    'trl',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
-    'transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist', 'Transformation matrix' ),
+#    'transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist', 'Transformation matrix' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'pole',WriteDiskItem( 'insula pole texture','Texture' )
 )
@@ -66,7 +66,7 @@ def initialization( self ):
         return 'label'
     self.linkParameters( 'white_mesh','graph' )
     self.linkParameters( 'pole', 'white_mesh' )
-    self.linkParameters( 'transformation', 'white_mesh' )
+#    self.linkParameters( 'transformation', 'white_mesh' )
     self.linkParameters( 'mri_corrected', 'white_mesh' )
 #    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
     self.findValue('gyri_model', { 'sulci_database' : '2008', 'graph_version': '3.0', 'model' : 'gyrus' })
@@ -93,6 +93,7 @@ def execution( self, context ):
     f.close()
     out_trsl_txt = context.temporary('Text File')
     command = ['siMeshSulciProjection','-i',self.white_mesh.fullPath(),'-g',self.graph.fullPath(),'-l',tmp_trl.fullPath(),'-m',self.gyri_model.fullPath(),'-s',self.sulcus_identification,'-v',self.mri_corrected.fullPath(),'-o',self.pole.fullPath(),'-V','1','-M','2','-n','5','-a','0.9','-e','10','-t',out_trsl_txt.fullPath(),'-p','1']
+    context.write(command)
     context.system(*command)
    
     re = aims.Reader()
