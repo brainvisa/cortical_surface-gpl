@@ -48,12 +48,19 @@ signature = Signature(
     'side', Choice('left', 'right'),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'pole_template',ReadDiskItem( 'Cingular Pole Template Subject' , 'Aims readable volume formats' ),
+    'dilation_1', Integer(),
+    'erosion', Integer(),
+    'dilation_2', Integer(),
     'pole',WriteDiskItem( 'Hippocampus pole texture','Texture' )
 )
 
 def initialization( self ):
     self.linkParameters( 'pole', 'white_mesh' )
-     
+    self.linkParameters( 'pole_template', 'white_mesh' )
+    self.dilation_1 = 15
+    self.erosion = 18
+    self.dilation_2 = 3 
+ 
 def execution( self, context ):
 #     a = anatomist.Anatomist()
 #     mesh = a.loadObject( self.white_mesh.fullPath() )
@@ -73,11 +80,11 @@ def execution( self, context ):
     tex_S16 = aims.TimeTexture_S16()
     tex_S16[0].assign(texture_poles[0])
     ws.write(tex_S16, self.pole.fullPath())
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','15','--connexity')#10
-    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','18','--connexity')#10
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','3','--connexity')#10
+    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
+    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')#10
+    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
     context.write('Dilation Erosion Done')
-
+    context.write('Topological correction...')
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
     cingular_tex_value = 1
@@ -85,4 +92,4 @@ def execution( self, context ):
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())
-    context.write('Topological correction Done')
+    context.write('... Done')

@@ -42,9 +42,9 @@ class SulcalLinesSet(object):
             self.names.append(sl.name)
             self.nbSulci += 1
 
-    def cat(self, sl):
-        for lab in sl.labels:
-            place = self.labels.index(lab)
+    def cat(self, sl_set):
+        for sl in sl_set.sulcalLines:
+            place = self.labels.index(sl.label)
             if place is None:
                 if isinstance(sl, sln.SulcalConstraint):
                     if sl.axisID == []:
@@ -83,10 +83,10 @@ class SulcalLinesSet(object):
 #            print 'max = ',np.max(new_indices)
             self.sulcalLines[sl_ind].updateIndices(np.array(new_indices, np.int32))
 
-    def label2Axis(self):
-        cstr_indices = [self.longitudeCstrIndex, self.latitudeCstrIndex]
-        for sl_ind in cstr_indices:
-            self.sulcalLines[sl_ind].label2Axis()
+#     def label2Axis(self):
+#         cstr_indices = [self.longitudeCstrIndex, self.latitudeCstrIndex]
+#         for sl_ind in cstr_indices:
+#             self.sulcalLines[sl_ind].label2Axis()
 
     def printArgs(self):
         print 'SulcalLinesSet ::'

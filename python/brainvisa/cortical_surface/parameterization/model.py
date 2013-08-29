@@ -209,6 +209,11 @@ class Model(object):
             print 'no axis defined for label ', label
         return(axisID, isLon, isLat)
     
+####################################################################
+#
+# defines the association between each sulcus and its corresponding axis in the model
+#
+####################################################################
     def sulcus2Axis(self, sulc_name_in):
         isLat = False
         isLon = False
@@ -290,13 +295,18 @@ class Model(object):
         elif sulc_name == 'S.T.s.ter.asc.ant.':
             axisID = 106
             isLat = True
-        elif sulc_name == 'T.s.ter.asc.post.':
+        elif sulc_name == 'S.T.s.ter.asc.post.':
             axisID = 92
             isLat = True
         else:
             print 'no axis defined for sulcus ', sulc_name
         return(axisID, isLon, isLat)
 
+####################################################################
+#
+# set the coordinates of each axis from 'sulci' using 'method'
+#
+####################################################################
     def setAxisCoord(self, sulci=None, method=None):
         if method is None:  # setting axis coord as the weighted barycenter of corresponding sulci
             print 'barycenter'
@@ -339,3 +349,50 @@ class Model(object):
 
         else:
             print 'method ',method,' is not implemented yet!'
+            
+# ####################################################################
+# #
+# # buildModel
+# #
+# ####################################################################
+# def buildModel(list_mesh, list_texture_sulci):
+# #    square_ratio = 4.5
+#     length = 4.5
+#     width = 1
+#     neocortex_tex_value = 0
+#     insula_tex_value = 180
+#     cingular_tex_value = 1
+#     SC_label = 25
+# 
+#     model = Model()
+#     group_full_sulci = SulcalLinesSet()
+#     nb_mesh = len(list_mesh)
+#     for mesh_ind in range(nb_mesh):
+#         mesh = list_mesh[mesh_ind]
+#         texture_poles = list_texture_poles[mesh_ind]
+#         texture_sulci = list_texture_sulci[mesh_ind]
+#         
+#         full_sulci = SulcalLinesSet()
+#         full_sulci.extractFromTexture(texture_sulci, mesh)
+# 
+#         full_sulci.updateIndices(neocortex_indices)
+#         vert = np.array(neoCortex_square.vertex())
+#         full_sulci.updateVertices(vert)
+# 
+#         SC_ind = full_sulci.names.index(('S.C._'+side))   
+#         SC_label = full_sulci.labels[SC_ind]
+#         print 'SC_label: ', SC_label
+#         full_sulci.sulcalLines[SC_ind].printArgs()
+#         translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
+#         vert = np.array(mesh.vertex())
+#         vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
+#         full_sulci.updateVertices(vert)
+#         full_sulci.sulcalLine2SulcalConstraint(model)
+#         group_full_sulci.cat(full_sulci)
+# 
+#     model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
+#     model.setAxisCoord(group_full_sulci)
+#     print 'model built from '+nb_mesh+' subjects'
+#     model.printArgs()
+# 
+#     return model

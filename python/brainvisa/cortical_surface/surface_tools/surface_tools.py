@@ -286,7 +286,8 @@ def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None
     for pb_poly in poly_set:
         pts_to_remove.append(pb_poly[np.where(ismember(pb_poly, pb_pt) == False)[0]])
     print pts_to_remove
-    tex[np.array(pts_to_remove)] = background_val
+    if len(pts_to_remove) > 0:
+        tex[np.array(pts_to_remove)] = background_val
     boundary = textureBoundary(mesh, tex, tex_val, neigh)
     u_boundary = set(boundary[0])
     dif_len = len(boundary[0]) - len(u_boundary)

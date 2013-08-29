@@ -54,7 +54,7 @@ class SulcalLine(object):
         print 'color = ', self.color
 
     def cat(self, sl):
-        self.vertices = np.vstack(self.vertices, sl.vertices)
+        self.vertices = np.vstack((self.vertices, sl.vertices))
         self.nbVertices = self.vertices.shape[0]
         self.computeAttributes()
 
@@ -237,7 +237,7 @@ class SulcalConstraint(SulcalLine):
 
     def cat(self, sc):
         super(SulcalConstraint, self).cat(sc)
-        self.setVerticesWeight()  # should be used for weighting between vertices inside a sulcaConstraint
+        self.setVertexWeight()  # should be used for weighting between vertices inside a sulcaConstraint
         self.weight = 1 / self.length  # sum(self.verticesWeight)
 
     def setVertexWeight(self, input_weights=None):

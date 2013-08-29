@@ -913,72 +913,6 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
     return (mesh, nb_inward_evol)
 
 
-####################################################################
-#
-# buildModel
-#
-####################################################################
-def buildModel(list_mesh, list_texture_poles, list_texture_sulci):
-#    square_ratio = 4.5
-    length = 4.5
-    width = 1
-    neocortex_tex_value = 0
-    insula_tex_value = 180
-    cingular_tex_value = 1
-    SC_label = 25
-
-    model = Model()
-    group_full_sulci = SulcalLinesSet()
-    nb_mesh = len(list_mesh)
-    for mesh_ind in range(nb_mesh):
-        mesh = list_mesh[mesh_ind]
-        texture_poles = list_texture_poles[mesh_ind]
-        texture_sulci = list_texture_sulci[mesh_ind]
-        cingular_tex_clean, cing_tex_boundary = poleTextureClean(mesh, texture_poles, cingular_tex_value)
-        insula_tex_clean, ins_tex_boundary = poleTextureClean(mesh, texture_poles, insula_tex_value)
-        tex_poles_clean = np.zeros(cingular_tex_clean.size)
-        tex_poles_clean[np.where(cingular_tex_clean == cingular_tex_value)[0]] = cingular_tex_value
-        tex_poles_clean[np.where(insula_tex_clean == insula_tex_value)[0]] = insula_tex_value
-        print '------------------CutMesh'
-        (sub_meshes, labels, sub_indexes) = cutMesh(mesh, tex_poles_clean)
-        print labels
-        neo_ind = labels.index(neocortex_tex_value)
-        neoCortex_mesh = sub_meshes[neo_ind]
-        neoCortex_boundary = meshBoundary(sub_meshes[neo_ind])
-        neocortex_indices = sub_indexes[neo_ind]
-        print '------------------poles path, always from insula to cingular pole'
-        poles_path = getShortestPath(mesh, ins_tex_boundary[0], cing_tex_boundary[0])
-        "poles_path to neocortex"
-        neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
-        print '------------------path2Boundary'
-        (neoCortex_open_mesh, neoCortex_open_boundary) = path2Boundary(neoCortex_mesh,neoCortex_boundary,neocortex_poles_path)
-        vert = np.array(neoCortex_open_mesh.vertex())
-        print '------------------rectConformalMapping'
-        neoCortex_square = rectConformalMapping(neoCortex_open_mesh, neoCortex_open_boundary, length, width, 0)
-        (neoCortex_square, nb_inward_evol) = solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, 100)
-
-        full_sulci = SulcalLinesSet()
-        full_sulci.extractFromTexture(texture_sulci, mesh)
-
-        full_sulci.updateIndices(neocortex_indices)
-        vert = np.array(neoCortex_square.vertex())
-        full_sulci.updateVertices(vert)
-
-        SC_ind = full_sulci.labels.index(SC_label)
-        translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
-        vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
-        neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
-        neoCortex_square.updateNormals()
-        full_sulci.updateVertices(vert)
-        full_sulci.sulcalLine2SulcalConstraint(model)
-        group_full_sulci.cat(full_sulci)
-
-    model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
-    model.setAxisCoord(group_full_sulci)
-    print 'model built from '+nb_mesh+' subjects'
-    model.printArgs()
-
-    return model
 
 
 ####################################################################
@@ -994,13 +928,23 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     insula_tex_value = 180
     cingular_tex_value = 1
     write_all_steps_to_disk = 0
+    cingular_inds = np.where(cingular_tex_clean == cingular_tex_value)[0]
+    insular_inds = np.where(insula_tex_clean == insula_tex_value)[0]
+    # test that there is no intersection between the two poles
+    inter = set(cingular_inds).intersection(insular_inds)
+    print inter
+    if inter:
+        print ('problem: the two poles are connected, cannot cut the mesh!!')
+        return
+
+    tex_poles_clean = np.zeros(cingular_tex_clean.size)
+    tex_poles_clean[cingular_inds] = cingular_tex_value
+    tex_poles_clean[insular_inds] = insula_tex_value
+
     print 'max(cingular_tex_clean) : ', np.max(cingular_tex_clean)
     print 'max(insula_tex_clean) : ', np.max(insula_tex_clean)
     neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
     #    cingular_tex_clean, cing_tex_boundary = poleTextureClean(mesh, texture_poles, cingular_tex_value)    #    insula_tex_clean, ins_tex_boundary = poleTextureClean(mesh, texture_poles, insula_tex_value)
-    tex_poles_clean = np.zeros(cingular_tex_clean.size)
-    tex_poles_clean[np.where(cingular_tex_clean == cingular_tex_value)[0]] = cingular_tex_value
-    tex_poles_clean[np.where(insula_tex_clean == insula_tex_value)[0]] = insula_tex_value
     print '------------------CutMesh'
     (sub_meshes, labels, sub_indexes) = surfTls.cutMesh(mesh, tex_poles_clean)
     print labels

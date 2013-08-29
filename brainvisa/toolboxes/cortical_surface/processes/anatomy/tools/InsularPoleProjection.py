@@ -54,6 +54,9 @@ signature = Signature(
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
 #    'transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist', 'Transformation matrix' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'dilation_1', Integer(),
+    'erosion', Integer(),
+    'dilation_2', Integer(),
     'pole',WriteDiskItem( 'insula pole texture','Texture' )
 )
 
@@ -66,6 +69,10 @@ def initialization( self ):
         return 'label'
     self.linkParameters( 'white_mesh','graph' )
     self.linkParameters( 'pole', 'white_mesh' )
+    self.dilation_1 = 2 
+    self.erosion = 3 
+    self.dilation_2 = 2 
+
 #    self.linkParameters( 'transformation', 'white_mesh' )
     self.linkParameters( 'mri_corrected', 'white_mesh' )
 #    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
@@ -104,9 +111,9 @@ def execution( self, context ):
     tex_S16[0].assign(texture_poles[0])
 #    context.write(max(tex_S16[0].arraydata()))
     ws.write(tex_S16, self.pole.fullPath())
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','2','--connexity')
-    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','3','--connexity')
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s','2','--connexity')
+    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')
+    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')
+    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_2,'--connexity')
     context.write('Dilation Erosion Done')
 
     mesh = re.read(self.white_mesh.fullPath())

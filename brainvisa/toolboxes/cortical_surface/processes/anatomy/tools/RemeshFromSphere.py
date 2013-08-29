@@ -34,15 +34,15 @@ userLevel = 2
 signature = Signature(
                       
     'Side', Choice('left', 'right'),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),    
     'spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),    
     'spherical_template', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
     'remeshed_mesh', WriteDiskItem( 'Remeshed mesh', 'Aims mesh formats' )
 )
 
 def initialization( self ):
-    self.linkParameters( 'spherical_mesh','white_mesh')
-    self.linkParameters( 'remeshed_mesh','white_mesh')
+    self.linkParameters( 'white_mesh','spherical_mesh')
+    self.linkParameters( 'remeshed_mesh','spherical_mesh')
 #    self.findValue( 'spherical_template', {'filename_variable' : 'ico100_7'} )
     self.sphere_ray = 100 
     
