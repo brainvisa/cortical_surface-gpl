@@ -339,7 +339,7 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     A_lon_diag = np.zeros(Nbv)
     for lon_cstr_ind in sulcalCstr.longitudeCstrIndex:
         lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = sulcalCstr.sulcalLines[lon_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lon_cstr_ind].weight
-        C_lon[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = modele.longitudeAxisCoord[modele.longitudeAxis.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] * lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
+        C_lon[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] * lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
         A_lon_diag[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = -lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
     A_lon = sparse.dia_matrix((A_lon_diag, 0), (Nbv, Nbv))
 
@@ -348,7 +348,7 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     A_lat_diag = np.zeros(Nbv)
     for lat_cstr_ind in sulcalCstr.latitudeCstrIndex:
         lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = sulcalCstr.sulcalLines[lat_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lat_cstr_ind].weight
-        C_lat[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = modele.latitudeAxisCoord[modele.latitudeAxis.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] * lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
+        C_lat[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] * lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
         A_lat_diag[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = -lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
     A_lat = sparse.dia_matrix((A_lat_diag, 0), (Nbv, Nbv))
 
@@ -798,11 +798,11 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
     tex_parcels = np.zeros(nb_vert)
     lab_parcel = 1
     sort_axes_lon = [0]
-    tmp_lon = [f for f in model.longitudeAxis]#[360 - f for f in model.longitudeAxis]
+    tmp_lon = [f for f in model.longitudeAxisID]#[360 - f for f in model.longitudeAxisID]
     sort_axes_lon.extend(tmp_lon)
     sort_axes_lon.sort()
     sort_axes_lat = [0]
-    tmp_lat = [f + 30 for f in model.latitudeAxis]
+    tmp_lat = [f + 30 for f in model.latitudeAxisID]
     sort_axes_lat.extend(tmp_lat)
     sort_axes_lat.sort()
     sort_axes_lat.append(180)
@@ -1037,10 +1037,9 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     full_sulci.printArgs()
 
     model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
-    model.printArgs()
     model.setAxisCoord(full_sulci)
     model.printArgs()
-    model.saveToFile('/home/toz/model_current.txt')
+#    model.saveToFile('/home/toz/model_current.txt')
 
     Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 

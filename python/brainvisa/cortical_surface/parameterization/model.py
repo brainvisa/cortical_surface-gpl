@@ -12,45 +12,59 @@ class Model(object):
     classdocs
     '''
 
-    def __init__(self, sulci=None, left=None, right=None, top=None, bottom=None):
+    def __init__(self, modelVersion=None, left=None, right=None, top=None, bottom=None, longitudeAxisID=None, latitudeAxisID=None, longitudeAxisCoord=None, latitudeAxisCoord=None):
         '''
         Constructor
         '''
-
-        self.longitudeAxis = [16, 40, 61, 281, 297, 339, 360]
-        self.latitudeAxis = [1, 55, 56, 81, 92, 106]
-        if sulci is None:
-            self.longitudeAxisCoord = []
-            self.latitudeAxisCoord = []
+        if modelVersion is None:
+            self.modelVersion = 0.1
         else:
-            self.setAxisCoord(sulci)
+            self.modelVersion = modelVersion
+        if longitudeAxisID is None:
+            self.longitudeAxisID = [16, 40, 61, 281, 297, 339, 360]
+        else:
+            self.longitudeAxisID = longitudeAxisID
+        if latitudeAxisID is None:
+            self.latitudeAxisID = [1, 55, 56, 81, 92, 106]
+        else:
+            self.latitudeAxisID = latitudeAxisID
+        if longitudeAxisCoord is None:
+            self.longitudeAxisCoord = [None, None, None, None, None, None, None]
+        else:
+            self.longitudeAxisCoord = longitudeAxisCoord
+        if longitudeAxisCoord is None:    
+            self.latitudeAxisCoord = [None, None, None, None, None, None]
+        else:
+            self.latitudeAxisCoord = latitudeAxisCoord
         if left == None:
-            self.left = []
+            self.left = 0.0
         else:
             self.left = left
         if right == None:
-            self.right = []
+            self.right = 4.5
         else:
             self.right = right
         if top == None:
-            self.top = []
+            self.top = 1.0
         else:
             self.top = top
         if bottom == None:
-            self.bottom = []
+            self.bottom = 0.0
         else:
             self.bottom = bottom
 
     def printArgs(self):
-        print 'model ::'
-        print '    left = ', self.left
-        print '    right = ', self.right
-        print '    top = ', self.top
-        print '    bottom = ', self.bottom
-        print '    longitudeAxis = ', self.longitudeAxis
-        print '    longitudeAxisCoord = ', self.longitudeAxisCoord
-        print '    latitudeAxis = ', self.latitudeAxis
-        print '    latitudeAxisCoord = ', self.latitudeAxisCoord
+        txt = 'modelVersion ' + str(self.modelVersion) + '\n'
+        txt = txt + '    left ' + str(self.left) + '\n'
+        txt = txt + '    right ' + str(self.right) + '\n'
+        txt = txt + '    top ' + str(self.top) + '\n'
+        txt = txt + '    bottom ' + str(self.bottom) + '\n'
+        txt = txt + '    longitudeAxisID '+ str(self.longitudeAxisID) + '\n'
+        txt = txt + '    longitudeAxisCoord ' + str(self.longitudeAxisCoord) + '\n'
+        txt = txt + '    latitudeAxisID ' + str(self.latitudeAxisID) + '\n'
+        txt = txt + '    latitudeAxisCoord ' + str(self.latitudeAxisCoord) + '\n'
+
+        return txt
 
     def setBoundary(self, left, right, top, bottom):
         self.left = left
@@ -64,19 +78,78 @@ class Model(object):
 
     def saveToFile(self, fileName):
         f = open(fileName, 'w')
-        txt = 'model ::\n'
+        txt = 'modelVersion ' + str(self.modelVersion) + '\n'
 #         for col in data[index,:]:
 #             txt = txt+' '+str(col)
-        txt = txt + 'left = ' + str(self.left) + '\n'
-        txt = txt + 'right = ' + str(self.right) + '\n'
-        txt = txt + 'top = ' + str(self.top) + '\n'
-        txt = txt + 'bottom = ' + str(self.bottom) + '\n'
-        txt = txt + 'longitudeAxis = ' + str(self.longitudeAxis) + '\n'
-        txt = txt + 'longitudeAxisCoord = ' + str(self.longitudeAxisCoord) + '\n'
-        txt = txt + 'latitudeAxis = ' + str(self.latitudeAxis) + '\n'
-        txt = txt + 'latitudeAxisCoord = ' + str(self.latitudeAxisCoord) + '\n'
+        txt = txt + 'left ' + str(self.left) + '\n'
+        txt = txt + 'right ' + str(self.right) + '\n'
+        txt = txt + 'top ' + str(self.top) + '\n'
+        txt = txt + 'bottom ' + str(self.bottom) + '\n'
+        txt_tmp = ','.join(str(i) for i in self.longitudeAxisID)
+        txt = txt + 'longitudeAxisID '+ txt_tmp + '\n'
+        txt_tmp = ','.join(str(i) for i in self.longitudeAxisCoord)
+        txt = txt + 'longitudeAxisCoord ' + txt_tmp + '\n'
+        txt_tmp = ','.join(str(i) for i in self.latitudeAxisID)
+        txt = txt + 'latitudeAxisID ' + txt_tmp + '\n'
+        txt_tmp = ','.join(str(i) for i in self.latitudeAxisCoord)
+        txt = txt + 'latitudeAxisCoord ' + txt_tmp + '\n'
         f.write(txt)
         f.close()
+
+####################################################################
+#
+# read model from file and return a dictionnary
+#
+####################################################################
+    def read(self, input_file):
+        txt_list = []
+        with open(input_file,'r') as inf:
+            for line in inf:
+                txt_list.append(line.split())
+        txt_dict = dict((key, value) for (key, value) in txt_list)
+        txt_dict['right'] = float(txt_dict['right'])
+        txt_dict['left'] = float(txt_dict['left'])
+        txt_dict['top'] = float(txt_dict['top'])
+        txt_dict['bottom'] = float(txt_dict['bottom'])
+        
+        data_txt = txt_dict['longitudeAxisID']
+        data_num = []
+        for x in data_txt.split(','):
+            try:
+                data_num.append(int(x))
+            except:
+                data_num.append(None)
+        txt_dict['longitudeAxisID'] = data_num
+
+        data_txt = txt_dict['latitudeAxisID']
+        data_num = []
+        for x in data_txt.split(','):
+            try:
+                data_num.append(int(x))
+            except:
+                data_num.append(None)
+        txt_dict['latitudeAxisID'] = data_num
+        
+        data_txt = txt_dict['longitudeAxisCoord']
+        data_num = []
+        for x in data_txt.split(','):
+            try:
+                data_num.append(float(x))
+            except:
+                data_num.append(None)
+        txt_dict['longitudeAxisCoord'] = data_num
+
+        data_txt = txt_dict['latitudeAxisCoord']
+        data_num = []
+        for x in data_txt.split(','):
+            try:
+                data_num.append(float(x))
+            except:
+                data_num.append(None)
+        txt_dict['latitudeAxisCoord'] = data_num
+        output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'])
+
+        return output_model
 
     def toMesh(self, z_coord=None):
         if z_coord is None:
@@ -311,10 +384,10 @@ class Model(object):
         if method is None:  # setting axis coord as the weighted barycenter of corresponding sulci
             print 'barycenter'
             # longitudes
-            self.longitudeAxisCoord = self.longitudeAxis[:]
+            self.longitudeAxisCoord = self.longitudeAxisID[:]
             arrayLongitudeCstrAxis = np.array(sulci.longitudeCstrAxis)
-            for ax_ind in range(len(self.longitudeAxis)):
-                inds = np.where(arrayLongitudeCstrAxis == self.longitudeAxis[ax_ind])[0]
+            for ax_ind in range(len(self.longitudeAxisID)):
+                inds = np.where(arrayLongitudeCstrAxis == self.longitudeAxisID[ax_ind])[0]
                 if len(inds) == 0:
                     self.longitudeAxisCoord[ax_ind] = None
                 else:
@@ -329,10 +402,10 @@ class Model(object):
                         ax_verts_weights.append(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].weight * np.ones(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].nbVertices))
                     self.longitudeAxisCoord[ax_ind] = (np.sum(np.array(ax_weights) * np.array(ax_barys))) / np.sum(ax_weights)
             # laitudes
-            self.latitudeAxisCoord = self.latitudeAxis[:]
+            self.latitudeAxisCoord = self.latitudeAxisID[:]
             arraylatitudeCstrAxis = np.array(sulci.latitudeCstrAxis)
-            for ax_ind in range(len(self.latitudeAxis)):
-                inds = np.where(arraylatitudeCstrAxis == self.latitudeAxis[ax_ind])[0]
+            for ax_ind in range(len(self.latitudeAxisID)):
+                inds = np.where(arraylatitudeCstrAxis == self.latitudeAxisID[ax_ind])[0]
                 if len(inds) == 0:
                     self.latitudeAxisCoord[ax_ind] = None
                 else:

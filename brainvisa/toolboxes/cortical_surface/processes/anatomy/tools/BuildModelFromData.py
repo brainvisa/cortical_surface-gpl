@@ -94,4 +94,6 @@ def execution( self, context ):
     context.write('model built from '+str(nb_mesh)+' subjects')
     model.printArgs()
     model.saveToFile(self.model_file.fullPath())
-
+    model2 = md.Model()
+    test = model2.read(self.model_file.fullPath())
+    context.write(test.printArgs())
