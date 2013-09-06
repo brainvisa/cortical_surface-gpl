@@ -57,9 +57,9 @@ signature = Signature(
 def initialization( self ):
     self.linkParameters( 'pole', 'white_mesh' )
     self.linkParameters( 'pole_template', 'white_mesh' )
-    self.dilation_1 = 15
-    self.erosion = 18
-    self.dilation_2 = 3 
+    self.dilation_1 = 7
+    self.erosion = 11
+    self.dilation_2 = 2 
  
 def execution( self, context ):
 #     a = anatomist.Anatomist()
@@ -88,7 +88,7 @@ def execution( self, context ):
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
     cingular_tex_value = 1
-    cingular_tex_clean, cing_tex_boundary = surfTls.poleTextureClean(mesh, tex[0].arraydata(), cingular_tex_value)
+    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), cingular_tex_value)
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())

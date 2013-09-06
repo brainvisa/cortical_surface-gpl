@@ -126,7 +126,7 @@ def execution( self, context ):
         tmp_tex_value = 1
     else:
         context.write('side must be set to left or right!')                        
-    cingular_tex_clean, cing_tex_boundary = surfTls.poleTextureClean(mesh, tex[0].arraydata(), tmp_tex_value)
+    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
     cingular_tex_clean[np.where(cingular_tex_clean == tmp_tex_value)[0]] = 180
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)

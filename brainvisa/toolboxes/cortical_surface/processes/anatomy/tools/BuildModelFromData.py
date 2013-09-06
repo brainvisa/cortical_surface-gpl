@@ -92,8 +92,7 @@ def execution( self, context ):
     model.setBoundary(np.min(vert[:, 0]), np.max(vert[:, 0]), np.min(vert[:, 1]), np.max(vert[:, 1]))
     model.setAxisCoord(group_full_sulci)
     context.write('model built from '+str(nb_mesh)+' subjects')
-    model.printArgs()
     model.saveToFile(self.model_file.fullPath())
-    model2 = md.Model()
-    test = model2.read(self.model_file.fullPath())
-    context.write(test.printArgs())
+    context.write('------------------- output model -------------------')
+    for line in model.printArgs().splitlines():
+        context.write(line)

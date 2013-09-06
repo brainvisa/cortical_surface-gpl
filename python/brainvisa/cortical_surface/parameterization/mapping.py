@@ -789,7 +789,6 @@ def invertedPolygon(mesh, shape=None):
         if nb_inward > len(mesh.vertex()) / 2:
             inward = np.where(norms[:, 2] < 0)[0]
             nb_inward = len(inward)
-        print 'nb_inward: ', nb_inward
     return(nb_inward, inward)
 
 def parcelsFromCoordinates(template_lat,template_lon,model):
@@ -935,6 +934,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     print inter
     if inter:
         print ('problem: the two poles are connected, cannot cut the mesh!!')
+        raise Exception('the two poles are connected, cannot cut the mesh')
         return
 
     tex_poles_clean = np.zeros(cingular_tex_clean.size)

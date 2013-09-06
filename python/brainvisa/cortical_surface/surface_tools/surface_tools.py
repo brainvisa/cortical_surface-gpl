@@ -191,10 +191,10 @@ def computeMeshLaplacian(mesh):
 
 ####################################################################
 #
-# clean the boundary of the texture corresponding to the value tex_val
+# ensure the texture corresponding to the value tex_val has only one connex component with simple boundary
 #
 ####################################################################
-def poleTextureClean(mesh, atex, tex_val, background_val=0, neigh=None):
+def textureTopologicalCorrection(mesh, atex, tex_val, background_val=0, neigh=None):
     tex_val_indices = np.where(atex == tex_val)[0]
     if not tex_val_indices.size:
         print 'no value ' + str(tex_val) + ' in the input texture!!'
@@ -205,7 +205,6 @@ def poleTextureClean(mesh, atex, tex_val, background_val=0, neigh=None):
             neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
         labels = np.unique(atex)
         labels = labels.tolist()
-        print 'labels present in this texture : ', labels
         #----------------begin:: ensure a single connex component
         tex2 = aims.TimeTexture_S16()
         tex2[0].reserve(atex.size)
@@ -217,13 +216,11 @@ def poleTextureClean(mesh, atex, tex_val, background_val=0, neigh=None):
         conn_tex = aimsalgo.AimsMeshLabelConnectedComponent(mesh, tex2, 0, 0)  # aimsalgo.AimsMeshLabelConnectedComponent(mesh, tex2,1,0)
 #        aconn_tex = conn_tex[0].arraydata()
         conn_labels = set(conn_tex[0].arraydata())
-        print 'labels present in conn_labels : ', conn_labels
         conn_labels = conn_labels.difference(set([-1]))  # value -1 corresponds to background
-        print 'after removing -1: ',conn_labels
         if len(conn_labels) > 1:
-            print len(conn_labels), " connex components for this value in the texture, keeping only the largest component"
+            print len(conn_labels), " connex component(s) for this value in the texture, keeping only the largest component"
             lab_val_indices_nb = [len(np.where(conn_tex[0].arraydata() == lab)[0]) for lab in conn_labels]#.difference(set([-1]))]
-            print lab_val_indices_nb#conn_labels#.difference(set([-1])),lab_val_indices_nb
+            #print lab_val_indices_nb#conn_labels#.difference(set([-1])),lab_val_indices_nb
             index_val_largest_comp = lab_val_indices_nb.index(max(lab_val_indices_nb))
           #  index_val_largest_comp = index_val_largest_comp.tolist()
             adeleted_conn_comp_indices = np.where(conn_tex[0].arraydata() == -1)[0]
@@ -240,14 +237,13 @@ def poleTextureClean(mesh, atex, tex_val, background_val=0, neigh=None):
         #----------------end:: ensure a single connex component
         #----------------begin:: fill any hole in this single connex component
         boundary = textureBoundary(mesh, atex, tex_val, neigh)
-        print len(boundary)
         if len(boundary) > 1:
             print "filling holes in the largest connex component"
 #            ws=aims.Writer()
 #            tex_out = aims.TimeTexture_S16()
 #            i=0
             while len(boundary) > 1:
-                print [len(bound) for bound in boundary]
+                print 'length of boundaries : ',[len(bound) for bound in boundary]
 #                i+=1
 #                nm= 's12158_Rhippo_cleaned'+str(i)+'.tex'
 #                tex_out[0].assign(atex)
@@ -255,28 +251,25 @@ def poleTextureClean(mesh, atex, tex_val, background_val=0, neigh=None):
                 for l in range(len(boundary) - 1):
                     atex = dilateTexture(atex, neigh, boundary[l])
                 boundary = textureBoundary(mesh, atex, tex_val, neigh)
-        print boundary
+        print 'length of boundaries : ',[len(bound) for bound in boundary]
         #----------------end:: fill any hole in this single connex component
-        #----------------begin:: ensure a not complex bounday
-        u_boundary = set(boundary[0])
-#        u_boundary.sort()
-        dif_len = len(boundary[0]) - len(u_boundary)
-        if dif_len > 0:
-            print "cleaning the boundary"
-            atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[0], background_val, neigh)
-#    neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
-#    clean_tex = textureBoundary(mesh, tex, tex_val,neigh)
-#    "guarantee that no triangle is on the boundary"
+        #----------------begin:: ensure that the boundary do not contain the 3 vertices of a triangle
+        print 'cleaning the boundary of the texture'
+        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[0], background_val, neigh)
     return (atex, boundary)
 
-
+####################################################################
+# ensure that the boundary do not contain the 3 vertices of a triangle
+####################################################################
 def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None):
     if neigh is None:
         neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+    '''check if the 3 vertices of any polygon is on the boundary
+    if it is the case, the vertex that can be removed is selected and removed'''    
     poly = np.array(mesh.polygon())
     I = ismember(poly, bound)
     poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
-    print poly_set
+    print poly_set.shape[0]
     u_bound = set(bound)
     count_list = [bound.count(x) for x in u_bound]
     lu_bound = list(u_bound)
@@ -289,26 +282,8 @@ def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None
     if len(pts_to_remove) > 0:
         tex[np.array(pts_to_remove)] = background_val
     boundary = textureBoundary(mesh, tex, tex_val, neigh)
-    u_boundary = set(boundary[0])
-    dif_len = len(boundary[0]) - len(u_boundary)
-    if dif_len > 0:
-        print 'complex boundary'
-#    pb_pt_ind1 = bound.index(pb_pt[0])
-#    pb_pt_ind2 = bound.index(pb_pt[0], pb_pt_ind1 + 1) - 1
-#    print pb_pt_ind1
-#    print pb_pt_ind2
-#    if mesh is not None:
-#        vert = np.array(mesh.vertex())
-#        plt.figure(1)
-#        plt.hold(True)
-#        for i in range(len(bound)-1):
-#            plt.plot(vert[[bound[i],bound[i+1]],0],vert[[bound[i],bound[i+1]],1],'b')
-#        plt.plot(vert[pb_pt,0],vert[pb_pt,1],'ro')
-#        plt.plot(vert[pts_to_remove,0],vert[pts_to_remove,1],'go')
-##        plt.plot(vert[bound[pb_pt_ind2],0],vert[bound[pb_pt_ind2],1],'go')
-#        plt.show()
-
-#    AimsTextureErosion??
+    if len(boundary) > 1:
+        print 'complex boundary after cleanTextureBoundary'
     return (tex, boundary)
 
 
@@ -330,22 +305,29 @@ def textureBoundary(mesh, atex, val, neigh=0):
         print 'no value ' + str(val) + ' in the input texture!!'
         return list()
     else:
-        print str(tex_val_indices.size) + ' vertices have the texture value ' + str(val)
-        print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
+        ####################################################################
+        # print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
+        ####################################################################
         if not neigh:
             neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+            
+        '''identify the vertices that are on the boundary,         
+        i.e that have at least one neigbor that has not the same value in the texture '''
         bound_verts = list()
         for i in tex_val_indices:
             ne_i = np.array(neigh[i].list())
             #print ne_i.size
             #print np.intersect1d_nu(ne_i, tex_val_indices).size
-            if np.__version__<1.6:
+            np_ver = [ int(x) for x in np.__version__.split( '.' ) ]
+            if np_ver < [ 1, 6 ]:
                 inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
             else:
                 inters_size = np.intersect1d(ne_i, tex_val_indices).size
             if (inters_size != ne_i.size):
                 bound_verts.append(i)
-
+                
+        ''' select the edges that are on the boundary in the polygons
+        '''
         adja = meshAdjacencyMatrix(mesh)
         r = sparse.extract.find(adja)
 #        print bound_verts
@@ -400,7 +382,7 @@ def meshAdjacencyMatrix(mesh):
 #
 # build the boundary by traversing edges
 # return list of connected components ORDERED, THE FIRST THE LONGEST
-#complex boundary corresponds to multiple holes in the surface or bad shaped boundary
+# complex boundary corresponds to multiple holes in the surface or bad shaped boundary
 ####################################################################
 def edges2Boundary(li, lj):
     tag = np.zeros(li.size)
@@ -441,15 +423,44 @@ def edges2Boundary(li, lj):
     "concatenate boundary pieces"
     bound_conn = boundariesIntersection(boundary)
     while len(bound_conn) > 0:  # while np.array(bound_conn)>0:
-        cat_bound = catBoundary(boundary[bound_conn[0][0]], boundary[bound_conn[0][1]], bound_conn[0][2]) 
+#        print 'concatenate boundaries'
+        cat_bound = catBoundary(boundary[bound_conn[0][0]], boundary[bound_conn[0][1]], bound_conn[0][2])
+#        print  cat_bound
         boundary[bound_conn[0][0]] = cat_bound
         boundary.pop(bound_conn[0][1])
         bound_conn = boundariesIntersection(boundary)
-
+        
     for bound in boundary:
         if bound[0] == bound[-1]:
             bound.pop()
 
+    ''' cut complex boundaries
+    '''
+    for b_ind,bound in enumerate(boundary):
+        occurence = listCount(bound)
+        if max(occurence.keys()) > 1:
+            print 'complex boundary --> cut into simple parts'
+            while max(occurence.keys()) > 1:
+#                 '''find the vertex that is taken more than one time in the boundary'''
+#                print bound
+#                print len(bound)
+#                print 'occurence',occurence
+                ite = occurence[max(occurence.keys())]
+                first_occ = bound.index(ite)
+                sec_occ = first_occ + 1 + bound[first_occ + 1:].index(ite)
+#                print 'first_occ',first_occ
+#                print 'sec_occ',sec_occ
+                '''create a new boundary that corresponds to the loop '''
+                print '[len(b) for b in boundary]',[len(b) for b in boundary]
+                boundary.append(bound[first_occ:sec_occ])
+                '''remove the loop from current boundary'''
+                bound[first_occ:sec_occ] = []
+#                print bound
+                occurence = listCount(bound)
+            boundary[b_ind] = bound
+            print '[len(b) for b in boundary]',[len(b) for b in boundary]
+
+            
     "sort the boundaries the first the longest"
     boundaries_len = [len(bound) for bound in boundary]
     inx = range(len(boundaries_len))
@@ -459,7 +470,6 @@ def edges2Boundary(li, lj):
 #    boundary.sort()
 
     return sort_boundary
-
 
 #    boundary_cat = {}
 #    nb_bound = bound_ind
@@ -603,6 +613,21 @@ def edges2Boundary(li, lj):
 #            tag[wi[0]] = 1
 #    boundary.pop()
 #    return np.array(boundary)
+
+####################################################################
+#
+# count the occurrences of all items in a list and return a dictionary
+# that is of the form {nb_occurence:list_item}, which is the opposite of
+# standard implementation usually found on the web
+# -----------------------------------------------------------------
+# in python >= 2.7, collections may be used, see example below
+# >>> from collections import Counter
+# >>> z = ['blue', 'red', 'blue', 'yellow', 'blue', 'red']
+# >>> Counter(z)
+# Counter({'blue': 3, 'red': 2, 'yellow': 1})
+####################################################################
+def listCount(l):
+    return dict((l.count(it),it) for it in l)
 
 
 def catBoundary(bound1, bound2, common_pts):
