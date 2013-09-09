@@ -132,6 +132,7 @@ def meshSmoothing(mesh, Niter, dt):
 #
 ####################################################################
 def computeMeshWeights(mesh):
+    threshold = 0.000001 #np.spacing(1)??
     print '    Computing mesh weights'
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
@@ -141,7 +142,7 @@ def computeMeshWeights(mesh):
     W = sparse.lil_matrix((Nbv, Nbv))
     #W = zeros((Nv,Nv))
     # this old numpy array representation cannot handle big meshes in memory
-
+    threshold_needed = 0
     for i in range(3):
         i1 = np.mod(i, 3)
         i2 = np.mod(i + 1, 3)
@@ -151,6 +152,15 @@ def computeMeshWeights(mesh):
         qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]
         nopp = np.apply_along_axis(np.linalg.norm, 1, pp)
         noqq = np.apply_along_axis(np.linalg.norm, 1, qq)
+        thersh_nopp = np.where(nopp<threshold)[0]
+        thersh_noqq = np.where(noqq<threshold)[0]
+        if len(thersh_nopp) > 0:
+            nopp[thersh_nopp] = threshold
+            threshold_needed = 1
+        if len(thersh_noqq) > 0:
+            noqq[thersh_noqq] = threshold
+            threshold_needed = 1
+#        print np.min(noqq)
         pp = pp / np.vstack((nopp, np.vstack((nopp, nopp)))).transpose()
         qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
         ang = np.arccos(np.sum(pp * qq, 1))
@@ -160,9 +170,10 @@ def computeMeshWeights(mesh):
             ind3 = poly[j, i3]
             W[ind2, ind3] = W[ind2, ind3] + 1 / np.tan(ang[j])
             W[ind3, ind2] = W[ind3, ind2] + 1 / np.tan(ang[j])
-
+    if threshold_needed:
+        print '    -weight threshold needed-'
     print '    OK'
-
+#    print np.isnan(W.data)
     return W
 
 

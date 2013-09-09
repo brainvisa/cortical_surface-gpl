@@ -902,6 +902,7 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
         mesh.vertex().assign(vv)
         (nb_inward, inward) = invertedPolygon(mesh)
         nb_inward_evol.append(nb_inward)
+        print nb_inward_evol
         if len(nb_inward_evol)>3:
             if nb_inward_evol[-1] == nb_inward_evol[-2] or nb_inward_evol[-1] == nb_inward_evol[-3]:
                 count += 1
@@ -972,8 +973,10 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     print '------------------rectConformalMapping'
     neoCortex_square = rectConformalMapping(neoCortex_open_mesh, neoCortex_open_boundary, length, width, 0)
     print '------------------solveInvertedPolygon'
-    (neoCortex_square, nb_inward_evol) = solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, 100)
-    print nb_inward_evol
+#     (neoCortex_square, nb_inward_evol) = solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, 100)
+#     print nb_inward_evol
+    (nb_inward, inward) = invertedPolygon(neoCortex_square)
+    print 'nb_inward : ', nb_inward
     return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh)
 #     if write_all_steps_to_disk:
 #         print '------------------textureBoundary'
@@ -1010,6 +1013,10 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
 #
 ####################################################################
 def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, sulci_dict, side, model=None):
+    vert = np.array(neoCortex_square.vertex())
+    if vert.shape[0] != len(texture_sulci):
+        raise Exception('sulcal lines texture and rectangular mesh are not compatible, run the process --texture to Flat Mesh--')
+        return
 
     full_sulci = slSet.SulcalLinesSet()
 #     tex_cstr_square = texture2ROI(texture_sulci, neocortex_indices)
@@ -1019,7 +1026,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
 #     full_sulci.updateVertices(vert)    
     full_sulci.extractFromTexture(texture_sulci, neoCortex_square, sulci_dict)
 
-    vert = np.array(neoCortex_square.vertex())
+    
     
     SC_ind = full_sulci.names.index(('S.C._'+side))   
     SC_label = full_sulci.labels[SC_ind]
