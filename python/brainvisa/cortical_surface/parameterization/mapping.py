@@ -791,6 +791,31 @@ def invertedPolygon(mesh, shape=None):
             nb_inward = len(inward)
     return(nb_inward, inward)
 
+def polygonNormals(vertices, faces):
+    print 'vertices.shape',vertices.shape
+    print 'faces.shape',faces.shape
+    print faces[:,2].shape
+    print vertices[faces[:,2],:].shape
+    normalf = crossp( vertices[faces[:,1],:]-vertices[faces[:,0],:], vertices[faces[:,2],:]-vertices[faces[:,0],:] )
+    print normalf.shape
+    d = np.sqrt(np.sum(np.square(normalf),1))
+    d[d<0.0000001]=1
+    print d.shape
+    rep =  np.tile( d, (3,1) ).transpose()
+    print rep.shape
+    normalf = normalf / rep
+    return normalf
+
+def crossp(x,y):
+    # x and y are (m,3) dimensional
+    z = x.copy()
+    z[:,0] = x[:,1]*y[:,2] - x[:,2]*y[:,1]
+    z[:,1] = x[:,2]*y[:,0] - x[:,0]*y[:,2]
+    z[:,2] = x[:,0]*y[:,1] - x[:,1]*y[:,0]
+    return z
+
+
+
 def parcelsFromCoordinates(template_lat,template_lon,model):
 
     nb_vert = template_lat.shape[0]
@@ -871,24 +896,31 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
     poly = np.array(mesh.polygon())
     (nb_inward, inward) = invertedPolygon(mesh)
     nb_inward_evol = [nb_inward]
+    inward_evol = [inward]
     count = 0
     while nb_inward_evol[-1] > 0:
         # group connected polyons into patchs
+        t0 = time.clock()
         bary = np.unique(poly[inward, :])
-        adj_list = []
-        for b in bary:
-            adj_list.append(neigh[b].list())
+#         print time.clock() - t0, "seconds process time"
+#         t0 = time.clock()
+#         adj_list = []
+#         for b in bary:
+#             adj_list.append(neigh[b].list())
+#         print time.clock() - t0, "seconds process time"
         vert = np.array(mesh.vertex())
+        t0 = time.clock()
         vert_out = vert.copy()
+        print time.clock() - t0, "seconds process time"
+        t0 = time.clock()
         for it in range(nb_it_smooth):
-            ind_bary = 0
-            for l_neigh_bary in adj_list:
+            for ind_bary,b in enumerate(bary):#l_neigh_bary in enumerate(adj_list):
+                l_neigh_bary = neigh[b].list()
                 for neigh_bary in l_neigh_bary:
                     neig = vert[neigh[neigh_bary].list(), :]
                     vert_out[neigh_bary, :] = np.mean(neig, axis = 0)
-                g_neig = vert_out[l_neigh_bary, :]
-                vert_out[bary[ind_bary], :] = np.mean(g_neig, axis = 0)
-                ind_bary += 1
+                #g_neig = vert_out[l_neigh_bary, :]
+                vert_out[bary[ind_bary], :] = np.mean(vert_out[l_neigh_bary, :], axis = 0)#g_neig, axis = 0)
             ## re projection of bounday vertices onto the bounday
             vert_out[boundary[0], 1] = vert[boundary[0], 1]
             vert_out[boundary[1], 0] = vert[boundary[1], 0]
@@ -896,12 +928,18 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
             vert_out[boundary[3], 0] = vert[boundary[3], 0]
             ###########################
             vert = vert_out.copy()
+        print time.clock() - t0, "seconds process time"
+        t0 = time.clock()
         vv = aims.vector_POINT3DF()
         for x in vert:
             vv.append(x)
         mesh.vertex().assign(vv)
+        print time.clock() - t0, "seconds process time"
+        t0 = time.clock()
         (nb_inward, inward) = invertedPolygon(mesh)
+        print time.clock() - t0, "seconds process time"
         nb_inward_evol.append(nb_inward)
+        inward_evol.append(inward)
         print nb_inward_evol
         if len(nb_inward_evol)>3:
             if nb_inward_evol[-1] == nb_inward_evol[-2] or nb_inward_evol[-1] == nb_inward_evol[-3]:
@@ -910,7 +948,7 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
                 count = 0
         if count > 10:
             break
-    return (mesh, nb_inward_evol)
+    return (mesh, nb_inward_evol, inward_evol)
 
 
 
@@ -972,11 +1010,6 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     vert = np.array(neoCortex_open_mesh.vertex())
     print '------------------rectConformalMapping'
     neoCortex_square = rectConformalMapping(neoCortex_open_mesh, neoCortex_open_boundary, length, width, 0)
-    print '------------------solveInvertedPolygon'
-#     (neoCortex_square, nb_inward_evol) = solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, 100)
-#     print nb_inward_evol
-    (nb_inward, inward) = invertedPolygon(neoCortex_square)
-    print 'nb_inward : ', nb_inward
     return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh)
 #     if write_all_steps_to_disk:
 #         print '------------------textureBoundary'
@@ -1031,7 +1064,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     SC_ind = full_sulci.names.index(('S.C._'+side))   
     SC_label = full_sulci.labels[SC_ind]
     print 'SC_label: ', SC_label
-    full_sulci.sulcalLines[SC_ind].printArgs()
+#    full_sulci.sulcalLines[SC_ind].printArgs()
     translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
     vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
     neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
@@ -1039,20 +1072,18 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     full_sulci.updateVertices(vert)
 
     model = md.Model()
-    model.printArgs()
+#    model.printArgs()
     full_sulci.sulcalLine2SulcalConstraint(model)
-    full_sulci.printArgs()
+#    full_sulci.printArgs()
 
     model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
     model.setAxisCoord(full_sulci)
-    model.printArgs()
+#    model.printArgs()
 #    model.saveToFile('/home/toz/model_current.txt')
 
     Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
-    (neoCortex_square_cstr, nb_inward_cstr_evol) = solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)
-    print 'nb_inward_cstr_evol', nb_inward_cstr_evol
     return neoCortex_square_cstr
 ####################################################################
 #

@@ -31,7 +31,7 @@ from soma import aims
 import numpy as np
 
 try:
-  from brainvisa.cortical_surface.parameterization.mapping import hop
+  from brainvisa.cortical_surface.parameterization import mapping as map
   from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 except:
   pass
@@ -50,6 +50,8 @@ signature = Signature(
     'cstrBalance', Float(),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
+    'unfold_reversed_triangles', Choice('yes','no'),
+    'nb_it_local_smoothing_for_unfolding', Integer(),
     'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats)
 )
 
@@ -60,6 +62,8 @@ def initialization( self ):
     self.cstrBalance = 200
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
     self.linkParameters( 'cstr_rectangular_mesh','rectangular_mesh')
+    self.unfold_reversed_triangles = 'yes'
+    self.nb_it_local_smoothing_for_unfolding = 100
     
 def execution( self, context ):
 
@@ -99,7 +103,23 @@ def execution( self, context ):
     context.write('associated to the following labels :')
     context.write(labels)
     context.write('HOP')
-    (cstr_mesh) = hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side)
+    (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side)
+    (nb_inward, inward) = map.invertedPolygon(cstr_mesh)
+    vert = np.array(neoCortex_square.vertex())
+    context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
+
+    if self.unfold_reversed_triangles == 'yes':
+        context.write('------------------unfolding reversed triangles')
+        (cstr_mesh, nb_inward_evol, inward_evol) = map.solveInvertedPolygon(cstr_mesh, boundary, self.nb_it_local_smoothing_for_unfolding)
+        context.write('------------------number of vertices on folded triangles : '+str(nb_inward_evol))
+        inward_tex = 'tmp.tex'
+        context.write('------------------writing inward tex in : '+inward_tex)
+        tmp_tex = np.zeros(len(mesh.vertex()))
+        tmp_tex[inward_evol[-1]] = 1
+        tex_unfold = aims.TimeTexture_S16()
+        tex_unfold[0].assign(tmp_tex)
+        ws.write(tex_unfold, inward_tex)
+
     context.write('Writing meshes and textures')
     
     ws.write( cstr_mesh, self.cstr_rectangular_mesh.fullPath() )
