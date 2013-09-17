@@ -105,20 +105,20 @@ def execution( self, context ):
     context.write('HOP')
     (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side)
     (nb_inward, inward) = map.invertedPolygon(cstr_mesh)
-    vert = np.array(neoCortex_square.vertex())
+    vert = np.array(cstr_mesh.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
 
     if self.unfold_reversed_triangles == 'yes':
         context.write('------------------unfolding reversed triangles')
         (cstr_mesh, nb_inward_evol, inward_evol) = map.solveInvertedPolygon(cstr_mesh, boundary, self.nb_it_local_smoothing_for_unfolding)
         context.write('------------------number of vertices on folded triangles : '+str(nb_inward_evol))
-        inward_tex = 'tmp.tex'
-        context.write('------------------writing inward tex in : '+inward_tex)
-        tmp_tex = np.zeros(len(mesh.vertex()))
-        tmp_tex[inward_evol[-1]] = 1
-        tex_unfold = aims.TimeTexture_S16()
-        tex_unfold[0].assign(tmp_tex)
-        ws.write(tex_unfold, inward_tex)
+#         inward_tex = 'tmp.tex'
+#         context.write('------------------writing inward tex in : '+inward_tex)
+#         tmp_tex = np.zeros(len(mesh.vertex()))
+#         tmp_tex[inward_evol[-1]] = 1
+#         tex_unfold = aims.TimeTexture_S16()
+#         tex_unfold[0].assign(tmp_tex)
+#         ws.write(tex_unfold, inward_tex)
 
     context.write('Writing meshes and textures')
     
