@@ -9,7 +9,7 @@ from brainvisa.cortical_surface.parameterization import model as md
 from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 from scipy import sparse
 import scipy
-ver = [ int(x) for x in scipy.__version__.split( '.' ) ]
+ver = [1]#[ int(x) for x in scipy.__version__.split( '.' ) ]
 if ver < [ 0, 9 ]:
     print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower)'
     from scipy.sparse.linalg import gmres
@@ -1071,15 +1071,15 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
 #    neoCortex_square.updateNormals()
     full_sulci.updateVertices(vert)
 
-    model = md.Model()
-#    model.printArgs()
-    full_sulci.sulcalLine2SulcalConstraint(model)
-#    full_sulci.printArgs()
+    if model is None:
+        model = md.Model()
 
-    model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
-    model.setAxisCoord(full_sulci)
-#    model.printArgs()
-#    model.saveToFile('/home/toz/model_current.txt')
+    full_sulci.sulcalLine2SulcalConstraint(model)
+    #    full_sulci.printArgs()
+    if model is None:
+        model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
+        model.setAxisCoord(full_sulci)
+
 
     Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 

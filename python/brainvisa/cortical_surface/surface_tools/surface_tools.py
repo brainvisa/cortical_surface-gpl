@@ -7,10 +7,11 @@ import numpy as np
 from soma import aims
 from soma import aimsalgo
 from scipy import sparse
-
+np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
+print 'the version of numpy is ',np_ver
 
 def ismember(ar1, ar2):
-    if np.__version__<1.6:
+    if np_ver < [1, 6]:
         (uni, inds) = np.unique1d(ar1, False, True)## deprecated since numpy.__version__ > 1.6
         I = np.setmember1d(uni, ar2)
     else:
@@ -425,7 +426,6 @@ def textureBoundary(mesh, atex, val, neigh=0):
             ne_i = np.array(neigh[i].list())
             #print ne_i.size
             #print np.intersect1d_nu(ne_i, tex_val_indices).size
-            np_ver = [ int(x) for x in np.__version__.split( '.' ) ]
             if np_ver < [ 1, 6 ]:
                 inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
             else:
@@ -882,7 +882,7 @@ def subCutMesh(mesh, atex, val):
     I = ismember(poly, tex_val_indices)
     poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
 #    print tex_val_indices
-    if np.__version__<1.6:
+    if np_ver < [1, 6]:
         (uni, inds) = np.unique1d(poly_set, False, True)
     else:
         (uni, inds) = np.unique(poly_set, False, True)        

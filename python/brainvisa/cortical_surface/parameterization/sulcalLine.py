@@ -6,7 +6,7 @@ Created on 2 august 2012
 import numpy as np
 from soma import aims
 from scipy import sparse
-np_ver = [ int(x) for x in np.__version__.split( '.' ) ]
+np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
 
 
 class SulcalLine(object):

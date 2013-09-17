@@ -33,6 +33,7 @@ import numpy as np
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map
   from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.parameterization import model as md
 except:
   pass
     
@@ -50,6 +51,7 @@ signature = Signature(
     'cstrBalance', Float(),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
+    'model_file',ReadDiskItem( 'Graph Label Translation', 'Text File'),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
     'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats)
@@ -66,9 +68,10 @@ def initialization( self ):
     self.nb_it_local_smoothing_for_unfolding = 100
     
 def execution( self, context ):
-
-#     lon, lat = hipHop(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), texture_sulci[0].arraydata(), self.side)
-
+    context.write('Reading model')
+    model = md.Model().read(self.model_file.fullPath())
+    for line in model.printArgs().splitlines():
+        context.write(line)
     re = aims.Reader()
     ws = aims.Writer()
     context.write('Reading textures and mesh')
@@ -103,7 +106,7 @@ def execution( self, context ):
     context.write('associated to the following labels :')
     context.write(labels)
     context.write('HOP')
-    (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side)
+    (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side, model)
     (nb_inward, inward) = map.invertedPolygon(cstr_mesh)
     vert = np.array(cstr_mesh.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
