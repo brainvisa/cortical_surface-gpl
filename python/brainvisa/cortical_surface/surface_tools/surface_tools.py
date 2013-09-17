@@ -60,8 +60,9 @@ def polygonAngles(vertices):
 # the two meshes must have the same number of vertex
 #
 ####################################################################
-def meshDdistortions(FV1,FV2,type):
-     distortions_out = np.zeros(FV1.vertex.shape[0])
+def meshDdistortions(mesh1,mesh2,type):
+    vert1 = np.array(mesh1.vertex())
+    distortions_out = np.zeros(vert1.shape[0])
 #     
 #     switch type
 #         case 'distance'
@@ -100,7 +101,7 @@ def meshDdistortions(FV1,FV2,type):
 #             end
 #         otherwise
 #             error('type of distortion not valid')
-     return distortions_out
+    return distortions_out
 
 ####################################################################
 #
