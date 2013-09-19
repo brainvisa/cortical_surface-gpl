@@ -817,7 +817,7 @@ def crossp(x,y):
 
 
 def parcelsFromCoordinates(template_lat,template_lon,model):
-#calculer model.longitudeAxisCoord dans [0-360] à partir des coords de boundary du model
+    #calculer model.longitudeAxisCoord dans [0-360] a partir des coords de boundary du model
     nb_vert = template_lat.shape[0]
     tex_parcels = np.zeros(nb_vert)
     lab_parcel = 1
