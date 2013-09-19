@@ -109,10 +109,17 @@ def execution( self, context ):
     neocortex_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
     insula_indices= np.where( tex_corresp_indices[1].arraydata() )[0]
     cingular_indices = np.where( tex_corresp_indices[2].arraydata() )[0]
-    
-    nb_vert_full_mesh = len(neocortex_indices) + len(insula_indices) + len(cingular_indices) 
+#    print np.concatenate((neocortex_indices, insula_indices),0)
+    nb_vert_full_mesh = len(np.unique(np.concatenate((np.concatenate((neocortex_indices, insula_indices), 0), cingular_indices), 0)))
+#    context.write('nb_vert_full_mesh'+str(nb_vert_full_mesh))
+#     nb_vert_full_mesh = len(neocortex_indices) + len(insula_indices) + len(cingular_indices) 
+#     context.write('nb_vert_full_mesh'+str(nb_vert_full_mesh))
     lon, lat = map.computeCoordinates(nb_vert_full_mesh, neocortex_indices, neoCortex_square_cstr, boundary, self.latitude_insula_boundary, self.latitude_cingular_pole_boundary)
 
+#     context.write('lon.shape'+str(lon.shape))
+#     context.write('lat.shape'+str(lon.shape))
+#     context.write('neoCortex_square_cstr.vertex().size '+str(neoCortex_square_cstr.vertex().size()))
+    
     '''
     if side is left
     invert the boundary
