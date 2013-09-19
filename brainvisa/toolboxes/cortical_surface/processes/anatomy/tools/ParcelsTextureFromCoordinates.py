@@ -62,6 +62,7 @@ def initialization( self ):
     self.linkParameters( 'side','latitude', linkSide )
     self.linkParameters( 'longitude','latitude')
     self.linkParameters( 'texture_parcels','latitude')
+    self.linkParameters( 'model_file', 'latitude' )
     
 def execution( self, context ):
        
