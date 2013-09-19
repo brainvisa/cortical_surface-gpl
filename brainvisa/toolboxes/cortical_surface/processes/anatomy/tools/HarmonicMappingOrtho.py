@@ -43,8 +43,8 @@ userLevel = 2
 
 signature = Signature(
                       
-    'side', Choice('right', 'left'),    
     'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
+    'side', Choice('left', 'right'),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
@@ -58,6 +58,10 @@ signature = Signature(
 )
 
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.rectangular_mesh is not None:
+            return proc.rectangular_mesh.get( 'side' )
+    self.linkParameters( 'side', 'rectangular_mesh', linkSide )
     self.linkParameters( 'boundary_texture','rectangular_mesh')
     self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
     self.linkParameters( 'white_sulcalines', 'rectangular_mesh')
@@ -101,8 +105,12 @@ def execution( self, context ):
 #     tex_square_sulci = np.hstack((tex_square_sulci_tmp, tex_square_sulci_tmp[boundary[1]]))
     square_sulci = tex_square_sulci[0].arraydata()
     labels = np.unique(square_sulci)
+    labels = labels[labels!=0]
     context.write('found the following sulci in the texture :')
-    context.write([sulc_labels_dict[lab] for lab in labels])
+    #context.write( 'labels:', labels )
+    #context.write( 'sulc_labels_dict:', sulc_labels_dict )
+    #context.write( 'missing:', [ lab not in sulc_labels_dict for lab in labels ] )
+    #context.write([sulc_labels_dict[lab] for lab in labels])
     context.write('associated to the following labels :')
     context.write(labels)
     context.write('HOP')

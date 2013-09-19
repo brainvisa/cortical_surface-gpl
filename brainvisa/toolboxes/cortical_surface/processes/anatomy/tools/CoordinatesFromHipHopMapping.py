@@ -149,18 +149,18 @@ def execution( self, context ):
     bound_mesh.vertex().assign(vv)
     bound_mesh.polygon().assign(ee)
     bound_mesh.updateNormals()
-    ws.write(bound_mesh, '/home/toz/ammon_Lwhite_insula_bound_cirlce.mesh' )
+    #ws.write(bound_mesh, '/home/toz/ammon_Lwhite_insula_bound_cirlce.mesh' )
 
     
     
-    ws.write(surfTls.meshBoundaryMesh(insula_mesh, [insula_boundary]), '/home/toz/ammon_Lwhite_insula_bound.mesh' )
+    #ws.write(surfTls.meshBoundaryMesh(insula_mesh, [insula_boundary]), '/home/toz/ammon_Lwhite_insula_bound.mesh' )
     tex_insula_boundary_lon = aims.TimeTexture_FLOAT()
     tex_insula_boundary_lon[0].assign(insula_lon[insula_boundary])
-    ws.write(tex_insula_boundary_lon,  '/home/toz/ammon_Lwhite_insula_boundary_lon.tex')
+    #ws.write(tex_insula_boundary_lon,  '/home/toz/ammon_Lwhite_insula_boundary_lon.tex')
 
     tex_insula_lon = aims.TimeTexture_FLOAT()
     tex_insula_lon[0].assign(insula_lon)
-    ws.write(tex_insula_lon,  '/home/toz/ammon_Lwhite_insula_lon.tex')
+    #ws.write(tex_insula_lon,  '/home/toz/ammon_Lwhite_insula_lon.tex')
 
     (insula_lon, insula_lat, insula_disk) = map.mesh2Disk(insula_mesh, insula_boundary, insula_lon)
     context.write('insula_lon = [',np.min(insula_lon),', ',np.max(insula_lon),']')

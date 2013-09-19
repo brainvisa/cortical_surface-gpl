@@ -48,8 +48,8 @@ userLevel = 2
     
 signature = Signature(
                       
-    'side', Choice('right', 'left'),    
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', shfjGlobals.aimsMeshFormats),    
+    'side', Choice('left', 'right'),
     'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'Texture'),
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
     'unfold_reversed_triangles', Choice('yes','no'),
@@ -61,6 +61,10 @@ signature = Signature(
 )
 
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.white_mesh is not None:
+            return proc.white_mesh.get( 'side' )
+    self.linkParameters( 'side', 'white_mesh', linkSide )
     self.linkParameters( 'cingular_pole_texture', 'white_mesh')
     self.linkParameters( 'insular_pole_texture', 'white_mesh')
     self.linkParameters( 'rectangular_mesh','white_mesh')

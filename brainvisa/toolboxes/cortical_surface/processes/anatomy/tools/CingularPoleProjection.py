@@ -45,8 +45,8 @@ userLevel = 2
 #     anatomist.validation()
 
 signature = Signature(
-    'side', Choice('left', 'right'),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'side', Choice('left', 'right'),
     'pole_template',ReadDiskItem( 'Cingular Pole Template Subject' , 'Aims readable volume formats' ),
     'dilation_1', Integer(),
     'erosion', Integer(),
@@ -55,6 +55,10 @@ signature = Signature(
 )
 
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.white_mesh is not None:
+            return proc.white_mesh.get( 'side' )
+    self.linkParameters( 'side', 'white_mesh', linkSide )
     self.linkParameters( 'pole', 'white_mesh' )
     self.linkParameters( 'pole_template', 'white_mesh' )
     self.dilation_1 = 7

@@ -43,8 +43,8 @@ userLevel = 2
     
 signature = Signature(
                       
-    'side', Choice('left', 'right'),
     'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture' ),
+    'side', Choice('left', 'right'),
     'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),
     'sphere_ray', Float(),
@@ -52,6 +52,10 @@ signature = Signature(
 )
 
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.latitude is not None:
+            return proc.latitude.get( 'side' )
+    self.linkParameters( 'side', 'latitude', linkSide )
     self.linkParameters( 'longitude','latitude')
     self.linkParameters( 'white_mesh','latitude')
     self.linkParameters( 'spherical_mesh','latitude')

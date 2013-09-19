@@ -54,9 +54,8 @@ signature = Signature(
 
 def initialization( self ):
     def linkSide( self, dummy ):
-        if self.pole_template is not None \
-            and self.mri_corrected is not None:
-            side = self.pole_template.get( 'side', None )
+        if self.mri_corrected is not None:
+            side = self.side
             if side is not None:
                 wdi = WriteDiskItem( 'Cingular Pole Template Subject' ,
                     'Aims writable volume formats',
@@ -66,8 +65,8 @@ def initialization( self ):
     self.linkParameters( 'transformation_input','mri_corrected')
     self.linkParameters( 'subject_to_template','mri_corrected')
     self.linkParameters( 'talairach_to_subject','mri_corrected')
-#    self.linkParameters( 'output_template',    # le 'mri_corrected') n'y était pas
-#        ( 'mri_corrected', 'pole_template' ), linkSide )
+    self.linkParameters( 'output_template',    # le 'mri_corrected') n'y était pas
+        ( 'mri_corrected', 'side' ), linkSide )
     self.findValue( 'pole_template', { 'side' : self.side , 'filename_variable' : 'Template_icbm', '_ontology' : 'shared'} )
     self.findValue( 'template_pole_transformation', {} )
 

@@ -44,8 +44,8 @@ userLevel = 2
 
 signature = Signature(
                       
-    'side', Choice('right', 'left'),    
     'rectangular_mesh',ListOf( ReadDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats) ),
+    'side', Choice('left', 'right'),
     'boundary_texture',ListOf( ReadDiskItem( 'Rectangular boundary texture', 'Texture') ),
 #    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'flat_white_sulcalines',ListOf( ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ) ),
@@ -55,6 +55,11 @@ signature = Signature(
 )
 
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.rectangular_mesh is not None \
+                and len( proc.rectangular_mesh ) != 0:
+            return proc.rectangular_mesh[0].get( 'side' )
+    self.linkParameters( 'side', 'rectangular_mesh', linkSide )
     self.linkParameters( 'boundary_texture','rectangular_mesh')
 #    self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
     self.linkParameters( 'flat_white_sulcalines', 'rectangular_mesh')

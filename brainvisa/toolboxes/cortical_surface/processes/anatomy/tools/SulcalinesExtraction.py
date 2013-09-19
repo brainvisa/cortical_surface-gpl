@@ -31,9 +31,9 @@ userLevel = 2
     
 signature = Signature(
                       
+    'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph'),
     'side', Choice('left', 'right'),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'graph', ReadDiskItem( 'Cortical folds graph', 'Graph'),
     'grey_white_input', ReadDiskItem( 'Morphologist Grey White Mask', shfjGlobals.anatomistVolumeFormats),
     'sulcus_identification',Choice('name','label'),
     'labels_translation_map',ReadDiskItem( 'Label Translation' ,'Label Translation'),
@@ -48,13 +48,19 @@ signature = Signature(
 )
 
 def initialization( self ):
+
+    def linkSide( proc, dummy ):
+        if proc.graph is not None:
+            side = proc.graph.get( 'side' )
+            return side
       
     self.linkParameters( 'mri', 'white_mesh' )
-    self.linkParameters( 'graph','white_mesh')
+    self.linkParameters( 'white_mesh', 'graph' )
     self.linkParameters( 'grey_white_input','white_mesh')
     self.linkParameters( 'white_sulcalines', 'white_mesh' )
     self.linkParameters( 'graph_label_basins','white_mesh')
     self.linkParameters( 'graph_label_basins','graph')
+    self.linkParameters( 'side', 'graph', linkSide )
     self.findValue( 'labels_translation_map', {'filename_variable' : 'sulci_model_2008'} )
     self.findValue( 'file_correspondance_constraint', {'filename_variable' : 'constraint_correspondance_2012'} )
     self.bucket_label_type = 'All'
