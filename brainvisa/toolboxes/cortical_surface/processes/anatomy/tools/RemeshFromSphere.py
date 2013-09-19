@@ -33,7 +33,6 @@ userLevel = 2
     
 signature = Signature(
                       
-    'Side', Choice('left', 'right'),
     'spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),    
     'spherical_template', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),

@@ -46,10 +46,10 @@ userLevel = 2
 #    anatomist.validation()
 
 signature = Signature(
+    'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph' ),
     'side', Choice('left', 'right'),
-    'graph', ReadDiskItem( 'Cortical folds graph', 'Graph' ),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'aims readable volume formats' ),
-    'sulcus_identification',Choice('name','label'),
+    'sulcus_identification',Choice('label', 'name'),
 #    'trl',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
 #    'transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist', 'Transformation matrix' ),
@@ -67,6 +67,10 @@ def initialization( self ):
             if m and m == 'Yes':
                 return 'name'
         return 'label'
+    def linkSide( proc, dummy ):
+        if proc.graph is not None:
+            return proc.graph.get( 'side' )
+    self.linkParameters( 'side', 'graph', linkSide )
     self.linkParameters( 'white_mesh','graph' )
     self.linkParameters( 'pole', 'white_mesh' )
     self.dilation_1 = 2 
@@ -75,7 +79,7 @@ def initialization( self ):
 
 #    self.linkParameters( 'transformation', 'white_mesh' )
     self.linkParameters( 'mri_corrected', 'white_mesh' )
-#    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
+    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
     self.findValue('gyri_model', { 'sulci_database' : '2008', 'graph_version': '3.0', 'model' : 'gyrus' })
 #    try:
 #      self.findValue('gyri_model', {})

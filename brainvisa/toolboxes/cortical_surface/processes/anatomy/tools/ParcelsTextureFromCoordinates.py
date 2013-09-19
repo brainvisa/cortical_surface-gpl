@@ -45,17 +45,24 @@ userLevel = 2
     
 signature = Signature(
                       
-    'Side', Choice('right', 'left'),
     'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture'),
+    'side', Choice('left', 'right'),
     'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture'),
 #    'model', ReadDiskItem(  ),
-    'texture_parcels', WriteDiskItem('hemisphere gyri parcellation texture','Texture')
+    'texture_parcels', WriteDiskItem('hemisphere gyri parcellation texture','Texture', requiredAttributes={ 'regularized': 'false' }),
+    'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
 
 )
 
 def initialization( self ):
-     self.linkParameters( 'longitude','latitude')
-#     self.linkParameters( 'remeshed_mesh','white_mesh')
+    def linkSide( proc, dummy ):
+        if proc.latitude is not None:
+            side = proc.latitude.get( 'side' )
+            return side
+    self.linkParameters( 'side','latitude', linkSide )
+    self.linkParameters( 'longitude','latitude')
+    self.linkParameters( 'texture_parcels','latitude')
+    self.linkParameters( 'model_file', 'latitude' )
     
 def execution( self, context ):
        
@@ -68,10 +75,11 @@ def execution( self, context ):
     context.write('Using the default model')    
     default_model = md.Model()
     default_model.printArgs()
-    default_model.saveToFile('/home/toz/model_default.txt')
-    tex_parcels = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), default_model)
+    #default_model.saveToFile('/home/toz/model_default.txt')
+    model = md.Model().read(self.model_file.fullPath())
+    tex_parcels = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model)
         
-    if self.Side =='left':
+    if self.side =='left':
         tex_parcels = tex_parcels + 100
     context.write('Writing texture')
     aims_tex_parcels = aims.TimeTexture_S16()

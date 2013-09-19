@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="surfacebased_data"/>
+      <xhtml name="surfacebased_SPMt_maps"/>
+      <xhtml name="protocol_text"/>
+      <xhtml name="contrast_name"/>
+      <xhtml name="primal_sketches"/>
+      <xhtml name="contrast"/>
+      <xhtml name="intmesh"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

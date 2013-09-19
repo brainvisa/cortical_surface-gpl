@@ -1,5 +1,6 @@
 cmake_minimum_required( VERSION 2.6 )
 find_package( brainvisa-cmake REQUIRED )
+BRAINVISA_FIND_PACKAGE( brainvisa-share )
 BRAINVISA_PROJECT()
 
 BRAINVISA_COPY_PYTHON_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/brainvisa"
@@ -10,6 +11,9 @@ BRAINVISA_COPY_PYTHON_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/python"
                                
 BRAINVISA_COPY_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/bin"
                           bin
+                          ${PROJECT_NAME} )
+BRAINVISA_COPY_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/share-data"
+                          share/brainvisa-share-${brainvisa-share_VERSION_MAJOR}.${brainvisa-share_VERSION_MINOR}
                           ${PROJECT_NAME} )
 BRAINVISA_COPY_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/share/doc/images"
                           share/doc/axon-${axon_VERSION_MAJOR}.${axon_VERSION_MINOR}/images

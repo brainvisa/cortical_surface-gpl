@@ -41,6 +41,10 @@ insert( 'nomenclature','surfaceanalysis',
     'surfaceReferential', SetType( 'Label Translation' ),SetWeakAttr( 'filename_variable', 'surfaceReferential'),SetWeakAttr( 'category', 'translation'),
     'surfaceRefModel_par', SetType( 'Latitude Constraint Gyri Model' ),
     'surfaceRefModel_mer', SetType( 'Longitude Constraint Gyri Model' ),
+    'sulcal_coordinates_model_left', SetType( 'HipHop Model' ),
+      SetWeakAttr( 'side', 'left' ),
+    'sulcal_coordinates_model_right', SetType( 'HipHop Model' ),
+      SetWeakAttr( 'side', 'right' ),
   )
 )
 

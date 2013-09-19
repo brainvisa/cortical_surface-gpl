@@ -7,10 +7,11 @@ import numpy as np
 from soma import aims
 from soma import aimsalgo
 from scipy import sparse
-
+np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
+print 'the version of numpy is ',np_ver
 
 def ismember(ar1, ar2):
-    if np.__version__<1.6:
+    if np_ver < [1, 6]:
         (uni, inds) = np.unique1d(ar1, False, True)## deprecated since numpy.__version__ > 1.6
         I = np.setmember1d(uni, ar2)
     else:
@@ -18,6 +19,98 @@ def ismember(ar1, ar2):
         I = np.in1d(uni, ar2)
     return np.reshape(I[inds], ar1.shape)
 
+####################################################################
+#
+# compute the 3 angles of each triangle in a mesh
+#
+####################################################################
+def meshPolygonAngles(vertex, polygon):
+    angles_out = np.zeros(polygon.shape)
+    print angles_out.shape
+    for ind,p in enumerate(polygon):
+        tet = polygonAngles(vertex[p,:])
+        angles_out[ind,:] = tet
+    return angles_out
+
+####################################################################
+#
+# compute the 3 angles between the 3 vertices given in parameter
+# for too small or flat triangles, return [0, 0, 0]
+#
+####################################################################
+def polygonAngles(vertices):
+    tet = np.zeros(3)
+    a = fastNorm(vertices[1,:] - vertices[0,:])
+    b = fastNorm(vertices[2,:] - vertices[0,:])
+    c = fastNorm(vertices[2,:] - vertices[1,:])
+#     print vertices[2,:] - vertices[0,:]
+#     print b
+    if a>0 and b>0 and c>0: #else: flat triangle
+        a2 = a**2
+        b2 = b**2
+        c2 = c**2
+        tet[0] = np.arccos((a2+b2-c2)/(2*a*b))
+        tet[1] = np.arccos((a2+c2-b2)/(2*a*c))
+        tet[2] = np.arccos((c2+b2-a2)/(2*c*b))
+    return tet
+
+####################################################################
+#
+# compute the norm distortions between the two meshes given following
+# the type of distortions is given in parameter
+# the two meshes must have the same number of vertex
+#
+####################################################################
+def meshDdistortions(mesh1,mesh2,type):
+    vert1 = np.array(mesh1.vertex())
+    distortions_out = np.zeros(vert1.shape[0])
+#     
+#     switch type
+#         case 'distance'
+#             VertConn = compute_vertex_ring(FV1.faces');
+#             for v=1:length(FV1.vertices(:,1))
+#                 for n=1:length(VertConn{v})
+#                     tex1(v)=tex1(v)+(euclidian_dist(FV2.vertices(v,:),FV2.vertices(VertConn{v}(n),:))-euclidian_dist(FV1.vertices(v,:),FV1.vertices(VertConn{v}(n),:)))^2;
+#                 end
+#                 tex1(v)=tex1(v)/(2*length(VertConn{v}));%normalisation par rapport au nb de voisins (x2 car chaque arete est parcourue 2 fois)
+#             end
+#         case 'angle'
+#             tet1=mesh_face_angles(FV1);
+#             tet2=mesh_face_angles(FV2);       
+#             tet_1{1,length(FV1.vertices(:,1))}=[];
+#             f_tet=abs(tet1-tet2);
+#             for f=1:length(FV1.faces(:,1))
+#                 for j=1:3
+#                     tet_1{FV1.faces(f,j)}=[tet_1{FV1.faces(f,j)},f_tet(j,f)];
+#                 end
+#             end
+#             for v=1:length(FV1.vertices(:,1))
+#                 tex1(v)=sum(tet_1{v}(:))/length(tet_1{v}(:));
+#             end
+#         case 'area'
+#             tet1=mesh_face_area(FV1);
+#             tet2=mesh_face_area(FV2);       
+#             tet_1{1,length(FV1.vertices(:,1))}=[];
+#             f_tet=abs(tet1-tet2);
+#             for f=1:length(FV1.faces(:,1))
+#                 for j=1:3
+#                     tet_1{FV1.faces(f,j)}=[tet_1{FV1.faces(f,j)},f_tet(f)];
+#                 end
+#             end
+#             for v=1:length(FV1.vertices(:,1))
+#                 tex1(v)=sum(tet_1{v}(:))/length(tet_1{v}(:));
+#             end
+#         otherwise
+#             error('type of distortion not valid')
+    return distortions_out
+
+####################################################################
+#
+# compute the norm of a vector very fast
+#
+####################################################################
+def fastNorm(x):
+    return np.sqrt(x.dot(x))
 
 ####################################################################
 #
@@ -132,7 +225,7 @@ def meshSmoothing(mesh, Niter, dt):
 #
 ####################################################################
 def computeMeshWeights(mesh):
-    threshold = 0.000001 #np.spacing(1)??
+    threshold = 0.00001 #np.spacing(1)??
     print '    Computing mesh weights'
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
@@ -173,7 +266,10 @@ def computeMeshWeights(mesh):
     if threshold_needed:
         print '    -weight threshold needed-'
     print '    OK'
-#    print np.isnan(W.data)
+
+    li = np.hstack(W.data)
+    print 'nb of Nan in weights: ', len(np.where(np.isnan(li))[0])
+
     return W
 
 
@@ -194,7 +290,8 @@ def computeMeshLaplacian(mesh):
 
 #    print dia - weights
     L = sparse.lil_matrix(dia - weights)
-
+    li = np.hstack(L.data)
+    print 'nb Nan in L : ', len(np.where(np.isnan(li))[0])
     print '    OK'
 
     return L
@@ -329,7 +426,6 @@ def textureBoundary(mesh, atex, val, neigh=0):
             ne_i = np.array(neigh[i].list())
             #print ne_i.size
             #print np.intersect1d_nu(ne_i, tex_val_indices).size
-            np_ver = [ int(x) for x in np.__version__.split( '.' ) ]
             if np_ver < [ 1, 6 ]:
                 inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
             else:
@@ -786,7 +882,7 @@ def subCutMesh(mesh, atex, val):
     I = ismember(poly, tex_val_indices)
     poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
 #    print tex_val_indices
-    if np.__version__<1.6:
+    if np_ver < [1, 6]:
         (uni, inds) = np.unique1d(poly_set, False, True)
     else:
         (uni, inds) = np.unique(poly_set, False, True)        

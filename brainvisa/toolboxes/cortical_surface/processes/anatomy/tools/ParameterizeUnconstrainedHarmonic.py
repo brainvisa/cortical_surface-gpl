@@ -32,7 +32,7 @@ from soma import aims
 import numpy as np
 
 try:
-  from brainvisa.cortical_surface.parameterization.mapping import hip#hipHop
+  from brainvisa.cortical_surface.parameterization import mapping as map#hipHop
 #  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 except:
   pass
@@ -48,10 +48,12 @@ userLevel = 2
     
 signature = Signature(
                       
-    'side', Choice('right', 'left'),    
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', shfjGlobals.aimsMeshFormats),    
+    'side', Choice('left', 'right'),
     'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'Texture'),
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
+    'unfold_reversed_triangles', Choice('yes','no'),
+    'nb_it_local_smoothing_for_unfolding', Integer(),
     'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
     'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture'),
@@ -59,13 +61,18 @@ signature = Signature(
 )
 
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.white_mesh is not None:
+            return proc.white_mesh.get( 'side' )
+    self.linkParameters( 'side', 'white_mesh', linkSide )
     self.linkParameters( 'cingular_pole_texture', 'white_mesh')
     self.linkParameters( 'insular_pole_texture', 'white_mesh')
     self.linkParameters( 'rectangular_mesh','white_mesh')
     self.linkParameters( 'boundary_texture','white_mesh')
     self.linkParameters( 'corresp_indices_texture','white_mesh')
     self.linkParameters( 'white_mesh_parts','white_mesh')
-
+    self.unfold_reversed_triangles = 'yes'
+    self.nb_it_local_smoothing_for_unfolding = 100
     
 def execution( self, context ):
   
@@ -77,8 +84,25 @@ def execution( self, context ):
     mesh = re.read(self.white_mesh.fullPath())
     context.write('HIP')
  
-     
-    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
+    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
+    (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
+    vert = np.array(neoCortex_square.vertex())
+    context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
+    if self.unfold_reversed_triangles == 'yes':
+        poly = np.array(neoCortex_square.polygon())
+        context.write('------------------unfolding reversed triangles')
+        (neoCortex_square, nb_inward_evol, inward_evol) = map.solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, self.nb_it_local_smoothing_for_unfolding)
+#        (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
+        context.write('------------------evolution of the iterative unfolding : '+str(nb_inward_evol))
+#         inward_tex = 'tmp.tex'
+#         context.write('------------------writing inward tex in : '+inward_tex)
+#         tmp_tex = np.zeros(len(neoCortex_square.vertex()))
+# #        print np.unique(poly[inward, :])
+#         tmp_tex[np.unique(poly[inward_evol[-1], :])] = 1
+#         tex_unfold = aims.TimeTexture_S16()
+#         tex_unfold[0].assign(tmp_tex)
+#         ws.write(tex_unfold, inward_tex)
+
     context.write('Writing meshes and textures')
     mesh_parts = aims.AimsTimeSurface_3()
     '''
