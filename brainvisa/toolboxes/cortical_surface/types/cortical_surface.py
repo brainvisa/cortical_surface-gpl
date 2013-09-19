@@ -180,4 +180,7 @@ FileType( 'Graph Label Translation', 'Text File' )
 FileType( 'Left Graph Label Translation', 'Graph Label Translation' )
 FileType( 'Right Graph Label Translation', 'Graph Label Translation' )
 
+FileType( 'HipHop Model', 'Text File' )
+
+
 

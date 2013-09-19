@@ -51,7 +51,7 @@ signature = Signature(
     'cstrBalance', Float(),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
-    'model_file',ReadDiskItem( 'Graph Label Translation', 'Text File'),
+    'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
     'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats)
@@ -68,6 +68,7 @@ def initialization( self ):
     self.cstrBalance = 200
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
     self.linkParameters( 'cstr_rectangular_mesh','rectangular_mesh')
+    self.linkParameters( 'model_file','rectangular_mesh')
     self.unfold_reversed_triangles = 'yes'
     self.nb_it_local_smoothing_for_unfolding = 100
     

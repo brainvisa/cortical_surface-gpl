@@ -50,7 +50,7 @@ signature = Signature(
     'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture'),
 #    'model', ReadDiskItem(  ),
     'texture_parcels', WriteDiskItem('hemisphere gyri parcellation texture','Texture', requiredAttributes={ 'regularized': 'false' }),
-    'model_file',ReadDiskItem( 'Graph Label Translation', 'Text File'),
+    'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
 
 )
 

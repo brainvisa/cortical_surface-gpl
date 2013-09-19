@@ -46,7 +46,7 @@ userLevel = 2
 #    anatomist.validation()
 
 signature = Signature(
-    'graph', ReadDiskItem( 'Cortical folds graph', 'Graph' ),
+    'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph' ),
     'side', Choice('left', 'right'),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'aims readable volume formats' ),
     'sulcus_identification',Choice('label', 'name'),

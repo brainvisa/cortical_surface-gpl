@@ -51,7 +51,7 @@ signature = Signature(
     'flat_white_sulcalines',ListOf( ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ) ),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ListOf( ReadDiskItem( 'Graph Label Translation', 'Text File') ),
-    'model_file',WriteDiskItem( 'Graph Label Translation', 'Text File')
+    'model_file',WriteDiskItem( 'HipHop Model', 'Text File')
 )
 
 def initialization( self ):
@@ -59,12 +59,17 @@ def initialization( self ):
         if proc.rectangular_mesh is not None \
                 and len( proc.rectangular_mesh ) != 0:
             return proc.rectangular_mesh[0].get( 'side' )
+    def linkModel( proc, dummy ):
+        if proc.side is not None:
+            return WriteDiskItem( 'HipHop Model', 'Text File',
+                requiredAttributes={ 'side': proc.side } ).findValue(
+                    proc.rectangular_mesh )
     self.linkParameters( 'side', 'rectangular_mesh', linkSide )
     self.linkParameters( 'boundary_texture','rectangular_mesh')
 #    self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
     self.linkParameters( 'flat_white_sulcalines', 'rectangular_mesh')
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
-#    self.linkParameters( 'cstr_rectangular_mesh','rectangular_mesh')
+    self.linkParameters( 'model_file', 'side', linkModel )
 
     
 def execution( self, context ):
