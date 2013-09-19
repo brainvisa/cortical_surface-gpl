@@ -817,17 +817,19 @@ def crossp(x,y):
 
 
 def parcelsFromCoordinates(template_lat,template_lon,model):
-
+#calculer model.longitudeAxisCoord dans [0-360] à partir des coords de boundary du model
     nb_vert = template_lat.shape[0]
     tex_parcels = np.zeros(nb_vert)
     lab_parcel = 1
     sort_axes_lon = [0]
-    tmp_lon = [f for f in model.longitudeAxisID]#[360 - f for f in model.longitudeAxisID]
-    sort_axes_lon.extend(tmp_lon)
+    for f in model.longitudeAxisCoord:#[360 - f for f in model.longitudeAxisID]
+        if f is not None:
+            sort_axes_lon.append(f)
     sort_axes_lon.sort()
     sort_axes_lat = [0]
-    tmp_lat = [f + 30 for f in model.latitudeAxisID]
-    sort_axes_lat.extend(tmp_lat)
+    for f in model.latitudeAxisCoord:
+        if f is not  None:
+           sort_axes_lat.append(f + 30) 
     sort_axes_lat.sort()
     sort_axes_lat.append(180)
     print sort_axes_lon

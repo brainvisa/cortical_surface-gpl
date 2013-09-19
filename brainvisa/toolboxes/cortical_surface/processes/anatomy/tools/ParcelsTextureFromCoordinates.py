@@ -72,11 +72,11 @@ def execution( self, context ):
     latitude_texture = re.read(self.latitude.fullPath())
     longitude_texture = re.read(self.longitude.fullPath())
     
-    context.write('Using the default model')    
-    default_model = md.Model()
-    default_model.printArgs()
-    #default_model.saveToFile('/home/toz/model_default.txt')
     model = md.Model().read(self.model_file.fullPath())
+    context.write('------------------- model used -------------------')
+    for line in model.printArgs().splitlines():
+        context.write(line)
+
     tex_parcels = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model)
         
     if self.side =='left':
