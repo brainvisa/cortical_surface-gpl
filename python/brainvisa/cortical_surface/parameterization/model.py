@@ -5,14 +5,14 @@ Created on Nov 16, 2012
 '''
 import numpy as np
 from soma import aims
-
+#from brainvisa.cortical_surface.parameterization import mapping as map
 
 class Model(object):
     '''
     classdocs
     '''
 
-    def __init__(self, modelVersion=None, left=None, right=None, top=None, bottom=None, longitudeAxisID=None, latitudeAxisID=None, longitudeAxisCoord=None, latitudeAxisCoord=None):
+    def __init__(self, modelVersion=None, left=None, right=None, top=None, bottom=None, longitudeAxisID=None, latitudeAxisID=None, longitudeAxisCoord=None, latitudeAxisCoord=None, insularPoleBoundaryCoord=None, cingularPoleBoundaryCoord=None):
         '''
         Constructor
         '''
@@ -52,6 +52,16 @@ class Model(object):
             self.bottom = 0.0
         else:
             self.bottom = bottom
+        if insularPoleBoundaryCoord == None:
+            self.insularPoleBoundaryCoord = 30.0
+        else:
+            self.insularPoleBoundaryCoord = insularPoleBoundaryCoord    
+        if cingularPoleBoundaryCoord == None:
+            self.cingularPoleBoundaryCoord = 30.0
+        else:
+            self.cingularPoleBoundaryCoord = cingularPoleBoundaryCoord    
+
+            
 
     def printArgs(self):
         txt = 'modelVersion ' + str(self.modelVersion) + '\n'
@@ -59,6 +69,8 @@ class Model(object):
         txt = txt + '    right ' + str(self.right) + '\n'
         txt = txt + '    top ' + str(self.top) + '\n'
         txt = txt + '    bottom ' + str(self.bottom) + '\n'
+        txt = txt + '    insularPoleBoundaryCoord ' + str(self.insularPoleBoundaryCoord) + '\n'
+        txt = txt + '    cingularPoleBoundaryCoord ' + str(self.cingularPoleBoundaryCoord) + '\n'
         txt = txt + '    longitudeAxisID '+ str(self.longitudeAxisID) + '\n'
         txt = txt + '    longitudeAxisCoord ' + str(self.longitudeAxisCoord) + '\n'
         txt = txt + '    latitudeAxisID ' + str(self.latitudeAxisID) + '\n'
@@ -85,6 +97,8 @@ class Model(object):
         txt = txt + 'right ' + str(self.right) + '\n'
         txt = txt + 'top ' + str(self.top) + '\n'
         txt = txt + 'bottom ' + str(self.bottom) + '\n'
+        txt = txt + 'insularPoleBoundaryCoord ' + str(self.insularPoleBoundaryCoord) + '\n'
+        txt = txt + 'cingularPoleBoundaryCoord ' + str(self.cingularPoleBoundaryCoord) + '\n'
         txt_tmp = ','.join(str(i) for i in self.longitudeAxisID)
         txt = txt + 'longitudeAxisID '+ txt_tmp + '\n'
         txt_tmp = ','.join(str(i) for i in self.longitudeAxisCoord)
@@ -111,6 +125,8 @@ class Model(object):
         txt_dict['left'] = float(txt_dict['left'])
         txt_dict['top'] = float(txt_dict['top'])
         txt_dict['bottom'] = float(txt_dict['bottom'])
+        txt_dict['insularPoleBoundaryCoord'] = float(txt_dict['insularPoleBoundaryCoord'])
+        txt_dict['cingularPoleBoundaryCoord'] = float(txt_dict['cingularPoleBoundaryCoord'])
         
         data_txt = txt_dict['longitudeAxisID']
         data_num = []
@@ -147,7 +163,7 @@ class Model(object):
             except:
                 data_num.append(None)
         txt_dict['latitudeAxisCoord'] = data_num
-        output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'])
+        output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
 
         return output_model
 
@@ -423,8 +439,31 @@ class Model(object):
         else:
             print 'method ',method,' is not implemented yet!'
 
-    
-            
+####################################################################
+#
+# converts the coords of axes in the rectangle into latitude and longitude degree in [0-180] or [0-360]
+#
+####################################################################
+    def axisCoordToDegree(self, poles_lat_insula, poles_lat_cingular):
+        from brainvisa.cortical_surface.parameterization.mapping import coordinatesFromRect
+
+        tmp_vert_lon = []
+        for l in self.longitudeAxisCoord:
+            if l is not None:
+                tmp_vert_lon.append([l,0])
+        tmp_vert_lat = []
+        for l in self.latitudeAxisCoord:
+            if l is not None:
+                tmp_vert_lat.append([0,l])
+        nb_lon = len(tmp_vert_lon)
+        nb_lat = len(tmp_vert_lat)
+        tmp_vert_boundaries = np.array([[self.left, self.top], [self.right, self.bottom]])
+        
+        tmp_vert = np.concatenate(( np.concatenate((np.array(tmp_vert_lon), np.array(tmp_vert_lat)), 0), tmp_vert_boundaries), 0)
+        degree_lon, degree_lat = coordinatesFromRect(tmp_vert, poles_lat_insula, poles_lat_cingular)
+        longitude_axis_coords = degree_lon[0:nb_lon]
+        latitude_axis_coords = degree_lat[nb_lon:nb_lon+nb_lat]
+        return (longitude_axis_coords, latitude_axis_coords)
 # ####################################################################
 # #
 # # buildModel

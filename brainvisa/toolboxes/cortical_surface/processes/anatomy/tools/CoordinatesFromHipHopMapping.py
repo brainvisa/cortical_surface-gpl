@@ -34,6 +34,7 @@ import numpy as np
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map
   from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.parameterization import model as md
 except:
   pass
 
@@ -51,8 +52,9 @@ signature = Signature(
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'white_mesh_parts',ReadDiskItem( 'White Mesh Parts', shfjGlobals.aimsMeshFormats),
-    'latitude_insula_boundary', Float(),
-    'latitude_cingular_pole_boundary', Float(),
+    'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
+#    'latitude_insula_boundary', Float(),
+#    'latitude_cingular_pole_boundary', Float(),
     'latitude',WriteDiskItem( 'Latitude coordinate texture','Texture'),
     'longitude',WriteDiskItem( 'Longitude coordinate texture','Texture')
 
@@ -64,14 +66,18 @@ def initialization( self ):
     self.linkParameters('white_mesh_parts', 'cstr_rectangular_mesh')
     self.linkParameters('latitude', 'cstr_rectangular_mesh')
     self.linkParameters('longitude', 'cstr_rectangular_mesh')
-    self.latitude_insula_boundary = 30
-    self.latitude_cingular_pole_boundary = 30
+#    self.latitude_insula_boundary = 30
+#    self.latitude_cingular_pole_boundary = 30
 
     
 def execution( self, context ):
     re = aims.Reader()
     ws = aims.Writer()
-    context.write('Reading textures and mesh')
+    context.write('Reading textures, meshes and model')
+    model = md.Model().read(self.model_file.fullPath())
+    for line in model.printArgs().splitlines():
+        context.write(line)
+
     neoCortex_square_cstr = re.read(self.cstr_rectangular_mesh.fullPath())
     mesh_parts = re.read(self.white_mesh_parts.fullPath())
     tex_corresp_indices = re.read(self.corresp_indices_texture.fullPath())
@@ -114,7 +120,7 @@ def execution( self, context ):
 #    context.write('nb_vert_full_mesh'+str(nb_vert_full_mesh))
 #     nb_vert_full_mesh = len(neocortex_indices) + len(insula_indices) + len(cingular_indices) 
 #     context.write('nb_vert_full_mesh'+str(nb_vert_full_mesh))
-    lon, lat = map.computeCoordinates(nb_vert_full_mesh, neocortex_indices, neoCortex_square_cstr, boundary, self.latitude_insula_boundary, self.latitude_cingular_pole_boundary)
+    lon, lat = map.computeCoordinates(nb_vert_full_mesh, neocortex_indices, neoCortex_square_cstr, boundary, model.insularPoleBoundaryCoord, model.cingularPoleBoundaryCoord)
 
 #     context.write('lon.shape'+str(lon.shape))
 #     context.write('lat.shape'+str(lon.shape))
@@ -189,7 +195,7 @@ def execution( self, context ):
 #     plt.show()
 
     lon[insula_indices] = insula_lon
-    lat[insula_indices] = insula_lat * self.latitude_insula_boundary
+    lat[insula_indices] = insula_lat * model.insularPoleBoundaryCoord
     context.write('mapping the cingular pole to a disk')    
     cingular_boundary = surfTls.meshBoundary(cingular_mesh)[0]
     cingular_lon = map.texture2ROI(lon, cingular_indices)
@@ -198,7 +204,7 @@ def execution( self, context ):
     context.write('cingular_lat = [', np.min(cingular_lat),', ',np.max(cingular_lat),']')
 
     lon[cingular_indices] = cingular_lon
-    lat[cingular_indices] = 180 - cingular_lat * self.latitude_cingular_pole_boundary
+    lat[cingular_indices] = 180 - cingular_lat * model.cingularPoleBoundaryCoord
     context.write('Writing textures')
     tex_lon = aims.TimeTexture_FLOAT()
     tex_lon[0].assign(lon)
