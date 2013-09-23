@@ -34,7 +34,7 @@ import numpy as np
 
 #from brainvisa import anatomist
 
-name = 'Texture to Flat Mesh'
+name = 'Cingular Pole From Manual Drawing'
 
 userLevel = 2
 
@@ -42,19 +42,14 @@ userLevel = 2
 #     anatomist.validation()
     
 signature = Signature(
-    'input_texture',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
-#    'input_texture',ReadDiskItem('Texture', 'Texture'),
-    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
-    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'output_texture',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
-    #'output_texture',WriteDiskItem( 'Rectangular flat texture', 'Texture')
+    'input_texture',ReadDiskItem( 'Texture', 'Texture' ),                     
+    'input_mesh',ReadDiskItem('Texture', 'Texture'),
+    'texture_value', Integer(),
+    'output_texture',WriteDiskItem( 'Texture', 'Texture' )
 )
 
-def initialization( self ):
-    self.linkParameters( 'boundary_texture','input_texture')
-    self.linkParameters( 'corresp_indices_texture','input_texture')
-    self.linkParameters( 'boundary_texture','input_texture')
-    self.linkParameters( 'output_texture','input_texture')
+#def initialization( self ):
+
 
     
 def execution( self, context ):
@@ -63,32 +58,16 @@ def execution( self, context ):
     ws = aims.Writer()
     context.write('Reading textures and mesh')
     input_tex = re.read(self.input_texture.fullPath())
-    tex_corresp_indices = re.read(self.corresp_indices_texture.fullPath())
-    boundary_tex = re.read(self.boundary_texture.fullPath())
-    context.write('Texture to flat mesh')
-    
-    '''
-    boundaries (see mapping.path2Boundary for details:"
-    boundary[0] == insula_boundary
-    boundary[1] == neocortex_poles_path always from insula to cingular pole
-    boundary[2] == cingular_boundary
-    boundary[3] == new vertices always from insula to cingular pole
-    '''
-    boundary = []
-    for t in  range( boundary_tex.size() ):
-        boundary.append(np.where(boundary_tex[t].arraydata()>0)[0])
-    '''
-    tex_corresp_indices contains the indices of the vertices in white_mesh for:
-        neoCortex_square in time 0
-        insula_indices in time 1
-        cingular_indices in time 2
-    '''
+    atex = np.zeros(tex[0].arraydata().shape)
+    atex[np.where()] = self.output_texture_value
+    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
+
     rectangular_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
     nb_vert_square = len(rectangular_mesh_indices) + len(boundary[3])
-    output_tex = aims.TimeTexture(input_tex)
+    output_tex = aims.TimeTexture_S16()
     for t in  range( input_tex.size() ):
         output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
-        tmp_tex = np.zeros(nb_vert_square, input_tex[t].arraydata().dtype )
+        tmp_tex = np.zeros(nb_vert_square, dtype=np.int16)
         tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
         for b in boundary:
             tmp_tex[b] = 0

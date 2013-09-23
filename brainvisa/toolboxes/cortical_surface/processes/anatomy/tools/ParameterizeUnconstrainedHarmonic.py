@@ -33,7 +33,7 @@ import numpy as np
 
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map#hipHop
-#  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 except:
   pass
 
@@ -83,8 +83,10 @@ def execution( self, context ):
     insula_pole = re.read(self.insular_pole_texture.fullPath())
     mesh = re.read(self.white_mesh.fullPath())
     context.write('HIP')
- 
-    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
+        
+    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, np.around(cing_pole[0].arraydata()), 1)
+
+    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, np.around(insula_pole[0].arraydata()), cingular_tex_clean)
     (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
     vert = np.array(neoCortex_square.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
