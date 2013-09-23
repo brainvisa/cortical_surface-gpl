@@ -1,6 +1,6 @@
 
 from brainvisa.processes import *
-import shfjGlobals   
+from brainvisa.tools import aimsGlobals
 
 name = 'Project Texture Onto Atlas'
 
@@ -8,14 +8,14 @@ userLevel = 2
 
 
 signature = Signature(
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , aimsGlobals.aimsMeshFormats),
     'texture_on_mesh', ReadDiskItem('Texture','Texture'),
-    'longitude',ReadDiskItem( 'Longitude coordinate texture', 'Texture'),
-    'latitude',ReadDiskItem( 'Latitude coordinate texture', 'Texture'),
-    'atlas',ReadDiskItem('Mesh' , shfjGlobals.aimsMeshFormats),
-    'atlas_longitude', ReadDiskItem('Texture','Texture'),
-    'atlas_latitude', ReadDiskItem('Texture','Texture'),
-    'texture_on_atlas', WriteDiskItem('Texture','Texture')
+    'longitude',ReadDiskItem( 'Longitude coordinate texture', 'Aims Texture formats'),
+    'latitude',ReadDiskItem( 'Latitude coordinate texture', 'Aims Texture formats'),
+    'atlas',ReadDiskItem('Mesh' , aimsGlobals.aimsMeshFormats),
+    'atlas_longitude', ReadDiskItem('Texture','Aims Texture formats'),
+    'atlas_latitude', ReadDiskItem('Texture','Aims Texture formats'),
+    'texture_on_atlas', WriteDiskItem('Texture','Aims Texture formats')
 )
 
 def initialization( self ):

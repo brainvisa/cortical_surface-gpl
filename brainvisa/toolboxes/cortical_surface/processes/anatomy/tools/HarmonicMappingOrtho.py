@@ -26,7 +26,7 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
   
 from brainvisa.processes import *
-import shfjGlobals  
+from brainvisa.tools import aimsGlobals
 from soma import aims
 import numpy as np
 
@@ -43,7 +43,7 @@ userLevel = 2
 
 signature = Signature(
                       
-    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
+    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', aimsGlobals.aimsMeshFormats),
     'side', Choice('left', 'right'),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
@@ -54,7 +54,8 @@ signature = Signature(
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
-    'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats)
+    'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh',
+        aimsGlobals.aimsMeshFormats)
 )
 
 def initialization( self ):

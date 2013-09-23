@@ -27,7 +27,7 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
   
 from brainvisa.processes import *
-import shfjGlobals  
+from brainvisa.tools import aimsGlobals
 from soma import aims
 import numpy as np
 
@@ -48,16 +48,16 @@ userLevel = 2
     
 signature = Signature(
                       
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', shfjGlobals.aimsMeshFormats),    
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', aimsGlobals.aimsMeshFormats),
     'side', Choice('left', 'right'),
     'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'Texture'),
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
-    'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', shfjGlobals.aimsMeshFormats),
+    'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', aimsGlobals.aimsMeshFormats),
     'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture'),
-    'white_mesh_parts',WriteDiskItem( 'White Mesh Parts', shfjGlobals.aimsMeshFormats)
+    'white_mesh_parts',WriteDiskItem( 'White Mesh Parts', aimsGlobals.aimsMeshFormats)
 )
 
 def initialization( self ):
@@ -67,7 +67,7 @@ def initialization( self ):
     self.linkParameters( 'side', 'white_mesh', linkSide )
     self.linkParameters( 'cingular_pole_texture', 'white_mesh')
     self.linkParameters( 'insular_pole_texture', 'white_mesh')
-    self.linkParameters( 'rectangular_mesh','white_mesh')
+    self.linkParameters( 'rectangular_mesh','white_mesh' )
     self.linkParameters( 'boundary_texture','white_mesh')
     self.linkParameters( 'corresp_indices_texture','white_mesh')
     self.linkParameters( 'white_mesh_parts','white_mesh')
