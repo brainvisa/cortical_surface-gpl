@@ -22,10 +22,11 @@
 
 def validation():
   try:
-    import brainvisa.cortical_surface.parameterization.mapping
+    from brainvisa.cortical_surface.surface_tools import surface_tools
   except:
-    raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
+    raise ValidationError( 'brainvisa.cortical_surface.parameterization.surface_tools module can not be imported.' )
   
+from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 from brainvisa.processes import *
 import shfjGlobals  
 from soma import aims
@@ -36,45 +37,39 @@ import numpy as np
 
 name = 'Cingular Pole From Manual Drawing'
 
-userLevel = 2
+userLevel = 1
 
 # def validation():
 #     anatomist.validation()
     
 signature = Signature(
-    'input_texture',ReadDiskItem( 'Texture', 'Texture' ),                     
-    'input_mesh',ReadDiskItem('Texture', 'Texture'),
-    'texture_value', Integer(),
-    'output_texture',WriteDiskItem( 'Texture', 'Texture' )
+    'input_texture',ReadDiskItem( 'Texture', 'Texture' ),      
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'pole',WriteDiskItem( 'Hippocampus pole texture','Texture' )
 )
 
-#def initialization( self ):
-
+def initialization( self ):
+    self.linkParameters( 'pole', 'white_mesh')
+ 
 
     
 def execution( self, context ):
-  
     re = aims.Reader()
     ws = aims.Writer()
     context.write('Reading textures and mesh')
     input_tex = re.read(self.input_texture.fullPath())
-    atex = np.zeros(tex[0].arraydata().shape)
-    atex[np.where()] = self.output_texture_value
-    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
+    mesh = re.read(self.white_mesh.fullPath())
 
-    rectangular_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
-    nb_vert_square = len(rectangular_mesh_indices) + len(boundary[3])
-    output_tex = aims.TimeTexture_S16()
-    for t in  range( input_tex.size() ):
-        output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
-        tmp_tex = np.zeros(nb_vert_square, dtype=np.int16)
-        tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
-        for b in boundary:
-            tmp_tex[b] = 0
-        output_tex[t].assign(tmp_tex)
+    atex = np.zeros(input_tex[0].arraydata().shape)
+    atex[input_tex[0].arraydata() > 0] = 1
+    context.write('Topological correction...')  
+    cingular_tex_clean, cingular_tex_boundary = surfTls.textureTopologicalCorrection(mesh, atex, 1)
 
-    ws.write(output_tex, self.output_texture.fullPath())
-    context.write('Texture set to 0 on the boundary')
-    context.write('Done')
+    tex_out = aims.TimeTexture_S16()
+    tex_out[0].assign(cingular_tex_clean)
+    ws.write(tex_out, self.pole.fullPath())
+    context.write('... Done')
+
+
             
       

@@ -40,7 +40,7 @@ from soma import aims
 
 name = 'Insular Pole Projection'
 
-userLevel = 2
+userLevel = 1
 
 #def validation():
 #    anatomist.validation()
@@ -123,16 +123,17 @@ def execution( self, context ):
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
 #    context.write(max(tex[0].arraydata()))
-    context.write(self.side)
+#    context.write(self.side)
     if self.side == 'right':
         tmp_tex_value = 2
     elif self.side == 'left':
         tmp_tex_value = 1
     else:
-        context.write('side must be set to left or right!')                        
+        context.write('side must be set to left or right!')     
+    context.write('Topological correction...')                           
     cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
     cingular_tex_clean[np.where(cingular_tex_clean == tmp_tex_value)[0]] = 180
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())
-    context.write('Topological correction Done')
+    context.write('... Done')

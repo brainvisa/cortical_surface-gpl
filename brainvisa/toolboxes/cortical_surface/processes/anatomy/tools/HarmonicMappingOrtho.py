@@ -39,7 +39,7 @@ except:
     
 name = 'Harmonic Orthogonal Parameterization (HOP)'
 
-userLevel = 2
+userLevel = 1
 
 signature = Signature(
                       

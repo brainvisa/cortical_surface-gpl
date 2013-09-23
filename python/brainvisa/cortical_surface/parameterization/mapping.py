@@ -1067,7 +1067,9 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     full_sulci.extractFromTexture(texture_sulci, neoCortex_square, sulci_dict)
 
     
-    
+    '''
+    realign the S.C. to 0, should already be the case!
+    '''    
     SC_ind = full_sulci.names.index(('S.C._'+side))   
     SC_label = full_sulci.labels[SC_ind]
     print 'SC_label: ', SC_label

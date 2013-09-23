@@ -42,7 +42,7 @@ except:
 
 name = 'CoordinatesFromHiphopMapping'
 
-userLevel = 2
+userLevel = 1
 
 # def validation():
 #     anatomist.validation()

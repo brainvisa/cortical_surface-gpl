@@ -39,7 +39,7 @@ import numpy as np
 
 name = 'Cingular Pole Projection'
 
-userLevel = 2
+userLevel = 1
 
 # def validation():
 #     anatomist.validation()
