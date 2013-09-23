@@ -72,6 +72,10 @@ def execution( self, context ):
     nb_mesh = len(self.rectangular_mesh)
 
     model = md.Model()
+    left = 0
+    right = 0
+    top = 0
+    bottom = 0
     for ind_mesh,r_mesh in enumerate(self.rectangular_mesh):
         context.write('working on mesh nb: ',ind_mesh+1)
         mesh = re.read(r_mesh.fullPath())
@@ -92,8 +96,22 @@ def execution( self, context ):
             group_full_sulci = full_sulci
         else:
             group_full_sulci.cat(full_sulci)
+        left +=np.min(vert[:, 0])
+        right += np.max(vert[:, 0])
+        top += np.max(vert[:, 1])
+        bottom += np.min(vert[:, 1])
 
-    model.setBoundary(np.min(vert[:, 0]), np.max(vert[:, 0]), np.min(vert[:, 1]), np.max(vert[:, 1]))
+####################################################################
+# the coordinates of the boundaries of the model corresponds to the barycenter 
+# of the boundaries of the rectangular meshes given in self.rectangular_mesh
+####################################################################    
+    left = left / nb_mesh
+    right = right / nb_mesh
+    top = top / nb_mesh
+    bottom = bottom / nb_mesh
+    context.write('right-left '+str(right-left))
+    context.write('top-bottom '+str(top-bottom))
+    model.setBoundary(left, right, top, bottom)
     model.setAxisCoord(group_full_sulci)
     context.write('model built from '+str(nb_mesh)+' subjects')
     model.saveToFile(self.model_file.fullPath())

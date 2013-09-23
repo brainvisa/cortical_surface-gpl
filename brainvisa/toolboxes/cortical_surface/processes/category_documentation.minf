@@ -4,7 +4,7 @@
 <xhtml name="en">
   <h1>Cortical Surface Toolbox</h1>
 
-  <p><img src="cortSurf_toolbox.png" /></p>
+  <p><img src="bvimage://cortSurf_toolbox.png" /></p>
 
   
   <h2>Présentation</h2>

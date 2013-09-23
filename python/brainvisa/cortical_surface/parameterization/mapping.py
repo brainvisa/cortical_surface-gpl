@@ -446,8 +446,8 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 #
 #
 ####################################################################
-def coordinatesFromRect(mesh, poles_lat_insula, poles_lat_cingular):
-    vert = np.array(mesh.vertex())
+def coordinatesFromRect(vert, poles_lat_insula, poles_lat_cingular):
+    #vert = np.array(mesh.vertex())
     # mesh vertices to square [0 1] [0 1]
     m = vert.min(0)
     M = vert.max(0)
@@ -491,7 +491,7 @@ def coordinatesFromDisk(mesh):
 ####################################################################
 def computeCoordinates(nb_vert_full_mesh, neocortex_indices, rect_mesh, rect_mesh_boundary, poles_lat_insula, poles_lat_cingular, insula_mesh=None, insula_boundary=None, insula_indices=None, cingular_mesh=None, cingular_boundary=None, cingular_indices=None):
 
-    rect_lon, rect_lat = coordinatesFromRect(rect_mesh, poles_lat_insula, poles_lat_cingular)
+    rect_lon, rect_lat = coordinatesFromRect(np.array(rect_mesh.vertex()), poles_lat_insula, poles_lat_cingular)
     "rect_mesh_boundary[3] == new vertices always from insula to cingular pole"
     rect_lon = np.delete(rect_lon, rect_mesh_boundary[3], None)
     rect_lat = np.delete(rect_lat, rect_mesh_boundary[3], None)
@@ -817,30 +817,38 @@ def crossp(x,y):
 
 
 def parcelsFromCoordinates(template_lat,template_lon,model):
+    #calculer model.longitudeAxisCoord dans [0-360] a partir des coords de boundary du model
+    
 
+    (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree(model.insularPoleBoundaryCoord,  model.cingularPoleBoundaryCoord)
+    print longitude_axis_coords
+    print latitude_axis_coords
+    
     nb_vert = template_lat.shape[0]
     tex_parcels = np.zeros(nb_vert)
     lab_parcel = 1
     sort_axes_lon = [0]
-    tmp_lon = [f for f in model.longitudeAxisID]#[360 - f for f in model.longitudeAxisID]
-    sort_axes_lon.extend(tmp_lon)
+    for f in longitude_axis_coords:#[360 - f for f in model.longitudeAxisID]
+        if f is not None:
+            sort_axes_lon.append(f)
     sort_axes_lon.sort()
-    sort_axes_lat = [0]
-    tmp_lat = [f + 30 for f in model.latitudeAxisID]
-    sort_axes_lat.extend(tmp_lat)
+    sort_axes_lat = [0, model.insularPoleBoundaryCoord]
+    for f in latitude_axis_coords:
+        if f is not  None:
+           sort_axes_lat.append(f) 
     sort_axes_lat.sort()
-    sort_axes_lat.append(180)
-    print sort_axes_lon
+    sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
+#    sort_axes_lat.append(180)
     print sort_axes_lon
     print sort_axes_lat
     for t_lon in range(len(sort_axes_lon)-1):
-        print sort_axes_lon[t_lon]
+#        print sort_axes_lon[t_lon]
         inds_lon = np.where((template_lon >= sort_axes_lon[t_lon])&(template_lon<=sort_axes_lon[t_lon+1]))[0]
         for t_lat in range(len(sort_axes_lat)-1):
-            print sort_axes_lat[t_lat]
+#            print sort_axes_lat[t_lat]
             inds_lat = np.where((template_lat[inds_lon]>=sort_axes_lat[t_lat])&(template_lat[inds_lon]<=sort_axes_lat[t_lat+1]))[0]
             tex_parcels[inds_lon[inds_lat]]=lab_parcel
-            print 'lab_parcel', lab_parcel
+#            print 'lab_parcel', lab_parcel
             lab_parcel = lab_parcel+1
 
 #     # concatenate some parcells
@@ -879,7 +887,6 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
 #     for u_parc in uparcells[2:]:
 #         tex_parcels[tex_parcels == u_parc] = reord_parc
 #         reord_parc = reord_parc+1
-#     print('nb parcells = %d\n',reord_parc-1)
 
     return tex_parcels
 
