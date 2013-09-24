@@ -533,9 +533,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     neoCortex_open_boundary = boundaryReordering(neoCortex_boundary, neocortex_poles_path, vert)
 
     neigh_verts = set(np.hstack(list(neigh[v]) for v in neoCortex_open_boundary[1]))
-    print 'neigh_verts : ', neigh_verts
     other_verts = neigh_verts.difference(neoCortex_open_boundary[1])
-    print 'other_verts : ', other_verts
 #     tex_out = aims.TimeTexture_S16()
 #     tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
 #     for i in xrange(neoCortex_mesh.vertex().size()):
@@ -553,7 +551,6 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     nb_tagged_o = 0
     cluster1 = [l_other_verts[0]]
     tag[l_other_verts.index(cluster1[0])] = 1
-    print neigh[cluster1[0]]
     neigh_cluster1 = set(neigh[cluster1[0]])
     while nb_tagged > nb_tagged_o:
         nb_tagged_o = nb_tagged
@@ -562,21 +559,14 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
                 cluster1.append(v)
                 neigh_cluster1 = neigh_cluster1.union(neigh[v])
                 tag[l_other_verts.index(v)] = 1
-                print cluster1
-                print neigh[v]
-                print neigh_cluster1
         nb_tagged = tag.sum()
         test = nb_tagged > nb_tagged_o
-        print "test ", test
-        print "nb_tagged ",nb_tagged
     "identify the anterior bank of the cut :: first vertex of the insula boundary is anterior while last one is posterior"   
     inter_bound0 = set(cluster1).intersection(neoCortex_open_boundary[0])
     if inter_bound0:
         if neoCortex_open_boundary[0].index(list(inter_bound0)) < (len(neoCortex_open_boundary[0]) / 2):
-            print 'cluster1 anterior'
             posterior_cluster = other_verts.difference(cluster1)
         else:
-            print 'cluster1 anterior'
             posterior_cluster = cluster1
     else:
         print 'problem: cluster1.intersection(insula) is empty'
@@ -588,15 +578,12 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
 
     added_poly_inds = set(posterior_cluster_ind_poly).intersection(poles_path_ind_poly)
     added_poly = poly[list(added_poly_inds), :]
-    print "added_poly ", added_poly
-    print "added_poly_inds ", added_poly_inds
 
     nb_new_verts = len(neoCortex_open_boundary[1])
     new_verts_inds = range(vert.shape[0], vert.shape[0] + nb_new_verts)
     for i in range(nb_new_verts):
         places = np.where(added_poly == neoCortex_open_boundary[1][i])
         added_poly[places[0], places[1]] = new_verts_inds[i]
-    print "added_poly ", added_poly
     #poly = np.vstack([poly,added_poly])
     poly[list(added_poly_inds), :] = added_poly
     pp = aims.vector_AimsVector_U32_3()
@@ -607,12 +594,10 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     for i in range(vert.shape[0]):
         vv.append([vert[i, 0], vert[i, 1], vert[i, 2]])
 
-    print 'create new mesh'
     neoCortex_open_mesh = aims.AimsTimeSurface_3()
     neoCortex_open_mesh.vertex().assign(vv)
     neoCortex_open_mesh.polygon().assign(pp)
     neoCortex_open_mesh.updateNormals()
-    print 'new mesh created'
 
     "add the new boundary and connect it"
     "neoCortex_open_boundary[3] == new verices always from insula to cingular pole as for neoCortex_open_boundary[1]"
@@ -631,9 +616,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
 #        pol = np.vstack( (np.zeros( len(boundary[bound_ind])-2, dtype = np.int32 ),boundary[bound_ind][0:-2],boundary[bound_ind][1:-1] )).transpose()
 #        print pol.dtype#astype(np.float32).dtype
 #        bound_mesh.polygon(bound_ind).assign([ aims.AimsVector(x,'U32') for x in pol ])
-    print "new_verts_inds ", new_verts_inds
-    print "cluster1 ", cluster1
-    print "neigh_cluster1 ", neigh_cluster1
+
     return (neoCortex_open_mesh, neoCortex_open_boundary)
 
 
@@ -977,7 +960,6 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     insular_inds = np.where(insula_tex_clean == insula_tex_value)[0]
     # test that there is no intersection between the two poles
     inter = set(cingular_inds).intersection(insular_inds)
-    print inter
     if inter:
         print ('problem: the two poles are connected, cannot cut the mesh!!')
         raise Exception('the two poles are connected, cannot cut the mesh')
@@ -993,7 +975,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     #    cingular_tex_clean, cing_tex_boundary = poleTextureClean(mesh, texture_poles, cingular_tex_value)    #    insula_tex_clean, ins_tex_boundary = poleTextureClean(mesh, texture_poles, insula_tex_value)
     print '------------------CutMesh'
     (sub_meshes, labels, sub_indexes) = surfTls.cutMesh(mesh, tex_poles_clean)
-    print labels
+    print 'labels found in the texture ', labels
     neo_ind = labels.index(neocortex_tex_value)
     neoCortex_mesh = sub_meshes[neo_ind]
     neoCortex_boundary = surfTls.meshBoundary(sub_meshes[neo_ind])
@@ -1010,7 +992,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
     ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
     poles_path = getShortestPath(mesh, ins_tex_boundary[0], cing_tex_boundary[0])
-    "poles_path to neocortex"
+    '''poles_path to neocortex'''
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
     print '------------------path2Boundary'
     (neoCortex_open_mesh, neoCortex_open_boundary) = path2Boundary(neoCortex_mesh,neoCortex_boundary,neocortex_poles_path)

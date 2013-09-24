@@ -194,7 +194,6 @@ def meshSmoothing(mesh, Niter, dt):
         if (i % mod == 0):
             print i
     print '    OK'
-    print 'Creating new mesh'
     vv = aims.vector_POINT3DF()
     for i in range(N):
         vv.append([Mvert[i, 0], Mvert[i, 1], Mvert[i, 2]])
@@ -858,7 +857,6 @@ def cutMesh(mesh, atex):
     labels = np.around(np.unique(atex))
     labels = labels.tolist()
     labels.reverse()
-    print 'labels:' + str(labels)
     sub_meshes = list()
     sub_indexes = list()
     last_label = labels[-1]

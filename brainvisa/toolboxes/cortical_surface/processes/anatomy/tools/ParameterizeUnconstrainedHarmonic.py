@@ -34,6 +34,7 @@ import numpy as np
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map#hipHop
   from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
 except:
   pass
 
@@ -116,22 +117,24 @@ def execution( self, context ):
 #         ws.write(tex_unfold, inward_tex)
     context.write('Translating the barycenter of S.C. to 0')
     output_SL_tex = aims.TimeTexture(sulcal_lines)
-    tex_square_sulci = sulcal_lines[0].arraydata()[neocortex_indices]
-#    tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
+    output_tex_tmp = sulcal_lines[0].arraydata()[neocortex_indices]
+    tex_square_sulci = np.zeros(vert.shape[0], sulcal_lines[0].arraydata().dtype )
+    tex_square_sulci[range( len(neocortex_indices) )] = output_tex_tmp
     for b in neoCortex_open_boundary:
         tex_square_sulci[b] = 0
     output_SL_tex[0].assign(tex_square_sulci)
     
+    
     labels = np.unique(tex_square_sulci)
     labels = labels[labels!=0]
     context.write('found the following sulci in the texture :')
+    context.write([sulc_labels_dict[lab] for lab in labels])
     context.write('associated to the following labels :')
     context.write(labels)
     full_sulci = slSet.SulcalLinesSet() 
     full_sulci.extractFromTexture(tex_square_sulci, neoCortex_square, sulc_labels_dict)
     SC_ind = full_sulci.names.index(('S.C._'+self.side))   
     SC_label = full_sulci.labels[SC_ind]
-    print 'SC_label: ', SC_label
 #    full_sulci.sulcalLines[SC_ind].printArgs()
     translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
     vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
