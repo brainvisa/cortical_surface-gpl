@@ -64,7 +64,8 @@ def initialization( self ):
             return proc.white_mesh.get( 'side' )
     self.linkParameters( 'side', 'white_mesh', linkSide )
     self.linkParameters( 'pole', 'white_mesh' )
-    self.findValue( 'pole_template', { 'side' : self.side , 'filename_variable' : 'Template_icbm', '_ontology' : 'shared'} )
+    #self.findValue( 'pole_template', { 'side' : self.side , 'filename_variable' : 'Template_icbm', '_ontology' : 'shared'} )
+    self.linkParameters( 'pole_template', 'white_mesh' )
     self.findValue( 'template_pole_transformation', {} )
     self.linkParameters( 'subject_transformation','white_mesh')
     self.dilation_1 = 7
