@@ -134,24 +134,25 @@ def execution( self, context ):
     context.write('mapping the insula to a disk')
     insula_lon = map.texture2ROI(lon, insula_indices)
     insula_boundary = surfTls.meshBoundary(insula_mesh)[0]
-    context.write(insula_boundary)
-    context.write(len(insula_boundary))
+#     context.write(insula_boundary)
+#     context.write(len(insula_boundary))
+# 
+# 
+#     context.write('insula_lon[insula_boundary]')
+#     context.write(len(insula_lon[insula_boundary]))
+#     context.write('lon[boundary[0]]')
+#     context.write(len(lon[boundary[0]]))
+#     context.write('lon[boundary[0]] = [',np.min(lon[boundary[0]]),', ',np.max(lon[boundary[0]]),']')
+#     context.write('insula_lon[insula_boundary] = [',np.min(insula_lon[insula_boundary]),', ',np.max(insula_lon[insula_boundary]),']')
+#     #(a,b) = np.sort(insula_lon[insula_boundary])
+#     context.write(insula_boundary)
 
-
-    context.write('insula_lon[insula_boundary]')
-    context.write(len(insula_lon[insula_boundary]))
-    context.write('lon[boundary[0]]')
-    context.write(len(lon[boundary[0]]))
-    context.write('lon[boundary[0]] = [',np.min(lon[boundary[0]]),', ',np.max(lon[boundary[0]]),']')
-    context.write('insula_lon[insula_boundary] = [',np.min(insula_lon[insula_boundary]),', ',np.max(insula_lon[insula_boundary]),']')
-    #(a,b) = np.sort(insula_lon[insula_boundary])
-    context.write(insula_boundary)
-    i_tmp = insula_lon[insula_boundary]
-    for i,b in enumerate(insula_boundary):
-        context.write(i_tmp[i])
+#     i_tmp = insula_lon[insula_boundary]
+#     for i,b in enumerate(insula_boundary):
+#         context.write(i_tmp[i])
     insula_bound_rad = np.pi * (insula_lon[insula_boundary] - 180) / 180 
     circle = np.array([np.cos(insula_bound_rad), np.sin(insula_bound_rad)])
-    context.write(circle)
+#     context.write(circle)
     bound_mesh = aims.AimsTimeSurface_2() 
     vv = aims.vector_POINT3DF()
     ee = aims.vector_AimsVector_U32_2()
@@ -176,8 +177,9 @@ def execution( self, context ):
     #ws.write(tex_insula_lon,  '/home/toz/ammon_Lwhite_insula_lon.tex')
 
     (insula_lon, insula_lat, insula_disk) = map.mesh2Disk(insula_mesh, insula_boundary, insula_lon)
-    context.write('insula_lon = [',np.min(insula_lon),', ',np.max(insula_lon),']')
-    context.write('insula_lat = [',np.min(insula_lat),', ',np.max(insula_lat),']')
+#     context.write('insula_lon = [',np.min(insula_lon),', ',np.max(insula_lon),']')
+#     context.write('insula_lat = [',np.min(insula_lat),', ',np.max(insula_lat),']')
+
 #     import matplotlib.pyplot as plt
 #     plt.figure(1)
 #     plt.hold(True)
@@ -200,8 +202,8 @@ def execution( self, context ):
     cingular_boundary = surfTls.meshBoundary(cingular_mesh)[0]
     cingular_lon = map.texture2ROI(lon, cingular_indices)
     (cingular_lon, cingular_lat, cingular_disk) = map.mesh2Disk(cingular_mesh, cingular_boundary, cingular_lon)
-    context.write('cingular_lon = [', np.min(cingular_lon),', ',np.max(cingular_lon),']')
-    context.write('cingular_lat = [', np.min(cingular_lat),', ',np.max(cingular_lat),']')
+#     context.write('cingular_lon = [', np.min(cingular_lon),', ',np.max(cingular_lon),']')
+#     context.write('cingular_lat = [', np.min(cingular_lat),', ',np.max(cingular_lat),']')
 
     lon[cingular_indices] = cingular_lon
     lat[cingular_indices] = 180 - cingular_lat * model.cingularPoleBoundaryCoord

@@ -444,7 +444,7 @@ class Model(object):
 # converts the coords of axes in the rectangle into latitude and longitude degree in [0-180] or [0-360]
 #
 ####################################################################
-    def axisCoordToDegree(self, poles_lat_insula, poles_lat_cingular):
+    def axisCoordToDegree(self):
         from brainvisa.cortical_surface.parameterization.mapping import coordinatesFromRect
 
         tmp_vert_lon = []
@@ -459,10 +459,15 @@ class Model(object):
         nb_lat = len(tmp_vert_lat)
         tmp_vert_boundaries = np.array([[self.left, self.top], [self.right, self.bottom]])
         
-        tmp_vert = np.concatenate(( np.concatenate((np.array(tmp_vert_lon), np.array(tmp_vert_lat)), 0), tmp_vert_boundaries), 0)
-        degree_lon, degree_lat = coordinatesFromRect(tmp_vert, poles_lat_insula, poles_lat_cingular)
-        longitude_axis_coords = degree_lon[0:nb_lon]
-        latitude_axis_coords = degree_lat[nb_lon:nb_lon+nb_lat]
+#        tmp_vert = np.concatenate(( np.concatenate((np.array(tmp_vert_lon), np.array(tmp_vert_lat)), 0), tmp_vert_boundaries), 0)
+        tmp_vert = np.concatenate(( np.concatenate((np.array(tmp_vert_lat), np.array(tmp_vert_lon)), 0), tmp_vert_boundaries), 0)
+
+        degree_lon, degree_lat = coordinatesFromRect(tmp_vert, self.insularPoleBoundaryCoord, self.cingularPoleBoundaryCoord)
+        latitude_axis_coords = degree_lat[0:nb_lat]
+        longitude_axis_coords = degree_lon[nb_lat:nb_lat+nb_lon+1]
+
+#        longitude_axis_coords = degree_lon[0:nb_lon]
+#        latitude_axis_coords = degree_lat[nb_lon:nb_lon+nb_lat]
         return (longitude_axis_coords, latitude_axis_coords)
 # ####################################################################
 # #

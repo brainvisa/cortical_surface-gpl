@@ -800,10 +800,9 @@ def crossp(x,y):
 
 
 def parcelsFromCoordinates(template_lat,template_lon,model):
-    #calculer model.longitudeAxisCoord dans [0-360] a partir des coords de boundary du model
     
-
-    (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree(model.insularPoleBoundaryCoord,  model.cingularPoleBoundaryCoord)
+    between_poles_parcell_width = 150
+    (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree()
     print longitude_axis_coords
     print latitude_axis_coords
     
@@ -811,9 +810,11 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
     tex_parcels = np.zeros(nb_vert)
     lab_parcel = 1
     sort_axes_lon = [0]
-    for f in longitude_axis_coords:#[360 - f for f in model.longitudeAxisID]
+    for f in longitude_axis_coords[:-1]:#[360 - f for f in model.longitudeAxisID]
         if f is not None:
             sort_axes_lon.append(f)
+    sort_axes_lon.append(longitude_axis_coords[-1] - between_poles_parcell_width / 2)
+    sort_axes_lon.append(longitude_axis_coords[-1] + between_poles_parcell_width / 2)
     sort_axes_lon.sort()
     sort_axes_lat = [0, model.insularPoleBoundaryCoord]
     for f in latitude_axis_coords:

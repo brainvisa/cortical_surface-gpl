@@ -83,10 +83,9 @@ def execution( self, context ):
         sulci_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels[ind_mesh].fullPath())
         full_sulci = slSet.SulcalLinesSet()
         full_sulci.extractFromTexture(tex_square_sulci[0].arraydata(), mesh, sulci_dict)
-        context.write('Translating S.C. to 0')
+        context.write('Translating the barycenter of S.C. to 0')
         SC_ind = full_sulci.names.index(('S.C._'+self.side))   
         SC_label = full_sulci.labels[SC_ind]
-        print 'SC_label: ', SC_label
 #        full_sulci.sulcalLines[SC_ind].printArgs()
         translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
         vert = np.array(mesh.vertex())
