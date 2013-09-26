@@ -74,7 +74,7 @@ def initialization( self ):
  
 def execution( self, context ):
     context.write('Changing Referential...')
-
+    cingular_tex_value = 1
     tmp_trm1 = context.temporary(  'Transformation matrix' )
     tmp_trm2 = context.temporary(  'Transformation matrix' )
     tmp_mesh = context.temporary(  'Mesh mesh' )
@@ -91,17 +91,21 @@ def execution( self, context ):
     ws = aims.Writer()
 
     texture_poles = re.read(self.pole.fullPath())
+    atex = np.zeros(texture_poles[0].arraydata().shape)
+    atex[texture_poles[0].arraydata() > 0] = cingular_tex_value
     tex_S16 = aims.TimeTexture_S16()
-    tex_S16[0].assign(texture_poles[0])
+    tex_S16[0].assign(atex)
     ws.write(tex_S16, self.pole.fullPath())
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
-    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')#10
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
+    if self.dilation_1>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
+    if self.erosion>0:
+        context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')#10
+    if self.dilation_2>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
     context.write('Dilation Erosion Done')
     context.write('Topological correction...')
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
-    cingular_tex_value = 1
     cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), cingular_tex_value)
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)

@@ -344,6 +344,7 @@ def textureTopologicalCorrection(mesh, atex, tex_val, background_val=0, neigh=No
         #----------------end:: ensure a single connex component
         #----------------begin:: fill any hole in this single connex component
         boundary = textureBoundary(mesh, atex, tex_val, neigh)
+        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[-1], background_val, neigh)
         if len(boundary) > 1:
             print "filling holes in the largest connex component"
 #            ws=aims.Writer()
@@ -376,22 +377,29 @@ def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None
     poly = np.array(mesh.polygon())
     I = ismember(poly, bound)
     poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
-    print poly_set.shape[0]
-    u_bound = set(bound)
-    count_list = [bound.count(x) for x in u_bound]
-    lu_bound = list(u_bound)
-    pb_pt = np.array(lu_bound)[np.where(np.array(count_list) > 1)[0]]
-    print pb_pt
-    pts_to_remove = []
-    for pb_poly in poly_set:
-        pts_to_remove.append(pb_poly[np.where(ismember(pb_poly, pb_pt) == False)[0]])
-    print pts_to_remove
-    if len(pts_to_remove) > 0:
-        tex[np.array(pts_to_remove)] = background_val
-    boundary = textureBoundary(mesh, tex, tex_val, neigh)
-    if len(boundary) > 1:
-        print 'complex boundary after cleanTextureBoundary'
-    return (tex, boundary)
+    if poly_set.shape[0]==0:
+        return (tex, textureBoundary(mesh, tex, tex_val, neigh))
+    else:
+        while poly_set.shape[0]>0:
+            print 'nb triangles on the boundary ',poly_set.shape[0]
+            u_bound = set(bound)
+            count_list = [bound.count(x) for x in u_bound]
+            lu_bound = list(u_bound)
+            pb_pt = np.array(lu_bound)[np.where(np.array(count_list) > 1)[0]]
+            print 'pb_pt ', pb_pt
+            pts_to_remove = []
+            for pb_poly in poly_set:
+                pts_to_remove.append(pb_poly[np.where(ismember(pb_poly, pb_pt) == False)[0]])
+            print 'pts_to_remove ', np.array(pts_to_remove)
+            if len(pts_to_remove) > 0:
+                tex[np.array(pts_to_remove)] = background_val
+            boundary = textureBoundary(mesh, tex, tex_val, neigh)
+            bound = boundary[-1]
+            I = ismember(poly, bound)
+            poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
+        if len(boundary) > 1:
+            print 'complex boundary after cleanTextureBoundary'
+        return (tex, boundary)
 
 
 def dilateTexture(tex, neigh, inds):
@@ -487,7 +495,7 @@ def meshAdjacencyMatrix(mesh):
 ####################################################################
 #
 # build the boundary by traversing edges
-# return list of connected components ORDERED, THE FIRST THE LONGEST
+# return list of connected components ORDERED ACCORDING TO THEIR LENGTH, i.e. THE FIRST THE SHORTEST
 # complex boundary corresponds to multiple holes in the surface or bad shaped boundary
 ####################################################################
 def edges2Boundary(li, lj):
@@ -557,14 +565,14 @@ def edges2Boundary(li, lj):
 #                print 'first_occ',first_occ
 #                print 'sec_occ',sec_occ
                 '''create a new boundary that corresponds to the loop '''
-                print '[len(b) for b in boundary]',[len(b) for b in boundary]
+#                print '[len(b) for b in boundary]',[len(b) for b in boundary]
                 boundary.append(bound[first_occ:sec_occ])
                 '''remove the loop from current boundary'''
                 bound[first_occ:sec_occ] = []
 #                print bound
                 occurence = listCount(bound)
             boundary[b_ind] = bound
-            print '[len(b) for b in boundary]',[len(b) for b in boundary]
+#            print '[len(b) for b in boundary]',[len(b) for b in boundary]
 
             
     "sort the boundaries the first the longest"
@@ -574,7 +582,7 @@ def edges2Boundary(li, lj):
 # < = >    inx = np.array(boundaries_len).argsort()
     sort_boundary = [boundary[i] for i in inx]
 #    boundary.sort()
-
+#    print 'in boundary boundaries_len = ',[len(bound) for bound in sort_boundary]
     return sort_boundary
 
 #    boundary_cat = {}

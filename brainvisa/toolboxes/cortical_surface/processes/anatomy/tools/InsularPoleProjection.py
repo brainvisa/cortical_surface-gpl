@@ -115,9 +115,12 @@ def execution( self, context ):
     tex_S16[0].assign(texture_poles[0])
 #    context.write(max(tex_S16[0].arraydata()))
     ws.write(tex_S16, self.pole.fullPath())
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')
-    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_2,'--connexity')
+    if self.dilation_1>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')
+    if self.erosion>0:
+        context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')
+    if self.dilation_2>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_2,'--connexity')
     context.write('Dilation Erosion Done')
 
     mesh = re.read(self.white_mesh.fullPath())
