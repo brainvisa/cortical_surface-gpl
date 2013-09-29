@@ -626,7 +626,6 @@ def boundaryReordering(neoCortex_boundary, neocortex_poles_path, vert):
     "insula and cingular boundary are always oriented in the same way"
     path_bound0 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[0])))
     path_bound1 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[1])))
-
     if path_bound0:
         ind_path_bound0 = neocortex_poles_path.index(path_bound0[0])
     else:
@@ -980,6 +979,10 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     neo_ind = labels.index(neocortex_tex_value)
     neoCortex_mesh = sub_meshes[neo_ind]
     neoCortex_boundary = surfTls.meshBoundary(sub_meshes[neo_ind])
+    if len(neoCortex_boundary)>2:
+        print ('problem: more than 2 boundaries in the neoCortex, the pole textures have topological defects')
+        raise Exception('more than 2 boundaries in the neoCortex, the pole textures have topological defects')
+        return
     neocortex_indices = sub_indexes[neo_ind]
     ins_ind = labels.index(insula_tex_value)
     insula_mesh = sub_meshes[ins_ind]
@@ -992,7 +995,29 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     print '------------------poles path, always from insula to cingular pole'
     cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
     ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
-    poles_path = getShortestPath(mesh, ins_tex_boundary[0], cing_tex_boundary[0])
+    poles_path = getShortestPath(mesh, ins_tex_boundary[-1], cing_tex_boundary[-1])
+#     ws = aims.Writer()
+#     tex_out = aims.TimeTexture_S16()
+#     tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in poles_path:
+#              tex_out[0].append(1)
+#         else:
+#              tex_out[0].append(0)
+#     tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in cing_tex_boundary[-1]:
+#              tex_out[1].append(1)
+#         else:
+#              tex_out[1].append(0)
+#     tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in ins_tex_boundary[-1]:
+#              tex_out[2].append(1)
+#         else:
+#              tex_out[2].append(0)
+#     ws.write(tex_out, '/home/toz/poles_link.tex')
+
     '''poles_path to neocortex'''
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
     print '------------------path2Boundary'
@@ -1003,21 +1028,12 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh)
 #     if write_all_steps_to_disk:
 #         print '------------------textureBoundary'
-#         ws = aims.Writer()
 #         ws.write(neoCortex_mesh, '/home/toz/ammon_Lwhite_neocortex_cut_mesh.mesh')
 #         ws.write(insula_mesh, '/home/toz/ammon_Lwhite_insula_cut_mesh.mesh')
 #         ws.write(cingular_mesh, '/home/toz/ammon_Lwhite_cingular_cut_mesh.mesh')
 #         ws.write(meshBoundaryMesh(mesh, cing_tex_boundary), '/home/toz/ammon_Lwhite_decim_cing_boundary.mesh' )
 #         ws.write(meshBoundaryMesh(mesh, ins_tex_boundary), '/home/toz/ammon_Lwhite_decim_ins_boundary.mesh' )
 #         print poles_path
-#         tex_out = aims.TimeTexture_S16()
-#         tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-#         for i in xrange(mesh.vertex().size()):
-#             if i in poles_path:
-#                 tex_out[0].append(1)
-#             else:
-#                 tex_out[0].append(0)
-#         ws.write(tex_out, '/home/toz/ammon_Lwhite_decim_poles_link.tex')
 #         print neocortex_poles_path
 #         tex_out = aims.TimeTexture_S16()
 #         tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory

@@ -61,7 +61,7 @@ def polygonAngles(vertices):
 # the two meshes must have the same number of vertex
 #
 ####################################################################
-def meshDdistortions(mesh1,mesh2,type):
+def meshDistortions(mesh1,mesh2,type):
     vert1 = np.array(mesh1.vertex())
     distortions_out = np.zeros(vert1.shape[0])
 #     
@@ -344,7 +344,6 @@ def textureTopologicalCorrection(mesh, atex, tex_val, background_val=0, neigh=No
         #----------------end:: ensure a single connex component
         #----------------begin:: fill any hole in this single connex component
         boundary = textureBoundary(mesh, atex, tex_val, neigh)
-        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[-1], background_val, neigh)
         if len(boundary) > 1:
             print "filling holes in the largest connex component"
 #            ws=aims.Writer()
@@ -362,8 +361,10 @@ def textureTopologicalCorrection(mesh, atex, tex_val, background_val=0, neigh=No
         print 'length of boundaries : ',[len(bound) for bound in boundary]
         #----------------end:: fill any hole in this single connex component
         #----------------begin:: ensure that the boundary do not contain the 3 vertices of a triangle
-        print 'cleaning the boundary of the texture'
-        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[0], background_val, neigh)
+        print 'cleaning the longest boundary of the texture'
+        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[-1], background_val, neigh)
+        #----------------end:: ensure that the boundary do not contain the 3 vertices of a triangle
+
     return (atex, boundary)
 
 ####################################################################
@@ -382,15 +383,18 @@ def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None
     else:
         while poly_set.shape[0]>0:
             print 'nb triangles on the boundary ',poly_set.shape[0]
-            u_bound = set(bound)
-            count_list = [bound.count(x) for x in u_bound]
-            lu_bound = list(u_bound)
-            pb_pt = np.array(lu_bound)[np.where(np.array(count_list) > 1)[0]]
-            print 'pb_pt ', pb_pt
             pts_to_remove = []
             for pb_poly in poly_set:
-                pts_to_remove.append(pb_poly[np.where(ismember(pb_poly, pb_pt) == False)[0]])
-            print 'pts_to_remove ', np.array(pts_to_remove)
+                ind_V1 = bound.index(pb_poly[0])
+                ind_V2 = bound.index(pb_poly[1])
+                ind_V3 = bound.index(pb_poly[2])
+                list_inds = [ind_V1, ind_V2, ind_V3]
+                m = min(list_inds)
+                M = max(list_inds)
+                pts_to_remove.append( bound[list(set(list_inds).difference(set([m,M])))[0]] )
+#             print 'pts_to_remove ', np.array(pts_to_remove)
+#             print 'poly_set ',poly_set
+#             print 'bound ', bound
             if len(pts_to_remove) > 0:
                 tex[np.array(pts_to_remove)] = background_val
             boundary = textureBoundary(mesh, tex, tex_val, neigh)

@@ -49,8 +49,8 @@ signature = Signature(
 )
 
 def initialization( self ):
-    self.linkParameters( 'pole', 'white_mesh')
- 
+    self.linkParameters( 'white_mesh','input_texture' )
+    self.linkParameters( 'pole', 'input_texture' )
 
     
 def execution( self, context ):

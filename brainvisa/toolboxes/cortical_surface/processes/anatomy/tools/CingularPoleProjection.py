@@ -68,9 +68,9 @@ def initialization( self ):
     self.linkParameters( 'pole_template', 'white_mesh' )
     self.findValue( 'template_pole_transformation', {} )
     self.linkParameters( 'subject_transformation','white_mesh')
-    self.dilation_1 = 7
-    self.erosion = 11
-    self.dilation_2 = 2 
+    self.dilation_1 = 0#7
+    self.erosion = 7#11
+    self.dilation_2 = 0#2 
  
 def execution( self, context ):
     context.write('Changing Referential...')
@@ -110,4 +110,6 @@ def execution( self, context ):
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())
+   
+#    ws.write(tex, self.pole.fullPath())
     context.write('... Done')
