@@ -802,18 +802,18 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
     
     between_poles_parcell_width = 150
     (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree()
-    print longitude_axis_coords
-    print latitude_axis_coords
+#    print longitude_axis_coords
+#    print latitude_axis_coords
     
     nb_vert = template_lat.shape[0]
     tex_parcels = np.zeros(nb_vert)
     lab_parcel = 1
-    sort_axes_lon = [0]
+    sort_axes_lon = [360]
     for f in longitude_axis_coords[:-1]:#[360 - f for f in model.longitudeAxisID]
         if f is not None:
             sort_axes_lon.append(f)
-    sort_axes_lon.append(longitude_axis_coords[-1] - between_poles_parcell_width / 2)
-    sort_axes_lon.append(longitude_axis_coords[-1] + between_poles_parcell_width / 2)
+    sort_axes_lon.append(longitude_axis_coords[-1] - between_poles_parcell_width / 3)
+    sort_axes_lon.append(longitude_axis_coords[-1] + 2 * between_poles_parcell_width / 3)
     sort_axes_lon.sort()
     sort_axes_lat = [0, model.insularPoleBoundaryCoord]
     for f in latitude_axis_coords:
@@ -822,8 +822,8 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
 #    sort_axes_lat.append(180)
-    print sort_axes_lon
-    print sort_axes_lat
+#    print sort_axes_lon
+#    print sort_axes_lat
     for t_lon in range(len(sort_axes_lon)-1):
 #        print sort_axes_lon[t_lon]
         inds_lon = np.where((template_lon >= sort_axes_lon[t_lon])&(template_lon<=sort_axes_lon[t_lon+1]))[0]
@@ -848,18 +848,15 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
 #     tex_parcels[tex_parcels == 55] = 37
 #     tex_parcels[tex_parcels == 61] = 37
 #     tex_parcels[tex_parcels == 67] = 37
-#     # arround the path between the poles
-#     tex_parcels[tex_parcels ==32] = 31
-#     tex_parcels[tex_parcels ==33] = 31
-#     tex_parcels[tex_parcels ==34] = 31
-#     tex_parcels[tex_parcels ==35] = 31
-#     tex_parcels[tex_parcels ==36] = 31
-#     tex_parcels[tex_parcels ==38] = 31
-#     tex_parcels[tex_parcels ==39] = 31
-#     tex_parcels[tex_parcels ==40] = 31
-#     tex_parcels[tex_parcels ==41] = 31
-#     tex_parcels[tex_parcels ==42] = 31
-#     # temporal anterior
+    # arround the path between the poles
+    tex_parcels[tex_parcels == 29] = 30
+    tex_parcels[tex_parcels == 30] = 30
+    tex_parcels[tex_parcels == 31] = 30
+    tex_parcels[tex_parcels == 32] = 30
+    tex_parcels[tex_parcels == 33] = 30
+    tex_parcels[tex_parcels == 34] = 30
+    tex_parcels[tex_parcels == 35] = 30
+    # temporal anterior
 #     tex_parcels[tex_parcels ==45] = 44
 #     tex_parcels[tex_parcels ==46] = 44
 #     tex_parcels[tex_parcels ==47] = 44

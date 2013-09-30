@@ -6,7 +6,7 @@ Created on Nov 16, 2012
 import numpy as np
 from soma import aims
 #from brainvisa.cortical_surface.parameterization import mapping as map
-
+precision_threshold = 0.00000001
 class Model(object):
     '''
     classdocs
@@ -465,7 +465,8 @@ class Model(object):
         degree_lon, degree_lat = coordinatesFromRect(tmp_vert, self.insularPoleBoundaryCoord, self.cingularPoleBoundaryCoord)
         latitude_axis_coords = degree_lat[0:nb_lat]
         longitude_axis_coords = degree_lon[nb_lat:nb_lat+nb_lon+1]
-
+        longitude_axis_coords[np.absolute(longitude_axis_coords)<precision_threshold] = 0
+        longitude_axis_coords[np.absolute(longitude_axis_coords-360)<precision_threshold] = 0
 #        longitude_axis_coords = degree_lon[0:nb_lon]
 #        latitude_axis_coords = degree_lat[nb_lon:nb_lon+nb_lat]
         return (longitude_axis_coords, latitude_axis_coords)
