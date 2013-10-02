@@ -9,18 +9,36 @@ from brainvisa.cortical_surface.parameterization import model as md
 from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 from scipy import sparse
 import scipy
+
+
+#########################################################
+# tolerance parameter for the linear system          ####
+# solver in scipy                                    ####
+# smaller value makes solver slower but more precise ####
+solver_tolerance = 1e-6                              ####
+#########################################################
 ver = [1]#[ int(x) for x in scipy.__version__.split( '.' ) ]
 if ver < [ 0, 9 ]:
-    print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower)'
+    print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower), with tolerance = ',solver_tolerance
     from scipy.sparse.linalg import gmres
     solver = 'gmres'
 else:
-    print 'HIP-HOP :: using lgmres for solving linear systems'
+    print 'HIP-HOP :: using lgmres for solving linear systems, with tolerance = ',solver_tolerance
     from scipy.sparse.linalg import lgmres
     solver = 'lgmres'  
 import numpy as np
 from soma import aims, aimsalgo
 import time
+
+
+#########################################################
+# tolerance parameter for the linear system          ####
+# solver in scipy                                    ####
+# smaller value makes solver slower but more precise ####
+solver_tolerance = 1e-6                              ####
+#########################################################
+
+
 
 #class Mapping(object):
 #    '''
@@ -107,11 +125,11 @@ def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
 #    Rx = sparse.lil_matrix(Rx).tocsr()
 #    Ry = sparse.lil_matrix(Ry).tocsr()
     if solver == 'lgmres':
-        x, info = lgmres(L, Rx, tol=1e-6)
-        y, info = lgmres(L, Ry, tol=1e-6)
+        x, info = lgmres(L, Rx, tol=solver_tolerance)
+        y, info = lgmres(L, Ry, tol=solver_tolerance)
     else:
-        x, info = gmres(L, Rx, tol=1e-6)
-        y, info = gmres(L, Ry, tol=1e-6)
+        x, info = gmres(L, Rx, tol=solver_tolerance)
+        y, info = gmres(L, Ry, tol=solver_tolerance)
 
 #    y = spsolve(L, Ry)
     z = np.zeros(Nv)
@@ -143,7 +161,7 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
     "boundary[1] == neocortex_poles_path always from insula to cingular pole"
     "boundary[2] == cingular_boundary"
     "boundary[3] == new vertices always from insula to cingular pole"
-    tol_in = 1e-6
+    solver_tolerance = 1e-6
     print 'mapping to the rectangle  ', length, ' x ', width, 'with fixed_boundary = ', fixed_boundary
     #print 'Laplacian : ', L
     Nbv = np.array(mesh.vertex()).shape[0]
@@ -259,19 +277,19 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
 #        result = scipy.sparse.linalg.lgmres(matrix, b, tol=1e-4, M=M)[0]
 #        print 'using bicgstab'
 #        t0 = time.clock()
-#        x1, info = bicgstab(Lx, Rx)#, tol=1e-6)
+#        x1, info = bicgstab(Lx, Rx)#, tol=solver_tolerance)
 ##        print info
 #        print time.clock() - t0, "seconds process time"
 #        print 'error:',np.linalg.norm(x_ex-x1)
         t0 = time.clock()
         if solver == 'lgmres':
-            x, info = lgmres(Lx, Rx, tol=tol_in)
-            y, info = lgmres(Ly, Ry, tol=tol_in)#spsolve(Ly, Ry)
+            x, info = lgmres(Lx, Rx, tol=solver_tolerance)
+            y, info = lgmres(Ly, Ry, tol=solver_tolerance)#spsolve(Ly, Ry)
             print 'using lgmres'
         else:
             print 'using gmres'
-            x, info = gmres(Lx, Rx, tol=tol_in)
-            y, info = gmres(Ly, Ry, tol=tol_in)
+            x, info = gmres(Lx, Rx, tol=solver_tolerance)
+            y, info = gmres(Ly, Ry, tol=solver_tolerance)
 #        print info
         print time.clock() - t0, "seconds process time"
     print 'matrix inverted'
@@ -303,7 +321,6 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     "boundary[1] == neocortex_poles_path always from insula to cingular pole"
     "boundary[2] == cingular_boundary"
     "boundary[3] == new vertices always from insula to cingular pole"
-    tol_in = 1e-6
     print 'cstr mapping in the rectangle  with cstrBalance = ', cstrBalance
     #print 'Laplacian : ', L
     vert = np.array(mesh.vertex())
@@ -377,16 +394,16 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 #    y = spsolve(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry)
     t0 = time.clock()
     if solver == 'lgmres':
-        x, info = lgmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=tol_in)
+        x, info = lgmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for x"
         t0 = time.clock()
-        y, info = lgmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=tol_in)
+        y, info = lgmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for y"
     else:        
-        x, info = gmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=tol_in)
+        x, info = gmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for x"
         t0 = time.clock()
-        y, info = gmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=tol_in)
+        y, info = gmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for y"
     print 'matrix inverted'
     z = np.zeros(Nbv)
@@ -730,12 +747,12 @@ def texture2ROI(tex_cstr, neocortex_indices):
 def sphericalMeshFromCoords(tex_lat, tex_lon, ray):
     tex_lat = tex_lat * np.pi / 180
     tex_lon = tex_lon * np.pi / 180
-    print tex_lon
+#    print tex_lon
     spherical_verts = np.ndarray((tex_lat.shape[0], 3))
     spherical_verts[:, 1] = ray * np.cos(tex_lon) * np.sin(tex_lat)
     spherical_verts[:, 0] = ray * np.sin(tex_lon) * np.sin(tex_lat)
     spherical_verts[:, 2] = ray * np.cos(tex_lat)
-    print spherical_verts[:, 2]
+#    print spherical_verts[:, 2]
     return spherical_verts
 
 
@@ -945,10 +962,8 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
 # HIP
 #
 ####################################################################
-def hip(mesh, insula_tex_clean, cingular_tex_clean):
+def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 #    square_ratio = 4.5
-    length = 4.5
-    width = 1
     neocortex_tex_value = 0
     insula_tex_value = 180
     cingular_tex_value = 1

@@ -35,6 +35,7 @@ try:
   from brainvisa.cortical_surface.parameterization import mapping as map#hipHop
   from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
   from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
+  from brainvisa.cortical_surface.parameterization import model as md
 except:
   pass
 
@@ -55,6 +56,7 @@ signature = Signature(
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
     'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
+    'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
     'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', aimsGlobals.aimsMeshFormats),
@@ -78,6 +80,7 @@ def initialization( self ):
     self.linkParameters( 'white_sulcalines', 'white_mesh')
     self.linkParameters( 'rectangular_white_sulcalines', 'white_mesh')
     self.linkParameters( 'sulcus_labels', 'white_mesh')
+    self.setOptional( 'model_file' )
     self.unfold_reversed_triangles = 'yes'
     self.nb_it_local_smoothing_for_unfolding = 100
     
@@ -93,11 +96,18 @@ def execution( self, context ):
     context.write('Reading sulcus-label correspondences file')
     sulc_labels_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
 
-    context.write('HIP')
-        
-#    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, np.around(cing_pole[0].arraydata()), 1)
+    if self.model_file is not None:
+        context.write('Reading model')
+        model = md.Model().read(self.model_file.fullPath())
+        for line in model.printArgs().splitlines():
+            context.write(line)
+    else:
+        model = md.Model()
+    length = model.right - model.left
+    width = model.top - model.bottom
 
-    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
+    context.write('HIP')
+    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), length, width)
     (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
     vert = np.array(neoCortex_square.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
@@ -141,6 +151,18 @@ def execution( self, context ):
     neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
     
     context.write('Writing meshes and textures')
+    if self.side == 'right':
+        poly = np.array(neoCortex_square.polygon())
+        poly_tmp = poly.copy()
+#        context.write(poly_tmp[0,:])
+        poly_tmp[:,0] = poly[:,1]
+        poly_tmp[:,1] = poly[:,0]
+        pp = aims.vector_AimsVector_U32_3()
+        for i in poly_tmp:
+            pp.append(i)
+#        context.write(np.array(pp)[0,:])
+        neoCortex_square.polygon().assign(pp)
+        neoCortex_square.updateNormals()
     ws.write( neoCortex_square, self.rectangular_mesh.fullPath() )
     ws.write(output_SL_tex, self.rectangular_white_sulcalines.fullPath())
     mesh_parts = aims.AimsTimeSurface_3()

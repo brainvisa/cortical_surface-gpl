@@ -98,13 +98,13 @@ def execution( self, context ):
 #    context.write(*command)
 #    context.system(*command)
 #    context.write('Projection Done')
-    tmp_trl = context.temporary(  'GIS image' )
+    tmp_trl = context.temporary('Text File')
     f = open(tmp_trl.fullPath(),'w')
     f.write('%INSULA\n')
     f.close()
     out_trsl_txt = context.temporary('Text File')
     command = ['siMeshSulciProjection','-i',self.white_mesh.fullPath(),'-g',self.graph.fullPath(),'-l',tmp_trl.fullPath(),'-m',self.gyri_model.fullPath(),'-s',self.sulcus_identification,'-v',self.mri_corrected.fullPath(),'-o',self.pole.fullPath(),'-V','1','-M','2','-n','5','-a','0.9','-e','10','-t',out_trsl_txt.fullPath(),'-p','1']
-    context.write(command)
+    context.write('Projecting the insula from sulci graph')
     context.system(*command)
    
     re = aims.Reader()

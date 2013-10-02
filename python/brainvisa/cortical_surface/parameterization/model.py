@@ -41,11 +41,11 @@ class Model(object):
         else:
             self.left = left
         if right == None:
-            self.right = 4.5
+            self.right = 4.5#0
         else:
             self.right = right
         if top == None:
-            self.top = 1.0
+            self.top = 1.0#0
         else:
             self.top = top
         if bottom == None:

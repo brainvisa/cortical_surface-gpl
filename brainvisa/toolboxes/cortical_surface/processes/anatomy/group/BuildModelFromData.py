@@ -118,3 +118,4 @@ def execution( self, context ):
     context.write('------------------- output model -------------------')
     for line in model.printArgs().splitlines():
         context.write(line)
+    model.saveToMesh('model.mesh')
