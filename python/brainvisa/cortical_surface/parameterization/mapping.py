@@ -582,7 +582,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     inter_bound0 = set(cluster1).intersection(neoCortex_open_boundary[0])
     print 'inter_bound0 ',inter_bound0 
     if inter_bound0:
-        if neoCortex_open_boundary[0].index(list(inter_bound0)[0]) < (len(neoCortex_open_boundary[0]) / 2):
+        if neoCortex_open_boundary[0].index(list(inter_bound0)) < (len(neoCortex_open_boundary[0]) / 2):
             posterior_cluster = other_verts.difference(cluster1)
         else:
             posterior_cluster = cluster1
@@ -903,9 +903,10 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
     nb_inward_evol = [nb_inward]
     inward_evol = [inward]
     count = 0
+    tot_count = 0
     while nb_inward_evol[-1] > 0:
         # group connected polyons into patchs
-        t0 = time.clock()
+#        t0 = time.clock()
         bary = np.unique(poly[inward, :])
 #         print time.clock() - t0, "seconds process time"
 #         t0 = time.clock()
@@ -914,10 +915,10 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
 #             adj_list.append(neigh[b].list())
 #         print time.clock() - t0, "seconds process time"
         vert = np.array(mesh.vertex())
-        t0 = time.clock()
+#        t0 = time.clock()
         vert_out = vert.copy()
-        print time.clock() - t0, "seconds process time"
-        t0 = time.clock()
+#        print time.clock() - t0, "seconds process time"
+#        t0 = time.clock()
         for it in range(nb_it_smooth):
             for ind_bary,b in enumerate(bary):#l_neigh_bary in enumerate(adj_list):
                 l_neigh_bary = neigh[b].list()
@@ -933,25 +934,30 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
             vert_out[boundary[3], 0] = vert[boundary[3], 0]
             ###########################
             vert = vert_out.copy()
-        print time.clock() - t0, "seconds process time"
-        t0 = time.clock()
+#        print time.clock() - t0, "seconds process time"
+#        t0 = time.clock()
         vv = aims.vector_POINT3DF()
         for x in vert:
             vv.append(x)
         mesh.vertex().assign(vv)
-        print time.clock() - t0, "seconds process time"
-        t0 = time.clock()
+#        print time.clock() - t0, "seconds process time"
+#        t0 = time.clock()
         (nb_inward, inward) = invertedPolygon(mesh)
-        print time.clock() - t0, "seconds process time"
+#        print time.clock() - t0, "seconds process time"
         nb_inward_evol.append(nb_inward)
         inward_evol.append(inward)
         print nb_inward_evol
+        tot_count +=1
+        if tot_count > 20:
+            print 'unable to solve the inverted faces'
+            break
         if len(nb_inward_evol)>3:
             if nb_inward_evol[-1] == nb_inward_evol[-2] or nb_inward_evol[-1] == nb_inward_evol[-3]:
                 count += 1
             else:
                 count = 0
-        if count > 10:
+        if count > 5:
+            print 'unable to solve the inverted faces'
             break
     return (mesh, nb_inward_evol, inward_evol)
 
@@ -1009,27 +1015,27 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
     ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
     poles_path = getShortestPath(mesh, ins_tex_boundary[-1], cing_tex_boundary[-1])
-#     ws = aims.Writer()
-#     tex_out = aims.TimeTexture_S16()
-#     tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
-#         if i in poles_path:
-#              tex_out[0].append(1)
-#         else:
-#              tex_out[0].append(0)
-#     tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
-#         if i in cing_tex_boundary[-1]:
-#              tex_out[1].append(1)
-#         else:
-#              tex_out[1].append(0)
-#     tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
-#         if i in ins_tex_boundary[-1]:
-#              tex_out[2].append(1)
-#         else:
-#              tex_out[2].append(0)
-#     ws.write(tex_out, '/home/toz/poles_link.tex')
+    ws = aims.Writer()
+    tex_out = aims.TimeTexture_S16()
+    tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
+    for i in xrange(mesh.vertex().size()):
+        if i in poles_path:
+             tex_out[0].append(1)
+        else:
+             tex_out[0].append(0)
+    tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
+    for i in xrange(mesh.vertex().size()):
+        if i in cing_tex_boundary[-1]:
+             tex_out[1].append(1)
+        else:
+             tex_out[1].append(0)
+    tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
+    for i in xrange(mesh.vertex().size()):
+        if i in ins_tex_boundary[-1]:
+             tex_out[2].append(1)
+        else:
+             tex_out[2].append(0)
+    ws.write(tex_out, '/home/toz/poles_link.tex')
 
     '''poles_path to neocortex'''
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
