@@ -51,7 +51,10 @@ signature = Signature(
     'flat_white_sulcalines',ListOf( ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ) ),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ListOf( ReadDiskItem( 'Graph Label Translation', 'Text File') ),
-    'model_file',WriteDiskItem( 'HipHop Model', 'Text File')
+    'model_file',WriteDiskItem( 'HipHop Model', 'Text File'),
+    'model_file_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
+    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),    
+    'union_sulcal_lines_texture',WriteDiskItem( 'Texture', 'Texture') 
 )
 
 def initialization( self ):
@@ -64,7 +67,7 @@ def initialization( self ):
 #    self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
     self.linkParameters( 'flat_white_sulcalines', 'rectangular_mesh')
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
-
+    self.setOptional('model_file_mesh', 'union_sulcal_lines_mesh', 'union_sulcal_lines_texture')
     
 def execution( self, context ):
 
@@ -118,5 +121,11 @@ def execution( self, context ):
     context.write('------------------- output model -------------------')
     for line in model.printArgs().splitlines():
         context.write(line)
-    model.saveToMesh('model.mesh')
-    group_full_sulci.save('group_full_sulci')
+    if self.model_file_mesh is not None:
+        model.saveToMesh(self.model_file_mesh.fullPath())
+    if self.union_sulcal_lines_mesh is not None:
+        ws = aims.Writer()
+        ws.write(group_full_sulci.toMesh(), self.union_sulcal_lines_mesh.fullPath())
+    if self.union_sulcal_lines_texture is not None:
+        ws = aims.Writer()
+        ws.write(group_full_sulci.toTex(), self.union_sulcal_lines_texture.fullPath())

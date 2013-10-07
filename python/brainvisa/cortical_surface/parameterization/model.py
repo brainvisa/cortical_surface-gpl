@@ -407,15 +407,15 @@ class Model(object):
                 if len(inds) == 0:
                     self.longitudeAxisCoord[ax_ind] = None
                 else:
-                    ax_verts = []
+#                    ax_verts = []
                     ax_barys = []
                     ax_weights = []
-                    ax_verts_weights = []
+#                    ax_verts_weights = []
                     for r_sc_ind in range(len(inds)):
-                        ax_verts.append(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].vertices)
+#                        ax_verts.append(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].vertices)
                         ax_barys.append(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].barycenter[0])
                         ax_weights.append(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].weight)
-                        ax_verts_weights.append(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].weight * np.ones(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].nbVertices))
+#                        ax_verts_weights.append(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].weight * np.ones(sulci.sulcalLines[sulci.longitudeCstrIndex[inds[r_sc_ind]]].nbVertices))
                     self.longitudeAxisCoord[ax_ind] = (np.sum(np.array(ax_weights) * np.array(ax_barys))) / np.sum(ax_weights)
             # laitudes
             self.latitudeAxisCoord = self.latitudeAxisID[:]
@@ -425,15 +425,15 @@ class Model(object):
                 if len(inds) == 0:
                     self.latitudeAxisCoord[ax_ind] = None
                 else:
-                    ax_verts = []
+#                    ax_verts = []
                     ax_barys = []
                     ax_weights = []
-                    ax_verts_weights = []
+#                    ax_verts_weights = []
                     for r_sc_ind in range(len(inds)):
-                        ax_verts.append(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].vertices)
+#                        ax_verts.append(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].vertices)
                         ax_barys.append(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].barycenter[1])
                         ax_weights.append(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].weight)
-                        ax_verts_weights.append(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].weight * np.ones(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].nbVertices))
+#                        ax_verts_weights.append(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].weight * np.ones(sulci.sulcalLines[sulci.latitudeCstrIndex[inds[r_sc_ind]]].nbVertices))
                     self.latitudeAxisCoord[ax_ind] = (np.sum(np.array(ax_weights) * np.array(ax_barys))) / np.sum(ax_weights)
 
         else:

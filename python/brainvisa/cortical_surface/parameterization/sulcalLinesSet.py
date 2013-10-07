@@ -59,29 +59,28 @@ class SulcalLinesSet(object):
                 self.nbSulci += 1
             else:
                 self.sulcalLines[place].cat(sl)
-                self.sulcalLines[place].computeAttributes()
 
     def updateVertices(self, vertices=None):
         for sl_ind in range(self.nbSulci):
             self.sulcalLines[sl_ind].updateVertices(vertices[self.sulcalLines[sl_ind].indices, :])
             self.sulcalLines[sl_ind].computeAttributes()
 
-    def updateIndices(self, neocortex_indices=None):
-        for sl_ind in range(self.nbSulci):
-            new_indices = []
-            for i in self.sulcalLines[sl_ind].indices:
-                try:
-                    curr_ind = neocortex_indices.index(i)
-                    new_indices.append(curr_ind)
-                except:
-                    # when a new indice is not in sulcalLines[sl_ind].indices,
-                    # add a -1 to allow sulcalLine.updateIndices() to delete 
-                    # the corresponding segment in self.segm
-                    new_indices.append(-1)
-                    print 'some vertices of sulcus nb ', sl_ind, ' are not in the new indices'
-#            print new_indices
-#            print 'max = ',np.max(new_indices)
-            self.sulcalLines[sl_ind].updateIndices(np.array(new_indices, np.int32))
+#     def updateIndices(self, neocortex_indices=None):
+#         for sl_ind in range(self.nbSulci):
+#             new_indices = []
+#             for i in self.sulcalLines[sl_ind].indices:
+#                 try:
+#                     curr_ind = neocortex_indices.index(i)
+#                     new_indices.append(curr_ind)
+#                 except:
+#                     # when a new indice is not in sulcalLines[sl_ind].indices,
+#                     # add a -1 to allow sulcalLine.updateIndices() to delete 
+#                     # the corresponding segment in self.segm
+#                     new_indices.append(-1)
+#                     print 'some vertices of sulcus nb ', sl_ind, ' are not in the new indices'
+# #            print new_indices
+# #            print 'max = ',np.max(new_indices)
+#             self.sulcalLines[sl_ind].updateIndices(np.array(new_indices, np.int32))
 
 #     def label2Axis(self):
 #         cstr_indices = [self.longitudeCstrIndex, self.latitudeCstrIndex]
@@ -141,7 +140,6 @@ class SulcalLinesSet(object):
                         print 'sulcalLine with name ', name, 'is not a constraint'
 
     def toMesh(self):
-        out_mesh = aims.AimsTimeSurface_2()
 
         outplst = []
         outv_tmp=[]
@@ -149,14 +147,21 @@ class SulcalLinesSet(object):
         n = 0
         for sl_ind in range(self.nbSulci):
             sl_mesh = self.sulcalLines[sl_ind].toMesh()
-#             outv_tmp.append(sl_mesh.vertex())
-#             outplst.append(sl_mesh.polygon() + n)
-#             n += len(sl_mesh.polygon())
+            outv_tmp.append(np.array(sl_mesh.vertex()))
+            outplst.append(np.array(sl_mesh.polygon()) + n)
+            n += len(sl_mesh.vertex())
             #outn_tmp.append(sl_mesh.normals())
-            out_mesh.vertex(sl_ind).assign(sl_mesh.vertex())
-            out_mesh.polygon(sl_ind).assign(sl_mesh.polygon())
-#         out_mesh.vertex().assign(vstack(outv_tmp)) 
-#         out_mesh.polygon().assign(vstack(outplst))
+#             out_mesh.vertex(sl_ind).assign(sl_mesh.vertex())
+#             out_mesh.polygon(sl_ind).assign(sl_mesh.polygon())
+        out_mesh = aims.AimsTimeSurface_2()
+        vv = aims.vector_POINT3DF()
+        vp = aims.vector_AimsVector_U32_2()
+        for x in np.vstack(outv_tmp):
+            vv.append(x)    
+        for x in np.vstack(outplst):
+            vp.append(x)
+        out_mesh.vertex().assign(vv) 
+        out_mesh.polygon().assign(vp)
         out_mesh.updateNormals()
         return out_mesh
 
@@ -165,7 +170,9 @@ class SulcalLinesSet(object):
 #        out_tex = []
         for sl_ind in range(self.nbSulci):
             sl_tex = self.sulcalLines[sl_ind].toTex()
-            out_tex[sl_ind] = sl_tex[0]
+            for i in sl_tex[0]:
+                out_tex[0].append(i)
+#            out_tex[sl_ind] = sl_tex[0]
 #            out_tex.extend(sl_tex[0])         
         return out_tex
 
@@ -178,7 +185,7 @@ class SulcalLinesSet(object):
             if i_col > len(colors) - 1:
                 i_col = 0
 
-    def save(self, fileName):
+    def save(self, fileNameMesh, fileNameTex):
         ws = aims.Writer()
-        ws.write(self.toMesh(), fileName + '.mesh')
-        ws.write(self.toTex(), fileName + '.tex')
+        ws.write(self.toMesh(), fileNameMesh)
+        ws.write(self.toTex(), fileNameTex)

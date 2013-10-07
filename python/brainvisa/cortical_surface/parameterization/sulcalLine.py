@@ -54,8 +54,10 @@ class SulcalLine(object):
         print 'color = ', self.color
 
     def cat(self, sl):
+        self.segm = np.vstack((self.segm, sl.segm+len(self.vertices)))
         self.vertices = np.vstack((self.vertices, sl.vertices))
         self.nbVertices = self.vertices.shape[0]
+#        self.indices
         self.computeAttributes()
 
     def updateName(self, sulc_labels_dict):
@@ -74,34 +76,34 @@ class SulcalLine(object):
         else:
             self.segm = segm
 
-    def updateIndices(self, indices=None):
-        if indices is None:
-            self.indices = np.array([], np.uint32)
-        else:
-            # remove the inds that are = -1 from indices and self.segm
-            deleted_inds = np.where(indices == -1)[0]
-            nb_deleted_inds = deleted_inds.shape[0]
-            if nb_deleted_inds == 0:
-                self.indices = np.array(indices, np.uint32)
-            else:
-#                print 'sulcalLine indices : ',indices
-                # remove the indices that are = -1...
-#                print 'deleted_inds : ', deleted_inds
-                indices = np.delete(indices, deleted_inds)
-                self.indices = np.array(indices, np.uint32)
-                print indices
-                # ...and the corresponding segment in self.segm
-                m_segm = np.max(self.segm)+1
-                print 'm_segm : ', m_segm
-                deleted_segm_tmp = np.array([np.where(self.segm == ind)[0] for ind in deleted_inds])
-                deleted_segm = np.unique(deleted_segm_tmp.flatten())
-#                print 'deleted_segm :', deleted_segm
-#                print 'segm :', self.segm
-                self.segm = np.delete(self.segm, deleted_segm, 0)
-                print 'segm :', self.segm
-                for el in range(m_segm - nb_deleted_inds, m_segm):
-                    self.segm[np.where(self.segm == el)] = el - nb_deleted_inds
-                print 'segm :', self.segm
+#     def updateIndices(self, indices=None):
+#         if indices is None:
+#             self.indices = np.array([], np.uint32)
+#         else:
+#             # remove the inds that are = -1 from indices and self.segm
+#             deleted_inds = np.where(indices == -1)[0]
+#             nb_deleted_inds = deleted_inds.shape[0]
+#             if nb_deleted_inds == 0:
+#                 self.indices = np.array(indices, np.uint32)
+#             else:
+# #                print 'sulcalLine indices : ',indices
+#                 # remove the indices that are = -1...
+# #                print 'deleted_inds : ', deleted_inds
+#                 indices = np.delete(indices, deleted_inds)
+#                 self.indices = np.array(indices, np.uint32)
+#                 print indices
+#                 # ...and the corresponding segment in self.segm
+#                 m_segm = np.max(self.segm)+1
+#                 print 'm_segm : ', m_segm
+#                 deleted_segm_tmp = np.array([np.where(self.segm == ind)[0] for ind in deleted_inds])
+#                 deleted_segm = np.unique(deleted_segm_tmp.flatten())
+# #                print 'deleted_segm :', deleted_segm
+# #                print 'segm :', self.segm
+#                 self.segm = np.delete(self.segm, deleted_segm, 0)
+#                 print 'segm :', self.segm
+#                 for el in range(m_segm - nb_deleted_inds, m_segm):
+#                     self.segm[np.where(self.segm == el)] = el - nb_deleted_inds
+#                 print 'segm :', self.segm
 
     def computeAttributes(self):
         if self.vertices.shape[0] > 0:
@@ -171,7 +173,7 @@ class SulcalLine(object):
 
     def toTex(self):
         out_tex = aims.TimeTexture_S16()
-        for i in np.ones(self.indices.shape[0], np.int16) * self.label:
+        for i in np.ones(self.vertices.shape[0], np.int16) * self.label:
                 out_tex[0].append(int(i))
         return out_tex
 
@@ -238,7 +240,7 @@ class SulcalConstraint(SulcalLine):
     def cat(self, sc):
         super(SulcalConstraint, self).cat(sc)
         self.setVertexWeight()  # should be used for weighting between vertices inside a sulcaConstraint
-        self.weight = 1 / self.length  # sum(self.verticesWeight)
+        self.weight = self.length  # sum(self.verticesWeight)
 
     def setVertexWeight(self, input_weights=None):
         if input_weights is None:
