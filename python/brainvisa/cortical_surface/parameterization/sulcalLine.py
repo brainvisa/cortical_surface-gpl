@@ -156,16 +156,16 @@ class SulcalLine(object):
             
     def toMesh(self):
         out_mesh = aims.AimsTimeSurface_2()
-#        verts = aims.vector_POINT3DF()
-#        poly = aims.vector_AimsVector_U32_2()
-#        for v in self.vertices:
-#            verts.append(v)
-#        for s in self.segm:
-#            poly.append(np.array(s, np.uint32))
-#        out_mesh.vertex().assign(verts)
-#        out_mesh.polygon().assign(poly)
-        out_mesh.vertex().assign(self.vertices)
-        out_mesh.polygon().assign(self.segm)
+        verts = aims.vector_POINT3DF()
+        poly = aims.vector_AimsVector_U32_2()
+        for v in self.vertices:
+            verts.append(v)
+        for s in self.segm:
+            poly.append(np.array(s, np.uint32))
+        out_mesh.vertex().assign(verts)
+        out_mesh.polygon().assign(poly)
+#        out_mesh.vertex().assign(self.verts)
+#        out_mesh.polygon().assign(self.segm)
         out_mesh.updateNormals()
         return out_mesh
 

@@ -119,3 +119,4 @@ def execution( self, context ):
     for line in model.printArgs().splitlines():
         context.write(line)
     model.saveToMesh('model.mesh')
+    group_full_sulci.save('group_full_sulci')

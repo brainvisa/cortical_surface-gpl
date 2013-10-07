@@ -142,18 +142,31 @@ class SulcalLinesSet(object):
 
     def toMesh(self):
         out_mesh = aims.AimsTimeSurface_2()
+
+        outplst = []
+        outv_tmp=[]
+        #outn_tmp=[]
+        n = 0
         for sl_ind in range(self.nbSulci):
             sl_mesh = self.sulcalLines[sl_ind].toMesh()
+#             outv_tmp.append(sl_mesh.vertex())
+#             outplst.append(sl_mesh.polygon() + n)
+#             n += len(sl_mesh.polygon())
+            #outn_tmp.append(sl_mesh.normals())
             out_mesh.vertex(sl_ind).assign(sl_mesh.vertex())
             out_mesh.polygon(sl_ind).assign(sl_mesh.polygon())
+#         out_mesh.vertex().assign(vstack(outv_tmp)) 
+#         out_mesh.polygon().assign(vstack(outplst))
         out_mesh.updateNormals()
         return out_mesh
 
     def toTex(self):
         out_tex = aims.TimeTexture_S16()
+#        out_tex = []
         for sl_ind in range(self.nbSulci):
             sl_tex = self.sulcalLines[sl_ind].toTex()
             out_tex[sl_ind] = sl_tex[0]
+#            out_tex.extend(sl_tex[0])         
         return out_tex
 
     def plot(self, plt, modele=None):

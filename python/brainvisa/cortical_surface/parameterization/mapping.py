@@ -580,8 +580,9 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
         test = nb_tagged > nb_tagged_o
     "identify the anterior bank of the cut :: first vertex of the insula boundary is anterior while last one is posterior"   
     inter_bound0 = set(cluster1).intersection(neoCortex_open_boundary[0])
+    print 'inter_bound0 ',inter_bound0 
     if inter_bound0:
-        if neoCortex_open_boundary[0].index(list(inter_bound0)) < (len(neoCortex_open_boundary[0]) / 2):
+        if neoCortex_open_boundary[0].index(list(inter_bound0)[0]) < (len(neoCortex_open_boundary[0]) / 2):
             posterior_cluster = other_verts.difference(cluster1)
         else:
             posterior_cluster = cluster1
@@ -974,7 +975,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     inter = set(cingular_inds).intersection(insular_inds)
     if inter:
         print ('problem: the two poles are connected, cannot cut the mesh!!')
-        raise Exception('the two poles are connected, cannot cut the mesh')
+        raise Exception('Cingular and Insular poles are connected ! You should rerun the insular pole extaction with a larger erosion parameter value.')
         return
 
     tex_poles_clean = np.zeros(cingular_tex_clean.size)

@@ -42,12 +42,12 @@ userLevel = 2
 #     anatomist.validation()
     
 signature = Signature(
-    'input_texture',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
-#    'input_texture',ReadDiskItem('Texture', 'Texture'),
+#    'input_texture',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
+    'input_texture',ReadDiskItem('Texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'output_texture',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
-    #'output_texture',WriteDiskItem( 'Rectangular flat texture', 'Texture')
+#    'output_texture',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
+    'output_texture',WriteDiskItem( 'Texture', 'Texture')
 )
 
 def initialization( self ):
