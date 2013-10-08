@@ -40,7 +40,7 @@ except:
 
 #from brainvisa import anatomist
 
-name = 'CoordinatesFromHiphopMapping'
+name = 'Coordinates From HipHop Mapping'
 
 userLevel = 1
 

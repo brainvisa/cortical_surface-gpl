@@ -44,8 +44,8 @@ signature = Signature(
 def initialization( self ):
     eNode = SerialExecutionNode( self.name, parameterized=self )
 
-    eNode.addChild( 'ChangeTemplateReferential',
-                    ProcessExecutionNode( 'ChangeTemplateReferential', optional = 1 ) )
+#    eNode.addChild( 'ChangeTemplateReferential',
+#                    ProcessExecutionNode( 'ChangeTemplateReferential', optional = 1 ) )
     eNode.addChild( 'CingularPole',
                     ProcessExecutionNode( 'CingularPoleProjection', optional = 1 ) )
 
@@ -61,16 +61,24 @@ def initialization( self ):
     eNode.addChild( 'HarmonicMappingOrtho',
                     ProcessExecutionNode( 'HarmonicMappingOrtho', optional = 1 ) )
 
-    eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'graph' )
-    eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'graph' )
-    eNode.addLink( 'ChangeTemplateReferential.side', 'side' )
+    eNode.addChild( 'CoordinatesFromHipHopMapping',
+                    ProcessExecutionNode( 'CoordinatesFromHipHopMapping', optional=1) )
+                    
+    eNode.addChild( 'CorticalParcellation',
+                    ProcessExecutionNode( 'CorticalParcellation', optional=1) )
+
+#    eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'graph' )
+#    eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'graph' )
+#    eNode.addLink( 'ChangeTemplateReferential.side', 'side' )
 
     eNode.addLink( 'CingularPole.white_mesh', 'graph')
     eNode.addLink(  'SulcalinesExtraction.white_mesh','graph')
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.white_mesh','graph')
-    eNode.addLink(  'HarmonicMappingOrtho.white_mesh','graph')
+    eNode.addLink(  'HarmonicMappingOrtho.rectangular_mesh','graph')
+    eNode.addLink(  'CoordinatesFromHipHopMapping.cstr_rectangular_mesh', 'HarmonicMappingOrtho.cstr_rectangular_mesh')
+    eNode.addLink(  'CorticalParcellation.longitude', 'CoordinatesFromHipHopMapping.longitude')
 
-    eNode.addLink(  'CingularPole.pole_template','ChangeTemplateReferential.output_template' )
+#    eNode.addLink(  'CingularPole.pole_template','ChangeTemplateReferential.output_template' )
 #    eNode.addLink(  'CingularPole.white_mesh','SulcalinesExtraction.white_mesh')
 #    eNode.addLink(  'CingularPole.white_mesh','ParameterizeUnconstrainedHarmonic.white_mesh')
 #    eNode.addLink(  'CingularPole.white_mesh','HarmonicMappingOrtho.white_mesh')
@@ -97,6 +105,9 @@ def initialization( self ):
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.sulcus_labels','SulcalinesExtraction.graph_label_basins')
 
     eNode.addLink(  'HarmonicMappingOrtho.side','side')
-
+    
+    eNode.addLink(  'CoordinatesFromHipHopMapping.model_file','HarmonicMappingOrtho.model_file')
+    
+    eNode.addLink(  'CorticalParcellation.Side', 'side')
 
     self.setExecutionNode( eNode )
