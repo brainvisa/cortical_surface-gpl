@@ -217,7 +217,9 @@ class SulcalConstraint(SulcalLine):
         else:
             self.axisID = axisID
         self.setVertexWeight()  # should be used for weighting between vertices inside a sulcaConstraint
-        self.weight = self.length  # sum(self.vertexWeight)
+        ######################################################################
+        self.weight = 1#self.nbVertices #self.length  # sum(self.vertexWeight)
+        ######################################################################
 
     def plotTarget(self, plt, modele):
         if self.isLat:
@@ -240,7 +242,9 @@ class SulcalConstraint(SulcalLine):
     def cat(self, sc):
         super(SulcalConstraint, self).cat(sc)
         self.setVertexWeight()  # should be used for weighting between vertices inside a sulcaConstraint
-        self.weight = self.length  # sum(self.verticesWeight)
+        ######################################################################
+        self.weight = 1#self.nbVertices#self.length  # sum(self.verticesWeight)
+        ######################################################################
 
     def setVertexWeight(self, input_weights=None):
         if input_weights is None:

@@ -1015,27 +1015,27 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
     ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
     poles_path = getShortestPath(mesh, ins_tex_boundary[-1], cing_tex_boundary[-1])
-    ws = aims.Writer()
-    tex_out = aims.TimeTexture_S16()
-    tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-    for i in xrange(mesh.vertex().size()):
-        if i in poles_path:
-             tex_out[0].append(1)
-        else:
-             tex_out[0].append(0)
-    tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
-    for i in xrange(mesh.vertex().size()):
-        if i in cing_tex_boundary[-1]:
-             tex_out[1].append(1)
-        else:
-             tex_out[1].append(0)
-    tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
-    for i in xrange(mesh.vertex().size()):
-        if i in ins_tex_boundary[-1]:
-             tex_out[2].append(1)
-        else:
-             tex_out[2].append(0)
-    ws.write(tex_out, '/home/toz/poles_link.tex')
+#     ws = aims.Writer()
+#     tex_out = aims.TimeTexture_S16()
+#     tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in poles_path:
+#              tex_out[0].append(1)
+#         else:
+#              tex_out[0].append(0)
+#     tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in cing_tex_boundary[-1]:
+#              tex_out[1].append(1)
+#         else:
+#              tex_out[1].append(0)
+#     tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in ins_tex_boundary[-1]:
+#              tex_out[2].append(1)
+#         else:
+#              tex_out[2].append(0)
+#     ws.write(tex_out, '/home/toz/poles_link.tex')
 
     '''poles_path to neocortex'''
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
@@ -1102,7 +1102,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
         model = md.Model()
 
     full_sulci.sulcalLine2SulcalConstraint(model)
-    #    full_sulci.printArgs()
+    full_sulci.sulcalLines[SC_ind].printArgs()
     if model is None:
         model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
         model.setAxisCoord(full_sulci)
