@@ -56,7 +56,8 @@ signature = Signature(
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
     'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
-    'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
+    'rectangle_length', Float(),
+    'rectangle_width', Float(),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
     'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', aimsGlobals.aimsMeshFormats),
@@ -80,9 +81,10 @@ def initialization( self ):
     self.linkParameters( 'white_sulcalines', 'white_mesh')
     self.linkParameters( 'rectangular_white_sulcalines', 'white_mesh')
     self.linkParameters( 'sulcus_labels', 'white_mesh')
-    self.setOptional( 'model_file' )
     self.unfold_reversed_triangles = 'yes'
     self.nb_it_local_smoothing_for_unfolding = 100
+    self.rectangle_length = 450.0
+    self.rectangle_width = 100.0
     
 def execution( self, context ):
   
@@ -96,18 +98,18 @@ def execution( self, context ):
     context.write('Reading sulcus-label correspondences file')
     sulc_labels_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
 
-    if self.model_file is not None:
-        context.write('Reading model')
-        model = md.Model().read(self.model_file.fullPath())
-        for line in model.printArgs().splitlines():
-            context.write(line)
-    else:
-        model = md.Model()
-    length = model.right - model.left
-    width = model.top - model.bottom
+#     if self.model_file is not None:
+#         context.write('Reading model')
+#         model = md.Model().read(self.model_file.fullPath())
+#         for line in model.printArgs().splitlines():
+#             context.write(line)
+#     else:
+#         model = md.Model()
+#     length = model.right - model.left
+#     width = model.top - model.bottom
 
     context.write('HIP')
-    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), length, width)
+    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), self.rectangle_length, self.rectangle_width)
     (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
     vert = np.array(neoCortex_square.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')

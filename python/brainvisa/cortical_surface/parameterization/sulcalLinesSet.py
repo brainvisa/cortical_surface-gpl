@@ -44,8 +44,10 @@ class SulcalLinesSet(object):
 
     def cat(self, sl_set):
         for sl in sl_set.sulcalLines:
-            place = self.labels.index(sl.label)
-            if place is None:
+            if sl.label in self.labels:
+                place = self.labels.index(sl.label)
+                self.sulcalLines[place].cat(sl)
+            else:
                 if isinstance(sl, sln.SulcalConstraint):
                     if sl.axisID == []:
                         print 'should not happen!!'
@@ -57,8 +59,7 @@ class SulcalLinesSet(object):
                 self.sulcalLines.append(sl)
                 self.labels.append(sl.label)
                 self.nbSulci += 1
-            else:
-                self.sulcalLines[place].cat(sl)
+                
 
     def updateVertices(self, vertices=None):
         for sl_ind in range(self.nbSulci):
