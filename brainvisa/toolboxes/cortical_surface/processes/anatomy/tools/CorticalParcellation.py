@@ -44,7 +44,7 @@ signature = Signature(
     'longitude',WriteDiskItem( 'Longitude coordinate texture','Texture'),
 #    'longitude',ReadDiskItem( 'Right hemisphere longitude texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
 #    'right_latitude',ReadDiskItem( 'Right hemisphere latitude texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
-    'file_correspondance_constraint',ReadDiskItem( 'Constraint coordinates values', 'Text File' ),
+    'file_correspondance_constraint',ReadDiskItem( 'HipHop Model', 'Text File'),
     'gyri',WriteDiskItem( 'Right hemisphere gyri parcellation texture','Texture',requiredAttributes={ 'side': 'right' } ),
 )
 

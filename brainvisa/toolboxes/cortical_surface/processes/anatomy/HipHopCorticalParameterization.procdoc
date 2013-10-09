@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This pipeline performs the Hip-Hop cortical surface parameterization. The purpose of such process is to build a coordinate system on the surface of each hemisphere, that provides a cortical surface inter-subject matching. A cortical surface parcellation is also performed at the end of the pipeline. <br/>
+For references and a detailed description of the process, a couple of research papers are given below.<br/>
+<br/>
+The Hip-Hop method is described in:<br/>
+<span style="color: rgb(51, 51, 255);">Auzias G, Lefèvre J, Le Troter A, Fischer C, Perrot M, Régis J, Coulon O, <span style="font-style: italic;">Model-driven Harmonic Parameterization of the Cortical Surface : HIP-HOP, </span> <span style="font-weight: bold;">IEEE Trans. on Medical Imaging, </span> 32(5):873-887, 2013.</span><br/>
+<br/>
+The cortical parcellation method is described in:<br/>
+<span style="color: rgb(51, 51, 255);">Clouchoux C, Coulon O, Anton J-L, Mangin J-F, Régis J,<span style="font-style: italic;">A new cortical surface parcellation model and its automatic implementation, </span> in <span style="font-weight: bold;">MICCAI 06 </span>, Lecture Notes in Computer Science, vol. 4191, pp. 193-200, Springer-Verlag, Copenhagen, Denmark, 2006.</span><br/>
+</xhtml>
+    <d name="parameters">
+      <xhtml name="Rgraph">This is the labelled sulci graph for the left hemisphere.</xhtml>
+      <xhtml name="sulcus_identification">In the graphs, sulci can be identified by labels (usually if the labelling has been done automatically) or by names (usually if the labelling has been done or modified manually).</xhtml>
+      <xhtml name="Lgraph">This is the labelled sulci graph for the left hemisphere.</xhtml>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

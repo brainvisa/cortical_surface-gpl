@@ -109,5 +109,6 @@ def initialization( self ):
     eNode.addLink(  'CoordinatesFromHipHopMapping.model_file','HarmonicMappingOrtho.model_file')
     
     eNode.addLink(  'CorticalParcellation.Side', 'side')
+    eNode.addLink(  'CorticalParcellation.file_correspondance_constraint', 'HarmonicMappingOrtho.model_file')
 
     self.setExecutionNode( eNode )
