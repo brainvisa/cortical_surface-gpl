@@ -3,23 +3,23 @@
 <d>
   <d name="fr">
     <xhtml name="short">Définition d'un système de coordonnées sur un sillon.</xhtml>
-    <d name="parameters">
-      <xhtml name="texture_param2">texture de coordonnée y</xhtml>
-      <xhtml name="texture_param1">texture de coordonnée x </xhtml>
-      <xhtml name="orientation">Orientation générale du silllon.</xhtml>
-      <xhtml name="graph">Graphe à l'intérieur duquel les morceaux du sillon sont identifiés</xhtml>
-      <xhtml name="dilation">Paramètre de dilatation (garder valeur par défaut).</xhtml>
-      <xhtml name="coordinates_grid">maillage de la grille de coordonnées.</xhtml>
-      <xhtml name="mri">IRM T1 (corrigée du biais ou non) associée.</xhtml>
-      <xhtml name="label_attributes">Le sillon est identifié dans le graphe par son "label" ou son "name".</xhtml>
-      <xhtml name="sulcus_mesh">Maillage final du sillon</xhtml>
-      <xhtml name="label_values">valeur du sillon dans le graphe.</xhtml>
-    </d>
     <xhtml name="long">L'objectif est de paramétrer (définir un système de coordonnées sur) un sillon. Ce sillon peut-être identifié par nom ou label dans un graphe. En sortie on obtient un maillage du sillon, deux textures de coordonnées, et une "grille" de coordonnées.
 Documentation plus détaillée sur <a href="http://pages-perso.esil.univmed.fr/~coulon.o/sulcal_parameterization.html">la page d'Olivier</a> (si le lien ne marche pas choisissez votre navigateur dans les préférences et redémarrez Brainvisa).
 
 
 </xhtml>
+    <d name="parameters">
+      <xhtml name="texture_param2">texture de coordonnée y</xhtml>
+      <xhtml name="texture_param1">texture de coordonnée x </xhtml>
+      <xhtml name="orientation">Orientation générale du silllon.</xhtml>
+      <xhtml name="graph">Graphe à l'intérieur duquel les morceaux du sillon sont identifiés</xhtml>
+      <xhtml name="sulcus_mesh">Maillage final du sillon</xhtml>
+      <xhtml name="coordinates_grid">maillage de la grille de coordonnées.</xhtml>
+      <xhtml name="mri">IRM T1 (corrigée du biais ou non) associée.</xhtml>
+      <xhtml name="label_attributes">Le sillon est identifié dans le graphe par son "label" ou son "name".</xhtml>
+      <xhtml name="dilation">Paramètre de dilatation (garder valeur par défaut).</xhtml>
+      <xhtml name="label_values">valeur du sillon dans le graphe.</xhtml>
+    </d>
   </d>
   <d name="en">
     <xhtml name="short">Parameterization of a sulcus, i.e. definition of a coordinate system on
@@ -87,19 +87,19 @@ the central sulcus, including small branches you do not want, as shown
 by the figure below.
 </p>
 
-<img src="../../images/cortical_surface/SCall.png" style="border: 2px solid ; width: 754px; height: 412px;" alt="Central Sulcus"/>
+<img src="bvimage://SCall.png" style="border: 2px solid ; width: 754px; height: 412px;" alt="Central Sulcus"/>
 
 <p>
 The solution is to display the graph (and a mesh) in an Anatomist 3D window, and the graph in an Anatomist browser. In the 3D window, select each pieces of the sulcus you want. They are highlighted in the browser, edit their <span style="font-style: italic;">label</span> or <span style="font-style: italic;">name</span> field with the identifier you want, e.g. scleft (see figure below), then save the graph. The best thing is to save the graph under a new name to avoid any corruption of a previous labelling. This new graph is the one to use for the sulcal parameterization.
 </p>
 
-<img src="../../images/cortical_surface/SCall.png" style="border: 2px solid ; width: 757px; height: 416px;" alt="Central sulcus without branches"/>
+<img src="bvimage://SCall.png" style="border: 2px solid ; width: 757px; height: 416px;" alt="Central sulcus without branches"/>
 
 <p>
 The figures below show the sulcus final mesh with the x-coordinate and y-coordinate textures as well as with the resulting coordinate grid.
 </p>
-<img src="../../images/cortical_surface/SCleft-x.jpg" style="border: 2px solid ; width: 383px; height: 457px;" alt="x-coordinate field"/> <img src="../../images/cortical_surface/SCleft-y.jpg" style="border: 2px solid ; width: 384px; height: 453px;" alt="y-coordinate field"/>
-<img src="../../images/cortical_surface/SCleft-grid.jpg" style="border: 2px solid ; width: 387px; height: 459px;" alt="coordinate grid"/>
+<img src="bvimage://SCleft-x.jpg" style="border: 2px solid ; width: 383px; height: 457px;" alt="x-coordinate field"/> <img src="bvimage://SCleft-y.jpg" style="border: 2px solid ; width: 384px; height: 453px;" alt="y-coordinate field"/>
+<img src="bvimage://SCleft-grid.jpg" style="border: 2px solid ; width: 387px; height: 459px;" alt="coordinate grid"/>
 <p>
 The process also returns a text file (depth_profile). This file contains 3 colums. The first one is a list of 101 positions (from 0 to 100), the second one is the depth curve value for each of these positions, and the third one is the sulcal profile value for eachof these positions. 
 </p>
