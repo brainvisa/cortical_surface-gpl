@@ -16,7 +16,7 @@ BRAINVISA_COPY_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/share-data"
                           share/brainvisa-share-${brainvisa-share_VERSION_MAJOR}.${brainvisa-share_VERSION_MINOR}
                           ${PROJECT_NAME} )
 BRAINVISA_COPY_DIRECTORY( "${CMAKE_CURRENT_SOURCE_DIR}/share/doc/images"
-                          share/doc/axon-${axon_VERSION_MAJOR}.${axon_VERSION_MINOR}/images
+                          share/doc/cortical_surface-gpl-${axon_VERSION_MAJOR}.${axon_VERSION_MINOR}/images
                           ${PROJECT_NAME} )
 
 BRAINVISA_CREATE_CMAKE_CONFIG_FILES()
