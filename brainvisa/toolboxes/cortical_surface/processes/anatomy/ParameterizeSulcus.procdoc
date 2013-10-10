@@ -87,19 +87,19 @@ the central sulcus, including small branches you do not want, as shown
 by the figure below.
 </p>
 
-<img src="bvimage://SCall.png" style="border: 2px solid ; width: 754px; height: 412px;" alt="Central Sulcus"/>
+<img src="../../images/SCall.png" style="border: 2px solid ; width: 754px; height: 412px;" alt="Central Sulcus"/>
 
 <p>
 The solution is to display the graph (and a mesh) in an Anatomist 3D window, and the graph in an Anatomist browser. In the 3D window, select each pieces of the sulcus you want. They are highlighted in the browser, edit their <span style="font-style: italic;">label</span> or <span style="font-style: italic;">name</span> field with the identifier you want, e.g. scleft (see figure below), then save the graph. The best thing is to save the graph under a new name to avoid any corruption of a previous labelling. This new graph is the one to use for the sulcal parameterization.
 </p>
 
-<img src="bvimage://SCall.png" style="border: 2px solid ; width: 757px; height: 416px;" alt="Central sulcus without branches"/>
+<img src="../../images/SCleft.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Central sulcus without branches"/>
 
 <p>
 The figures below show the sulcus final mesh with the x-coordinate and y-coordinate textures as well as with the resulting coordinate grid.
 </p>
-<img src="bvimage://SCleft-x.jpg" style="border: 2px solid ; width: 383px; height: 457px;" alt="x-coordinate field"/> <img src="bvimage://SCleft-y.jpg" style="border: 2px solid ; width: 384px; height: 453px;" alt="y-coordinate field"/>
-<img src="bvimage://SCleft-grid.jpg" style="border: 2px solid ; width: 387px; height: 459px;" alt="coordinate grid"/>
+<img src="../../images/SCleft-x.jpg" style="border: 2px solid ; width: 383px; height: 457px;" alt="x-coordinate field"/> <img src="../../images/SCleft-y.jpg" style="border: 2px solid ; width: 384px; height: 453px;" alt="y-coordinate field"/>
+<img src="../../images/SCleft-grid.jpg" style="border: 2px solid ; width: 387px; height: 459px;" alt="coordinate grid"/>
 <p>
 The process also returns a text file (depth_profile). This file contains 3 colums. The first one is a list of 101 positions (from 0 to 100), the second one is the depth curve value for each of these positions, and the third one is the sulcal profile value for eachof these positions. 
 </p>

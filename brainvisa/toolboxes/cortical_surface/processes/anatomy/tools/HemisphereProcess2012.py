@@ -74,7 +74,7 @@ def initialization( self ):
     eNode.addLink( 'CingularPole.white_mesh', 'graph')
     eNode.addLink(  'SulcalinesExtraction.white_mesh','graph')
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.white_mesh','graph')
-    eNode.addLink(  'HarmonicMappingOrtho.rectangular_mesh','graph')
+    eNode.addLink(  'HarmonicMappingOrtho.rectangular_mesh','ParameterizeUnconstrainedHarmonic.rectangular_mesh')
     eNode.addLink(  'CoordinatesFromHipHopMapping.cstr_rectangular_mesh', 'HarmonicMappingOrtho.cstr_rectangular_mesh')
     eNode.addLink(  'CorticalParcellation.longitude', 'CoordinatesFromHipHopMapping.longitude')
 
