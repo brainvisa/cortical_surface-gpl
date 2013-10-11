@@ -66,15 +66,9 @@ FileType( 'Left hemisphere longitude texture', 'Longitude coordinate texture' )
 FileType( 'Left hemisphere latitude texture', 'Latitude coordinate texture' )
 FileType( 'Right hemisphere longitude texture', 'Longitude coordinate texture' )
 FileType( 'Right hemisphere latitude texture', 'Latitude coordinate texture' )
+# useless?
 FileType( 'Conformal longitude texture', 'Coordinate texture' )
 FileType( 'Conformal latitude texture', 'Coordinate texture' )
-
-FileType( 'Hemisphere gyri parcellation texture', 'Gyri White Texture' )
-FileType( 'Left hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
-FileType( 'Right hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
-FileType( 'Left hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
-FileType( 'Right hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
-
 
 FileType( 'Coordinate grid', 'Mesh' )
 FileType( 'Left hemisphere coordinate grid', 'Coordinate grid')
@@ -126,21 +120,26 @@ FileType( 'Left Cingular Pole Template Subject', 'Cingular Pole Template Subject
 FileType( 'Right Cingular Pole Template Subject', 'Cingular Pole Template Subject' )
 
 ## model files
-
 FileType( 'Latitude Constraint Gyri Model', 'Gyri Model' )
 FileType( 'Longitude Constraint Gyri Model', 'Gyri Model' )
 
-## Transformation matrices for cingular pole template registration
+## HIipHop model files
+FileType( 'HipHop Model', 'Text File' )
 
+## Transformation matrices for cingular pole template registration
 FileType( 'Talairach To Subject Transformation', 'Transformation matrix' )
 FileType( 'Subject To Template Transformation', 'Transformation matrix' )
 
 ## Tranformation matrices for registration between function and anatomy
-
 FileType( 'Anatomy To Mean Functional Volume Transformation', 'Transformation matrix' )
 FileType( 'Mean Functional Volume To Anatomy Transformation', 'Transformation matrix' )
 
-## Gyri files
+## Gyri files !! different from Parcels files
+FileType( 'Hemisphere gyri parcellation texture', 'Gyri White Texture' )
+FileType( 'Left hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
+FileType( 'Right hemisphere gyri parcellation texture', 'Hemisphere gyri parcellation texture' )
+FileType( 'Left hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
+FileType( 'Right hemisphere regularized parcellation texture', 'Hemisphere gyri parcellation texture')
 
 FileType( 'Left Gyri Graph', 'Data graph' )
 FileType( 'Right Gyri Graph', 'Data graph' )
@@ -148,11 +147,39 @@ FileType( 'Right Gyri Graph', 'Data graph' )
 FileType( 'Left Gyri Volume', '4D Volume' )
 FileType( 'Right Gyri Volume', '4D Volume' )
 
+## Parcels files !! different from Gyri files
+FileType( 'Hemisphere parcellation texture', 'Gyri White Texture' )
+FileType( 'Left hemisphere parcellation texture', 'Hemisphere parcellation texture' )
+FileType( 'Right hemisphere parcellation texture', 'Hemisphere parcellation texture' )
+
+FileType( 'Left hemisphere model parcellation texture', 'Left hemisphere parcellation texture' )
+FileType( 'Right hemisphere model parcellation texture', 'Right hemisphere parcellation texture' )
+
+FileType( 'Left hemisphere coarse parcellation texture', 'Left hemisphere parcellation texture')
+FileType( 'Right hemisphere coarse parcellation texture', 'Right hemisphere parcellation texture')
+
+# may be used to replace hemisphere regularized parcellation texture
+#FileType( 'Left hemisphere regularized model parcellation texture', 'Hemisphere gyri parcellation texture')
+#FileType( 'Right hemisphere regularized model parcellation texture', 'Hemisphere gyri parcellation texture')
+#FileType( 'Left hemisphere regularized coarse parcellation texture', 'Hemisphere gyri parcellation texture')
+#FileType( 'Right hemisphere regularized coarse parcellation texture', 'Hemisphere gyri parcellation texture')
+
+FileType( 'Parcels Graph', 'Data graph' )
+FileType( 'Left parcels Graph', 'Parcels Graph' )
+FileType( 'Right parcels Graph', 'Parcels Graph' )
+
+FileType( 'Parcellation volume', '4D Volume' )
+FileType( 'Left parcellation volume', 'Parcellation volume' )
+FileType( 'Right parcellation volume', 'Parcellation volume' )
+FileType( 'Left model parcellation volume', 'Left parcellation volume' )
+FileType( 'Right model parcellation volume', 'Right parcellation volume' )
+FileType( 'Left coarse parcellation volume', 'Left parcellation volume' )
+FileType( 'Right coarse parcellation volume', 'Right parcellation volume' )
+
 ## Projection using convolution kernels
 FileType( 'Labelled Functional Blobs Texture', 'Label Texture' )
 
 ## Types related to surface-based functional analysis
-
 FileType( 'Projection convolution kernels', '4D Volume' )
 FileType( 'Functional Texture', 'Texture' )
 FileType( 'Functional Time Texture', 'Texture' )
@@ -160,11 +187,9 @@ FileType( 'Surface-Based SPMt Map', 'Texture' )
 FileType( 'Surface-Based Beta Map', 'Texture' )
 
 # Cortical thickness
-
 FileType( 'Cortical thickness', 'Texture' )
 
 # Sulci parameterizations
-
 FileType( 'Sulcus mesh' , 'Mesh' )
 FileType( 'Sulcus x coordinate texture', 'Texture' )
 FileType( 'Sulcus y coordinate texture', 'Texture' ) 
@@ -179,8 +204,6 @@ FileType( 'Right hemisphere Sulcal Lines texture', 'hemisphere Sulcal Lines text
 FileType( 'Graph Label Translation', 'Text File' )
 FileType( 'Left Graph Label Translation', 'Graph Label Translation' )
 FileType( 'Right Graph Label Translation', 'Graph Label Translation' )
-
-FileType( 'HipHop Model', 'Text File' )
 
 
 

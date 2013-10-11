@@ -224,7 +224,7 @@ def meshSmoothing(mesh, Niter, dt):
 #
 ####################################################################
 def computeMeshWeights(mesh):
-    threshold = 0.00001 #np.spacing(1)??
+    threshold = 0.0001 #np.spacing(1)??
     print '    Computing mesh weights'
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
@@ -248,10 +248,10 @@ def computeMeshWeights(mesh):
         thersh_noqq = np.where(noqq<threshold)[0]
         if len(thersh_nopp) > 0:
             nopp[thersh_nopp] = threshold
-            threshold_needed = 1
+            threshold_needed += len(thersh_nopp)
         if len(thersh_noqq) > 0:
             noqq[thersh_noqq] = threshold
-            threshold_needed = 1
+            threshold_needed += len(thersh_noqq)
 #        print np.min(noqq)
         pp = pp / np.vstack((nopp, np.vstack((nopp, nopp)))).transpose()
         qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
@@ -262,8 +262,8 @@ def computeMeshWeights(mesh):
             ind3 = poly[j, i3]
             W[ind2, ind3] = W[ind2, ind3] + 1 / np.tan(ang[j])
             W[ind3, ind2] = W[ind3, ind2] + 1 / np.tan(ang[j])
-    if threshold_needed:
-        print '    -weight threshold needed-'
+    if threshold_needed > 0:
+        print '    -weight threshold needed for ',threshold_needed,' values-'
     print '    OK'
 
     li = np.hstack(W.data)
@@ -291,6 +291,7 @@ def computeMeshLaplacian(mesh):
     L = sparse.lil_matrix(dia - weights)
     li = np.hstack(L.data)
     print 'nb Nan in L : ', len(np.where(np.isnan(li))[0])
+    print 'nb Inf in L : ', len(np.where(np.isinf(li))[0])   
     print '    OK'
 
     return L

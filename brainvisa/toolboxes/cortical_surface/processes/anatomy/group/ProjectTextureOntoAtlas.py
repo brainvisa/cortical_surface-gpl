@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # As a counterpart to the access to the source code and  rights to copy,
 # modify and redistribute granted by the license, users are provided only
 # with a limited warranty  and the software's author,  the holder of the
@@ -18,58 +17,46 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
-
-
-def validation():
-  try:
-    from brainvisa.cortical_surface.surface_tools import surface_tools
-  except:
-    raise ValidationError( 'brainvisa.cortical_surface.parameterization.surface_tools module can not be imported.' )
-  
-from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 from brainvisa.processes import *
-import shfjGlobals  
-from soma import aims
-import numpy as np
-
-
+import shfjGlobals   
 #from brainvisa import anatomist
+import sigraph
+import sys
+from soma import aims, aimsalgo
 
-name = 'Cingular Pole From Manual Drawing'
+name = 'Project Texture Onto Atlas From Sphere'
 
-userLevel = 0
+userLevel = 1
 
 # def validation():
 #     anatomist.validation()
     
 signature = Signature(
-    'input_texture',ReadDiskItem( 'Texture', 'Texture' ),      
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'pole',WriteDiskItem( 'Hippocampus pole texture','Texture' )
+    'subject_texture', ReadDiskItem('Texture','Aims Texture formats'),
+    'subject_spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
+    'atlas_spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
+    'texture_on_atlas', WriteDiskItem('Texture','Aims Texture formats')
+
 )
 
 def initialization( self ):
-    self.linkParameters( 'white_mesh','input_texture' )
-    self.linkParameters( 'pole', 'input_texture' )
-
+    self.linkParameters( 'subject_spherical_mesh','subject_texture' )
+#    self.findValue( 'spherical_template', {'filename_variable' : 'ico100_7'} )
+    self.sphere_ray = 100 
     
 def execution( self, context ):
+       
     re = aims.Reader()
     ws = aims.Writer()
-    context.write('Reading textures and mesh')
-    input_tex = re.read(self.input_texture.fullPath())
-    mesh = re.read(self.white_mesh.fullPath())
+    
+    subject_spherical_mesh = re.read(self.subject_spherical_mesh.fullPath())
+    atlas_spherical_mesh = re.read(self.atlas_spherical_mesh.fullPath())
+    mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
+    mi.project() # calcule les correspondances et coord barycentriques
+    subject_texture = re.read(self.subject_texture.fullPath())
+    texture_on_atlas = mi.resampleMesh(subject_texture)
+    ws.write( texture_on_atlas, self.texture_on_atlas.fullPath() )
 
-    atex = np.zeros(input_tex[0].arraydata().shape)
-    atex[input_tex[0].arraydata() > 0] = 1
-    context.write('Topological correction...')  
-    cingular_tex_clean, cingular_tex_boundary = surfTls.textureTopologicalCorrection(mesh, atex, 1)
-
-    tex_out = aims.TimeTexture_S16()
-    tex_out[0].assign(cingular_tex_clean)
-    ws.write(tex_out, self.pole.fullPath())
-    context.write('... Done')
-
-
+    context.write('Done')
             
       

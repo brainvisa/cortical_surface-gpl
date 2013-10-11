@@ -40,7 +40,7 @@ except :
 
 name = 'Spherical mesh from HIP-HOP parameterization coordinates'
 
-userLevel = 1
+userLevel = 0
     
 signature = Signature(
                       

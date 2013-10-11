@@ -36,7 +36,7 @@ import numpy as np
 
 name = 'Texture to Flat Mesh'
 
-userLevel = 2
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()

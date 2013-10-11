@@ -43,7 +43,7 @@ except:
 
 name = 'Harmonic Intrinsic Parameterization (HIP)'
 
-userLevel = 1
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()

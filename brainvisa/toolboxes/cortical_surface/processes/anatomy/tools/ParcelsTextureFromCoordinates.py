@@ -38,7 +38,7 @@ except:
 
 name = 'ParcelsTextureFromCoordinates'
 
-userLevel = 1
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()
@@ -49,9 +49,9 @@ signature = Signature(
     'side', Choice('left', 'right'),
     'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture'),
 #    'model', ReadDiskItem(  ),
-    'texture_parcels', WriteDiskItem('hemisphere gyri parcellation texture','Texture', requiredAttributes={ 'regularized': 'false' }),
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
-
+    'parcellation_resolution', Choice('model', 'coarse'),
+    'texture_parcels', WriteDiskItem('hemisphere parcellation texture','Texture', requiredAttributes={'regularized': 'false' }),
 )
 
 def initialization( self ):
@@ -63,6 +63,12 @@ def initialization( self ):
     self.linkParameters( 'longitude','latitude')
     self.linkParameters( 'texture_parcels','latitude')
     self.linkParameters( 'model_file', 'latitude' )
+    def linkRes( self, dummy ):
+        if self.latitude is not None:
+            return self.signature[ 'texture_parcels' ].findValue( self.latitude, requiredAttributes={ 'parcellation_type' : self.parcellation_resolution } )
+
+    self.linkParameters( 'texture_parcels', ('latitude', 'parcellation_resolution' ), linkRes )
+    
     
 def execution( self, context ):
        
@@ -77,10 +83,12 @@ def execution( self, context ):
     for line in model.printArgs().splitlines():
         context.write(line)
 
-    tex_parcels = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model)
-        
-    if self.side =='left':
-        tex_parcels = tex_parcels + 100
+    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, self.parcellation_resolution)
+    context.write('----------------------------------------------------------')
+    context.write('number of parcels created (including the cingular pole) :')
+    context.write(nb_parcels)
+    if self.side =='right':
+        tex_parcels = tex_parcels + 1
     context.write('Writing texture')
     aims_tex_parcels = aims.TimeTexture_S16()
     aims_tex_parcels[0].assign(tex_parcels)

@@ -26,7 +26,7 @@ from soma import aims, aimsalgo
 
 name = 'RemeshFromSphere'
 
-userLevel = 2
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()

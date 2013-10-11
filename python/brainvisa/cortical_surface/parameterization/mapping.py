@@ -355,18 +355,22 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     C_lon = np.zeros(Nbv)#sparse.lil_matrix(Nbv, 1)
     A_lon_diag = np.zeros(Nbv)
     for lon_cstr_ind in sulcalCstr.longitudeCstrIndex:
-        lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = sulcalCstr.sulcalLines[lon_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lon_cstr_ind].weight
-        C_lon[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] * lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
-        A_lon_diag[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = -lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
+        if sulcalCstr.sulcalLines[lon_cstr_ind].axisID in modele.longitudeAxisID:
+            if modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] is not None:
+                lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = sulcalCstr.sulcalLines[lon_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lon_cstr_ind].weight
+                C_lon[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] * lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
+                A_lon_diag[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = -lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
     A_lon = sparse.dia_matrix((A_lon_diag, 0), (Nbv, Nbv))
 
     lat_weights = np.zeros(Nbv)
     C_lat = np.zeros(Nbv)
     A_lat_diag = np.zeros(Nbv)
     for lat_cstr_ind in sulcalCstr.latitudeCstrIndex:
-        lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = sulcalCstr.sulcalLines[lat_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lat_cstr_ind].weight
-        C_lat[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] * lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
-        A_lat_diag[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = -lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
+        if sulcalCstr.sulcalLines[lat_cstr_ind].axisID in modele.latitudeAxisID:
+            if modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] is not None:
+                lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = sulcalCstr.sulcalLines[lat_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lat_cstr_ind].weight
+                C_lat[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] * lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
+                A_lat_diag[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = -lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
     A_lat = sparse.dia_matrix((A_lat_diag, 0), (Nbv, Nbv))
 
 ##    t1 = timeit.default_timer()
@@ -377,6 +381,29 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 ##    Rx = sparse.lil_matrix(Rx).tocsr()
 ##    t2 = timeit.default_timer()
 ##    print "%.2f sec"  %(t2-t1)
+
+#     li = np.hstack(Lx.data)
+#     print 'nb Nan in Lx : ', len(np.where(np.isnan(li))[0])
+#     print 'nb Inf in Lx : ', len(np.where(np.isinf(li))[0])   
+#     print 'nb Nan in Rx : ', len(np.where(np.isnan(Rx))[0])
+#     print 'nb Inf in Rx : ', len(np.where(np.isinf(Rx))[0])
+#     li = np.hstack(A_lon.data)
+#     print 'nb Nan in A_lon : ', len(np.where(np.isnan(li))[0]) 
+#     print 'nb Inf in A_lon : ', len(np.where(np.isinf(li))[0])  
+#     print 'nb Nan in C_lon : ', len(np.where(np.isnan(C_lon))[0])  
+#     print 'nb Inf in C_lon : ', len(np.where(np.isinf(C_lon))[0])  
+#      
+#     li = np.hstack(Ly.data)
+#     print 'nb Nan in Ly : ', len(np.where(np.isnan(li))[0])
+#     print 'nb Inf in Ly : ', len(np.where(np.isinf(li))[0])
+#     print 'nb Nan in Ry : ', len(np.where(np.isnan(Ry))[0])
+#     print 'nb Inf in Ry : ', len(np.where(np.isinf(Ry))[0])  
+#     li = np.hstack(A_lat.data)
+#     print 'nb Nan in A_lat : ', len(np.where(np.isnan(li))[0]) 
+#     print 'nb Inf in A_lat : ', len(np.where(np.isinf(li))[0])    
+#     print 'nb Nan in C_lat : ', len(np.where(np.isnan(C_lat))[0])   
+#     print 'nb Inf in C_lat : ', len(np.where(np.isinf(C_lat))[0])   
+
 #
     print 'solve the linear system'
     Lx = Lx.tocsr()
@@ -392,6 +419,11 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 
 #    x = spsolve(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx)
 #    y = spsolve(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry)
+    
+    
+
+
+
     t0 = time.clock()
     if solver == 'lgmres':
         x, info = lgmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=solver_tolerance)
@@ -816,29 +848,46 @@ def crossp(x,y):
 
 
 
-def parcelsFromCoordinates(template_lat,template_lon,model):
+def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=None):
+    if parcellation_type is None:
+        parcellation_type == 'model' # default resolution
+
+    between_poles_parcell_central_value = 190
+    between_poles_parcell_width = 120
+    temporal_pole_parcell_width = 40
     
-    between_poles_parcell_width = 150
     (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree()
 #    print longitude_axis_coords
 #    print latitude_axis_coords
     
     nb_vert = template_lat.shape[0]
     tex_parcels = np.zeros(nb_vert)
-    lab_parcel = 1
+    lab_parcel = 2
     sort_axes_lon = [360]
     for f in longitude_axis_coords[:-1]:#[360 - f for f in model.longitudeAxisID]
         if f is not None:
             sort_axes_lon.append(f)
-    sort_axes_lon.append(longitude_axis_coords[-1] - between_poles_parcell_width / 3)
-    sort_axes_lon.append(longitude_axis_coords[-1] + 2 * between_poles_parcell_width / 3)
-    sort_axes_lon.sort()
+    sort_axes_lon.append(between_poles_parcell_central_value - between_poles_parcell_width / 2)
+    sort_axes_lon.append(between_poles_parcell_central_value + between_poles_parcell_width / 2)    
+
     sort_axes_lat = [0, model.insularPoleBoundaryCoord]
     for f in latitude_axis_coords:
         if f is not  None:
            sort_axes_lat.append(f) 
+         
+    sort_axes_lon.sort()
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
+    
+    if parcellation_type == 'coarse':
+        # add suplementary axes to the model <=> subdivise parcels
+        # antero-posterior subdivision of the prefrontal lobe
+        sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
+        # antero-posterior subdivision of the temporal lobe
+        sort_axes_lon.append(sort_axes_lon[5] + 3 * (sort_axes_lon[6] - sort_axes_lon[5]) / 4)
+        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcell_width)
+        sort_axes_lon.sort()
+
 #    sort_axes_lat.append(180)
 #    print sort_axes_lon
 #    print sort_axes_lat
@@ -852,42 +901,59 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
 #            print 'lab_parcel', lab_parcel
             lab_parcel = lab_parcel+1
 
-#     # concatenate some parcells
-#     # INSULA sup ant
-#     tex_parcels[tex_parcels == 79] = 1
-#     tex_parcels[tex_parcels == 73] = 1
-#     # INSULA sup post
-#     tex_parcels[tex_parcels == 13] = 25
-#     tex_parcels[tex_parcels == 19] = 25
-#     tex_parcels[tex_parcels == 7] = 25
-#     # INSULA inf
-#     tex_parcels[tex_parcels == 43] = 37
-#     tex_parcels[tex_parcels == 49] = 37
-#     tex_parcels[tex_parcels == 55] = 37
-#     tex_parcels[tex_parcels == 61] = 37
-#     tex_parcels[tex_parcels == 67] = 37
+    if parcellation_type == 'coarse':
+        print 'il faut concatener autour du path!'
     # arround the path between the poles
-    tex_parcels[tex_parcels == 29] = 30
-    tex_parcels[tex_parcels == 30] = 30
-    tex_parcels[tex_parcels == 31] = 30
-    tex_parcels[tex_parcels == 32] = 30
-    tex_parcels[tex_parcels == 33] = 30
-    tex_parcels[tex_parcels == 34] = 30
-    tex_parcels[tex_parcels == 35] = 30
-    # temporal anterior
-#     tex_parcels[tex_parcels ==45] = 44
-#     tex_parcels[tex_parcels ==46] = 44
-#     tex_parcels[tex_parcels ==47] = 44
-#     tex_parcels[tex_parcels ==48] = 44 
-#     uparcells=np.unique(tex_parcels)
-#     print uparcells
-#     reord_parc=1
-#     for u_parc in uparcells[2:]:
-#         tex_parcels[tex_parcels == u_parc] = reord_parc
-#         reord_parc = reord_parc+1
+    #    tex_parcels[tex_parcels == 30] = 30
+#         tex_parcels[tex_parcels == 31] = 30
+#         tex_parcels[tex_parcels == 32] = 30
+#         tex_parcels[tex_parcels == 33] = 30
+#         tex_parcels[tex_parcels == 34] = 30
+#         tex_parcels[tex_parcels == 35] = 30
+#         tex_parcels[tex_parcels == 36] = 30
 
-    return tex_parcels
+    else:#default parcellation <=> model axes
 
+    #     # concatenate some parcels
+    #     # INSULA sup ant
+    #     tex_parcels[tex_parcels == 79] = 1
+    #     tex_parcels[tex_parcels == 73] = 1
+    #     # INSULA sup post
+    #     tex_parcels[tex_parcels == 13] = 25
+    #     tex_parcels[tex_parcels == 19] = 25
+    #     tex_parcels[tex_parcels == 7] = 25
+    #     # INSULA inf
+    #     tex_parcels[tex_parcels == 43] = 37
+    #     tex_parcels[tex_parcels == 49] = 37
+    #     tex_parcels[tex_parcels == 55] = 37
+    #     tex_parcels[tex_parcels == 61] = 37
+    #     tex_parcels[tex_parcels == 67] = 37
+        # arround the path between the poles
+    #    tex_parcels[tex_parcels == 30] = 30
+        tex_parcels[tex_parcels == 31] = 30
+        tex_parcels[tex_parcels == 32] = 30
+        tex_parcels[tex_parcels == 33] = 30
+        tex_parcels[tex_parcels == 34] = 30
+        tex_parcels[tex_parcels == 35] = 30
+        tex_parcels[tex_parcels == 36] = 30
+        # temporal anterior
+    #     tex_parcels[tex_parcels ==45] = 44
+    #     tex_parcels[tex_parcels ==46] = 44
+    #     tex_parcels[tex_parcels ==47] = 44
+    #     tex_parcels[tex_parcels ==48] = 44 
+    # cingular pole
+    tex_parcels[tex_parcels == 0] = 1
+    
+    
+    
+    
+    uparcells = np.unique(tex_parcels)
+    reord_parc = 1
+    for u_parc in uparcells:
+        tex_parcels[tex_parcels == u_parc] = reord_parc
+        reord_parc = reord_parc+2
+
+    return (tex_parcels, uparcells.shape[0])
 
 
 ####################################################################
@@ -896,6 +962,8 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
 #
 ####################################################################
 def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
+    max_tot_count = 30
+    max_count = 5
     if neigh is None:
         neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
     poly = np.array(mesh.polygon())
@@ -948,7 +1016,7 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
         inward_evol.append(inward)
         print nb_inward_evol
         tot_count +=1
-        if tot_count > 20:
+        if tot_count > max_tot_count:
             print 'unable to solve the inverted faces'
             break
         if len(nb_inward_evol)>3:
@@ -956,7 +1024,7 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
                 count += 1
             else:
                 count = 0
-        if count > 5:
+        if count > max_count:
             print 'unable to solve the inverted faces'
             break
     return (mesh, nb_inward_evol, inward_evol)
@@ -1102,7 +1170,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
         model = md.Model()
 
     full_sulci.sulcalLine2SulcalConstraint(model)
-    full_sulci.sulcalLines[SC_ind].printArgs()
+#    full_sulci.sulcalLines[SC_ind].printArgs()
     if model is None:
         model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
         model.setAxisCoord(full_sulci)

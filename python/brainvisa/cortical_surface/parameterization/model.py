@@ -6,7 +6,6 @@ Created on Nov 16, 2012
 import numpy as np
 from soma import aims
 #from brainvisa.cortical_surface.parameterization import mapping as map
-precision_threshold = 0.00000001
 class Model(object):
     '''
     classdocs
@@ -116,54 +115,57 @@ class Model(object):
 #
 ####################################################################
     def read(self, input_file):
-        txt_list = []
-        with open(input_file,'r') as inf:
-            for line in inf:
-                txt_list.append(line.split())
-        txt_dict = dict((key, value) for (key, value) in txt_list)
-        txt_dict['right'] = float(txt_dict['right'])
-        txt_dict['left'] = float(txt_dict['left'])
-        txt_dict['top'] = float(txt_dict['top'])
-        txt_dict['bottom'] = float(txt_dict['bottom'])
-        txt_dict['insularPoleBoundaryCoord'] = float(txt_dict['insularPoleBoundaryCoord'])
-        txt_dict['cingularPoleBoundaryCoord'] = float(txt_dict['cingularPoleBoundaryCoord'])
-        
-        data_txt = txt_dict['longitudeAxisID']
-        data_num = []
-        for x in data_txt.split(','):
-            try:
-                data_num.append(int(x))
-            except:
-                data_num.append(None)
-        txt_dict['longitudeAxisID'] = data_num
-
-        data_txt = txt_dict['latitudeAxisID']
-        data_num = []
-        for x in data_txt.split(','):
-            try:
-                data_num.append(int(x))
-            except:
-                data_num.append(None)
-        txt_dict['latitudeAxisID'] = data_num
-        
-        data_txt = txt_dict['longitudeAxisCoord']
-        data_num = []
-        for x in data_txt.split(','):
-            try:
-                data_num.append(float(x))
-            except:
-                data_num.append(None)
-        txt_dict['longitudeAxisCoord'] = data_num
-
-        data_txt = txt_dict['latitudeAxisCoord']
-        data_num = []
-        for x in data_txt.split(','):
-            try:
-                data_num.append(float(x))
-            except:
-                data_num.append(None)
-        txt_dict['latitudeAxisCoord'] = data_num
-        output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
+        try: 
+            txt_list = []
+            with open(input_file,'r') as inf:
+                for line in inf:
+                    txt_list.append(line.split())
+            txt_dict = dict((key, value) for (key, value) in txt_list)
+            txt_dict['right'] = float(txt_dict['right'])
+            txt_dict['left'] = float(txt_dict['left'])
+            txt_dict['top'] = float(txt_dict['top'])
+            txt_dict['bottom'] = float(txt_dict['bottom'])
+            txt_dict['insularPoleBoundaryCoord'] = float(txt_dict['insularPoleBoundaryCoord'])
+            txt_dict['cingularPoleBoundaryCoord'] = float(txt_dict['cingularPoleBoundaryCoord'])
+            
+            data_txt = txt_dict['longitudeAxisID']
+            data_num = []
+            for x in data_txt.split(','):
+                try:
+                    data_num.append(int(x))
+                except:
+                    data_num.append(None)
+            txt_dict['longitudeAxisID'] = data_num
+    
+            data_txt = txt_dict['latitudeAxisID']
+            data_num = []
+            for x in data_txt.split(','):
+                try:
+                    data_num.append(int(x))
+                except:
+                    data_num.append(None)
+            txt_dict['latitudeAxisID'] = data_num
+            
+            data_txt = txt_dict['longitudeAxisCoord']
+            data_num = []
+            for x in data_txt.split(','):
+                try:
+                    data_num.append(float(x))
+                except:
+                    data_num.append(None)
+            txt_dict['longitudeAxisCoord'] = data_num
+    
+            data_txt = txt_dict['latitudeAxisCoord']
+            data_num = []
+            for x in data_txt.split(','):
+                try:
+                    data_num.append(float(x))
+                except:
+                    data_num.append(None)
+            txt_dict['latitudeAxisCoord'] = data_num
+            output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
+        except:
+            raise Exception('cannot read the model file')
 
         return output_model
 
@@ -446,6 +448,8 @@ class Model(object):
 ####################################################################
     def axisCoordToDegree(self):
         from brainvisa.cortical_surface.parameterization.mapping import coordinatesFromRect
+
+        precision_threshold = 0.00000001
 
         tmp_vert_lon = []
         for l in self.longitudeAxisCoord:

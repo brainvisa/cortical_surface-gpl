@@ -40,7 +40,7 @@ except:
     
 name = 'Build a Model from a set of subjects'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
                       
