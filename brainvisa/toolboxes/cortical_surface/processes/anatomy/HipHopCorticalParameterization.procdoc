@@ -29,10 +29,11 @@ The pipeline produces a number of useful files that are briefly listed below:
 <li> two parcellation textures, 'texture_model_parcels' and 'texture_coarse_parcels'.
 <ul>
 <li>'texture_model_parcels' is the parcellation strictly defined by the model used for the HOP step.</li>
-<li>'texture_coarse_parcels' is a parcellation that has been refined to provide a more regular and useful parcellation scheme.</li>
+<li>'texture_coarse_parcels' is a parcellation that has been refined to provide a more regular and useful parcellation scheme. So far, this is the one to use for region of interest analyses or connectivity estimation.</li>
 </ul></li>
 </ul>
 <br/>
+It is possible to generate a volume-based parcellation of the cortex from the surface-based one using the process <a href="2dParcellationTo3dParcellation.html">2D Parcellation to 3D Parcellation</a> available in the low-level category of the toolbox.<br/>
 <br/>
 
 </xhtml>
