@@ -35,7 +35,7 @@ import shfjGlobals
 
 name = '2D Parcellation to 3D parcellation'
 
-userLevel = 1
+userLevel = 0
 
 signature = Signature(
     'Side', Choice("Both","Left","Right"),

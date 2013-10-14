@@ -34,7 +34,7 @@ from neuroProcesses import *
 import shfjGlobals     
 
 name = 'Texture Linear Combination'
-userLevel = 1
+userLevel = 0
 
 signature = Signature(
     'texture1',ReadDiskItem( 'Texture' ,'Texture'  ),

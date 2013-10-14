@@ -35,7 +35,7 @@ import shfjGlobals
 
 name = '2D Geodesic Texture Smoothing'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
      'Texture', ReadDiskItem( 'Texture', 'Texture' ), 
