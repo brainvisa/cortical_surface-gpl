@@ -61,6 +61,8 @@ def initialization( self ):
     self.linkParameters( 'left_gyri', 'right_gyri' )
     self.linkParameters( 'left_white_mesh', 'left_gyri' )
     self.linkParameters( 'right_white_mesh', 'right_gyri' )
+    self.linkParameters( 'right_white_mesh', 'left_white_mesh' )
+    self.linkParameters( 'left_white_mesh', 'right_white_mesh' )
     self.linkParameters( 'left_input_volume', 'left_white_mesh' )
     self.linkParameters( 'right_input_volume', 'right_white_mesh' )
     self.linkParameters( 'left_output_volume', 'left_white_mesh' )
@@ -68,7 +70,7 @@ def initialization( self ):
 #    self.linkParameters( 'left_output_graph', 'left_gyri' )
 #    self.linkParameters( 'right_output_graph', 'right_gyri' )
     self.texture_time = 0
-    self.setOptional('left_white_mesh','right_white_mesh','left_gyri','right_gyri')#,'translation','object_label','left_output_graph','right_output_graph' )
+#    self.setOptional('left_white_mesh','right_white_mesh','left_gyri','right_gyri')#,'translation','object_label','left_output_graph','right_output_graph' )
 #    self.object_label = 100
 
 def execution( self, context ): 
@@ -90,7 +92,7 @@ def execution( self, context ):
 #                       '-m', self.left_white_mesh.fullPath(),
 #                       '-t', self.left_gyri.fullPath(),
 #                       '-o', self.left_output_graph.fullPath(),
-                       '-T', self.texture_time]
+#                       '-T', self.texture_time]
         
 #           if self.translation is not None :
 #               options = ['-c', self.translation.fullPath()]
