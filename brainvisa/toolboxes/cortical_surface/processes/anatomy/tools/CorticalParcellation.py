@@ -57,5 +57,5 @@ def initialization( self ):
 
 def execution( self, context ):
     context.write('Cortical parcellation')
-    context.system('AimsGyriStuff', '-x', self.right_longitude.fullPath() , '-y', self.right_latitude.fullPath() ,  '-a', self.file_correspondance_constraint.fullPath() ,  '-o' , self.right_gyri.fullPath() )
+    context.system('AimsGyriStuff', '-x', self.longitude.fullPath() , '-y', self.latitude.fullPath() ,  '-a', self.file_correspondance_constraint.fullPath() ,  '-o' , self.gyri.fullPath() )
     context.write('Done')

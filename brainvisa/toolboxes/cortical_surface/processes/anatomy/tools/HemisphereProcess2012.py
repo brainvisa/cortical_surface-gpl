@@ -64,8 +64,8 @@ def initialization( self ):
     eNode.addChild( 'CoordinatesFromHipHopMapping',
                     ProcessExecutionNode( 'CoordinatesFromHipHopMapping', optional=1) )
                     
-    eNode.addChild( 'CorticalParcellation',
-                    ProcessExecutionNode( 'CorticalParcellation', optional=1) )
+    eNode.addChild( 'ParcelsTextureFromCoordinates',
+                    ProcessExecutionNode( 'ParcelsTextureFromCoordinates', optional=1) )
 
 #    eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'graph' )
 #    eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'graph' )
@@ -76,7 +76,7 @@ def initialization( self ):
     eNode.addLink(  'ParameterizeUnconstrainedHarmonic.white_mesh','graph')
     eNode.addLink(  'HarmonicMappingOrtho.rectangular_mesh','ParameterizeUnconstrainedHarmonic.rectangular_mesh')
     eNode.addLink(  'CoordinatesFromHipHopMapping.cstr_rectangular_mesh', 'HarmonicMappingOrtho.cstr_rectangular_mesh')
-    eNode.addLink(  'CorticalParcellation.longitude', 'CoordinatesFromHipHopMapping.longitude')
+    eNode.addLink(  'ParcelsTextureFromCoordinates.latitude', 'CoordinatesFromHipHopMapping.latitude')
 
 #    eNode.addLink(  'CingularPole.pole_template','ChangeTemplateReferential.output_template' )
 #    eNode.addLink(  'CingularPole.white_mesh','SulcalinesExtraction.white_mesh')
@@ -108,7 +108,7 @@ def initialization( self ):
     
     eNode.addLink(  'CoordinatesFromHipHopMapping.model_file','HarmonicMappingOrtho.model_file')
     
-    eNode.addLink(  'CorticalParcellation.Side', 'side')
-    eNode.addLink(  'CorticalParcellation.file_correspondance_constraint', 'HarmonicMappingOrtho.model_file')
+    eNode.addLink(  'ParcelsTextureFromCoordinates.side', 'side')
+    eNode.addLink(  'ParcelsTextureFromCoordinates.model_file', 'HarmonicMappingOrtho.model_file')
 
     self.setExecutionNode( eNode )
