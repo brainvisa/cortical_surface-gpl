@@ -16,7 +16,26 @@ The cortical parcellation method is described in:<br/>
       <xhtml name="sulcus_identification">In the graphs, sulci can be identified by labels (usually if the labelling has been done automatically) or by names (usually if the labelling has been done or modified manually).</xhtml>
       <xhtml name="Lgraph">This is the labelled sulci graph for the left hemisphere.</xhtml>
     </d>
-    <xhtml name="long"/>
+    <xhtml name="long">The 'Hip-Hop cortical surface parameterization' process has to be ran AFTER the 'morphologist 2013' pipeline.<br/> 
+In order to produce a parameterization and a parcellation of the ocrical surface of each hemisphere you need to segment the white/grey interface and represent it as a triangulated surface (Morphologist 2013), and you need to extrat the siulci graph and label it. Therefore in the 'morphologist 2013' pipeline you need to make sure that 'Sulci Recognition' is ticked on for each hemisphere (it is of by default). Our recommendation is to use the 'Sulci Recognition with SPAM' option, it is both faster and overall more reliable. <br/>
+<br/>
+The only input you need to provide to the pipeline if the left or right labelled sulci graph and the attribute that identifies sulci. This attribute is set to 'label' by default, which is alright if the sulci recognition has been performed automatically as mentioned above. If you have labelled your sulci by hand you probably need to set it on 'name'.<br/>
+<br/>
+The pipeline produces a number of useful files that are briefly listed below:
+<ul>
+<li>a flat rectangular mesh ('rectangular_mesh') corresponding to the HIP projection of the neo-cortex.</li>
+<li>a flat rectangular mesh ('cstr_rectangular_mesh') corresponding to the HOP projection of the neo-cortex registered with the model.</li>
+<li> longitude and latitude textures that go with the white_mesh of the subject. These two textures indicates the sperical coordinates at each point. This is the information that is primarily used for parcellation and inter-subject matching</li>
+<li> two parcellation textures, 'texture_model_parcels' and 'texture_coarse_parcels'.
+<ul>
+<li>'texture_model_parcels' is the parcellation strictly defined by the model used for the HOP step.</li>
+<li>'texture_coarse_parcels' is a parcellation that has been refined to provide a more regular and useful parcellation scheme.</li>
+</ul></li>
+</ul>
+<br/>
+<br/>
+
+</xhtml>
   </d>
 </d>
 </minf>
