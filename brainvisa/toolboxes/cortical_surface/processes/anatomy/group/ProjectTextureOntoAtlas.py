@@ -26,7 +26,7 @@ from soma import aims, aimsalgo
 
 name = 'Project Texture Onto Atlas From Sphere'
 
-userLevel = 1
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()

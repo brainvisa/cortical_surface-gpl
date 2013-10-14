@@ -33,7 +33,7 @@
 from brainvisa.processes import *
 import shfjGlobals
 name = 'Remesh To Atlas'
-userLevel = 2
+userLevel = 0
 
 
 signature = Signature(
