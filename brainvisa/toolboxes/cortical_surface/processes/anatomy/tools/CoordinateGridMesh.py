@@ -37,7 +37,7 @@ import shfjGlobals
 
 name = 'Coordinate Grid Mesh'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
     'mesh', ReadDiskItem( 'Mesh', 'MESH mesh'),

@@ -35,7 +35,7 @@ import shfjGlobals, neuroConfig
 
 name = 'Create Cortical Constraints Texture'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
     'Side', Choice("Both","Left","Right"),

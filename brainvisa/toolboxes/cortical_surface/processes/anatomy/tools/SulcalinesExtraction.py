@@ -24,7 +24,7 @@ import shfjGlobals
 
 name = 'Sulcal Lines Extraction'
 
-userLevel = 2
+userLevel = 0
 
 #def validation():
 #    anatomist.validation()

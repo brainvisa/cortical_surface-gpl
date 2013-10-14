@@ -33,7 +33,7 @@
 from brainvisa.processes import *
 
 name = 'Hip-Hop Hemispheric  Parameterization'
-userLevel = 2
+userLevel = 0
  
 signature = Signature(
   'side', Choice('left', 'right'),

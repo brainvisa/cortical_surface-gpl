@@ -36,7 +36,7 @@ from brainvisa.processes import *
 import shfjGlobals     
 
 name = 'Hip-Hop Cortical Parameterization'
-userLevel = 2
+userLevel = 0
 
 signature = Signature( 
   'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
