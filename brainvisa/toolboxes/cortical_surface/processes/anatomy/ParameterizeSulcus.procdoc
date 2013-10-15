@@ -3,23 +3,23 @@
 <d>
   <d name="fr">
     <xhtml name="short">Définition d'un système de coordonnées sur un sillon.</xhtml>
-    <d name="parameters">
-      <xhtml name="texture_param2">texture de coordonnée y</xhtml>
-      <xhtml name="texture_param1">texture de coordonnée x </xhtml>
-      <xhtml name="orientation">Orientation générale du silllon.</xhtml>
-      <xhtml name="graph">Graphe à l'intérieur duquel les morceaux du sillon sont identifiés</xhtml>
-      <xhtml name="dilation">Paramètre de dilatation (garder valeur par défaut).</xhtml>
-      <xhtml name="coordinates_grid">maillage de la grille de coordonnées.</xhtml>
-      <xhtml name="mri">IRM T1 (corrigée du biais ou non) associée.</xhtml>
-      <xhtml name="label_attributes">Le sillon est identifié dans le graphe par son "label" ou son "name".</xhtml>
-      <xhtml name="sulcus_mesh">Maillage final du sillon</xhtml>
-      <xhtml name="label_values">valeur du sillon dans le graphe.</xhtml>
-    </d>
     <xhtml name="long">L'objectif est de paramétrer (définir un système de coordonnées sur) un sillon. Ce sillon peut-être identifié par nom ou label dans un graphe. En sortie on obtient un maillage du sillon, deux textures de coordonnées, et une "grille" de coordonnées.
 Documentation plus détaillée sur <a href="http://pages-perso.esil.univmed.fr/~coulon.o/sulcal_parameterization.html">la page d'Olivier</a> (si le lien ne marche pas choisissez votre navigateur dans les préférences et redémarrez Brainvisa).
 
 
 </xhtml>
+    <d name="parameters">
+      <xhtml name="texture_param2">texture de coordonnée y</xhtml>
+      <xhtml name="texture_param1">texture de coordonnée x </xhtml>
+      <xhtml name="orientation">Orientation générale du silllon.</xhtml>
+      <xhtml name="graph">Graphe à l'intérieur duquel les morceaux du sillon sont identifiés</xhtml>
+      <xhtml name="sulcus_mesh">Maillage final du sillon</xhtml>
+      <xhtml name="coordinates_grid">maillage de la grille de coordonnées.</xhtml>
+      <xhtml name="mri">IRM T1 (corrigée du biais ou non) associée.</xhtml>
+      <xhtml name="label_attributes">Le sillon est identifié dans le graphe par son "label" ou son "name".</xhtml>
+      <xhtml name="dilation">Paramètre de dilatation (garder valeur par défaut).</xhtml>
+      <xhtml name="label_values">valeur du sillon dans le graphe.</xhtml>
+    </d>
   </d>
   <d name="en">
     <xhtml name="short">Parameterization of a sulcus, i.e. definition of a coordinate system on

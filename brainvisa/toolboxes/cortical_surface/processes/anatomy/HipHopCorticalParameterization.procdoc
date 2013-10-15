@@ -35,8 +35,21 @@ The pipeline produces a number of useful files that are briefly listed below:
 <br/>
 It is possible to generate a volume-based parcellation of the cortex from the surface-based one using the process <a href="2dParcellationTo3dParcellation.html">2D Parcellation to 3D Parcellation</a> available in the low-level category of the toolbox.<br/>
 <br/>
+The parcellation provided by the pipeline should look something like this:
 
-</xhtml>
+
+<br/>
+<br/>
+<span style="font-weight: bold;">Troubleshooting:</span><br/>
+<br/>
+A well known problem occurs from time to time: the cingular pole and the insular pole, produced by the first two components of the pipeline sometimes have a non-empty intersection. This is most of the time due to the fact that the insula has been projected outside its location and slightly overlaps the cingular pole. When the problem occurs, the pipeline stops at the beginning of the HIP process and returns the folowing: "Cingular and insular pole are connected. You should rerun the insular pole extraction with a larger erosion parameter value". The first thing to do is then to re-run the insular pole projection with an increased  erosion parameter value. Default value is 3, try it with 4 or 5. If it does not solve the problem, increase also the erosion parmeter value in the cingular pole projection step. 
+
+Figures below show a typical insular pole (2 views) and a typical cingular pole. <br/>
+<img src="bvimage://insularPole1.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Insular pole, view 1"/><br/>
+<img src="bvimage://insularPole2.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Insular pole, view 2"/><br/>
+<br/>
+<img src="bvimage://cingularPole.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Cingular pole"/><br/>
+<br/></xhtml>
   </d>
 </d>
 </minf>
