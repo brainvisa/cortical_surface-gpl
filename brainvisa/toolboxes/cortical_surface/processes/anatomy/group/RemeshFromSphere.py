@@ -24,7 +24,7 @@ import sigraph
 import sys
 from soma import aims, aimsalgo
 
-name = 'RemeshFromSphere'
+name = 'Remesh From Sphere'
 
 userLevel = 0
 

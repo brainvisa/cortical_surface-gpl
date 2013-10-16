@@ -54,7 +54,7 @@ def execution( self, context ):
     mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
     mi.project() # calcule les correspondances et coord barycentriques
     subject_texture = re.read(self.subject_texture.fullPath())
-    texture_on_atlas = mi.resampleMesh(subject_texture)
+    texture_on_atlas = mi.resampleTexture(subject_texture)
     ws.write( texture_on_atlas, self.texture_on_atlas.fullPath() )
 
     context.write('Done')
