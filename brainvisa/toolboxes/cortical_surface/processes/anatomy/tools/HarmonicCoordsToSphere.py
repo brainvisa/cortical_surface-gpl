@@ -44,22 +44,22 @@ userLevel = 0
     
 signature = Signature(
                       
-    'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture' ),
-    'side', Choice('left', 'right'),
-    'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),
+    'side', Choice('left', 'right'),
+    'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture' ),
+    'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture' ),
     'sphere_ray', Float(),
     'spherical_mesh', WriteDiskItem( 'spherical mesh', 'Aims mesh formats' )
 )
 
 def initialization( self ):
     def linkSide( proc, dummy ):
-        if proc.latitude is not None:
-            return proc.latitude.get( 'side' )
-    self.linkParameters( 'side', 'latitude', linkSide )
-    self.linkParameters( 'longitude','latitude')
-    self.linkParameters( 'white_mesh','latitude')
-    self.linkParameters( 'spherical_mesh','latitude')
+        if proc.white_mesh is not None:
+            return proc.white_mesh.get( 'side' )
+    self.linkParameters( 'side', 'white_mesh', linkSide )
+    self.linkParameters( 'longitude','white_mesh')
+    self.linkParameters( 'latitude','white_mesh')
+    self.linkParameters( 'spherical_mesh','white_mesh')
     self.sphere_ray = 100 
     
 def execution( self, context ):
