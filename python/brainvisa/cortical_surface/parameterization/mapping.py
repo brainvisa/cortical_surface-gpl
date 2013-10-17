@@ -161,7 +161,6 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
     "boundary[1] == neocortex_poles_path always from insula to cingular pole"
     "boundary[2] == cingular_boundary"
     "boundary[3] == new vertices always from insula to cingular pole"
-    solver_tolerance = 1e-6
     print 'mapping to the rectangle  ', length, ' x ', width, 'with fixed_boundary = ', fixed_boundary
     #print 'Laplacian : ', L
     Nbv = np.array(mesh.vertex()).shape[0]
@@ -903,14 +902,32 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
 
     if parcellation_type == 'coarse':
         print 'il faut concatener autour du path!'
-    # arround the path between the poles
+    #     # INSULA sup ant
+    #     tex_parcels[tex_parcels == 79] = 1
+    #     tex_parcels[tex_parcels == 73] = 1
+    #     # INSULA sup post
+    #     tex_parcels[tex_parcels == 13] = 25
+    #     tex_parcels[tex_parcels == 19] = 25
+    #     tex_parcels[tex_parcels == 7] = 25
+    #     # INSULA inf
+    #     tex_parcels[tex_parcels == 43] = 37
+    #     tex_parcels[tex_parcels == 49] = 37
+    #     tex_parcels[tex_parcels == 55] = 37
+    #     tex_parcels[tex_parcels == 61] = 37
+    #     tex_parcels[tex_parcels == 67] = 37
+        # arround the path between the poles
     #    tex_parcels[tex_parcels == 30] = 30
-#         tex_parcels[tex_parcels == 31] = 30
-#         tex_parcels[tex_parcels == 32] = 30
-#         tex_parcels[tex_parcels == 33] = 30
-#         tex_parcels[tex_parcels == 34] = 30
-#         tex_parcels[tex_parcels == 35] = 30
-#         tex_parcels[tex_parcels == 36] = 30
+        tex_parcels[tex_parcels == 38] = 37
+        tex_parcels[tex_parcels == 39] = 37
+        tex_parcels[tex_parcels == 40] = 37
+        tex_parcels[tex_parcels == 41] = 37
+        tex_parcels[tex_parcels == 42] = 37
+        tex_parcels[tex_parcels == 43] = 37
+        # temporal anterior
+    #     tex_parcels[tex_parcels ==45] = 44
+    #     tex_parcels[tex_parcels ==46] = 44
+    #     tex_parcels[tex_parcels ==47] = 44
+    #     tex_parcels[tex_parcels ==48] = 44 
 
     else:#default parcellation <=> model axes
 
@@ -936,11 +953,6 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 34] = 30
         tex_parcels[tex_parcels == 35] = 30
         tex_parcels[tex_parcels == 36] = 30
-        # temporal anterior
-    #     tex_parcels[tex_parcels ==45] = 44
-    #     tex_parcels[tex_parcels ==46] = 44
-    #     tex_parcels[tex_parcels ==47] = 44
-    #     tex_parcels[tex_parcels ==48] = 44 
     # cingular pole
     tex_parcels[tex_parcels == 0] = 1
     
@@ -948,10 +960,10 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     
     
     uparcells = np.unique(tex_parcels)
-    reord_parc = 1
-    for u_parc in uparcells:
-        tex_parcels[tex_parcels == u_parc] = reord_parc
-        reord_parc = reord_parc+2
+#     reord_parc = 1
+#     for u_parc in uparcells:
+#         tex_parcels[tex_parcels == u_parc] = reord_parc
+#         reord_parc = reord_parc+2
 
     return (tex_parcels, uparcells.shape[0])
 
