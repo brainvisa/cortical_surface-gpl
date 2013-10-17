@@ -23,6 +23,7 @@ import shfjGlobals
 import sigraph
 import sys
 from soma import aims, aimsalgo
+import numpy as np
 
 name = 'Remesh From Sphere'
 
@@ -58,6 +59,18 @@ def execution( self, context ):
     mi.project() # calcule les correspondances et coord barycentriques
     white_mesh = re.read(self.white_mesh.fullPath())
     outmesh = mi.resampleMesh(white_mesh)
+    
+    # ensure there is no Nan in the vertex of outmesh
+    verts = np.array(outmesh.vertex())
+    verts_Nan = np.where(np.isnan(verts))[0]
+    if len(verts_Nan)>0:
+        neigh = aims.SurfaceManip.surfaceNeighbours(outmesh)
+        for vert_ind in verts_Nan:
+            neig_vert = verts[neigh[vert_ind].list(), :]
+            verts[vert_ind, :] = np.mean(neig_vert, axis = 0)
+        outmesh.vertex().assign([ aims.Point3df(x) for x in verts ])
+        outmesh.updateNormals()
+    
     ws.write( outmesh, self.remeshed_mesh.fullPath() )
 
     context.write('Done')
