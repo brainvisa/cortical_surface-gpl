@@ -57,7 +57,6 @@ def execution( self, context ):
         mesh = re.read(tmp_mesh.fullPath())
         context.write('nb of vertices in the mesh '+str(len(mesh.vertex())))
         if ind_mesh==0:
-            avg_mesh = mesh
             avg_verts = np.array(mesh.vertex())
         else:
             if len(mesh.vertex()) == avg_verts.shape[0]:
@@ -66,7 +65,21 @@ def execution( self, context ):
                 raise Exception('mesh # '+str(ind_mesh)+' do not have the good number of vertices')
 
     avg_verts = avg_verts / nb_mesh
-    avg_mesh.vertex().assign( [ aims.Point3df(x) for x in avg_verts ] )
+    avg_mesh = aims.AimsTimeSurface_3()
+    avg_mesh.vertex().assign([ aims.Point3df(x) for x in avg_verts ])
+    if self.side == 'right':
+        poly = np.array(mesh.polygon())
+        poly_tmp = poly.copy()
+#        context.write(poly_tmp[0,:])
+        poly_tmp[:,0] = poly[:,1]
+        poly_tmp[:,1] = poly[:,0]
+        pp = aims.vector_AimsVector_U32_3()
+        for i in poly_tmp:
+            pp.append(i)
+#        context.write(np.array(pp)[0,:])
+        avg_mesh.polygon().assign(pp)
+    else:
+        avg_mesh.polygon().assign(mesh.polygon())
     avg_mesh.updateNormals()
     ws = aims.Writer()
     ws.write(avg_mesh, self.average_mesh.fullPath())
