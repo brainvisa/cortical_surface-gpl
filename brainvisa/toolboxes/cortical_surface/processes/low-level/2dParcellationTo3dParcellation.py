@@ -35,130 +35,135 @@ import shfjGlobals
 
 name = '2D Parcellation to 3D parcellation'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
     'Side', Choice("Both","Left","Right"),
+    'left_gyri',ReadDiskItem( 'hemisphere parcellation texture','Texture',requiredAttributes={ 'side': 'left' } ),
+    'right_gyri',ReadDiskItem( 'hemisphere parcellation texture','Texture',requiredAttributes={ 'side': 'right' } ),
     'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'left_gyri',WriteDiskItem( 'Left hemisphere gyri parcellation texture','Texture',requiredAttributes={ 'side': 'left' } ),
-    'right_gyri',WriteDiskItem( 'Right hemisphere gyri parcellation texture','Texture',requiredAttributes={ 'side': 'right' } ),
     'texture_time', Integer(),
-    'translation',ReadDiskItem('Label Translation','Label Translation' ),
-    'translation_type', Choice("int_to_string","string_to_int"),
+#    'translation',ReadDiskItem('Label Translation','Label Translation' ),
+#    'translation_type', Choice("int_to_string","string_to_int"),
     'left_input_volume', ReadDiskItem( 'Left Grey White Mask', shfjGlobals.anatomistVolumeFormats ),
     'right_input_volume', ReadDiskItem( 'Right Grey White Mask', shfjGlobals.anatomistVolumeFormats ),
-    'object_label', Integer(),
-    'left_output_volume', WriteDiskItem( 'Left Gyri Volume', 'GIS image' ),
-    'right_output_volume', WriteDiskItem( 'Right Gyri Volume', 'GIS image' ),
-    'left_output_graph', WriteDiskItem( 'Left Gyri Graph', 'Graph' ),
-    'right_output_graph', WriteDiskItem( 'Right Gyri Graph', 'Graph' ),
+#    'object_label', Integer(),
+    'left_output_volume', WriteDiskItem( 'Left Gyri Volume', 'Aims writable volume formats' ), #parcellation volume', 'Aims writable volume formats' ),
+    'right_output_volume', WriteDiskItem( 'Right Gyri Volume', 'Aims writable volume formats' ), #parcellation volume', 'Aims writable volume formats' ),
+#    'left_output_graph', WriteDiskItem( 'Left Gyri Graph', 'Graph' ),#Parcels Graph', 'Graph' ),
+#    'right_output_graph', WriteDiskItem( 'Right Gyri Graph', 'Graph' ),#Parcels Graph', 'Graph' ),
 
 )
 
 def initialization( self ):
-     self.linkParameters( 'right_white_mesh', 'left_white_mesh' )
-     self.linkParameters( 'left_gyri', 'left_white_mesh' )
-     self.linkParameters( 'right_gyri', 'right_white_mesh' )
-     self.linkParameters( 'left_input_volume', 'left_white_mesh' )
-     self.linkParameters( 'right_input_volume', 'right_white_mesh' )
-     self.linkParameters( 'left_output_volume', 'left_white_mesh' )
-     self.linkParameters( 'right_output_volume', 'right_white_mesh' )
-     self.linkParameters( 'left_output_graph', 'left_white_mesh' )
-     self.linkParameters( 'right_output_graph', 'right_white_mesh' )
-     self.texture_time = 0
-     self.setOptional('left_white_mesh','right_white_mesh','left_gyri','right_gyri','translation','object_label','left_input_volume','right_input_volume','left_output_graph','right_output_graph', 'left_output_volume', 'right_output_volume' )
-     self.object_label = 100
+    self.linkParameters( 'right_gyri', 'left_gyri' )
+    self.linkParameters( 'left_gyri', 'right_gyri' )
+    self.linkParameters( 'left_white_mesh', 'left_gyri' )
+    self.linkParameters( 'right_white_mesh', 'right_gyri' )
+    self.linkParameters( 'right_white_mesh', 'left_white_mesh' )
+    self.linkParameters( 'left_white_mesh', 'right_white_mesh' )
+    self.linkParameters( 'left_input_volume', 'left_white_mesh' )
+    self.linkParameters( 'right_input_volume', 'right_white_mesh' )
+    self.linkParameters( 'left_output_volume', 'left_white_mesh' )
+    self.linkParameters( 'right_output_volume', 'right_white_mesh' )
+#    self.linkParameters( 'left_output_graph', 'left_gyri' )
+#    self.linkParameters( 'right_output_graph', 'right_gyri' )
+    self.texture_time = 0
+#    self.setOptional('left_white_mesh','right_white_mesh','left_gyri','right_gyri')#,'translation','object_label','left_output_graph','right_output_graph' )
+#    self.object_label = 100
 
 def execution( self, context ): 
-     graph_version = '3.0'
-
-     if self.Side in ('Left','Both'):
-        #Build Roi graph from texture
-        call_list = ['AimsTex2Graph',
+#    graph_version = '3.0'
+    if self.Side in ('Left','Both'):    
+        context.write('3D parcellation.')
+        context.system('AimsMeshParcellation2VolumeParcellation',
                     '-m', self.left_white_mesh.fullPath(),
                     '-t', self.left_gyri.fullPath(),
-                    '-o', self.left_output_graph.fullPath(),
-                    '-T', self.texture_time]
+                    '-o', self.left_output_volume.fullPath(),
+                    '-v', self.left_input_volume.fullPath(),
+                    '-T', self.texture_time)
+#                    '-l', self.object_label )
+            
+            
+#        if self.left_output_graph is not None:
+           #Build Roi graph from texture
+#           call_list = ['AimsTex2Graph',
+#                       '-m', self.left_white_mesh.fullPath(),
+#                       '-t', self.left_gyri.fullPath(),
+#                       '-o', self.left_output_graph.fullPath(),
+#                       '-T', self.texture_time]
+        
+#           if self.translation is not None :
+#               options = ['-c', self.translation.fullPath()]
+#               if self.translation_type == "string_to_int":
+#                   options += ['--reverse']
+#               call_list += options
+        
+#           context.write('Convert mesh+texture to ROI graph.')
+#           apply( context.system, call_list)
     
-        if self.translation is not None :
-            options = ['-c', self.translation.fullPath()]
-            if self.translation_type == "string_to_int":
-                options += ['--reverse']
-            call_list += options
+#           tmp = context.temporary( 'Graph' )
+#           context.system('AimsGraphConvert',
+#                           '-i', self.left_output_volume.fullPath(),
+#                           '-o', tmp,
+#                           '--bucket')
+#           context.system('AimsGraphMerge',
+#                           '-i', tmp,
+#                           '-j', self.left_output_graph.fullPath(),
+#                           '-k', 'roi_label',
+#                           '-o', self.left_output_graph.fullPath())
     
-        context.write('Convert mesh+texture to ROI graph.')
-        apply( context.system, call_list)
+#           context.system('AimsGraphComplete',
+#                           '-i', self.left_output_graph.fullPath(),
+#                           '-o', self.left_output_graph.fullPath(),
+#                           '--dversion', graph_version,
+#                           '--mversion', graph_version)
     
-        if self.left_input_volume is not None :
-            context.write('3D parcellation.')
-            context.system('AimsMeshParcellation2VolumeParcellation',
-                        '-m', self.left_white_mesh.fullPath(),
-                        '-t', self.left_gyri.fullPath(),
-                        '-o', self.left_output_volume.fullPath(),
-                        '-v', self.left_input_volume.fullPath(),
-                        '-T', self.texture_time,
-                        '-l', self.object_label )
-            tmp = context.temporary( 'Graph' )
-            context.system('AimsGraphConvert',
-                            '-i', self.left_output_volume.fullPath(),
-                            '-o', tmp,
-                            '--bucket')
-            context.system('AimsGraphMerge',
-                            '-i', tmp,
-                            '-j', self.left_output_graph.fullPath(),
-                            '-k', 'roi_label',
-                            '-o', self.left_output_graph.fullPath())
-    
-    
-        context.system('AimsGraphComplete',
-                        '-i', self.left_output_graph.fullPath(),
-                        '-o', self.left_output_graph.fullPath(),
-                        '--dversion', graph_version,
-                        '--mversion', graph_version)
-    
-
-     if self.Side in ('Right','Both'):
-        #Build Roi graph from texture
-        call_list = ['AimsTex2Graph',
-                    '-m', self.right_white_mesh.fullPath(),
-                    '-t', self.right_gyri.fullPath(),
-                    '-o', self.right_output_graph.fullPath(),
-                    '-T', self.texture_time]
-    
-        if self.translation is not None :
-            options = ['-c', self.translation.fullPath()]
-            if self.translation_type == "string_to_int":
-                options += ['--reverse']
-            call_list += options
-    
-        context.write('Convert mesh+texture to ROI graph.')
-        apply( context.system, call_list)
-    
-        if self.right_input_volume is not None :
+    if self.Side in ('Right','Both'):
+        if self.right_input_volume is not None :    
             context.write('3D parcellation.')
             context.system('AimsMeshParcellation2VolumeParcellation',
                         '-m', self.right_white_mesh.fullPath(),
                         '-t', self.right_gyri.fullPath(),
                         '-o', self.right_output_volume.fullPath(),
                         '-v', self.right_input_volume.fullPath(),
-                        '-T', self.texture_time,
-                        '-l', self.object_label )
-            tmp = context.temporary( 'Graph' )
-            context.system('AimsGraphConvert',
-                            '-i', self.right_output_volume.fullPath(),
-                            '-o', tmp,
-                            '--bucket')
-            context.system('AimsGraphMerge',
-                            '-i', tmp,
-                            '-j', self.right_output_graph.fullPath(),
-                            '-k', 'roi_label',
-                            '-o', self.right_output_graph.fullPath())
+                        '-T', self.texture_time)
+#                        '-l', self.object_label )
     
-    
-        context.system('AimsGraphComplete',
-                        '-i', self.right_output_graph.fullPath(),
-                        '-o', self.right_output_graph.fullPath(),
-                        '--dversion', graph_version,
-                        '--mversion', graph_version)
+
+#        if self.right_output_graph is not None:
+           #Build Roi graph from texture
+#           call_list = ['AimsTex2Graph',
+#                       '-m', self.right_white_mesh.fullPath(),
+#                       '-t', self.right_gyri.fullPath(),
+#                       '-o', self.right_output_graph.fullPath(),
+#                       '-T', self.texture_time]
+        
+#           if self.translation is not None :
+#               options = ['-c', self.translation.fullPath()]
+#               if self.translation_type == "string_to_int":
+#                   options += ['--reverse']
+#               call_list += options
+        
+#           context.write('Convert mesh+texture to ROI graph.')
+#           apply( context.system, call_list)
+        
+#           tmp = context.temporary( 'Graph' )
+#           context.system('AimsGraphConvert',
+#                           '-i', self.right_output_volume.fullPath(),
+#                           '-o', tmp,
+#                           '--bucket')
+#           context.system('AimsGraphMerge',
+#                           '-i', tmp,
+#                           '-j', self.right_output_graph.fullPath(),
+#                           '-k', 'roi_label',
+#                           '-o', self.right_output_graph.fullPath())
+#        
+        
+#           context.system('AimsGraphComplete',
+#                           '-i', self.right_output_graph.fullPath(),
+#                           '-o', self.right_output_graph.fullPath(),
+#                           '--dversion', graph_version,
+#                           '--mversion', graph_version)
     

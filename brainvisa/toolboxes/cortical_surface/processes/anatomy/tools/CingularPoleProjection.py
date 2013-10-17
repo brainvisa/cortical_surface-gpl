@@ -39,7 +39,7 @@ import numpy as np
 
 name = 'Cingular Pole Projection'
 
-userLevel = 2
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()
@@ -47,7 +47,11 @@ userLevel = 2
 signature = Signature(
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'side', Choice('left', 'right'),
-    'pole_template',ReadDiskItem( 'Cingular Pole Template Subject' , 'Aims readable volume formats' ),
+#    'pole_template',ReadDiskItem( 'Cingular Pole Template Subject' , 'Aims readable volume formats' ),
+    'subject_transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist',
+    'Transformation matrix' ),
+    'pole_template',ReadDiskItem( 'Cingular Pole Template' , 'Aims readable volume formats' ),
+    'template_pole_transformation',ReadDiskItem( 'Template Pole To Talairach Tranformation', 'Transformation matrix' ),
     'dilation_1', Integer(),
     'erosion', Integer(),
     'dilation_2', Integer(),
@@ -60,20 +64,26 @@ def initialization( self ):
             return proc.white_mesh.get( 'side' )
     self.linkParameters( 'side', 'white_mesh', linkSide )
     self.linkParameters( 'pole', 'white_mesh' )
+    #self.findValue( 'pole_template', { 'side' : self.side , 'filename_variable' : 'Template_icbm', '_ontology' : 'shared'} )
     self.linkParameters( 'pole_template', 'white_mesh' )
-    self.dilation_1 = 7
-    self.erosion = 11
-    self.dilation_2 = 2 
+    self.findValue( 'template_pole_transformation', {} )
+    self.linkParameters( 'subject_transformation','white_mesh')
+    self.dilation_1 = 0#7
+    self.erosion = 7#11
+    self.dilation_2 = 0#2 
  
 def execution( self, context ):
-#     a = anatomist.Anatomist()
-#     mesh = a.loadObject( self.white_mesh.fullPath() )
-#     vol = a.loadObject( self.pole_template.fullPath() )
-#     fusion = a.fusionObjects( [mesh, vol], method='Fusion3DMethod' )
-#     fusion.exportTexture(filename=self.pole.fullPath())
-#    context.system('AimsMeshTransform', '-i',self.left_white_mesh.fullPath(),'-o',tmp_white,'-t',self.transformation)
-    command = [ 'AimsCreateTexture', '-m',self.white_mesh.fullPath(), '-v',self.pole_template.fullPath(), '-t', self.pole.fullPath() ]
-#    context.write(command)
+    context.write('Changing Referential...')
+    cingular_tex_value = 1
+    tmp_trm1 = context.temporary(  'Transformation matrix' )
+    tmp_trm2 = context.temporary(  'Transformation matrix' )
+    tmp_mesh = context.temporary(  'Mesh mesh' )
+    context.system('AimsInvertTransformation', '-i', self.template_pole_transformation, '-o', tmp_trm1.fullPath() )
+    context.system('AimsComposeTransformation', '-i', tmp_trm1.fullPath(), '-j', self.subject_transformation, '-o', tmp_trm2.fullPath() )
+    context.system('AimsMeshTransform', '-i',self.white_mesh.fullPath(),'-o',tmp_mesh.fullPath(),'-t',tmp_trm2.fullPath())
+    command = [ 'AimsCreateTexture', '-m',tmp_mesh.fullPath(), '-v',self.pole_template.fullPath(), '-t', self.pole.fullPath() ]
+
+#    command = [ 'AimsCreateTexture', '-m',self.white_mesh.fullPath(), '-v',self.pole_template.fullPath(), '-t', self.pole.fullPath() ]
     context.system(*command)
     context.write('Projection Done')
 
@@ -81,19 +91,25 @@ def execution( self, context ):
     ws = aims.Writer()
 
     texture_poles = re.read(self.pole.fullPath())
+    atex = np.zeros(texture_poles[0].arraydata().shape)
+    atex[texture_poles[0].arraydata() > 0] = cingular_tex_value
     tex_S16 = aims.TimeTexture_S16()
-    tex_S16[0].assign(texture_poles[0])
+    tex_S16[0].assign(atex)
     ws.write(tex_S16, self.pole.fullPath())
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
-    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')#10
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
+    if self.dilation_1>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
+    if self.erosion>0:
+        context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')#10
+    if self.dilation_2>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
     context.write('Dilation Erosion Done')
     context.write('Topological correction...')
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
-    cingular_tex_value = 1
     cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), cingular_tex_value)
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())
+   
+#    ws.write(tex, self.pole.fullPath())
     context.write('... Done')

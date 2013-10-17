@@ -46,17 +46,42 @@ insert( '{center}/{subject}',
     '<subject>_rootsValues', SetType( 'Constraint coordinates values'),
     '<subject>_Lwhite_grid', SetType( 'Left hemisphere coordinate grid'), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_grid', SetType( 'Right hemisphere coordinate grid'), SetWeakAttr( 'side', 'right' ),
-    '<subject>_Lwhite_gyri', SetType( 'Left hemisphere gyri parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'false' ),
-    '<subject>_Rwhite_gyri', SetType( 'Right hemisphere gyri parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'false' ),
-    '<subject>_Lwhite_gyri_regul', SetType( 'Left hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ),
-    '<subject>_Rwhite_gyri_regul', SetType( 'Right hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ),
     '<subject>_Lhippo_Volume', SetType( 'Left Cingular Pole Template Subject' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rhippo_Volume', SetType( 'Right Cingular Pole Template Subject' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Talairach_To_Subject_Transformation', SetType( 'Talairach To Subject Transformation'),
     '<subject>_Subject_To_Template_Transformation', SetType( 'Subject To Template Transformation' ),
-    
-    #'<subject>_L_gyriGraph', SetType( 'Left Gyri Graph' ), SetWeakAttr( 'side', 'left' ),
-    #'<subject>_R_gyriGraph', SetType( 'Right Gyri Graph' ), SetWeakAttr( 'side', 'right' ),
+
+#    ## Parcels from HIP-HOP parameterization
+    '<subject>_Lwhite_model_parcels', SetType( 'Left hemisphere model parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'parcellation_type', 'model' ), SetWeakAttr( 'regularized', 'false' ),
+    '<subject>_Rwhite_model_parcels', SetType( 'Right hemisphere model parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'parcellation_type', 'model' ), SetWeakAttr( 'regularized', 'false' ),
+    '<subject>_Lwhite_coarse_parcels', SetType( 'Left hemisphere coarse parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'parcellation_type', 'coarse' ), SetWeakAttr( 'regularized', 'false' ),
+    '<subject>_Rwhite_coarse_parcels', SetType( 'Right hemisphere coarse parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'parcellation_type', 'coarse' ), SetWeakAttr( 'regularized', 'false' ),
+#
+## may be used to replace gyri regularized parcellation texture
+##    '<subject>_Lwhite_model_parcels_regul', SetType( 'Left hemisphere regularized model parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'model' ),
+##    '<subject>_Rwhite_model_parcels_regul', SetType( 'Right hemisphere regularized model parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'model' ),
+##    '<subject>_Lwhite_coarse_parcels_regul', SetType( 'Left hemisphere regularized coarse parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'coarse' ),
+##    '<subject>_Rwhite_coarse_parcels_regul', SetType( 'Right hemisphere regularized coarse parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'coarse' ),
+#
+#    '<subject>_L_model_parcelsVolume', SetType( 'Left model parcellation volume' ), SetWeakAttr( 'side', 'left' ),
+#    '<subject>_R_model_parcelsVolume', SetType( 'Right model parcellation volume' ), SetWeakAttr( 'side', 'right' ),
+#    '<subject>_L_coarse_parcelsVolume', SetType( 'Left coarse parcellation volume' ), SetWeakAttr( 'side', 'left' ),
+#    '<subject>_R_coarse_parcelsVolume', SetType( 'Right coarse parcellation volume' ), SetWeakAttr( 'side', 'right' ),
+# Parcels Graphs do not work....
+#    '<subject>_L_parcelsGraph', SetType( 'Left Parcels Graph' ), SetWeakAttr( 'side', 'left' ),
+#    '<subject>_R_parcelsGraph', SetType( 'Right Parcels Graph' ), SetWeakAttr( 'side', 'right' ),
+
+    ## Old Gyri parcellation types, should be replaced by Parcels (above)
+    '<subject>_Lwhite_gyri', SetType( 'Left hemisphere gyri parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'false' ),
+    '<subject>_Rwhite_gyri', SetType( 'Right hemisphere gyri parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'false' ),
+    '<subject>_Lwhite_gyri_regul', SetType( 'Left hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ),
+    '<subject>_Rwhite_gyri_regul', SetType( 'Right hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ),
+
+
+
+    ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface    
+    '<subject>_L_gyriGraph', SetType( 'Left Gyri Graph' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_R_gyriGraph', SetType( 'Right Gyri Graph' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_L_gyriVolume', SetType( 'Left Gyri Volume' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_R_gyriVolume', SetType( 'Right Gyri Volume' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lwhite_KERNEL', SetType( 'Projection convolution kernels'), SetWeakAttr( 'side', 'left' ) ,

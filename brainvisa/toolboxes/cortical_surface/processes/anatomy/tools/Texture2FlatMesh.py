@@ -36,18 +36,18 @@ import numpy as np
 
 name = 'Texture to Flat Mesh'
 
-userLevel = 2
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()
     
 signature = Signature(
-    'input_texture',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
-#    'input_texture',ReadDiskItem('Texture', 'Texture'),
+#    'input_texture',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
+    'input_texture',ReadDiskItem('Texture', 'Texture'),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'output_texture',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
-    #'output_texture',WriteDiskItem( 'Rectangular flat texture', 'Texture')
+#    'output_texture',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
+    'output_texture',WriteDiskItem( 'Texture', 'Texture')
 )
 
 def initialization( self ):
@@ -85,10 +85,10 @@ def execution( self, context ):
     '''
     rectangular_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
     nb_vert_square = len(rectangular_mesh_indices) + len(boundary[3])
-    output_tex = aims.TimeTexture_S16()
+    output_tex = aims.TimeTexture(input_tex)
     for t in  range( input_tex.size() ):
         output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
-        tmp_tex = np.zeros(nb_vert_square, dtype=np.int16)
+        tmp_tex = np.zeros(nb_vert_square, input_tex[t].arraydata().dtype )
         tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
         for b in boundary:
             tmp_tex[b] = 0

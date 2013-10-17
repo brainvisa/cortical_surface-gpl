@@ -40,7 +40,7 @@ from soma import aims
 
 name = 'Insular Pole Projection'
 
-userLevel = 2
+userLevel = 0
 
 #def validation():
 #    anatomist.validation()
@@ -98,13 +98,13 @@ def execution( self, context ):
 #    context.write(*command)
 #    context.system(*command)
 #    context.write('Projection Done')
-    tmp_trl = context.temporary(  'GIS image' )
+    tmp_trl = context.temporary('Text File')
     f = open(tmp_trl.fullPath(),'w')
     f.write('%INSULA\n')
     f.close()
     out_trsl_txt = context.temporary('Text File')
     command = ['siMeshSulciProjection','-i',self.white_mesh.fullPath(),'-g',self.graph.fullPath(),'-l',tmp_trl.fullPath(),'-m',self.gyri_model.fullPath(),'-s',self.sulcus_identification,'-v',self.mri_corrected.fullPath(),'-o',self.pole.fullPath(),'-V','1','-M','2','-n','5','-a','0.9','-e','10','-t',out_trsl_txt.fullPath(),'-p','1']
-    context.write(command)
+    context.write('Projecting the insula from sulci graph')
     context.system(*command)
    
     re = aims.Reader()
@@ -115,24 +115,28 @@ def execution( self, context ):
     tex_S16[0].assign(texture_poles[0])
 #    context.write(max(tex_S16[0].arraydata()))
     ws.write(tex_S16, self.pole.fullPath())
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')
-    context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')
-    context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_2,'--connexity')
+    if self.dilation_1>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')
+    if self.erosion>0:
+        context.system('AimsTextureErosion', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.erosion,'--connexity')
+    if self.dilation_2>0:
+        context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_2,'--connexity')
     context.write('Dilation Erosion Done')
 
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
 #    context.write(max(tex[0].arraydata()))
-    context.write(self.side)
+#    context.write(self.side)
     if self.side == 'right':
         tmp_tex_value = 2
     elif self.side == 'left':
         tmp_tex_value = 1
     else:
-        context.write('side must be set to left or right!')                        
+        context.write('side must be set to left or right!')     
+    context.write('Topological correction...')                           
     cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
     cingular_tex_clean[np.where(cingular_tex_clean == tmp_tex_value)[0]] = 180
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())
-    context.write('Topological correction Done')
+    context.write('... Done')

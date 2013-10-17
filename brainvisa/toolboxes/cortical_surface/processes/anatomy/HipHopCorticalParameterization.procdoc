@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This pipeline performs the Hip-Hop cortical surface parameterization. The purpose of such process is to build a coordinate system on the surface of each hemisphere, that provides a cortical surface inter-subject matching. A cortical surface parcellation is also performed at the end of the pipeline. <br/>
+For references and a detailed description of the process, a couple of research papers are given below.<br/>
+<br/>
+The Hip-Hop method is described in:<br/>
+<span style="color: rgb(51, 51, 255);">Auzias G, Lefèvre J, Le Troter A, Fischer C, Perrot M, Régis J, Coulon O, <span style="font-style: italic;">Model-driven Harmonic Parameterization of the Cortical Surface : HIP-HOP, </span> <span style="font-weight: bold;">IEEE Trans. on Medical Imaging, </span> 32(5):873-887, 2013.</span><br/>
+<br/>
+The cortical parcellation method is described in:<br/>
+<span style="color: rgb(51, 51, 255);">Clouchoux C, Coulon O, Anton J-L, Mangin J-F, Régis J,<span style="font-style: italic;">A new cortical surface parcellation model and its automatic implementation, </span> in <span style="font-weight: bold;">MICCAI 06 </span>, Lecture Notes in Computer Science, vol. 4191, pp. 193-200, Springer-Verlag, Copenhagen, Denmark, 2006.</span><br/>
+</xhtml>
+    <d name="parameters">
+      <xhtml name="Rgraph">This is the labelled sulci graph for the left hemisphere.</xhtml>
+      <xhtml name="sulcus_identification">In the graphs, sulci can be identified by labels (usually if the labelling has been done automatically) or by names (usually if the labelling has been done or modified manually).</xhtml>
+      <xhtml name="Lgraph">This is the labelled sulci graph for the left hemisphere.</xhtml>
+    </d>
+    <xhtml name="long">The 'Hip-Hop cortical surface parameterization' process has to be ran AFTER the 'morphologist 2013' pipeline.<br/> 
+In order to produce a parameterization and a parcellation of the ocrical surface of each hemisphere you need to segment the white/grey interface and represent it as a triangulated surface (Morphologist 2013), and you need to extrat the siulci graph and label it. Therefore in the 'morphologist 2013' pipeline you need to make sure that 'Sulci Recognition' is ticked on for each hemisphere (it is of by default). Our recommendation is to use the 'Sulci Recognition with SPAM' option, it is both faster and overall more reliable. <br/>
+<br/>
+The only input you need to provide to the pipeline if the left or right labelled sulci graph and the attribute that identifies sulci. This attribute is set to 'label' by default, which is alright if the sulci recognition has been performed automatically as mentioned above. If you have labelled your sulci by hand you probably need to set it on 'name'.<br/>
+<br/>
+The pipeline produces a number of useful files that are briefly listed below:
+<ul>
+<li>a flat rectangular mesh ('rectangular_mesh') corresponding to the HIP projection of the neo-cortex.</li>
+<li>a flat rectangular mesh ('cstr_rectangular_mesh') corresponding to the HOP projection of the neo-cortex registered with the model.</li>
+<li> longitude and latitude textures that go with the white_mesh of the subject. These two textures indicates the sperical coordinates at each point. This is the information that is primarily used for parcellation and inter-subject matching</li>
+<li> two parcellation textures, 'texture_model_parcels' and 'texture_coarse_parcels'.
+<ul>
+<li>'texture_model_parcels' is the parcellation strictly defined by the model used for the HOP step.</li>
+<li>'texture_coarse_parcels' is a parcellation that has been refined to provide a more regular and useful parcellation scheme. So far, this is the one to use for region of interest analyses or connectivity estimation.</li>
+</ul></li>
+</ul>
+<br/>
+It is possible to generate a volume-based parcellation of the cortex from the surface-based one using the process <a href="2dParcellationTo3dParcellation.html">2D Parcellation to 3D Parcellation</a> available in the low-level category of the toolbox.<br/>
+<br/>
+The parcellation provided by the pipeline should look something like this:
+
+
+<br/>
+<br/>
+<span style="font-weight: bold;">Troubleshooting:</span><br/>
+<br/>
+A well known problem occurs from time to time: the cingular pole and the insular pole, produced by the first two components of the pipeline sometimes have a non-empty intersection. This is most of the time due to the fact that the insula has been projected outside its location and slightly overlaps the cingular pole. When the problem occurs, the pipeline stops at the beginning of the HIP process and returns the folowing: "Cingular and insular pole are connected. You should rerun the insular pole extraction with a larger erosion parameter value". The first thing to do is then to re-run the insular pole projection with an increased  erosion parameter value. Default value is 3, try it with 4 or 5. If it does not solve the problem, increase also the erosion parmeter value in the cingular pole projection step. 
+
+Figures below show a typical insular pole (2 views) and a typical cingular pole. <br/>
+<img src="bvimage://insularPole1.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Insular pole, view 1"/><br/>
+<img src="bvimage://insularPole2.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Insular pole, view 2"/><br/>
+<br/>
+<img src="bvimage://cingularPole.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Cingular pole"/><br/>
+<br/></xhtml>
+  </d>
+</d>
+</minf>

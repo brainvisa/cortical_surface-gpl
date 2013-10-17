@@ -28,7 +28,7 @@ compare them through individuals. As well as a parametrization, the
 process generates a text file that contains a depth curve and a sulcal
 profile that can be used for morphometrics purposes. <br/>
 <br/>
-If one wants to reference such process, a few publications are
+If one wants to reference such process, or look for detailed explanations about the methods, a few publications are
 mentioned below.<br/>
 <br/>
 The parametrization process is described in:<br/>
@@ -76,8 +76,36 @@ Engineering in Medicine and Biology Society, pp.7795-7798, Boston 2011.</span><b
       <xhtml name="sulcus_mesh">output mesh: the sulcus is remeshed as a single object</xhtml>
       <xhtml name="label_values">value of the name/label to extract the sulcus</xhtml>
     </d>
-    <xhtml name="long">The point is to define a coordinate system on a sulcus. This sulcus is identified by name or label ina graph. As an output, one gets a mesh of the sulcus, two coordinate textures, and one coordinate "grid" .
-A detailed documentation is available on  <a href="http://olivier.coulon.perso.esil.univmed.fr/sulcal_parameterization.html">Olivier's page</a> (if the link does not work, chose your browser in the opreferences and restart Brainvisa).</xhtml>
+    <xhtml name="long"><p>The point is to define a coordinate system on a sulcus. This sulcus is identified by name or label in a graph. As an output, one gets a mesh of the sulcus, two coordinate textures, and one coordinate "grid" .
+</p>
+<p>
+This process performs the parameterization of  a sulcus. The sulcus needs to have been identified and labelled automatically or by hand before. The result is a x-y coordinate system on the mesh of the sulcus. Some geometrical features of the sulcus (such as the extremities or the top and bottome ridges) have constant cordinates across subjects and  the parameterization therefore implicitely provides an inter-subject matching, which means that a particular coordinate pair (longitude, latitude) should localize the same anatomical point on the sulcus across subjects.
+</p>
+<p>
+It is essential that the input graph contains proper information about the sulcus you want to parameterize. A graph that has been automatically labelled is likely <span style="font-weight: bold; font-style: italic; text-decoration: underline;">NOT</span> to contain a proper labelling. For instance the central sulcus will be labelled <span style="font-style: italic;">S.C.left</span>. Sulcus being over-segmented, this label will point to every pieces of
+the central sulcus, including small branches you do not want, as shown
+by the figure below.
+</p>
+
+<img src="../../images/SCall.png" style="border: 2px solid ; width: 754px; height: 412px;" alt="Central Sulcus"/>
+
+<p>
+The solution is to display the graph (and a mesh) in an Anatomist 3D window, and the graph in an Anatomist browser. In the 3D window, select each pieces of the sulcus you want. They are highlighted in the browser, edit their <span style="font-style: italic;">label</span> or <span style="font-style: italic;">name</span> field with the identifier you want, e.g. scleft (see figure below), then save the graph. The best thing is to save the graph under a new name to avoid any corruption of a previous labelling. This new graph is the one to use for the sulcal parameterization.
+</p>
+
+<img src="../../images/SCleft.jpg" style="border: 2px solid ; width: 757px; height: 416px;" alt="Central sulcus without branches"/>
+
+<p>
+The figures below show the sulcus final mesh with the x-coordinate and y-coordinate textures as well as with the resulting coordinate grid.
+</p>
+<img src="../../images/SCleft-x.jpg" style="border: 2px solid ; width: 383px; height: 457px;" alt="x-coordinate field"/> <img src="../../images/SCleft-y.jpg" style="border: 2px solid ; width: 384px; height: 453px;" alt="y-coordinate field"/>
+<img src="../../images/SCleft-grid.jpg" style="border: 2px solid ; width: 387px; height: 459px;" alt="coordinate grid"/>
+<p>
+The process also returns a text file (depth_profile). This file contains 3 colums. The first one is a list of 101 positions (from 0 to 100), the second one is the depth curve value for each of these positions, and the third one is the sulcal profile value for eachof these positions. 
+</p>
+<p>
+A detailed documentation is available on  <a href="http://olivier.coulon.perso.luminy.univ-amu.fr/sulcal_parameterization.html">Olivier's page</a> (if the link does not work, specify your browser path in the preferences and restart Brainvisa).
+</p></xhtml>
   </d>
 </d>
 </minf>

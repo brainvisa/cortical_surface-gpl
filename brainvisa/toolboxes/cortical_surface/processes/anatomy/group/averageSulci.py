@@ -39,7 +39,7 @@ import numpy
 import operator
 
 name = 'Average Sulci'
-userLevel = 2
+userLevel = 0
 
 ##################################################################
 def sulcus2vector(mesh) :

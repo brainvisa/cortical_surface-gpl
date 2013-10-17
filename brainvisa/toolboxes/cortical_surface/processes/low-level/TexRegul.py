@@ -35,7 +35,7 @@ import shfjGlobals
 
 name = 'Texture Regularization'
 
-userLevel = 1
+userLevel = 0
 
 signature = Signature(
      'Texture', ReadDiskItem( 'Texture', 'Texture' ), 

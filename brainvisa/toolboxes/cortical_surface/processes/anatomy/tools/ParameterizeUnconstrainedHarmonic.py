@@ -33,7 +33,9 @@ import numpy as np
 
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map#hipHop
-#  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
+  from brainvisa.cortical_surface.parameterization import model as md
 except:
   pass
 
@@ -41,7 +43,7 @@ except:
 
 name = 'Harmonic Intrinsic Parameterization (HIP)'
 
-userLevel = 2
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()
@@ -52,9 +54,14 @@ signature = Signature(
     'side', Choice('left', 'right'),
     'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'Texture'),
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
+    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
+    'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
+    'rectangle_length', Float(),
+    'rectangle_width', Float(),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
     'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', aimsGlobals.aimsMeshFormats),
+    'rectangular_white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
     'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'Texture'),
     'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'white_mesh_parts',WriteDiskItem( 'White Mesh Parts', aimsGlobals.aimsMeshFormats)
@@ -71,8 +78,13 @@ def initialization( self ):
     self.linkParameters( 'boundary_texture','white_mesh')
     self.linkParameters( 'corresp_indices_texture','white_mesh')
     self.linkParameters( 'white_mesh_parts','white_mesh')
+    self.linkParameters( 'white_sulcalines', 'white_mesh')
+    self.linkParameters( 'rectangular_white_sulcalines', 'white_mesh')
+    self.linkParameters( 'sulcus_labels', 'white_mesh')
     self.unfold_reversed_triangles = 'yes'
     self.nb_it_local_smoothing_for_unfolding = 100
+    self.rectangle_length = 450.0
+    self.rectangle_width = 100.0
     
 def execution( self, context ):
   
@@ -81,10 +93,23 @@ def execution( self, context ):
     context.write('Reading textures and mesh')
     cing_pole = re.read(self.cingular_pole_texture.fullPath())
     insula_pole = re.read(self.insular_pole_texture.fullPath())
+    sulcal_lines = re.read(self.white_sulcalines.fullPath())
     mesh = re.read(self.white_mesh.fullPath())
+    context.write('Reading sulcus-label correspondences file')
+    sulc_labels_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
+
+#     if self.model_file is not None:
+#         context.write('Reading model')
+#         model = md.Model().read(self.model_file.fullPath())
+#         for line in model.printArgs().splitlines():
+#             context.write(line)
+#     else:
+#         model = md.Model()
+#     length = model.right - model.left
+#     width = model.top - model.bottom
+
     context.write('HIP')
- 
-    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata())
+    (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), self.rectangle_length, self.rectangle_width)
     (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
     vert = np.array(neoCortex_square.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
@@ -92,7 +117,7 @@ def execution( self, context ):
         poly = np.array(neoCortex_square.polygon())
         context.write('------------------unfolding reversed triangles')
         (neoCortex_square, nb_inward_evol, inward_evol) = map.solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, self.nb_it_local_smoothing_for_unfolding)
-#        (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
+        vert = np.array(neoCortex_square.vertex())
         context.write('------------------evolution of the iterative unfolding : '+str(nb_inward_evol))
 #         inward_tex = 'tmp.tex'
 #         context.write('------------------writing inward tex in : '+inward_tex)
@@ -102,8 +127,46 @@ def execution( self, context ):
 #         tex_unfold = aims.TimeTexture_S16()
 #         tex_unfold[0].assign(tmp_tex)
 #         ws.write(tex_unfold, inward_tex)
-
+    context.write('Translating the barycenter of S.C. to 0')
+    output_SL_tex = aims.TimeTexture(sulcal_lines)
+    output_tex_tmp = sulcal_lines[0].arraydata()[neocortex_indices]
+    tex_square_sulci = np.zeros(vert.shape[0], sulcal_lines[0].arraydata().dtype )
+    tex_square_sulci[range( len(neocortex_indices) )] = output_tex_tmp
+    for b in neoCortex_open_boundary:
+        tex_square_sulci[b] = 0
+    output_SL_tex[0].assign(tex_square_sulci)
+    
+    
+    labels = np.unique(tex_square_sulci)
+    labels = labels[labels!=0]
+    context.write('found the following sulci in the texture :')
+    context.write([sulc_labels_dict[lab] for lab in labels])
+    context.write('associated to the following labels :')
+    context.write(labels)
+    full_sulci = slSet.SulcalLinesSet() 
+    full_sulci.extractFromTexture(tex_square_sulci, neoCortex_square, sulc_labels_dict)
+    SC_ind = full_sulci.names.index(('S.C._'+self.side))   
+    SC_label = full_sulci.labels[SC_ind]
+#    full_sulci.sulcalLines[SC_ind].printArgs()
+    translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
+    vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
+    neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
+    
     context.write('Writing meshes and textures')
+    if self.side == 'right':
+        poly = np.array(neoCortex_square.polygon())
+        poly_tmp = poly.copy()
+#        context.write(poly_tmp[0,:])
+        poly_tmp[:,0] = poly[:,1]
+        poly_tmp[:,1] = poly[:,0]
+        pp = aims.vector_AimsVector_U32_3()
+        for i in poly_tmp:
+            pp.append(i)
+#        context.write(np.array(pp)[0,:])
+        neoCortex_square.polygon().assign(pp)
+        neoCortex_square.updateNormals()
+    ws.write( neoCortex_square, self.rectangular_mesh.fullPath() )
+    ws.write(output_SL_tex, self.rectangular_white_sulcalines.fullPath())
     mesh_parts = aims.AimsTimeSurface_3()
     '''
     mesh_parts[0] = neoCortex
@@ -133,7 +196,6 @@ def execution( self, context ):
         tmp_tex[bound] = 1
         tex_boundary[ind].assign(tmp_tex)
     ws.write(tex_boundary, self.boundary_texture.fullPath())
-    ws.write( neoCortex_square, self.rectangular_mesh.fullPath() )
     '''
     tex_corresp_indices contains the indices of the vertices in white_mesh for:
         neoCortex_square in time 0

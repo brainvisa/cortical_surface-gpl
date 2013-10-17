@@ -9,18 +9,36 @@ from brainvisa.cortical_surface.parameterization import model as md
 from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 from scipy import sparse
 import scipy
+
+
+#########################################################
+# tolerance parameter for the linear system          ####
+# solver in scipy                                    ####
+# smaller value makes solver slower but more precise ####
+solver_tolerance = 1e-6                              ####
+#########################################################
 ver = [1]#[ int(x) for x in scipy.__version__.split( '.' ) ]
 if ver < [ 0, 9 ]:
-    print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower)'
+    print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower), with tolerance = ',solver_tolerance
     from scipy.sparse.linalg import gmres
     solver = 'gmres'
 else:
-    print 'HIP-HOP :: using lgmres for solving linear systems'
+    print 'HIP-HOP :: using lgmres for solving linear systems, with tolerance = ',solver_tolerance
     from scipy.sparse.linalg import lgmres
     solver = 'lgmres'  
 import numpy as np
 from soma import aims, aimsalgo
 import time
+
+
+#########################################################
+# tolerance parameter for the linear system          ####
+# solver in scipy                                    ####
+# smaller value makes solver slower but more precise ####
+solver_tolerance = 1e-6                              ####
+#########################################################
+
+
 
 #class Mapping(object):
 #    '''
@@ -107,11 +125,11 @@ def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
 #    Rx = sparse.lil_matrix(Rx).tocsr()
 #    Ry = sparse.lil_matrix(Ry).tocsr()
     if solver == 'lgmres':
-        x, info = lgmres(L, Rx, tol=1e-6)
-        y, info = lgmres(L, Ry, tol=1e-6)
+        x, info = lgmres(L, Rx, tol=solver_tolerance)
+        y, info = lgmres(L, Ry, tol=solver_tolerance)
     else:
-        x, info = gmres(L, Rx, tol=1e-6)
-        y, info = gmres(L, Ry, tol=1e-6)
+        x, info = gmres(L, Rx, tol=solver_tolerance)
+        y, info = gmres(L, Ry, tol=solver_tolerance)
 
 #    y = spsolve(L, Ry)
     z = np.zeros(Nv)
@@ -143,7 +161,6 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
     "boundary[1] == neocortex_poles_path always from insula to cingular pole"
     "boundary[2] == cingular_boundary"
     "boundary[3] == new vertices always from insula to cingular pole"
-    tol_in = 1e-6
     print 'mapping to the rectangle  ', length, ' x ', width, 'with fixed_boundary = ', fixed_boundary
     #print 'Laplacian : ', L
     Nbv = np.array(mesh.vertex()).shape[0]
@@ -259,19 +276,19 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
 #        result = scipy.sparse.linalg.lgmres(matrix, b, tol=1e-4, M=M)[0]
 #        print 'using bicgstab'
 #        t0 = time.clock()
-#        x1, info = bicgstab(Lx, Rx)#, tol=1e-6)
+#        x1, info = bicgstab(Lx, Rx)#, tol=solver_tolerance)
 ##        print info
 #        print time.clock() - t0, "seconds process time"
 #        print 'error:',np.linalg.norm(x_ex-x1)
         t0 = time.clock()
         if solver == 'lgmres':
-            x, info = lgmres(Lx, Rx, tol=tol_in)
-            y, info = lgmres(Ly, Ry, tol=tol_in)#spsolve(Ly, Ry)
+            x, info = lgmres(Lx, Rx, tol=solver_tolerance)
+            y, info = lgmres(Ly, Ry, tol=solver_tolerance)#spsolve(Ly, Ry)
             print 'using lgmres'
         else:
             print 'using gmres'
-            x, info = gmres(Lx, Rx, tol=tol_in)
-            y, info = gmres(Ly, Ry, tol=tol_in)
+            x, info = gmres(Lx, Rx, tol=solver_tolerance)
+            y, info = gmres(Ly, Ry, tol=solver_tolerance)
 #        print info
         print time.clock() - t0, "seconds process time"
     print 'matrix inverted'
@@ -303,7 +320,6 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     "boundary[1] == neocortex_poles_path always from insula to cingular pole"
     "boundary[2] == cingular_boundary"
     "boundary[3] == new vertices always from insula to cingular pole"
-    tol_in = 1e-6
     print 'cstr mapping in the rectangle  with cstrBalance = ', cstrBalance
     #print 'Laplacian : ', L
     vert = np.array(mesh.vertex())
@@ -338,18 +354,22 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     C_lon = np.zeros(Nbv)#sparse.lil_matrix(Nbv, 1)
     A_lon_diag = np.zeros(Nbv)
     for lon_cstr_ind in sulcalCstr.longitudeCstrIndex:
-        lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = sulcalCstr.sulcalLines[lon_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lon_cstr_ind].weight
-        C_lon[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] * lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
-        A_lon_diag[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = -lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
+        if sulcalCstr.sulcalLines[lon_cstr_ind].axisID in modele.longitudeAxisID:
+            if modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] is not None:
+                lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = sulcalCstr.sulcalLines[lon_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lon_cstr_ind].weight
+                C_lon[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] * lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
+                A_lon_diag[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = -lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
     A_lon = sparse.dia_matrix((A_lon_diag, 0), (Nbv, Nbv))
 
     lat_weights = np.zeros(Nbv)
     C_lat = np.zeros(Nbv)
     A_lat_diag = np.zeros(Nbv)
     for lat_cstr_ind in sulcalCstr.latitudeCstrIndex:
-        lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = sulcalCstr.sulcalLines[lat_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lat_cstr_ind].weight
-        C_lat[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] * lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
-        A_lat_diag[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = -lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
+        if sulcalCstr.sulcalLines[lat_cstr_ind].axisID in modele.latitudeAxisID:
+            if modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] is not None:
+                lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = sulcalCstr.sulcalLines[lat_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lat_cstr_ind].weight
+                C_lat[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] * lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
+                A_lat_diag[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = -lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
     A_lat = sparse.dia_matrix((A_lat_diag, 0), (Nbv, Nbv))
 
 ##    t1 = timeit.default_timer()
@@ -360,6 +380,29 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 ##    Rx = sparse.lil_matrix(Rx).tocsr()
 ##    t2 = timeit.default_timer()
 ##    print "%.2f sec"  %(t2-t1)
+
+#     li = np.hstack(Lx.data)
+#     print 'nb Nan in Lx : ', len(np.where(np.isnan(li))[0])
+#     print 'nb Inf in Lx : ', len(np.where(np.isinf(li))[0])   
+#     print 'nb Nan in Rx : ', len(np.where(np.isnan(Rx))[0])
+#     print 'nb Inf in Rx : ', len(np.where(np.isinf(Rx))[0])
+#     li = np.hstack(A_lon.data)
+#     print 'nb Nan in A_lon : ', len(np.where(np.isnan(li))[0]) 
+#     print 'nb Inf in A_lon : ', len(np.where(np.isinf(li))[0])  
+#     print 'nb Nan in C_lon : ', len(np.where(np.isnan(C_lon))[0])  
+#     print 'nb Inf in C_lon : ', len(np.where(np.isinf(C_lon))[0])  
+#      
+#     li = np.hstack(Ly.data)
+#     print 'nb Nan in Ly : ', len(np.where(np.isnan(li))[0])
+#     print 'nb Inf in Ly : ', len(np.where(np.isinf(li))[0])
+#     print 'nb Nan in Ry : ', len(np.where(np.isnan(Ry))[0])
+#     print 'nb Inf in Ry : ', len(np.where(np.isinf(Ry))[0])  
+#     li = np.hstack(A_lat.data)
+#     print 'nb Nan in A_lat : ', len(np.where(np.isnan(li))[0]) 
+#     print 'nb Inf in A_lat : ', len(np.where(np.isinf(li))[0])    
+#     print 'nb Nan in C_lat : ', len(np.where(np.isnan(C_lat))[0])   
+#     print 'nb Inf in C_lat : ', len(np.where(np.isinf(C_lat))[0])   
+
 #
     print 'solve the linear system'
     Lx = Lx.tocsr()
@@ -375,18 +418,23 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
 
 #    x = spsolve(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx)
 #    y = spsolve(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry)
+    
+    
+
+
+
     t0 = time.clock()
     if solver == 'lgmres':
-        x, info = lgmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=tol_in)
+        x, info = lgmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for x"
         t0 = time.clock()
-        y, info = lgmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=tol_in)
+        y, info = lgmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for y"
     else:        
-        x, info = gmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=tol_in)
+        x, info = gmres(Lx - cstrBalance * A_lon, cstrBalance * C_lon + Rx, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for x"
         t0 = time.clock()
-        y, info = gmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=tol_in)
+        y, info = gmres(Ly - cstrBalance * A_lat, cstrBalance * C_lat + Ry, tol=solver_tolerance)
         print time.clock() - t0, "seconds process time for y"
     print 'matrix inverted'
     z = np.zeros(Nbv)
@@ -533,9 +581,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     neoCortex_open_boundary = boundaryReordering(neoCortex_boundary, neocortex_poles_path, vert)
 
     neigh_verts = set(np.hstack(list(neigh[v]) for v in neoCortex_open_boundary[1]))
-    print 'neigh_verts : ', neigh_verts
     other_verts = neigh_verts.difference(neoCortex_open_boundary[1])
-    print 'other_verts : ', other_verts
 #     tex_out = aims.TimeTexture_S16()
 #     tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
 #     for i in xrange(neoCortex_mesh.vertex().size()):
@@ -553,7 +599,6 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     nb_tagged_o = 0
     cluster1 = [l_other_verts[0]]
     tag[l_other_verts.index(cluster1[0])] = 1
-    print neigh[cluster1[0]]
     neigh_cluster1 = set(neigh[cluster1[0]])
     while nb_tagged > nb_tagged_o:
         nb_tagged_o = nb_tagged
@@ -562,21 +607,15 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
                 cluster1.append(v)
                 neigh_cluster1 = neigh_cluster1.union(neigh[v])
                 tag[l_other_verts.index(v)] = 1
-                print cluster1
-                print neigh[v]
-                print neigh_cluster1
         nb_tagged = tag.sum()
         test = nb_tagged > nb_tagged_o
-        print "test ", test
-        print "nb_tagged ",nb_tagged
     "identify the anterior bank of the cut :: first vertex of the insula boundary is anterior while last one is posterior"   
     inter_bound0 = set(cluster1).intersection(neoCortex_open_boundary[0])
+    print 'inter_bound0 ',inter_bound0 
     if inter_bound0:
         if neoCortex_open_boundary[0].index(list(inter_bound0)) < (len(neoCortex_open_boundary[0]) / 2):
-            print 'cluster1 anterior'
             posterior_cluster = other_verts.difference(cluster1)
         else:
-            print 'cluster1 anterior'
             posterior_cluster = cluster1
     else:
         print 'problem: cluster1.intersection(insula) is empty'
@@ -588,15 +627,12 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
 
     added_poly_inds = set(posterior_cluster_ind_poly).intersection(poles_path_ind_poly)
     added_poly = poly[list(added_poly_inds), :]
-    print "added_poly ", added_poly
-    print "added_poly_inds ", added_poly_inds
 
     nb_new_verts = len(neoCortex_open_boundary[1])
     new_verts_inds = range(vert.shape[0], vert.shape[0] + nb_new_verts)
     for i in range(nb_new_verts):
         places = np.where(added_poly == neoCortex_open_boundary[1][i])
         added_poly[places[0], places[1]] = new_verts_inds[i]
-    print "added_poly ", added_poly
     #poly = np.vstack([poly,added_poly])
     poly[list(added_poly_inds), :] = added_poly
     pp = aims.vector_AimsVector_U32_3()
@@ -607,12 +643,10 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     for i in range(vert.shape[0]):
         vv.append([vert[i, 0], vert[i, 1], vert[i, 2]])
 
-    print 'create new mesh'
     neoCortex_open_mesh = aims.AimsTimeSurface_3()
     neoCortex_open_mesh.vertex().assign(vv)
     neoCortex_open_mesh.polygon().assign(pp)
     neoCortex_open_mesh.updateNormals()
-    print 'new mesh created'
 
     "add the new boundary and connect it"
     "neoCortex_open_boundary[3] == new verices always from insula to cingular pole as for neoCortex_open_boundary[1]"
@@ -631,9 +665,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
 #        pol = np.vstack( (np.zeros( len(boundary[bound_ind])-2, dtype = np.int32 ),boundary[bound_ind][0:-2],boundary[bound_ind][1:-1] )).transpose()
 #        print pol.dtype#astype(np.float32).dtype
 #        bound_mesh.polygon(bound_ind).assign([ aims.AimsVector(x,'U32') for x in pol ])
-    print "new_verts_inds ", new_verts_inds
-    print "cluster1 ", cluster1
-    print "neigh_cluster1 ", neigh_cluster1
+
     return (neoCortex_open_mesh, neoCortex_open_boundary)
 
 
@@ -643,7 +675,6 @@ def boundaryReordering(neoCortex_boundary, neocortex_poles_path, vert):
     "insula and cingular boundary are always oriented in the same way"
     path_bound0 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[0])))
     path_bound1 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[1])))
-
     if path_bound0:
         ind_path_bound0 = neocortex_poles_path.index(path_bound0[0])
     else:
@@ -748,12 +779,12 @@ def texture2ROI(tex_cstr, neocortex_indices):
 def sphericalMeshFromCoords(tex_lat, tex_lon, ray):
     tex_lat = tex_lat * np.pi / 180
     tex_lon = tex_lon * np.pi / 180
-    print tex_lon
+#    print tex_lon
     spherical_verts = np.ndarray((tex_lat.shape[0], 3))
     spherical_verts[:, 1] = ray * np.cos(tex_lon) * np.sin(tex_lat)
     spherical_verts[:, 0] = ray * np.sin(tex_lon) * np.sin(tex_lat)
     spherical_verts[:, 2] = ray * np.cos(tex_lat)
-    print spherical_verts[:, 2]
+#    print spherical_verts[:, 2]
     return spherical_verts
 
 
@@ -816,31 +847,49 @@ def crossp(x,y):
 
 
 
-def parcelsFromCoordinates(template_lat,template_lon,model):
-    #calculer model.longitudeAxisCoord dans [0-360] a partir des coords de boundary du model
-    
+def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=None):
+    if parcellation_type is None:
+        parcellation_type == 'model' # default resolution
 
-    (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree(model.insularPoleBoundaryCoord,  model.cingularPoleBoundaryCoord)
-    print longitude_axis_coords
-    print latitude_axis_coords
+    between_poles_parcell_central_value = 190
+    between_poles_parcell_width = 120
+    temporal_pole_parcell_width = 40
+    
+    (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree()
+#    print longitude_axis_coords
+#    print latitude_axis_coords
     
     nb_vert = template_lat.shape[0]
     tex_parcels = np.zeros(nb_vert)
-    lab_parcel = 1
-    sort_axes_lon = [0]
-    for f in longitude_axis_coords:#[360 - f for f in model.longitudeAxisID]
+    lab_parcel = 2
+    sort_axes_lon = [360]
+    for f in longitude_axis_coords[:-1]:#[360 - f for f in model.longitudeAxisID]
         if f is not None:
             sort_axes_lon.append(f)
-    sort_axes_lon.sort()
+    sort_axes_lon.append(between_poles_parcell_central_value - between_poles_parcell_width / 2)
+    sort_axes_lon.append(between_poles_parcell_central_value + between_poles_parcell_width / 2)    
+
     sort_axes_lat = [0, model.insularPoleBoundaryCoord]
     for f in latitude_axis_coords:
         if f is not  None:
            sort_axes_lat.append(f) 
+         
+    sort_axes_lon.sort()
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
+    
+    if parcellation_type == 'coarse':
+        # add suplementary axes to the model <=> subdivise parcels
+        # antero-posterior subdivision of the prefrontal lobe
+        sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
+        # antero-posterior subdivision of the temporal lobe
+        sort_axes_lon.append(sort_axes_lon[5] + 3 * (sort_axes_lon[6] - sort_axes_lon[5]) / 4)
+        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcell_width)
+        sort_axes_lon.sort()
+
 #    sort_axes_lat.append(180)
-    print sort_axes_lon
-    print sort_axes_lat
+#    print sort_axes_lon
+#    print sort_axes_lat
     for t_lon in range(len(sort_axes_lon)-1):
 #        print sort_axes_lon[t_lon]
         inds_lon = np.where((template_lon >= sort_axes_lon[t_lon])&(template_lon<=sort_axes_lon[t_lon+1]))[0]
@@ -851,45 +900,72 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
 #            print 'lab_parcel', lab_parcel
             lab_parcel = lab_parcel+1
 
-#     # concatenate some parcells
-#     # INSULA sup ant
-#     tex_parcels[tex_parcels == 79] = 1
-#     tex_parcels[tex_parcels == 73] = 1
-#     # INSULA sup post
-#     tex_parcels[tex_parcels == 13] = 25
-#     tex_parcels[tex_parcels == 19] = 25
-#     tex_parcels[tex_parcels == 7] = 25
-#     # INSULA inf
-#     tex_parcels[tex_parcels == 43] = 37
-#     tex_parcels[tex_parcels == 49] = 37
-#     tex_parcels[tex_parcels == 55] = 37
-#     tex_parcels[tex_parcels == 61] = 37
-#     tex_parcels[tex_parcels == 67] = 37
-#     # arround the path between the poles
-#     tex_parcels[tex_parcels ==32] = 31
-#     tex_parcels[tex_parcels ==33] = 31
-#     tex_parcels[tex_parcels ==34] = 31
-#     tex_parcels[tex_parcels ==35] = 31
-#     tex_parcels[tex_parcels ==36] = 31
-#     tex_parcels[tex_parcels ==38] = 31
-#     tex_parcels[tex_parcels ==39] = 31
-#     tex_parcels[tex_parcels ==40] = 31
-#     tex_parcels[tex_parcels ==41] = 31
-#     tex_parcels[tex_parcels ==42] = 31
-#     # temporal anterior
-#     tex_parcels[tex_parcels ==45] = 44
-#     tex_parcels[tex_parcels ==46] = 44
-#     tex_parcels[tex_parcels ==47] = 44
-#     tex_parcels[tex_parcels ==48] = 44 
-#     uparcells=np.unique(tex_parcels)
-#     print uparcells
-#     reord_parc=1
-#     for u_parc in uparcells[2:]:
+    if parcellation_type == 'coarse':
+        print 'il faut concatener autour du path!'
+    #     # INSULA sup ant
+    #     tex_parcels[tex_parcels == 79] = 1
+    #     tex_parcels[tex_parcels == 73] = 1
+    #     # INSULA sup post
+    #     tex_parcels[tex_parcels == 13] = 25
+    #     tex_parcels[tex_parcels == 19] = 25
+    #     tex_parcels[tex_parcels == 7] = 25
+    #     # INSULA inf
+    #     tex_parcels[tex_parcels == 43] = 37
+    #     tex_parcels[tex_parcels == 49] = 37
+    #     tex_parcels[tex_parcels == 55] = 37
+    #     tex_parcels[tex_parcels == 61] = 37
+    #     tex_parcels[tex_parcels == 67] = 37
+        # arround the path between the poles
+    #    tex_parcels[tex_parcels == 30] = 30
+        tex_parcels[tex_parcels == 38] = 37
+        tex_parcels[tex_parcels == 39] = 37
+        tex_parcels[tex_parcels == 40] = 37
+        tex_parcels[tex_parcels == 41] = 37
+        tex_parcels[tex_parcels == 42] = 37
+        tex_parcels[tex_parcels == 43] = 37
+        # temporal anterior
+    #     tex_parcels[tex_parcels ==45] = 44
+    #     tex_parcels[tex_parcels ==46] = 44
+    #     tex_parcels[tex_parcels ==47] = 44
+    #     tex_parcels[tex_parcels ==48] = 44 
+
+    else:#default parcellation <=> model axes
+
+    #     # concatenate some parcels
+    #     # INSULA sup ant
+    #     tex_parcels[tex_parcels == 79] = 1
+    #     tex_parcels[tex_parcels == 73] = 1
+    #     # INSULA sup post
+    #     tex_parcels[tex_parcels == 13] = 25
+    #     tex_parcels[tex_parcels == 19] = 25
+    #     tex_parcels[tex_parcels == 7] = 25
+    #     # INSULA inf
+    #     tex_parcels[tex_parcels == 43] = 37
+    #     tex_parcels[tex_parcels == 49] = 37
+    #     tex_parcels[tex_parcels == 55] = 37
+    #     tex_parcels[tex_parcels == 61] = 37
+    #     tex_parcels[tex_parcels == 67] = 37
+        # arround the path between the poles
+    #    tex_parcels[tex_parcels == 30] = 30
+        tex_parcels[tex_parcels == 31] = 30
+        tex_parcels[tex_parcels == 32] = 30
+        tex_parcels[tex_parcels == 33] = 30
+        tex_parcels[tex_parcels == 34] = 30
+        tex_parcels[tex_parcels == 35] = 30
+        tex_parcels[tex_parcels == 36] = 30
+    # cingular pole
+    tex_parcels[tex_parcels == 0] = 1
+    
+    
+    
+    
+    uparcells = np.unique(tex_parcels)
+#     reord_parc = 1
+#     for u_parc in uparcells:
 #         tex_parcels[tex_parcels == u_parc] = reord_parc
-#         reord_parc = reord_parc+1
+#         reord_parc = reord_parc+2
 
-    return tex_parcels
-
+    return (tex_parcels, uparcells.shape[0])
 
 
 ####################################################################
@@ -898,6 +974,8 @@ def parcelsFromCoordinates(template_lat,template_lon,model):
 #
 ####################################################################
 def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
+    max_tot_count = 30
+    max_count = 5
     if neigh is None:
         neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
     poly = np.array(mesh.polygon())
@@ -905,9 +983,10 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
     nb_inward_evol = [nb_inward]
     inward_evol = [inward]
     count = 0
+    tot_count = 0
     while nb_inward_evol[-1] > 0:
         # group connected polyons into patchs
-        t0 = time.clock()
+#        t0 = time.clock()
         bary = np.unique(poly[inward, :])
 #         print time.clock() - t0, "seconds process time"
 #         t0 = time.clock()
@@ -916,10 +995,10 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
 #             adj_list.append(neigh[b].list())
 #         print time.clock() - t0, "seconds process time"
         vert = np.array(mesh.vertex())
-        t0 = time.clock()
+#        t0 = time.clock()
         vert_out = vert.copy()
-        print time.clock() - t0, "seconds process time"
-        t0 = time.clock()
+#        print time.clock() - t0, "seconds process time"
+#        t0 = time.clock()
         for it in range(nb_it_smooth):
             for ind_bary,b in enumerate(bary):#l_neigh_bary in enumerate(adj_list):
                 l_neigh_bary = neigh[b].list()
@@ -935,25 +1014,30 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
             vert_out[boundary[3], 0] = vert[boundary[3], 0]
             ###########################
             vert = vert_out.copy()
-        print time.clock() - t0, "seconds process time"
-        t0 = time.clock()
+#        print time.clock() - t0, "seconds process time"
+#        t0 = time.clock()
         vv = aims.vector_POINT3DF()
         for x in vert:
             vv.append(x)
         mesh.vertex().assign(vv)
-        print time.clock() - t0, "seconds process time"
-        t0 = time.clock()
+#        print time.clock() - t0, "seconds process time"
+#        t0 = time.clock()
         (nb_inward, inward) = invertedPolygon(mesh)
-        print time.clock() - t0, "seconds process time"
+#        print time.clock() - t0, "seconds process time"
         nb_inward_evol.append(nb_inward)
         inward_evol.append(inward)
         print nb_inward_evol
+        tot_count +=1
+        if tot_count > max_tot_count:
+            print 'unable to solve the inverted faces'
+            break
         if len(nb_inward_evol)>3:
             if nb_inward_evol[-1] == nb_inward_evol[-2] or nb_inward_evol[-1] == nb_inward_evol[-3]:
                 count += 1
             else:
                 count = 0
-        if count > 10:
+        if count > max_count:
+            print 'unable to solve the inverted faces'
             break
     return (mesh, nb_inward_evol, inward_evol)
 
@@ -965,10 +1049,8 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
 # HIP
 #
 ####################################################################
-def hip(mesh, insula_tex_clean, cingular_tex_clean):
+def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 #    square_ratio = 4.5
-    length = 4.5
-    width = 1
     neocortex_tex_value = 0
     insula_tex_value = 180
     cingular_tex_value = 1
@@ -977,10 +1059,9 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     insular_inds = np.where(insula_tex_clean == insula_tex_value)[0]
     # test that there is no intersection between the two poles
     inter = set(cingular_inds).intersection(insular_inds)
-    print inter
     if inter:
         print ('problem: the two poles are connected, cannot cut the mesh!!')
-        raise Exception('the two poles are connected, cannot cut the mesh')
+        raise Exception('Cingular and Insular poles are connected ! You should rerun the insular pole extaction with a larger erosion parameter value.')
         return
 
     tex_poles_clean = np.zeros(cingular_tex_clean.size)
@@ -993,10 +1074,14 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     #    cingular_tex_clean, cing_tex_boundary = poleTextureClean(mesh, texture_poles, cingular_tex_value)    #    insula_tex_clean, ins_tex_boundary = poleTextureClean(mesh, texture_poles, insula_tex_value)
     print '------------------CutMesh'
     (sub_meshes, labels, sub_indexes) = surfTls.cutMesh(mesh, tex_poles_clean)
-    print labels
+    print 'labels found in the texture ', labels
     neo_ind = labels.index(neocortex_tex_value)
     neoCortex_mesh = sub_meshes[neo_ind]
     neoCortex_boundary = surfTls.meshBoundary(sub_meshes[neo_ind])
+    if len(neoCortex_boundary)>2:
+        print ('problem: more than 2 boundaries in the neoCortex, the pole textures have topological defects')
+        raise Exception('more than 2 boundaries in the neoCortex, the pole textures have topological defects')
+        return
     neocortex_indices = sub_indexes[neo_ind]
     ins_ind = labels.index(insula_tex_value)
     insula_mesh = sub_meshes[ins_ind]
@@ -1009,8 +1094,30 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     print '------------------poles path, always from insula to cingular pole'
     cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
     ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
-    poles_path = getShortestPath(mesh, ins_tex_boundary[0], cing_tex_boundary[0])
-    "poles_path to neocortex"
+    poles_path = getShortestPath(mesh, ins_tex_boundary[-1], cing_tex_boundary[-1])
+#     ws = aims.Writer()
+#     tex_out = aims.TimeTexture_S16()
+#     tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in poles_path:
+#              tex_out[0].append(1)
+#         else:
+#              tex_out[0].append(0)
+#     tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in cing_tex_boundary[-1]:
+#              tex_out[1].append(1)
+#         else:
+#              tex_out[1].append(0)
+#     tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in ins_tex_boundary[-1]:
+#              tex_out[2].append(1)
+#         else:
+#              tex_out[2].append(0)
+#     ws.write(tex_out, '/home/toz/poles_link.tex')
+
+    '''poles_path to neocortex'''
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
     print '------------------path2Boundary'
     (neoCortex_open_mesh, neoCortex_open_boundary) = path2Boundary(neoCortex_mesh,neoCortex_boundary,neocortex_poles_path)
@@ -1020,21 +1127,12 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean):
     return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh)
 #     if write_all_steps_to_disk:
 #         print '------------------textureBoundary'
-#         ws = aims.Writer()
 #         ws.write(neoCortex_mesh, '/home/toz/ammon_Lwhite_neocortex_cut_mesh.mesh')
 #         ws.write(insula_mesh, '/home/toz/ammon_Lwhite_insula_cut_mesh.mesh')
 #         ws.write(cingular_mesh, '/home/toz/ammon_Lwhite_cingular_cut_mesh.mesh')
 #         ws.write(meshBoundaryMesh(mesh, cing_tex_boundary), '/home/toz/ammon_Lwhite_decim_cing_boundary.mesh' )
 #         ws.write(meshBoundaryMesh(mesh, ins_tex_boundary), '/home/toz/ammon_Lwhite_decim_ins_boundary.mesh' )
 #         print poles_path
-#         tex_out = aims.TimeTexture_S16()
-#         tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-#         for i in xrange(mesh.vertex().size()):
-#             if i in poles_path:
-#                 tex_out[0].append(1)
-#             else:
-#                 tex_out[0].append(0)
-#         ws.write(tex_out, '/home/toz/ammon_Lwhite_decim_poles_link.tex')
 #         print neocortex_poles_path
 #         tex_out = aims.TimeTexture_S16()
 #         tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
@@ -1067,7 +1165,9 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     full_sulci.extractFromTexture(texture_sulci, neoCortex_square, sulci_dict)
 
     
-    
+    '''
+    realign the S.C. to 0, should already be the case!
+    '''    
     SC_ind = full_sulci.names.index(('S.C._'+side))   
     SC_label = full_sulci.labels[SC_ind]
     print 'SC_label: ', SC_label
@@ -1082,7 +1182,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
         model = md.Model()
 
     full_sulci.sulcalLine2SulcalConstraint(model)
-    #    full_sulci.printArgs()
+#    full_sulci.sulcalLines[SC_ind].printArgs()
     if model is None:
         model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
         model.setAxisCoord(full_sulci)

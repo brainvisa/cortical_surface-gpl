@@ -37,7 +37,7 @@ from soma import aims
 
 
 name = 'Get Sulci Mesh From Graph'
-userLevel = 2
+userLevel = 1
 	
 ################################################################################
 # Signature

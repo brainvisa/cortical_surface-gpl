@@ -4,7 +4,7 @@ from brainvisa.tools import aimsGlobals
 
 name = 'Project Texture Onto Atlas'
 
-userLevel = 2
+userLevel = 0
 
 
 signature = Signature(

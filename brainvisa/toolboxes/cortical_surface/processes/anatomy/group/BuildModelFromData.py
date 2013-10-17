@@ -40,7 +40,7 @@ except:
     
 name = 'Build a Model from a set of subjects'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
                       
@@ -51,7 +51,10 @@ signature = Signature(
     'flat_white_sulcalines',ListOf( ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ) ),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ListOf( ReadDiskItem( 'Graph Label Translation', 'Text File') ),
-    'model_file',WriteDiskItem( 'HipHop Model', 'Text File')
+    'model_file',WriteDiskItem( 'HipHop Model', 'Text File'),
+    'model_file_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
+    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),    
+    'union_sulcal_lines_texture',WriteDiskItem( 'Texture', 'Texture') 
 )
 
 def initialization( self ):
@@ -64,7 +67,7 @@ def initialization( self ):
 #    self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
     self.linkParameters( 'flat_white_sulcalines', 'rectangular_mesh')
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
-
+    self.setOptional('model_file_mesh', 'union_sulcal_lines_mesh', 'union_sulcal_lines_texture')
     
 def execution( self, context ):
 
@@ -83,9 +86,9 @@ def execution( self, context ):
         sulci_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels[ind_mesh].fullPath())
         full_sulci = slSet.SulcalLinesSet()
         full_sulci.extractFromTexture(tex_square_sulci[0].arraydata(), mesh, sulci_dict)
+        context.write('Translating the barycenter of S.C. to 0')
         SC_ind = full_sulci.names.index(('S.C._'+self.side))   
         SC_label = full_sulci.labels[SC_ind]
-        print 'SC_label: ', SC_label
 #        full_sulci.sulcalLines[SC_ind].printArgs()
         translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
         vert = np.array(mesh.vertex())
@@ -118,3 +121,11 @@ def execution( self, context ):
     context.write('------------------- output model -------------------')
     for line in model.printArgs().splitlines():
         context.write(line)
+    if self.model_file_mesh is not None:
+        model.saveToMesh(self.model_file_mesh.fullPath())
+    if self.union_sulcal_lines_mesh is not None:
+        ws = aims.Writer()
+        ws.write(group_full_sulci.toMesh(), self.union_sulcal_lines_mesh.fullPath())
+    if self.union_sulcal_lines_texture is not None:
+        ws = aims.Writer()
+        ws.write(group_full_sulci.toTex(), self.union_sulcal_lines_texture.fullPath())

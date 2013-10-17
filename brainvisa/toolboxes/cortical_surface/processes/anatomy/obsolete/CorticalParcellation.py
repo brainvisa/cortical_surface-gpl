@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
@@ -33,37 +31,31 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals     
+import shfjGlobals   
 
-name = 'Hip-Hop Cortical Parameterization'
-userLevel = 0
+name = 'Cortical Surface Parcellation from HipHop'
 
-signature = Signature( 
-  'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
-  'Rgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
-  'sulcus_identification', Choice('name','label')
-  )
+userLevel = 2
 
+
+signature = Signature(
+    'Side', Choice('left', 'right'),
+    'latitude',WriteDiskItem( 'Latitude coordinate texture','Texture'),
+    'longitude',WriteDiskItem( 'Longitude coordinate texture','Texture'),
+#    'longitude',ReadDiskItem( 'Right hemisphere longitude texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
+#    'right_latitude',ReadDiskItem( 'Right hemisphere latitude texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
+    'file_correspondance_constraint',ReadDiskItem( 'HipHop Model', 'Text File'),
+    'gyri',WriteDiskItem( 'Right hemisphere gyri parcellation texture','Texture',requiredAttributes={ 'side': 'right' } ),
+)
 
 def initialization( self ):
-    self.linkParameters( 'Lgraph','Rgraph')
-    self.linkParameters( 'Rgraph','Lgraph')
-    self.sulcus_identification='label'
-    
-    eNode = SerialExecutionNode( self.name, parameterized=self )
+    self.linkParameters( 'latitude','longitude')
+    self.linkParameters( 'longitude','latitude')
+    self.linkParameters( 'gyri','longitude')
+    self.findValue( 'file_correspondance_constraint', {} )
+    self.setOptional('file_correspondance_constraint')
 
-    eNode.addChild( 'Hemisphere_Process_Left',
-                    ProcessExecutionNode( 'HemisphereProcess2012', optional = 1 ) )
-    eNode.addChild( 'Hemisphere_Process_Right',
-                    ProcessExecutionNode( 'HemisphereProcess2012', optional = 1 ) )
-               
-    eNode.Hemisphere_Process_Left.side='left'
-    eNode.Hemisphere_Process_Right.side='right'
-    
-    eNode.addLink( 'Hemisphere_Process_Left.graph', 'Lgraph' )
-    eNode.addLink( 'Hemisphere_Process_Right.graph', 'Rgraph' )
-
-    eNode.addLink( 'Hemisphere_Process_Left.sulcus_identification', 'sulcus_identification')
-    eNode.addLink( 'Hemisphere_Process_Right.sulcus_identification', 'sulcus_identification')
-    
-    self.setExecutionNode( eNode )
+def execution( self, context ):
+    context.write('Cortical parcellation')
+    context.system('AimsGyriStuff', '-x', self.longitude.fullPath() , '-y', self.latitude.fullPath() ,  '-a', self.file_correspondance_constraint.fullPath() ,  '-o' , self.gyri.fullPath() )
+    context.write('Done')

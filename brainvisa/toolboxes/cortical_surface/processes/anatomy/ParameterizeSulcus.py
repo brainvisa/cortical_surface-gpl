@@ -36,7 +36,7 @@ from numpy import *
 
 name = 'Sulcus Parameterization'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
     'graph', ReadDiskItem( 'Cortical folds graph', 'Graph' ),

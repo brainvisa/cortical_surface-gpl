@@ -61,7 +61,7 @@ def polygonAngles(vertices):
 # the two meshes must have the same number of vertex
 #
 ####################################################################
-def meshDdistortions(mesh1,mesh2,type):
+def meshDistortions(mesh1,mesh2,type):
     vert1 = np.array(mesh1.vertex())
     distortions_out = np.zeros(vert1.shape[0])
 #     
@@ -194,7 +194,6 @@ def meshSmoothing(mesh, Niter, dt):
         if (i % mod == 0):
             print i
     print '    OK'
-    print 'Creating new mesh'
     vv = aims.vector_POINT3DF()
     for i in range(N):
         vv.append([Mvert[i, 0], Mvert[i, 1], Mvert[i, 2]])
@@ -225,7 +224,7 @@ def meshSmoothing(mesh, Niter, dt):
 #
 ####################################################################
 def computeMeshWeights(mesh):
-    threshold = 0.00001 #np.spacing(1)??
+    threshold = 0.0001 #np.spacing(1)??
     print '    Computing mesh weights'
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
@@ -249,10 +248,10 @@ def computeMeshWeights(mesh):
         thersh_noqq = np.where(noqq<threshold)[0]
         if len(thersh_nopp) > 0:
             nopp[thersh_nopp] = threshold
-            threshold_needed = 1
+            threshold_needed += len(thersh_nopp)
         if len(thersh_noqq) > 0:
             noqq[thersh_noqq] = threshold
-            threshold_needed = 1
+            threshold_needed += len(thersh_noqq)
 #        print np.min(noqq)
         pp = pp / np.vstack((nopp, np.vstack((nopp, nopp)))).transpose()
         qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
@@ -263,8 +262,8 @@ def computeMeshWeights(mesh):
             ind3 = poly[j, i3]
             W[ind2, ind3] = W[ind2, ind3] + 1 / np.tan(ang[j])
             W[ind3, ind2] = W[ind3, ind2] + 1 / np.tan(ang[j])
-    if threshold_needed:
-        print '    -weight threshold needed-'
+    if threshold_needed > 0:
+        print '    -weight threshold needed for ',threshold_needed,' values-'
     print '    OK'
 
     li = np.hstack(W.data)
@@ -292,6 +291,7 @@ def computeMeshLaplacian(mesh):
     L = sparse.lil_matrix(dia - weights)
     li = np.hstack(L.data)
     print 'nb Nan in L : ', len(np.where(np.isnan(li))[0])
+    print 'nb Inf in L : ', len(np.where(np.isinf(li))[0])   
     print '    OK'
 
     return L
@@ -362,8 +362,10 @@ def textureTopologicalCorrection(mesh, atex, tex_val, background_val=0, neigh=No
         print 'length of boundaries : ',[len(bound) for bound in boundary]
         #----------------end:: fill any hole in this single connex component
         #----------------begin:: ensure that the boundary do not contain the 3 vertices of a triangle
-        print 'cleaning the boundary of the texture'
-        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[0], background_val, neigh)
+        print 'cleaning the longest boundary of the texture'
+        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[-1], background_val, neigh)
+        #----------------end:: ensure that the boundary do not contain the 3 vertices of a triangle
+
     return (atex, boundary)
 
 ####################################################################
@@ -377,22 +379,32 @@ def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None
     poly = np.array(mesh.polygon())
     I = ismember(poly, bound)
     poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
-    print poly_set.shape[0]
-    u_bound = set(bound)
-    count_list = [bound.count(x) for x in u_bound]
-    lu_bound = list(u_bound)
-    pb_pt = np.array(lu_bound)[np.where(np.array(count_list) > 1)[0]]
-    print pb_pt
-    pts_to_remove = []
-    for pb_poly in poly_set:
-        pts_to_remove.append(pb_poly[np.where(ismember(pb_poly, pb_pt) == False)[0]])
-    print pts_to_remove
-    if len(pts_to_remove) > 0:
-        tex[np.array(pts_to_remove)] = background_val
-    boundary = textureBoundary(mesh, tex, tex_val, neigh)
-    if len(boundary) > 1:
-        print 'complex boundary after cleanTextureBoundary'
-    return (tex, boundary)
+    if poly_set.shape[0]==0:
+        return (tex, textureBoundary(mesh, tex, tex_val, neigh))
+    else:
+        while poly_set.shape[0]>0:
+            print 'nb triangles on the boundary ',poly_set.shape[0]
+            pts_to_remove = []
+            for pb_poly in poly_set:
+                ind_V1 = bound.index(pb_poly[0])
+                ind_V2 = bound.index(pb_poly[1])
+                ind_V3 = bound.index(pb_poly[2])
+                list_inds = [ind_V1, ind_V2, ind_V3]
+                m = min(list_inds)
+                M = max(list_inds)
+                pts_to_remove.append( bound[list(set(list_inds).difference(set([m,M])))[0]] )
+#             print 'pts_to_remove ', np.array(pts_to_remove)
+#             print 'poly_set ',poly_set
+#             print 'bound ', bound
+            if len(pts_to_remove) > 0:
+                tex[np.array(pts_to_remove)] = background_val
+            boundary = textureBoundary(mesh, tex, tex_val, neigh)
+            bound = boundary[-1]
+            I = ismember(poly, bound)
+            poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
+        if len(boundary) > 1:
+            print 'complex boundary after cleanTextureBoundary'
+        return (tex, boundary)
 
 
 def dilateTexture(tex, neigh, inds):
@@ -488,7 +500,7 @@ def meshAdjacencyMatrix(mesh):
 ####################################################################
 #
 # build the boundary by traversing edges
-# return list of connected components ORDERED, THE FIRST THE LONGEST
+# return list of connected components ORDERED ACCORDING TO THEIR LENGTH, i.e. THE FIRST THE SHORTEST
 # complex boundary corresponds to multiple holes in the surface or bad shaped boundary
 ####################################################################
 def edges2Boundary(li, lj):
@@ -558,14 +570,14 @@ def edges2Boundary(li, lj):
 #                print 'first_occ',first_occ
 #                print 'sec_occ',sec_occ
                 '''create a new boundary that corresponds to the loop '''
-                print '[len(b) for b in boundary]',[len(b) for b in boundary]
+#                print '[len(b) for b in boundary]',[len(b) for b in boundary]
                 boundary.append(bound[first_occ:sec_occ])
                 '''remove the loop from current boundary'''
                 bound[first_occ:sec_occ] = []
 #                print bound
                 occurence = listCount(bound)
             boundary[b_ind] = bound
-            print '[len(b) for b in boundary]',[len(b) for b in boundary]
+#            print '[len(b) for b in boundary]',[len(b) for b in boundary]
 
             
     "sort the boundaries the first the longest"
@@ -575,7 +587,7 @@ def edges2Boundary(li, lj):
 # < = >    inx = np.array(boundaries_len).argsort()
     sort_boundary = [boundary[i] for i in inx]
 #    boundary.sort()
-
+#    print 'in boundary boundaries_len = ',[len(bound) for bound in sort_boundary]
     return sort_boundary
 
 #    boundary_cat = {}
@@ -858,7 +870,6 @@ def cutMesh(mesh, atex):
     labels = np.around(np.unique(atex))
     labels = labels.tolist()
     labels.reverse()
-    print 'labels:' + str(labels)
     sub_meshes = list()
     sub_indexes = list()
     last_label = labels[-1]

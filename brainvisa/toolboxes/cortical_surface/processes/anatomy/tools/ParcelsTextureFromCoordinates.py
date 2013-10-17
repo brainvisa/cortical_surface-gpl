@@ -38,7 +38,7 @@ except:
 
 name = 'ParcelsTextureFromCoordinates'
 
-userLevel = 2
+userLevel = 0
 
 # def validation():
 #     anatomist.validation()
@@ -48,10 +48,10 @@ signature = Signature(
     'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture'),
     'side', Choice('left', 'right'),
     'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture'),
-#    'model', ReadDiskItem(  ),
-    'texture_parcels', WriteDiskItem('hemisphere gyri parcellation texture','Texture', requiredAttributes={ 'regularized': 'false' }),
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
-
+#=    'parcellation_resolution', Choice('model', 'coarse'),
+    'texture_model_parcels', WriteDiskItem('hemisphere parcellation texture','Texture', requiredAttributes={'parcellation_type':'model', 'regularized': 'false' }),
+    'texture_coarse_parcels', WriteDiskItem('hemisphere parcellation texture','Texture', requiredAttributes={'parcellation_type':'coarse', 'regularized': 'false' }),
 )
 
 def initialization( self ):
@@ -61,8 +61,16 @@ def initialization( self ):
             return side
     self.linkParameters( 'side','latitude', linkSide )
     self.linkParameters( 'longitude','latitude')
-    self.linkParameters( 'texture_parcels','latitude')
+#=    self.linkParameters( 'texture_parcels','latitude')
     self.linkParameters( 'model_file', 'latitude' )
+    self.linkParameters( 'texture_model_parcels', 'latitude')
+    self.linkParameters( 'texture_coarse_parcels', 'latitude')
+#=    def linkRes( self, dummy ):
+#=        if self.latitude is not None:
+#=            return self.signature[ 'texture_parcels' ].findValue( self.latitude, requiredAttributes={ 'parcellation_type' : self.parcellation_resolution } )
+
+#=    self.linkParameters( 'texture_parcels', ('latitude', 'parcellation_resolution' ), linkRes )
+    
     
 def execution( self, context ):
        
@@ -73,18 +81,31 @@ def execution( self, context ):
     longitude_texture = re.read(self.longitude.fullPath())
     
     model = md.Model().read(self.model_file.fullPath())
-    context.write('------------------- model used -------------------')
-    for line in model.printArgs().splitlines():
-        context.write(line)
+#=    context.write('------------------- model used -------------------')
+#=    for line in model.printArgs().splitlines():
+#=        context.write(line)
 
-    tex_parcels = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model)
-        
-    if self.side =='left':
-        tex_parcels = tex_parcels + 100
+    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'model')
+ #=   context.write('----------------------------------------------------------')
+    context.write('number of parcels created for the model=based parcellation (including the cingular pole) :')
+    context.write(nb_parcels)
+    if self.side =='right':
+        tex_parcels = tex_parcels + 1
     context.write('Writing texture')
     aims_tex_parcels = aims.TimeTexture_S16()
     aims_tex_parcels[0].assign(tex_parcels)
-    ws.write(aims_tex_parcels, self.texture_parcels.fullPath())
+    ws.write(aims_tex_parcels, self.texture_model_parcels.fullPath())
+
+    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'coarse')
+ #=   context.write('----------------------------------------------------------')
+    context.write('number of parcels created for the coarse poarcellation (including the cingular pole) :')
+    context.write(nb_parcels)
+    if self.side =='right':
+        tex_parcels = tex_parcels + 1
+    context.write('Writing texture')
+    aims_tex_parcels = aims.TimeTexture_S16()
+    aims_tex_parcels[0].assign(tex_parcels)
+    ws.write(aims_tex_parcels, self.texture_coarse_parcels.fullPath())
 
     context.write('Done')
             

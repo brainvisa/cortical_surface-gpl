@@ -35,7 +35,7 @@ import shfjGlobals
 
 name = 'Right Cortical Surface Gyri Regularization'
 
-userLevel = 2
+userLevel = 0
 
 
 signature = Signature(

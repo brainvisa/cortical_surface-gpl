@@ -28,6 +28,7 @@ def validation():
 from brainvisa.processes import *
 import shfjGlobals 
 from soma import aims
+import numpy as np
 
 try :
   from brainvisa.cortical_surface.parameterization.mapping import sphericalMeshFromCoords
@@ -39,26 +40,26 @@ except :
 
 name = 'Spherical mesh from HIP-HOP parameterization coordinates'
 
-userLevel = 2
+userLevel = 0
     
 signature = Signature(
                       
-    'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture' ),
-    'side', Choice('left', 'right'),
-    'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),
+    'side', Choice('left', 'right'),
+    'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture' ),
+    'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture' ),
     'sphere_ray', Float(),
     'spherical_mesh', WriteDiskItem( 'spherical mesh', 'Aims mesh formats' )
 )
 
 def initialization( self ):
     def linkSide( proc, dummy ):
-        if proc.latitude is not None:
-            return proc.latitude.get( 'side' )
-    self.linkParameters( 'side', 'latitude', linkSide )
-    self.linkParameters( 'longitude','latitude')
-    self.linkParameters( 'white_mesh','latitude')
-    self.linkParameters( 'spherical_mesh','latitude')
+        if proc.white_mesh is not None:
+            return proc.white_mesh.get( 'side' )
+    self.linkParameters( 'side', 'white_mesh', linkSide )
+    self.linkParameters( 'longitude','white_mesh')
+    self.linkParameters( 'latitude','white_mesh')
+    self.linkParameters( 'spherical_mesh','white_mesh')
     self.sphere_ray = 100 
     
 def execution( self, context ):
@@ -75,15 +76,22 @@ def execution( self, context ):
 #     for i in range(spherical_verts.shape[0]):
 #         vv.append([spherical_verts[i, 0], spherical_verts[i, 1], spherical_verts[i, 2]])
     mesh = re.read(self.white_mesh.fullPath())
-    print 'vv ok read mesh ok'
     new_mesh = aims.AimsTimeSurface_3()
-    print 'vv ok read mesh ok'
     new_mesh.vertex().assign(vv)
-    print 'vv ok read mesh ok'
-    new_mesh.polygon().assign(mesh.polygon())
-    print 'vv ok read mesh ok'
+    if self.side == 'right':
+        poly = np.array(mesh.polygon())
+        poly_tmp = poly.copy()
+#        context.write(poly_tmp[0,:])
+        poly_tmp[:,0] = poly[:,1]
+        poly_tmp[:,1] = poly[:,0]
+        pp = aims.vector_AimsVector_U32_3()
+        for i in poly_tmp:
+            pp.append(i)
+#        context.write(np.array(pp)[0,:])
+        new_mesh.polygon().assign(pp)
+    else:
+        new_mesh.polygon().assign(mesh.polygon())
     new_mesh.updateNormals()
-    print 'vv ok read mesh ok'
     ws.write( new_mesh, self.spherical_mesh.fullPath() )
 
     context.write('Done')

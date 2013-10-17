@@ -14,6 +14,9 @@
 The Cortical Surface toolbox provides surface-based generation and processing methods for MR brain data.
   </p>
   <p>
+      <span style="color: rgb(255, 51, 51);">IMPORTANT: documentation will be updated and accessible, together with some tutorials, at the following URL: <a href="http://olivier.coulon.perso.luminy.univ-amu.fr/brainvisa.html">http://olivier.coulon.perso.luminy.univ-amu.fr/brainvisa.html</a></span>
+  </p>
+  <p>
 These methods are organized as follow:
   <ul>
   <li> <b>anatomy</b> contains tools to parameterize the cortical surface and perform inter-subject comparisons of cortical surfaces. After cortical parameterization, a cortical surface parcellation into a complete set of gyrus-based regions of interest can be applied. A process for the morphological analyses of sulci (in particular the Central Sulcus) is also provided and generates sulcal depth curves and sulcal profiles such that morphological group analysis can be performed. Additionally, a few tools are provided to average anatomical surfaces that have been parameterized.</li>

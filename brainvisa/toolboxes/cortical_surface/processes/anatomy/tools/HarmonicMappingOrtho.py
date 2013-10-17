@@ -39,7 +39,7 @@ except:
     
 name = 'Harmonic Orthogonal Parameterization (HOP)'
 
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
                       
@@ -112,7 +112,7 @@ def execution( self, context ):
     #context.write( 'labels:', labels )
     #context.write( 'sulc_labels_dict:', sulc_labels_dict )
     #context.write( 'missing:', [ lab not in sulc_labels_dict for lab in labels ] )
-    #context.write([sulc_labels_dict[lab] for lab in labels])
+    context.write([sulc_labels_dict[lab] for lab in labels])
     context.write('associated to the following labels :')
     context.write(labels)
     context.write('HOP')
