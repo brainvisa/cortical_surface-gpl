@@ -66,17 +66,18 @@ def execution( self, context ):
     avg_verts = avg_verts / nb_mesh
     avg_mesh = aims.AimsTimeSurface_3()
     avg_mesh.vertex().assign([ aims.Point3df(x) for x in avg_verts ])
-    if self.side == 'right':
-        poly = np.array(mesh.polygon())
-        poly_tmp = poly.copy()
-        poly_tmp[:,0] = poly[:,1]
-        poly_tmp[:,1] = poly[:,0]
-        pp = aims.vector_AimsVector_U32_3()
-        for i in poly_tmp:
-            pp.append(i)
-        avg_mesh.polygon().assign(pp)
-    else:
-        avg_mesh.polygon().assign(mesh.polygon())
+#     if self.side == 'right':
+#         poly = np.array(mesh.polygon())
+#         poly_tmp = poly.copy()
+#         poly_tmp[:,0] = poly[:,1]
+#         poly_tmp[:,1] = poly[:,0]
+#         pp = aims.vector_AimsVector_U32_3()
+#         for i in poly_tmp:
+#             pp.append(i)
+#         avg_mesh.polygon().assign(pp)
+#     else:
+#         avg_mesh.polygon().assign(mesh.polygon())
+    avg_mesh.polygon().assign(mesh.polygon())
     # ensure there is no Nan in the vertex of outmesh, should never be the case because it was checked in remeshFromSphere
     verts_Nan = np.where(np.isnan(avg_verts))[0]
     if len(verts_Nan)>0:

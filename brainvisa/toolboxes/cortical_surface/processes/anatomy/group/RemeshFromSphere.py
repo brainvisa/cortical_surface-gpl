@@ -35,12 +35,17 @@ userLevel = 0
 signature = Signature(
                       
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),    
+    'side', Choice('left', 'right'),
     'spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
     'spherical_template', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
     'remeshed_mesh', WriteDiskItem( 'Remeshed mesh', 'Aims mesh formats' )
 )
 
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.white_mesh is not None:
+            return proc.white_mesh.get( 'side' )
+    self.linkParameters( 'side', 'white_mesh', linkSide )
     self.linkParameters( 'white_mesh','spherical_mesh')
     self.linkParameters( 'spherical_mesh', 'white_mesh')
     self.linkParameters( 'remeshed_mesh','spherical_mesh')
@@ -65,11 +70,30 @@ def execution( self, context ):
     verts_Nan = np.where(np.isnan(verts))[0]
     if len(verts_Nan)>0:
         neigh = aims.SurfaceManip.surfaceNeighbours(outmesh)
-        for vert_ind in verts_Nan:
-            neig_vert = verts[neigh[vert_ind].list(), :]
-            verts[vert_ind, :] = np.mean(neig_vert, axis = 0)
+        while len(verts_Nan)>0:
+            for vert_ind in verts_Nan:
+                lneigh = neigh[vert_ind].list()
+                intersection = list(set(lneigh) & set(verts_Nan))
+                if len(intersection)>0:
+                    for i in intersection:
+                        lneigh.remove(i)
+                neig_vert = verts[lneigh, :]
+                verts[vert_ind, :] = np.mean(neig_vert, axis = 0)
+            verts_Nan = np.where(np.isnan(verts))[0]
         outmesh.vertex().assign([ aims.Point3df(x) for x in verts ])
-        outmesh.updateNormals()
+         
+    if self.side == 'right':
+        poly = np.array(outmesh.polygon())
+        poly_tmp = poly.copy()
+#        context.write(poly_tmp[0,:])
+        poly_tmp[:,0] = poly[:,1]
+        poly_tmp[:,1] = poly[:,0]
+        pp = aims.vector_AimsVector_U32_3()
+        for i in poly_tmp:
+            pp.append(i)
+#        context.write(np.array(pp)[0,:])
+        outmesh.polygon().assign(pp)
+    outmesh.updateNormals()
     
     ws.write( outmesh, self.remeshed_mesh.fullPath() )
 

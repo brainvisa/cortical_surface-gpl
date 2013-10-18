@@ -948,13 +948,13 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     tex_parcels[tex_parcels == 0] = 1
     
     
-    
-    
     uparcells = np.unique(tex_parcels)
-#     reord_parc = 1
-#     for u_parc in uparcells:
-#         tex_parcels[tex_parcels == u_parc] = reord_parc
-#         reord_parc = reord_parc+2
+    
+    tex_parcels_tmp = tex_parcels.copy()
+    reord_parc = 1
+    for u_parc in uparcells:
+        tex_parcels[tex_parcels_tmp == u_parc] = reord_parc
+        reord_parc = reord_parc+2
 
     return (tex_parcels, uparcells.shape[0])
 
