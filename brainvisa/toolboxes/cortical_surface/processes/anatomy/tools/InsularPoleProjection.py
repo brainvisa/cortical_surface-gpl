@@ -61,12 +61,12 @@ signature = Signature(
 )
 
 def initialization( self ):
-    def linkLabelAtt( self, dummy ):
-        if self.graph is not None:
-            m = self.graph.get( 'manually_labelled' )
-            if m and m == 'Yes':
-                return 'name'
-        return 'label'
+#    def linkLabelAtt( self, dummy ):
+#        if self.graph is not None:
+#            m = self.graph.get( 'manually_labelled' )
+#            if m and m == 'Yes':
+#                return 'name'
+#        return 'label'
     def linkSide( proc, dummy ):
         if proc.graph is not None:
             return proc.graph.get( 'side' )
@@ -79,7 +79,7 @@ def initialization( self ):
 
 #    self.linkParameters( 'transformation', 'white_mesh' )
     self.linkParameters( 'mri_corrected', 'white_mesh' )
-    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
+#    self.linkParameters( 'sulcus_identification', 'graph', linkLabelAtt )
     self.findValue('gyri_model', { 'sulci_database' : '2008', 'graph_version': '3.0', 'model' : 'gyrus' })
 #    try:
 #      self.findValue('gyri_model', {})
