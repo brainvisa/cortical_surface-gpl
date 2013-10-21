@@ -68,9 +68,9 @@ def initialization( self ):
     self.linkParameters( 'pole_template', 'white_mesh' )
     self.findValue( 'template_pole_transformation', {} )
     self.linkParameters( 'subject_transformation','white_mesh')
-    self.dilation_1 = 0#7
-    self.erosion = 7#11
-    self.dilation_2 = 0#2 
+    self.dilation_1 = 2#7
+    self.erosion = 6#11
+    self.dilation_2 = 4#2 
  
 def execution( self, context ):
     context.write('Changing Referential...')

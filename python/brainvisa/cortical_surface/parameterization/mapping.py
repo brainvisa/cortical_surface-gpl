@@ -884,7 +884,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
         # antero-posterior subdivision of the temporal lobe
         sort_axes_lon.append(sort_axes_lon[5] + 3 * (sort_axes_lon[6] - sort_axes_lon[5]) / 4)
-        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcell_width)
+#        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcell_width)
         sort_axes_lon.sort()
 
 #    sort_axes_lat.append(180)
@@ -903,20 +903,16 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     if parcellation_type == 'coarse':
         print 'il faut concatener autour du path!'
     #     # INSULA sup ant
-    #     tex_parcels[tex_parcels == 79] = 1
-    #     tex_parcels[tex_parcels == 73] = 1
-    #     # INSULA sup post
-    #     tex_parcels[tex_parcels == 13] = 25
-    #     tex_parcels[tex_parcels == 19] = 25
-    #     tex_parcels[tex_parcels == 7] = 25
-    #     # INSULA inf
-    #     tex_parcels[tex_parcels == 43] = 37
-    #     tex_parcels[tex_parcels == 49] = 37
-    #     tex_parcels[tex_parcels == 55] = 37
-    #     tex_parcels[tex_parcels == 61] = 37
-    #     tex_parcels[tex_parcels == 67] = 37
+        tex_parcels[tex_parcels == 16] = 9
+        tex_parcels[tex_parcels == 23] = 9
+        tex_parcels[tex_parcels == 30] = 9
+#     #     # INSULA sup post
+        tex_parcels[tex_parcels == 65] = 2
+        tex_parcels[tex_parcels == 72] = 2
+#     #     # INSULA inf
+        tex_parcels[tex_parcels == 51] = 44
+        tex_parcels[tex_parcels == 58] = 44
         # arround the path between the poles
-    #    tex_parcels[tex_parcels == 30] = 30
         tex_parcels[tex_parcels == 38] = 37
         tex_parcels[tex_parcels == 39] = 37
         tex_parcels[tex_parcels == 40] = 37
@@ -932,38 +928,33 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     else:#default parcellation <=> model axes
 
     #     # concatenate some parcels
-    #     # INSULA sup ant
-    #     tex_parcels[tex_parcels == 79] = 1
-    #     tex_parcels[tex_parcels == 73] = 1
-    #     # INSULA sup post
-    #     tex_parcels[tex_parcels == 13] = 25
-    #     tex_parcels[tex_parcels == 19] = 25
-    #     tex_parcels[tex_parcels == 7] = 25
-    #     # INSULA inf
-    #     tex_parcels[tex_parcels == 43] = 37
-    #     tex_parcels[tex_parcels == 49] = 37
-    #     tex_parcels[tex_parcels == 55] = 37
-    #     tex_parcels[tex_parcels == 61] = 37
-    #     tex_parcels[tex_parcels == 67] = 37
+    #     # INSULA
+        tex_parcels[tex_parcels == 9] = 2
+        tex_parcels[tex_parcels == 16] = 2
+        tex_parcels[tex_parcels == 23] = 2
+        tex_parcels[tex_parcels == 37] = 2
+        tex_parcels[tex_parcels == 44] = 2
+        tex_parcels[tex_parcels == 51] = 2
+        tex_parcels[tex_parcels == 58] = 2
         # arround the path between the poles
-    #    tex_parcels[tex_parcels == 30] = 30
         tex_parcels[tex_parcels == 31] = 30
         tex_parcels[tex_parcels == 32] = 30
         tex_parcels[tex_parcels == 33] = 30
         tex_parcels[tex_parcels == 34] = 30
         tex_parcels[tex_parcels == 35] = 30
         tex_parcels[tex_parcels == 36] = 30
+        
     # cingular pole
     tex_parcels[tex_parcels == 0] = 1
     
     
-    
-    
     uparcells = np.unique(tex_parcels)
-#     reord_parc = 1
-#     for u_parc in uparcells:
-#         tex_parcels[tex_parcels == u_parc] = reord_parc
-#         reord_parc = reord_parc+2
+    
+    tex_parcels_tmp = tex_parcels.copy()
+    reord_parc = 1
+    for u_parc in uparcells:
+        tex_parcels[tex_parcels_tmp == u_parc] = reord_parc
+        reord_parc = reord_parc+2
 
     return (tex_parcels, uparcells.shape[0])
 
