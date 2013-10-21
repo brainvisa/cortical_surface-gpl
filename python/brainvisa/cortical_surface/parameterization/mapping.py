@@ -19,11 +19,11 @@ solver_tolerance = 1e-6                              ####
 #########################################################
 ver = [1]#[ int(x) for x in scipy.__version__.split( '.' ) ]
 if ver < [ 0, 9 ]:
-    print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower), with tolerance = ',solver_tolerance
+#    print 'HIP-HOP :: scipy is too old, using gmres for solving linear systems (will be slower), with tolerance = ',solver_tolerance
     from scipy.sparse.linalg import gmres
     solver = 'gmres'
 else:
-    print 'HIP-HOP :: using lgmres for solving linear systems, with tolerance = ',solver_tolerance
+#    print 'HIP-HOP :: using lgmres for solving linear systems, with tolerance = ',solver_tolerance
     from scipy.sparse.linalg import lgmres
     solver = 'lgmres'  
 import numpy as np
@@ -861,7 +861,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     
     nb_vert = template_lat.shape[0]
     tex_parcels = np.zeros(nb_vert)
-    lab_parcel = 2
+    lab_parcel = 2 #1 will correspond to the cingular pole
     sort_axes_lon = [360]
     for f in longitude_axis_coords[:-1]:#[360 - f for f in model.longitudeAxisID]
         if f is not None:
