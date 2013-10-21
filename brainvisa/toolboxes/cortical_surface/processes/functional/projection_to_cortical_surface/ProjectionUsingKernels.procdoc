@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="kernels"><i>kernels</i>  represents the convolution kernels, stored in a 4D volume and computed at the previous step (see <b>Creation of Kernels for fMRI data projection</b>)</xhtml>
+      <xhtml name="fMRI_4D_data"><i>fMRI_4D_data</i> is the volume to be projected on the surface. Check out that the kernels have the same size as the projected volume.</xhtml>
+      <xhtml name="fMRI_surface_data"><i>fMRI_surface_data</i> is the output projected data, stored as a mesh texture.</xhtml>
+      <xhtml name="white_mesh"><i>intmesh</i> represents the mesh of the inner cortical surface, i.e. the grey / white matter interface</xhtml>
+    </d>
+    <xhtml name="long">Convolution kernels created from a cortical surface mesh allow to project 3D/4D volumes on this mesh, provided the kernels have been previously computed at the same resolution as the volumes. 
+This second step creates <b>surface-based representations of these volumes</b> using these kernels.
+
+<h4>Projection of fMRI data onto cortical surfaces using convolution kernels</h4>
+This process aims at creating surface-based maps out of volume-based fMRI data. It takes as input a 4D volume, containing an fMRI (BOLD) timeserie (<i>fmri_data</i> parameter), and a mesh of the grey / white matter interface (<i>white_mesh</i> parameter), like the one produced by Morphologist pipeline. It generates a map (also referred as texture, <i>timeserie_texture</i> parameter) assigning each node of the mesh with a functional timecourse. This map can then be taken as an input of the Surface-based Structural Group Analysis pipeline.<br/>
+<br/>
+This pipeline consists as follows :<br/>
+- first it computes an average 3D volume from the functional 4D volume (step 1)<br/>
+- this average volume is used as a reference template to register the white_mesh surface with (step 2 - 3).<br/>
+- from the white_mesh surface, a set of convolution kernels is computed (step 4). <b> Check that the kernels are produced at the same resolution as the input fMRI volumes !</b><br/>
+- the final process takes the kernels, the fMRI 4D volume and the cortical mesh to produce a surface-based fMRI map<br/><br/>
+
+The whole method is described in : <br/>
+G. Operto, R. Bulot, J.-L. Anton, O. Coulon, Projection of fMRI data onto the cortical surface using anatomically-informed convolution kernels, NeuroImage, Volume 39, Issue 1, 1 January 2008, Pages 127-135, ISSN 1053-8119, http://dx.doi.org/10.1016/j.neuroimage.2007.08.039.<br/>
+(http://www.sciencedirect.com/science/article/pii/S1053811907007586)<br/>
+Keywords: fMRI; Cortical surface; Surface-based analysis; Anatomical constraints</xhtml>
+  </d>
+</d>
+</minf>

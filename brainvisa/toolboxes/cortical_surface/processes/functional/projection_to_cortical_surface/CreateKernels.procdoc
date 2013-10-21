@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="norm_decay"><i>norm_decay</i> (in mm) is a euclidian distance beyond which the influence between two points in the volume, outside from the cortical ribbon, is considered null</xhtml>
+      <xhtml name="geod_decay"><i>geod_decay</i> (in mm) is a geodesic distance beyond which the influence between two points on the surface is considered null</xhtml>
+      <xhtml name="output"><i>output</i> represents the <b>convolution kernels</b>, stored in a 4D volume.</xhtml>
+      <xhtml name="intmesh"><i>intmesh</i> represents the mesh of the inner cortical surface, i.e. the grey / white matter interface</xhtml>
+      <xhtml name="resolution"><span style="font-weight:bold; color:red">Warning</span><span style="color:red"> : the <i>resolution</i> parameter (given as a vector of three floats) must equal the resolution of the images that will be consecutively projected on the cortical surface.</span></xhtml>
+      <xhtml name="size"><i>size</i> sets the extent (in number of voxels) of a convolution kernel. This parameter must be high enough so as to cover all the voxels with nonnull weights.</xhtml>
+    </d>
+    <xhtml name="long">This process creates <b>anatomically-informed convolution kernels</b> out of a mesh of the cortical surface (ideally the grey white matter interface). These kernels are then used by a second process for projection of 3D data onto the cortical surface. These kernels embed local geometric and anatomical information that is taken account of by the projection.<br/><br/>
+
+<img src="../../images/kernel.jpg" width="200"/><br/><br/>
+
+These kernels are stored as a (4D) sequence of small volumes, each of which is related to a mesh node. Each kernel describes, for each node, the contribution given to each voxel of a small neighboring volume by the node. The final value assigned to each node is then a linear combination of these voxels intensities, weighted by these estimated kernel values. 
+
+<h4>Projection of fMRI data onto cortical surfaces using convolution kernels</h4>
+This process aims at creating surface-based maps out of volume-based fMRI data. It takes as input a 4D volume, containing an fMRI (BOLD) timeserie (<i>fmri_data</i> parameter), and a mesh of the grey / white matter interface (<i>white_mesh</i> parameter), like the one produced by Morphologist pipeline. It generates a map (also referred as texture, <i>timeserie_texture</i> parameter) assigning each node of the mesh with a functional timecourse. This map can then be taken as an input of the Surface-based Structural Group Analysis pipeline.<br/>
+<br/>
+This pipeline consists as follows :<br/>
+- first it computes an average 3D volume from the functional 4D volume (step 1)<br/>
+- this average volume is used as a reference template to register the white_mesh surface with (step 2 - 3).<br/>
+- from the white_mesh surface, a set of convolution kernels is computed (step 4). <b> Check that the kernels are produced at the same resolution as the input fMRI volumes !</b><br/>
+- the final process takes the kernels, the fMRI 4D volume and the cortical mesh to produce a surface-based fMRI map<br/><br/>
+
+The whole method is described in : <br/>
+G. Operto, R. Bulot, J.-L. Anton, O. Coulon, Projection of fMRI data onto the cortical surface using anatomically-informed convolution kernels, NeuroImage, Volume 39, Issue 1, 1 January 2008, Pages 127-135, ISSN 1053-8119, http://dx.doi.org/10.1016/j.neuroimage.2007.08.039.<br/>
+(http://www.sciencedirect.com/science/article/pii/S1053811907007586)<br/>
+Keywords: fMRI; Cortical surface; Surface-based analysis; Anatomical constraints</xhtml>
+  </d>
+</d>
+</minf>

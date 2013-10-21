@@ -12,10 +12,10 @@ def InputParameters( arguments, messages_defaults ):
 
     params = [ arguments[i] for i in xrange(nb_arguments) ]
     doAsk = True
-    
+
     if ( nb_arguments < len (defaults) ):
         inputs = []
-        for i in xrange( len(defaults) - nb_arguments) :        
+        for i in xrange( len(defaults) - nb_arguments) :
             if (doAsk):
                 inp = raw_input(messages[i + nb_arguments] + str( ' ? (%s) '%defaults[messages[ i + nb_arguments ] ] ) )
             else :
@@ -30,10 +30,10 @@ def InputParameters( arguments, messages_defaults ):
             else :
                 params.append(defaults[ messages[i + nb_arguments] ])
     print params
-    
+
     print '\n params'
     for i, p in enumerate(params):
         print messages[i], p
         defaults[messages[i]] = p
-        
+
     return params
