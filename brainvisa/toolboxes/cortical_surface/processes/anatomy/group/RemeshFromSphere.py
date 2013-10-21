@@ -60,9 +60,25 @@ def execution( self, context ):
     
     spherical_mesh = re.read(self.spherical_mesh.fullPath())
     spherical_template_mesh = re.read(self.spherical_template.fullPath())
+    
+    spherical_mesh.updateNormals()
+    spherical_template_mesh.updateNormals()
     mi = aims.MeshInterpoler(spherical_mesh, spherical_template_mesh)
     mi.project() # calcule les correspondances et coord barycentriques
     white_mesh = re.read(self.white_mesh.fullPath())
+    if self.side == 'right':
+        poly = np.array(white_mesh.polygon())
+        poly_tmp = poly.copy()
+#        context.write(poly_tmp[0,:])
+        poly_tmp[:,0] = poly[:,1]
+        poly_tmp[:,1] = poly[:,0]
+        pp = aims.vector_AimsVector_U32_3()
+        for i in poly_tmp:
+            pp.append(i)
+#        context.write(np.array(pp)[0,:])
+        white_mesh.polygon().assign(pp)
+        white_mesh.updateNormals()
+
     outmesh = mi.resampleMesh(white_mesh)
     
     # ensure there is no Nan in the vertex of outmesh
