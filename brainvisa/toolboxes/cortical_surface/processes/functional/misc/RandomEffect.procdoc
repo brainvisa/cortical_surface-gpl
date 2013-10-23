@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This process performs a Random Effects (RFX) Group Analysis on a set of vectors, stored as a set of textures (<a href="http://brainvisa.info/doc/pyaims-4.3/sphinx/pyaims_highlevel.html">Time Texture</a>).
+
+<img src="../../images/rfx.jpg" width="300"/></xhtml>
+    <d name="parameters">
+      <xhtml name="rfx_map">The <i>rfx_map</i> is the resulting texture of the RFX analysis.</xhtml>
+      <xhtml name="individual_maps"><i>individual_maps</i> is a set of textures (i.e. <a href="http://brainvisa.info/doc/pyaims-4.3/sphinx/pyaims_highlevel.html">Time Texture</a>) on which the Random Effects (RFX) Group Analysis will be applied. The textures can be considered as coming from different individual subjects.</xhtml>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

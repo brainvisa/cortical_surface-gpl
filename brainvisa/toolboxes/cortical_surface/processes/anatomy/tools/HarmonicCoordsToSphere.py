@@ -78,19 +78,19 @@ def execution( self, context ):
     mesh = re.read(self.white_mesh.fullPath())
     new_mesh = aims.AimsTimeSurface_3()
     new_mesh.vertex().assign(vv)
+    new_mesh.polygon().assign(mesh.polygon())
     if self.side == 'right':
-        poly = np.array(mesh.polygon())
-        poly_tmp = poly.copy()
-#        context.write(poly_tmp[0,:])
-        poly_tmp[:,0] = poly[:,1]
-        poly_tmp[:,1] = poly[:,0]
-        pp = aims.vector_AimsVector_U32_3()
-        for i in poly_tmp:
-            pp.append(i)
-#        context.write(np.array(pp)[0,:])
-        new_mesh.polygon().assign(pp)
-    else:
-        new_mesh.polygon().assign(mesh.polygon())
+        aims.SurfaceManip.invertSurfacePolygons(new_mesh)
+#         poly = np.array(mesh.polygon())
+#         poly_tmp = poly.copy()
+# #        context.write(poly_tmp[0,:])
+#         poly_tmp[:,0] = poly[:,1]
+#         poly_tmp[:,1] = poly[:,0]
+#         pp = aims.vector_AimsVector_U32_3()
+#         for i in poly_tmp:
+#             pp.append(i)
+# #        context.write(np.array(pp)[0,:])
+#         new_mesh.polygon().assign(pp)
     new_mesh.updateNormals()
     ws.write( new_mesh, self.spherical_mesh.fullPath() )
 

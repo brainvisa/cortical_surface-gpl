@@ -214,6 +214,6 @@ def execution( self, context ):
     tex_lat = aims.TimeTexture_FLOAT()
     tex_lat[0].assign(lat)
     ws.write(tex_lat, self.latitude.fullPath())
-    ws.write(insula_disk, 'insula_disk.mesh')
-    ws.write(cingular_disk, 'cingular_disk.mesh')
+#    ws.write(insula_disk, 'insula_disk.mesh')
+#    ws.write(cingular_disk, 'cingular_disk.mesh')
     

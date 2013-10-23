@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short"/>
+    <d name="parameters">
+      <xhtml name="kernels"><i>kernels</i>  represents the convolution kernels, stored in a 4D volume and computed at the previous step (see <b>Creation of Kernels for fMRI data projection</b>)</xhtml>
+      <xhtml name="fMRI_4D_data"><i>fMRI_4D_data</i> is the volume to be projected on the surface. Check out that the kernels have the same size as the projected volume.</xhtml>
+      <xhtml name="fMRI_surface_data"><i>fMRI_surface_data</i> is the output projected data, stored as a mesh texture.</xhtml>
+      <xhtml name="white_mesh"><i>intmesh</i> represents the mesh of the inner cortical surface, i.e. the grey / white matter interface</xhtml>
+    </d>
+    <xhtml name="long">Convolution kernels created from a cortical surface mesh allow to project 3D/4D volumes on this mesh, provided the kernels have been previously computed at the same resolution as the volumes. 
+This second step creates <b>surface-based representations of these volumes</b> using these kernels.<br/><br/>
+
+This is the second step of the process for projection fMRI data onto the cortical surface.
+(see process <b>Create Surface-Based Functional Data</b>)</xhtml>
+  </d>
+</d>
+</minf>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This process is used through the projection pipeline in order to register anatomical and functional data before projection.</xhtml>
+    <d name="parameters">
+      <xhtml name="input"><i>input</i> is the white mesh to register.</xhtml>
+      <xhtml name="transformation"><i>transformation</i> is the .trm transformation to apply to the mesh</xhtml>
+      <xhtml name="output"><i>output</i> is the output resulting from the registration of the input mesh</xhtml>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

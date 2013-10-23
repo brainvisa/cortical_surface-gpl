@@ -8,7 +8,6 @@ from soma import aims
 from soma import aimsalgo
 from scipy import sparse
 np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
-print 'the version of numpy is ',np_ver
 
 def ismember(ar1, ar2):
     if np_ver < [1, 6]:

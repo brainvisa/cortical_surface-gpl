@@ -6,9 +6,9 @@
 #
 # This software is governed by the CeCILL license version 2 under
 # French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the 
+# You can  use, modify and/or redistribute the software under the
 # terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info". 
+# and INRIA at the following URL "http://www.cecill.info".
 #
 # As a counterpart to the access to the source code and  rights to copy,
 # modify and redistribute granted by the license, users are provided only
@@ -23,14 +23,14 @@
 # therefore means  that it is reserved for developers  and  experienced
 # professionals having in-depth computer knowledge. Users are therefore
 # encouraged to load and test the software's suitability as regards their
-# requirements in conditions enabling the security of their systems and/or 
-# data to be ensured and,  more generally, to use and operate it in the 
+# requirements in conditions enabling the security of their systems and/or
+# data to be ensured and,  more generally, to use and operate it in the
 # same conditions as regards security.
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals     
+import shfjGlobals
 
 name = 'Surface-Based Structural Analysis Pipeline'
 userLevel = 2
@@ -42,8 +42,8 @@ signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh',
         'contrast', String(),
         'contrast_name', String(),
         'protocol_text', ReadDiskItem( 'Text File', 'Text File' )
-        
-          
+
+
   )
 
 
@@ -51,14 +51,14 @@ signature = Signature(  'intmesh', ListOf(ReadDiskItem( 'Hemisphere White Mesh',
 def initialization( self ):
     eNode = SerialExecutionNode( self.name, parameterized=self )
 
-    
+
     eNode.addChild( 'SPMtMaps', ProcessExecutionNode( 'CreateSurfaceBasedSPMtMaps', optional = 1 ) )
     eNode.addChild( 'PrimalSketches', ProcessExecutionNode( 'CreateSurfaceBasedPrimalSketches', optional = 1 ) )
     eNode.addChild( 'GroupAnalysis', ProcessExecutionNode( 'PerformGroupAnalysis', optional = 1 ) )
     eNode.addChild( 'Significance', ProcessExecutionNode( 'ResultsSignificance', optional = 1 ) )
     eNode.addChild( 'LabelsTexture', ProcessExecutionNode( 'CreateResultsLabelsTexture', optional = 1 ) )
-    
-    
+
+
     #eNode.addLink('SPMtMaps.meshes', 'intmesh')
     eNode.addLink('surfacebased_SPMt_maps', 'SPMtMaps.spmtmaps')
     eNode.addLink('PrimalSketches.intmesh', 'intmesh')
@@ -83,9 +83,9 @@ def initialization( self ):
     eNode.addLink('Significance.lsweight', 'GroupAnalysis.lsweight')
     eNode.addLink('Significance.ddh', 'GroupAnalysis.ddh')
     eNode.addLink('Significance.labeled_primalsketches', 'GroupAnalysis.labeled_primalsketches')
-    
-    
+
+
 
     self.setExecutionNode( eNode )
-    
+
 

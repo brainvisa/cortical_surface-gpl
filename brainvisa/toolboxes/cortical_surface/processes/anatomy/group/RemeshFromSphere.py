@@ -63,6 +63,22 @@ def execution( self, context ):
     mi = aims.MeshInterpoler(spherical_mesh, spherical_template_mesh)
     mi.project() # calcule les correspondances et coord barycentriques
     white_mesh = re.read(self.white_mesh.fullPath())
+    if self.side == 'right':
+        aims.SurfaceManip.invertSurfacePolygons(white_mesh)
+        white_mesh.updateNormals()
+
+#         poly = np.array(white_mesh.polygon())
+#         poly_tmp = poly.copy()
+# #        context.write(poly_tmp[0,:])
+#         poly_tmp[:,0] = poly[:,1]
+#         poly_tmp[:,1] = poly[:,0]
+#         pp = aims.vector_AimsVector_U32_3()
+#         for i in poly_tmp:
+#             pp.append(i)
+# #        context.write(np.array(pp)[0,:])
+#         white_mesh.polygon().assign(pp)
+#         white_mesh.updateNormals()
+
     outmesh = mi.resampleMesh(white_mesh)
     
     # ensure there is no Nan in the vertex of outmesh
@@ -83,16 +99,19 @@ def execution( self, context ):
         outmesh.vertex().assign([ aims.Point3df(x) for x in verts ])
          
     if self.side == 'right':
-        poly = np.array(outmesh.polygon())
-        poly_tmp = poly.copy()
-#        context.write(poly_tmp[0,:])
-        poly_tmp[:,0] = poly[:,1]
-        poly_tmp[:,1] = poly[:,0]
-        pp = aims.vector_AimsVector_U32_3()
-        for i in poly_tmp:
-            pp.append(i)
-#        context.write(np.array(pp)[0,:])
-        outmesh.polygon().assign(pp)
+        aims.SurfaceManip.invertSurfacePolygons(outmesh)
+
+#         poly = np.array(outmesh.polygon())
+#         poly_tmp = poly.copy()
+# #        context.write(poly_tmp[0,:])
+#         poly_tmp[:,0] = poly[:,1]
+#         poly_tmp[:,1] = poly[:,0]
+#         pp = aims.vector_AimsVector_U32_3()
+#         for i in poly_tmp:
+#             pp.append(i)
+# #        context.write(np.array(pp)[0,:])
+#         outmesh.polygon().assign(pp)
+    
     outmesh.updateNormals()
     
     ws.write( outmesh, self.remeshed_mesh.fullPath() )

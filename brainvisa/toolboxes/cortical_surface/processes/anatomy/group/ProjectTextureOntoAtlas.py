@@ -23,6 +23,7 @@ import shfjGlobals
 import sigraph
 import sys
 from soma import aims, aimsalgo
+import numpy as np
 
 name = 'Project Texture Onto Atlas From Sphere'
 
@@ -54,7 +55,14 @@ def execution( self, context ):
     mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
     mi.project() # calcule les correspondances et coord barycentriques
     subject_texture = re.read(self.subject_texture.fullPath())
-    texture_on_atlas = mi.resampleTexture(subject_texture)
+    a = subject_texture[0].arraydata()
+    isint = a.dtype.type in ( np.int, np.int8, np.int16, np.int32, np.int64 )
+    if isint:
+        context.write('texture type is interger, using nearest neighbour interpolation')
+        texture_on_atlas = mi.resampleTexture(subject_texture, mi.NearestNeighbour)
+    else:
+        context.write('texture type is float, using linear interpolation')
+        texture_on_atlas = mi.resampleTexture(subject_texture)
     ws.write( texture_on_atlas, self.texture_on_atlas.fullPath() )
 
     context.write('Done')
