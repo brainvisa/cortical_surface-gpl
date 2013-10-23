@@ -6,9 +6,9 @@
 #
 # This software is governed by the CeCILL license version 2 under
 # French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the 
+# You can  use, modify and/or redistribute the software under the
 # terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info". 
+# and INRIA at the following URL "http://www.cecill.info".
 #
 # As a counterpart to the access to the source code and  rights to copy,
 # modify and redistribute granted by the license, users are provided only
@@ -23,18 +23,18 @@
 # therefore means  that it is reserved for developers  and  experienced
 # professionals having in-depth computer knowledge. Users are therefore
 # encouraged to load and test the software's suitability as regards their
-# requirements in conditions enabling the security of their systems and/or 
-# data to be ensured and,  more generally, to use and operate it in the 
+# requirements in conditions enabling the security of their systems and/or
+# data to be ensured and,  more generally, to use and operate it in the
 # same conditions as regards security.
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
-import shfjGlobals     
+import shfjGlobals
 
 name = 'Random Effect'
-userLevel = 2
+userLevel = 0
 
 signature = Signature(
   'individual_maps', ReadDiskItem( 'Texture', 'Texture'),
@@ -43,13 +43,13 @@ signature = Signature(
   )
 def initialization( self ):
   pass
-     
+
 
 def execution( self, context ):
   import fff.glm as G
   import numpy as N
   from soma import aims
-  import sys,os,string 
+  import sys,os,string
 
   #########################
   reader = aims.Reader()
@@ -58,19 +58,19 @@ def execution( self, context ):
 
   nb_nodes = int(texture[0].nItem())
   nb_sujets = int(texture.size())
- 
+
   tab = N.arange(float(nb_nodes*nb_sujets))
   k=0
   baseline = N.zeros(nb_sujets)
   #moyenne = 0.0
-  
+
   for i in range(0,nb_nodes):
      for j in range(0,nb_sujets):
         tab[k] = texture[j][i]
-        k=k+1 
+        k=k+1
         baseline[j] += texture[j][i]
         #moyenne += texture[j][i]
-     
+
   baseline /= nb_nodes
   #moyenne /= nb_nodes
   #moyenne /= nb_sujets
@@ -79,7 +79,7 @@ def execution( self, context ):
 
   reg = N.zeros(nb_sujets, float)
   reg = reg.reshape(nb_sujets, 1)
-   
+
   reg[:,0] = baseline
   #print reg[:,0]
 
@@ -101,9 +101,9 @@ def execution( self, context ):
   writer = aims.Writer()
   textur = aims.TimeTexture_FLOAT()
   textur[0] = aims.Texture_FLOAT(int(t.size))
-  
+
   for i in range(0,t.size):
      textur[0][i] = float(t[i])
   writer.write(textur, str(self.rfx_map))
 
-      
+

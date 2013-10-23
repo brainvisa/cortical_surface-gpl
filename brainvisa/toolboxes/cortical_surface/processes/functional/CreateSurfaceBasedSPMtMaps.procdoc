@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This process fits a General Linear Model on fMRI data which has previously been converted in a surface-based representation (see <b>Projection of fMRI data onto the cortical surface using convolution kernels</b>). It results in a surface-based SPMt map, according to a given set of regressors and contrast.</xhtml>
+    <d name="parameters">
+      <xhtml name="protocolfile"><i>protocol_text</i> is a Python script defining a set of variables.
+<i>TR</i> is the repetition time in ms (ex : TR = 2400)
+<i>times</i> is a numpy array containing a sequence of timestamps in ms (the starting time of each stimulus)
+<i>types</i> is a numpy array defining the type of each stimulus (by an integer index)
+<i>names</i> is a list of strings, giving a name for each stimulation type</xhtml>
+      <xhtml name="spmtmaps"><i>spmtmaps</i> is a set of activation (SPMt) maps, assigning each node with a t-test value from the GLM.</xhtml>
+      <xhtml name="boldtextures">The <i>boldtextures</i> represent the surface-based representation of fMRI BOLD volumes. In other terms, it is a set of textures (one per subject) representing fMRI data projected onto the cortical surface (see <b>Create Surface-Based Functional Data</b>)</xhtml>
+      <xhtml name="contrast">a <i>contrast</i> is defined by a vector of integers, according to the protocol described in <i>protocol_text</i> text file.</xhtml>
+      <xhtml name="betamaps"><i>betamaps</i> is a set of maps, containing the beta values estimated from the GLM.</xhtml>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>
