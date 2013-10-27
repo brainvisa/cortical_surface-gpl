@@ -6,9 +6,9 @@
 #
 # This software is governed by the CeCILL license version 2 under
 # French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the 
+# You can  use, modify and/or redistribute the software under the
 # terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info". 
+# and INRIA at the following URL "http://www.cecill.info".
 #
 # As a counterpart to the access to the source code and  rights to copy,
 # modify and redistribute granted by the license, users are provided only
@@ -23,20 +23,20 @@
 # therefore means  that it is reserved for developers  and  experienced
 # professionals having in-depth computer knowledge. Users are therefore
 # encouraged to load and test the software's suitability as regards their
-# requirements in conditions enabling the security of their systems and/or 
-# data to be ensured and,  more generally, to use and operate it in the 
+# requirements in conditions enabling the security of their systems and/or
+# data to be ensured and,  more generally, to use and operate it in the
 # same conditions as regards security.
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals     
+import shfjGlobals
 import numpy as np
-from soma import aims    
+from soma import aims
 import sys, os
 
-name = '1 - Create Surface-Based Statistical Parametric Maps'
-userLevel = 2
+name = 'Create Surface-Based Statistical Parametric Maps'
+userLevel = 0
 
 signature = Signature(
     'boldtextures', ListOf(ReadDiskItem('Functional Time Texture', 'Texture')),
@@ -282,7 +282,7 @@ def getBetaName(self, data):
 def initialization( self ):
     pass
 
-def LogGamma ( x ) : 
+def LogGamma ( x ) :
     import math
     coeff0 =  7.61800917300e+1
     coeff1 = -8.65053203300e+1
@@ -294,9 +294,9 @@ def LogGamma ( x ) :
     half   =  5.00000000000e-1
     fourpf =  4.50000000000e+0
     one    =  1.00000000000e+0
-    two    =  2.00000000000e+0 
+    two    =  2.00000000000e+0
     three  =  3.00000000000e+0
-    four   =  4.00000000000e+0 
+    four   =  4.00000000000e+0
     five   =  5.00000000000e+0
     r = coeff0 / ( x ) + coeff1 / ( x + one   ) + coeff2 / ( x + two  ) + coeff3 / ( x + three ) + coeff4 / ( x + four ) + coeff5 / ( x + five  )
     s = x + fourpf
@@ -332,7 +332,7 @@ def HrfFunction ( sampling_rate ) :
 
     maxA = max ( A )
     maxB = max ( B )
-    
+
     hf = A / maxA - alp * B / maxB
     return hf
 
@@ -346,7 +346,7 @@ def PreRegressor ( condition, types, times, conversion_factor ):
             preregressor should be sampled in s, conversion_factor equals 0.001 )'''
     assert (len(times)==len(types))
     assert (len(times) > 0)
-    
+
     try:
         if ( len(times[0]) == 2 ) :
             mode = 'EPOCH'
@@ -356,14 +356,14 @@ def PreRegressor ( condition, types, times, conversion_factor ):
     ''' A specific mode is triggered according to the syntax used in the protocol file
         times = [(onset1,duration1), ...] triggers the EPOCH omde
         times = [onset1, onset2, ...] triggers the EVENT mode'''
-    
- 
+
+
     if ( mode == 'EVENT' ) :
         prereg = np.zeros ( int ( times[-1] * conversion_factor ) + 1 , float )
         for j in xrange( len(types) ):
             if int(types[j]) == int(condition) :
                 prereg [ int(times[j] * conversion_factor ) ] = 1
-                
+
     elif ( mode == 'EPOCH' ):
         onsets = [ each[0] for each in times ]
         durations = [ each[1] for each in times ]
@@ -375,14 +375,14 @@ def PreRegressor ( condition, types, times, conversion_factor ):
                 for k in xrange ( int( durations[j] * conversion_factor ) ) :
                     prereg [ int(onsets[j] * conversion_factor + k ) ] = 1
     return prereg
-        
+
 
 def execution ( self, context ) :
 
     execfile ( self.protocolfile.fullPath(), locals(), globals() )
     nptimes = np.array(times)
     nptypes = np.array(types)
-    
+
     context.write ( 'TR (must be in ms):', TR )
     context.write ( 'times (must be in ms):', nptimes )
     context.write ( 'types:', nptypes )
@@ -435,7 +435,7 @@ def execution ( self, context ) :
             '''reg_x is the sampling space of reg_aux (normally [0, 1*TR*conversion_factor,
             2*TR*conversion_factor, 3*TR*conversion_factor, ..., (nb_scans-1)*TR*conversion_factor])'''
             reg_aux = np.interp ( reg_x, aux_x, hrf_aux ).tolist()
-            
+
             reg[:, condition_index] = reg_aux
 
         reg[:,nb_cond] = baseline

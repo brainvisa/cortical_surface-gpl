@@ -18,8 +18,9 @@ This pipeline consists as follows :<br/>
 - the final process takes the kernels, the fMRI 4D volume and the cortical mesh to produce a surface-based fMRI map<br/><br/>
 
 The whole method is described in : <br/>
+<span style="color: rgb(51, 51, 255);">
 G. Operto, R. Bulot, J.-L. Anton, O. Coulon, Projection of fMRI data onto the cortical surface using anatomically-informed convolution kernels, NeuroImage, Volume 39, Issue 1, 1 January 2008, Pages 127-135, ISSN 1053-8119, http://dx.doi.org/10.1016/j.neuroimage.2007.08.039.<br/>
-(http://www.sciencedirect.com/science/article/pii/S1053811907007586)<br/>
+(http://www.sciencedirect.com/science/article/pii/S1053811907007586)<br/></span>
 Keywords: fMRI; Cortical surface; Surface-based analysis; Anatomical constraints</xhtml>
   </d>
 </d>
