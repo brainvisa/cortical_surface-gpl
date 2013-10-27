@@ -1,0 +1,7 @@
+attributes = {
+    'data_type' : 'VOID',
+    'object_type' : 'Mesh',
+    'polygon_dimension' : 3,
+    'polygon_number' : 147794,
+    'vertex_number' : 73899
+  }
