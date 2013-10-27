@@ -1,0 +1,6 @@
+attributes = {
+    'data_type' : 'S16',
+    'nb_t_pos' : 1,
+    'object_type' : 'Texture',
+    'uuid' : 'ea106f4f-ec7e-40cd-ec3d-ba6499907baa'
+  }
