@@ -26,7 +26,6 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
   
 from brainvisa.processes import *
-import shfjGlobals   
 import sigraph
 from soma import aims
 from brainvisa.cortical_surface.parameterization import model as md
@@ -45,13 +44,13 @@ userLevel = 0
     
 signature = Signature(
                       
-    'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture'),
+    'latitude',ReadDiskItem( 'Latitude coordinate texture', 'aims Texture formats' ),
     'side', Choice('left', 'right'),
-    'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture'),
+    'longitude',ReadDiskItem( 'Longitude coordinate texture', 'aims Texture formats' ),
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
 #=    'parcellation_resolution', Choice('model', 'coarse'),
-    'texture_model_parcels', WriteDiskItem('hemisphere parcellation texture','Texture', requiredAttributes={'parcellation_type':'model', 'regularized': 'false' }),
-    'texture_coarse_parcels', WriteDiskItem('hemisphere parcellation texture','Texture', requiredAttributes={'parcellation_type':'coarse', 'regularized': 'false' }),
+    'texture_model_parcels', WriteDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'model', 'regularized': 'false' }),
+    'texture_coarse_parcels', WriteDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'coarse', 'regularized': 'false' }),
 )
 
 def initialization( self ):

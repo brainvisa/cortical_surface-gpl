@@ -27,7 +27,6 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
   
 from brainvisa.processes import *
-from brainvisa.tools import aimsGlobals
 from soma import aims
 import numpy as np
 
@@ -49,22 +48,22 @@ userLevel = 0
 #     anatomist.validation()
     
 signature = Signature(
-                      
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', aimsGlobals.aimsMeshFormats),
+
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
     'side', Choice('left', 'right'),
-    'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'Texture'),
-    'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'Texture'),
-    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
+    'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'aims Texture formats'),
+    'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'aims Texture formats'),
+    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'aims Texture formats' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
     'rectangle_length', Float(),
     'rectangle_width', Float(),
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
-    'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', aimsGlobals.aimsMeshFormats),
-    'rectangular_white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
-    'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'Texture'),
-    'white_mesh_parts',WriteDiskItem( 'White Mesh Parts', aimsGlobals.aimsMeshFormats)
+    'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', 'aims mesh formats' ),
+    'rectangular_white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'aims Texture formats' ),
+    'boundary_texture',WriteDiskItem( 'Rectangular boundary texture', 'aims Texture formats'),
+    'corresp_indices_texture',WriteDiskItem( 'Rectangular flat indices texture', 'aims Texture formats' ),
+    'white_mesh_parts',WriteDiskItem( 'White Mesh Parts', 'aims mesh formats' )
 )
 
 def initialization( self ):

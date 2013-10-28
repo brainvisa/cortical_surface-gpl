@@ -37,7 +37,7 @@ userLevel = 0
  
 signature = Signature(
   'side', Choice('left', 'right'),
-  'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph'  ),
+  'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph and data'  ),
   'sulcus_identification', Choice('name','label')
 )
 
@@ -67,48 +67,61 @@ def initialization( self ):
     eNode.addChild( 'ParcelsTextureFromCoordinates',
                     ProcessExecutionNode( 'ParcelsTextureFromCoordinates', optional=1) )
 
-#    eNode.addLink( 'ChangeTemplateReferential.mri_corrected', 'graph' )
-#    eNode.addLink( 'ChangeTemplateReferential.transformation_input', 'graph' )
-#    eNode.addLink( 'ChangeTemplateReferential.side', 'side' )
+    eNode.addDoubleLink( 'CingularPole.side', 'side' )
 
-    eNode.addLink( 'CingularPole.white_mesh', 'graph')
-    eNode.addLink(  'SulcalinesExtraction.white_mesh','graph')
-    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.white_mesh','graph')
-    eNode.addLink(  'HarmonicMappingOrtho.rectangular_mesh','ParameterizeUnconstrainedHarmonic.rectangular_mesh')
-    eNode.addLink(  'CoordinatesFromHipHopMapping.cstr_rectangular_mesh', 'HarmonicMappingOrtho.cstr_rectangular_mesh')
-    eNode.addLink(  'ParcelsTextureFromCoordinates.latitude', 'CoordinatesFromHipHopMapping.latitude')
+    eNode.InsularPole.removeLink( 'side', 'graph' )
+    eNode.addDoubleLink( 'InsularPole.white_mesh', 'CingularPole.white_mesh' )
+    eNode.addDoubleLink( 'InsularPole.side', 'side')
+    eNode.addDoubleLink( 'InsularPole.graph', 'graph')
+    eNode.addDoubleLink( 'InsularPole.sulcus_identification', 'sulcus_identification')
 
-#    eNode.addLink(  'CingularPole.pole_template','ChangeTemplateReferential.output_template' )
-#    eNode.addLink(  'CingularPole.white_mesh','SulcalinesExtraction.white_mesh')
-#    eNode.addLink(  'CingularPole.white_mesh','ParameterizeUnconstrainedHarmonic.white_mesh')
-#    eNode.addLink(  'CingularPole.white_mesh','HarmonicMappingOrtho.white_mesh')
-    eNode.addLink(  'CingularPole.side', 'side' )
+    eNode.SulcalinesExtraction.removeLink( 'white_mesh', 'graph' )
+    eNode.SulcalinesExtraction.removeLink( 'mri', 'white_mesh' )
+    eNode.addDoubleLink(  'SulcalinesExtraction.graph', 'graph' )
+    eNode.addDoubleLink(  'SulcalinesExtraction.side', 'side' )
+    eNode.addDoubleLink(  'SulcalinesExtraction.sulcus_identification', 'sulcus_identification' )
+    eNode.addDoubleLink( 'SulcalinesExtraction.white_mesh', 'CingularPole.white_mesh' )
+    eNode.addDoubleLink( 'SulcalinesExtraction.mri', 'InsularPole.mri_corrected' )
 
-    eNode.addLink( 'InsularPole.side', 'side')
-    eNode.addLink( 'InsularPole.graph', 'graph')
-    eNode.addLink( 'InsularPole.sulcus_identification', 'sulcus_identification')
-
-
-    eNode.addLink(  'SulcalinesExtraction.graph','graph' )        
-    eNode.addLink(  'SulcalinesExtraction.side','side' )
-    eNode.addLink(  'SulcalinesExtraction.sulcus_identification','sulcus_identification' )
-
-    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.side','side')
-    eNode.ParameterizeUnconstrainedHarmonic.removeLink('cingular_pole_texture', 'white_mesh')
+    eNode.ParameterizeUnconstrainedHarmonic.removeLink( 'cingular_pole_texture', 'white_mesh' )
     eNode.ParameterizeUnconstrainedHarmonic.removeLink('insular_pole_texture', 'white_mesh')
     eNode.ParameterizeUnconstrainedHarmonic.removeLink('white_sulcalines', 'white_mesh')
     eNode.ParameterizeUnconstrainedHarmonic.removeLink('sulcus_labels', 'white_mesh')
-    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.cingular_pole_texture', 'CingularPole.pole' )
-    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.insular_pole_texture', 'InsularPole.pole' )
-    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.cingular_pole_texture', 'CingularPole.pole' )
-    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.white_sulcalines','SulcalinesExtraction.white_sulcalines')
-    eNode.addLink(  'ParameterizeUnconstrainedHarmonic.sulcus_labels','SulcalinesExtraction.graph_label_basins')
+    eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.white_mesh', 'CingularPole.white_mesh' )
+    eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.side', 'side' )
+    eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.cingular_pole_texture', 'CingularPole.pole' )
+    eNode.addDoubleLink(  'ParameterizeUnconstrainedHarmonic.insular_pole_texture', 'InsularPole.pole' )
+    eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.white_sulcalines', 'SulcalinesExtraction.white_sulcalines')
+    eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.sulcus_labels', 'SulcalinesExtraction.graph_label_basins')
 
-    eNode.addLink(  'HarmonicMappingOrtho.side','side')
-    
-    eNode.addLink(  'CoordinatesFromHipHopMapping.model_file','HarmonicMappingOrtho.model_file')
-    
-    eNode.addLink(  'ParcelsTextureFromCoordinates.side', 'side')
-    eNode.addLink(  'ParcelsTextureFromCoordinates.model_file', 'HarmonicMappingOrtho.model_file')
+    eNode.HarmonicMappingOrtho.removeLink( 'side', 'rectangular_mesh' )
+    eNode.HarmonicMappingOrtho.removeLink( 'boundary_texture', 'rectangular_mesh' )
+    eNode.HarmonicMappingOrtho.removeLink( 'corresp_indices_texture', 'rectangular_mesh' )
+    eNode.HarmonicMappingOrtho.removeLink( 'white_sulcalines', 'rectangular_mesh' )
+    eNode.HarmonicMappingOrtho.removeLink( 'sulcus_labels', 'rectangular_mesh' )
+    eNode.addDoubleLink( 'HarmonicMappingOrtho.rectangular_mesh', 'ParameterizeUnconstrainedHarmonic.rectangular_mesh' )
+    eNode.addDoubleLink(  'HarmonicMappingOrtho.side','side')
+    eNode.addDoubleLink( 'HarmonicMappingOrtho.boundary_texture', 'ParameterizeUnconstrainedHarmonic.boundary_texture' )
+    eNode.addDoubleLink( 'HarmonicMappingOrtho.corresp_indices_texture', 'ParameterizeUnconstrainedHarmonic.corresp_indices_texture' )
+    eNode.addDoubleLink( 'HarmonicMappingOrtho.white_sulcalines', 'ParameterizeUnconstrainedHarmonic.rectangular_white_sulcalines' )
+    eNode.addDoubleLink( 'HarmonicMappingOrtho.sulcus_labels', 'SulcalinesExtraction.graph_label_basins' )
+
+    eNode.CoordinatesFromHipHopMapping.removeLink( 'boundary_texture', 'cstr_rectangular_mesh' )
+    eNode.CoordinatesFromHipHopMapping.removeLink( 'corresp_indices_texture', 'cstr_rectangular_mesh' )
+    eNode.CoordinatesFromHipHopMapping.removeLink( 'white_mesh_parts', 'cstr_rectangular_mesh' )
+    #eNode.CoordinatesFromHipHopMapping.removeLink( 'model_file', 'cstr_rectangular_mesh' )
+    eNode.addDoubleLink( 'CoordinatesFromHipHopMapping.cstr_rectangular_mesh', 'HarmonicMappingOrtho.cstr_rectangular_mesh' )
+    eNode.addDoubleLink( 'CoordinatesFromHipHopMapping.boundary_texture', 'ParameterizeUnconstrainedHarmonic.boundary_texture' )
+    eNode.addDoubleLink( 'CoordinatesFromHipHopMapping.corresp_indices_texture', 'ParameterizeUnconstrainedHarmonic.corresp_indices_texture' )
+    eNode.addDoubleLink( 'CoordinatesFromHipHopMapping.white_mesh_parts', 'ParameterizeUnconstrainedHarmonic.white_mesh_parts' )
+    eNode.addDoubleLink( 'CoordinatesFromHipHopMapping.model_file', 'HarmonicMappingOrtho.model_file')
+
+    eNode.ParcelsTextureFromCoordinates.removeLink( 'side', 'latitude' )
+    eNode.ParcelsTextureFromCoordinates.removeLink( 'longitude', 'latitude' )
+    eNode.ParcelsTextureFromCoordinates.removeLink( 'model_file', 'latitude' )
+    eNode.addDoubleLink( 'ParcelsTextureFromCoordinates.latitude', 'CoordinatesFromHipHopMapping.latitude')
+    eNode.addDoubleLink( 'ParcelsTextureFromCoordinates.side', 'side' )
+    eNode.addDoubleLink( 'ParcelsTextureFromCoordinates.longitude', 'CoordinatesFromHipHopMapping.longitude')
+    eNode.addDoubleLink( 'ParcelsTextureFromCoordinates.model_file', 'HarmonicMappingOrtho.model_file' )
 
     self.setExecutionNode( eNode )
