@@ -50,7 +50,7 @@ def initialization( self ):
     self.linkParameters( 'Rgraph','Lgraph')
     self.sulcus_identification='label'
     
-    eNode = SerialExecutionNode( self.name, parameterized=self )
+    eNode = ParallelExecutionNode( self.name, parameterized=self )
 
     eNode.addChild( 'Hemisphere_Process_Left',
                     ProcessExecutionNode( 'HemisphereProcess2012', optional = 1 ) )
