@@ -31,7 +31,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals
 from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
 import numpy as np
 from soma import aims
@@ -46,18 +45,18 @@ userLevel = 0
 #    anatomist.validation()
 
 signature = Signature(
-    'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph' ),
+    'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph and data' ),
     'side', Choice('left', 'right'),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'aims readable volume formats' ),
     'sulcus_identification',Choice('label', 'name'),
 #    'trl',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
 #    'transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist', 'Transformation matrix' ),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
     'dilation_1', Integer(),
     'erosion', Integer(),
     'dilation_2', Integer(),
-    'pole',WriteDiskItem( 'insula pole texture','Texture' )
+    'pole',WriteDiskItem( 'insula pole texture','aims Texture formats' )
 )
 
 def initialization( self ):

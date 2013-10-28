@@ -43,11 +43,11 @@ userLevel = 0
 
 signature = Signature(
                       
-    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', aimsGlobals.aimsMeshFormats),
+    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', 'aims mesh formats' ),
     'side', Choice('left', 'right'),
-    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
-    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ),
+    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'aims Texture formats' ),
+    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'aims Texture formats' ),
+    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'aims Texture formats' ),
     'cstrBalance', Float(),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),
@@ -55,7 +55,7 @@ signature = Signature(
     'unfold_reversed_triangles', Choice('yes','no'),
     'nb_it_local_smoothing_for_unfolding', Integer(),
     'cstr_rectangular_mesh',WriteDiskItem( 'Rectangular flat cstr mesh',
-        aimsGlobals.aimsMeshFormats)
+      'aims mesh formats' )
 )
 
 def initialization( self ):

@@ -27,7 +27,6 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
   
 from brainvisa.processes import *
-import shfjGlobals  
 from soma import aims
 import numpy as np
 
@@ -48,15 +47,15 @@ userLevel = 0
 #     anatomist.validation()
     
 signature = Signature(
-    'cstr_rectangular_mesh',ReadDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats),        
-    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
-    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
-    'white_mesh_parts',ReadDiskItem( 'White Mesh Parts', shfjGlobals.aimsMeshFormats),
+    'cstr_rectangular_mesh',ReadDiskItem( 'Rectangular flat cstr mesh', 'aims mesh formats' ),
+    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'aims Texture formats'),
+    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'aims Texture formats'),
+    'white_mesh_parts',ReadDiskItem( 'White Mesh Parts', 'aims mesh formats' ),
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
 #    'latitude_insula_boundary', Float(),
 #    'latitude_cingular_pole_boundary', Float(),
-    'latitude',WriteDiskItem( 'Latitude coordinate texture','Texture'),
-    'longitude',WriteDiskItem( 'Longitude coordinate texture','Texture')
+    'latitude',WriteDiskItem( 'Latitude coordinate texture', 'aims Texture formats' ),
+    'longitude',WriteDiskItem( 'Longitude coordinate texture', 'aims Texture formats' )
 
 )
 

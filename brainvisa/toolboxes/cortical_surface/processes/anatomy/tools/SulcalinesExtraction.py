@@ -19,7 +19,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
 #from brainvisa import anatomist
 
 name = 'Sulcal Lines Extraction'
@@ -31,17 +30,17 @@ userLevel = 0
     
 signature = Signature(
                       
-    'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph'),
+    'graph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph and data' ),
     'side', Choice('left', 'right'),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'grey_white_input', ReadDiskItem( 'Morphologist Grey White Mask', shfjGlobals.anatomistVolumeFormats),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
+    'grey_white_input', ReadDiskItem( 'Morphologist Grey White Mask', 'aims readable volume formats' ),
     'sulcus_identification',Choice('name','label'),
     'labels_translation_map',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'graph_label_basins',WriteDiskItem( 'Graph Label Translation', 'Text File'),
     'file_correspondance_constraint',ReadDiskItem( 'Constraint coordinates values', 'Text File'),
-    'mri', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims writable volume formats' ),
-    'bucket_label_type', Choice('All', 'aims_junction', 'aims_bottom', 'aims_ss', 'aims_other'),  
-    'white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines texture', 'Texture'),
+    'mri', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims readable volume formats' ),
+    'bucket_label_type', Choice('All', 'aims_junction', 'aims_bottom', 'aims_ss', 'aims_other'),
+    'white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines texture', 'aims Texture formats'),
     'basin_min_size', Float(),
     'constraint_weight', Integer(),
     'constraint_value', Choice('Basins Label','Lat/Lon'),

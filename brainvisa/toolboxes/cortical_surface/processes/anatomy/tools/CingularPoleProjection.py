@@ -50,12 +50,12 @@ signature = Signature(
 #    'pole_template',ReadDiskItem( 'Cingular Pole Template Subject' , 'Aims readable volume formats' ),
     'subject_transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist',
     'Transformation matrix' ),
-    'pole_template',ReadDiskItem( 'Cingular Pole Template' , 'Aims readable volume formats' ),
+    'pole_template',ReadDiskItem( 'Cingular Pole Template', 'Aims readable volume formats' ),
     'template_pole_transformation',ReadDiskItem( 'Template Pole To Talairach Tranformation', 'Transformation matrix' ),
     'dilation_1', Integer(),
     'erosion', Integer(),
     'dilation_2', Integer(),
-    'pole',WriteDiskItem( 'Hippocampus pole texture','Texture' )
+    'pole',WriteDiskItem( 'Hippocampus pole texture', 'aims Texture formats' )
 )
 
 def initialization( self ):
