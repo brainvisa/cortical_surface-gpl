@@ -39,8 +39,8 @@ userLevel = 0
 
 signature = Signature(
     'Side', Choice("Both","Left","Right"),
-    'left_gyri',ReadDiskItem( 'hemisphere parcellation texture','Texture',requiredAttributes={ 'side': 'left' } ),
-    'right_gyri',ReadDiskItem( 'hemisphere parcellation texture','Texture',requiredAttributes={ 'side': 'right' } ),
+    'left_gyri',ReadDiskItem( 'hemisphere parcellation texture','Aims texture formats',requiredAttributes={ 'side': 'left' } ),
+    'right_gyri',ReadDiskItem( 'hemisphere parcellation texture','Aims texture formats',requiredAttributes={ 'side': 'right' } ),
     'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'texture_time', Integer(),
