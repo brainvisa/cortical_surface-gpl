@@ -418,7 +418,7 @@ def dilateTexture(tex, neigh, inds):
 # in a texture
 #
 ####################################################################
-def textureBoundary(mesh, atex, val, neigh=0):
+def textureBoundary(mesh, atex, val, neigh=None):
     tex_val_indices = np.where(atex == val)[0]
     if not tex_val_indices.size:
         print 'no value ' + str(val) + ' in the input texture!!'
@@ -427,7 +427,7 @@ def textureBoundary(mesh, atex, val, neigh=0):
         ####################################################################
         # print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
         ####################################################################
-        if not neigh:
+        if neigh is None:
             neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
             
         '''identify the vertices that are on the boundary,         

@@ -39,6 +39,10 @@ insert( '{center}/{subject}',
     '<subject>_Rwhite_lat', SetType( 'Right hemisphere latitude texture'), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lwhite_lon', SetType( 'Left hemisphere longitude texture'), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_lon', SetType( 'Right hemisphere longitude texture'), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_lat_HIP', SetType( 'Left hemisphere latitude HIP texture'), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_lat_HIP', SetType( 'Right hemisphere latitude HIP texture'), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_lon_HIP', SetType( 'Left hemisphere longitude HIP texture'), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_lon_HIP', SetType( 'Right hemisphere longitude HIP texture'), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lconf_lat', SetType( 'Conformal latitude texture'), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rconf_lat', SetType( 'Conformal latitude texture'), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lconf_lon', SetType( 'Conformal longitude texture'), SetWeakAttr( 'side', 'left' ),
@@ -77,7 +81,11 @@ insert( '{center}/{subject}',
     '<subject>_Lwhite_gyri_regul', SetType( 'Left hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ),
     '<subject>_Rwhite_gyri_regul', SetType( 'Right hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ),
 
+  ),
+)
 
+
+insert( '{center}/{subject}/surface',
 
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface    
     '<subject>_L_gyriGraph', SetType( 'Left Gyri Graph' ), SetWeakAttr( 'side', 'left' ),
@@ -113,7 +121,6 @@ insert( '{center}/{subject}',
     "<subject>_Rwhite_sulcalines", SetType( 'Right hemisphere Sulcal Lines texture' ), SetWeakAttr( 'side', 'right' ),
     "<subject>_LgraphLabelBasins", SetType( 'Left Graph Label Translation' ), SetWeakAttr( 'side', 'left' ),
     "<subject>_RgraphLabelBasins", SetType( 'Right Graph Label Translation' ), SetWeakAttr( 'side', 'right' ),
-  ),
 )
 
 # Cortical Surface Functional-related Types

@@ -73,7 +73,7 @@ def initialization( self ):
     self.linkParameters( 'white_mesh','graph' )
     self.linkParameters( 'pole', 'white_mesh' )
     self.dilation_1 = 2 
-    self.erosion = 3 
+    self.erosion = 5
     self.dilation_2 = 2 
 
 #    self.linkParameters( 'transformation', 'white_mesh' )
