@@ -34,7 +34,7 @@ try:
   from brainvisa.cortical_surface.parameterization.mapping import hop
   from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
   from brainvisa.cortical_surface.parameterization import model as md
-  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.surface_tools import readSulcusLabelTranslationFile as rSLT
 except:
   pass
     
@@ -83,7 +83,7 @@ def execution( self, context ):
         context.write('working on mesh nb: ',ind_mesh+1)
         mesh = re.read(r_mesh.fullPath())
         tex_square_sulci = re.read(self.flat_white_sulcalines[ind_mesh].fullPath())
-        sulci_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels[ind_mesh].fullPath())
+        sulci_dict = rSLT.readSulcusLabelTranslationFile(self.sulcus_labels[ind_mesh].fullPath())
         full_sulci = slSet.SulcalLinesSet()
         full_sulci.extractFromTexture(tex_square_sulci[0].arraydata(), mesh, sulci_dict)
         context.write('Translating the barycenter of S.C. to 0')

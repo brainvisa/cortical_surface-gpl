@@ -6,7 +6,8 @@ Created on Jan 15, 2013
 from brainvisa.cortical_surface.parameterization import sulcalLine as sln
 from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
 from brainvisa.cortical_surface.parameterization import model as md
-from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
+from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
 from scipy import sparse
 import scipy
 
@@ -97,14 +98,14 @@ def sphereConformalMapping(mesh):
 ####################################################################
 def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
     if boundary is None:
-        boundary = surfTls.meshBoundary(mesh)
+        boundary = basicTls.meshBoundary(mesh)
         #print 'Boundary: ', boundary
     boundary = np.array(boundary)
     if boundary_coords is None:
         p = boundary.size
         t = np.arange(0, 2 * np.math.pi, (2 * np.math.pi / p))
         boundary_coords = np.array([np.cos(t), np.sin(t)])
-    L = surfTls.computeMeshLaplacian(mesh)
+    L = pdeTls.computeMeshLaplacian(mesh)
     #print 'Laplacian : ', L
     #vert = np.array(mesh.vertex())
     Nv = len(mesh.vertex())  # np.array(mesh.vertex()).shape[0]
@@ -168,7 +169,7 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
     Rx = np.zeros(Nbv)
     Ry = np.zeros(Nbv)
 
-    Lx = surfTls.computeMeshLaplacian(mesh)
+    Lx = pdeTls.computeMeshLaplacian(mesh)
 
     if fixed_boundary:
         for i in boundary[3]:
@@ -798,7 +799,7 @@ def invertedPolygon(mesh, shape=None):
     if shape is None:
         shape = 'square'
 #    norms = np.array(mesh.normal())
-    norms = surfTls.meshPolygonNormal(mesh)
+    norms = basicTls.meshPolygonNormal(mesh)
     if shape is 'sphere':
         print 'sphere not available yet'
 #N(1,:)=FaceNormal(1,:)+FaceCenter(1,:);
@@ -1030,6 +1031,7 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
         if count > max_count:
             print 'unable to solve the inverted faces'
             break
+        mesh.updateNormals()
     return (mesh, nb_inward_evol, inward_evol)
 
 
@@ -1064,11 +1066,11 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
     #    cingular_tex_clean, cing_tex_boundary = poleTextureClean(mesh, texture_poles, cingular_tex_value)    #    insula_tex_clean, ins_tex_boundary = poleTextureClean(mesh, texture_poles, insula_tex_value)
     print '------------------CutMesh'
-    (sub_meshes, labels, sub_indexes) = surfTls.cutMesh(mesh, tex_poles_clean)
+    (sub_meshes, labels, sub_indexes) = basicTls.cutMesh(mesh, tex_poles_clean)
     print 'labels found in the texture ', labels
     neo_ind = labels.index(neocortex_tex_value)
     neoCortex_mesh = sub_meshes[neo_ind]
-    neoCortex_boundary = surfTls.meshBoundary(sub_meshes[neo_ind])
+    neoCortex_boundary = basicTls.meshBoundary(sub_meshes[neo_ind])
     if len(neoCortex_boundary)>2:
         print ('problem: more than 2 boundaries in the neoCortex, the pole textures have topological defects')
         raise Exception('more than 2 boundaries in the neoCortex, the pole textures have topological defects')
@@ -1076,15 +1078,15 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     neocortex_indices = sub_indexes[neo_ind]
     ins_ind = labels.index(insula_tex_value)
     insula_mesh = sub_meshes[ins_ind]
-#    insula_boundary = surfTls.meshBoundary(sub_meshes[ins_ind])
+#    insula_boundary = basicTls.meshBoundary(sub_meshes[ins_ind])
     insula_indices = sub_indexes[ins_ind]
     cing_ind = labels.index(cingular_tex_value)
     cingular_mesh = sub_meshes[cing_ind]
-#    cingular_boundary = surfTls.meshBoundary(sub_meshes[cing_ind])
+#    cingular_boundary = basicTls.meshBoundary(sub_meshes[cing_ind])
     cingular_indices = sub_indexes[cing_ind]
     print '------------------poles path, always from insula to cingular pole'
-    cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
-    ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
+    cing_tex_boundary = basicTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
+    ins_tex_boundary = basicTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
     poles_path = getShortestPath(mesh, ins_tex_boundary[-1], cing_tex_boundary[-1])
 #     ws = aims.Writer()
 #     tex_out = aims.TimeTexture_S16()
@@ -1179,7 +1181,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
         model.setAxisCoord(full_sulci)
 
 
-    Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
+    Lx = pdeTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
     return neoCortex_square_cstr
@@ -1224,23 +1226,23 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, side, mode
     tex_poles_clean[np.where(cingular_tex_clean == cingular_tex_value)[0]] = cingular_tex_value
     tex_poles_clean[np.where(insula_tex_clean == insula_tex_value)[0]] = insula_tex_value
     print '------------------CutMesh'
-    (sub_meshes, labels, sub_indexes) = surfTls.cutMesh(mesh, tex_poles_clean)
+    (sub_meshes, labels, sub_indexes) = basicTls.cutMesh(mesh, tex_poles_clean)
     print labels
     neo_ind = labels.index(neocortex_tex_value)
     neoCortex_mesh = sub_meshes[neo_ind]
-    neoCortex_boundary = surfTls.meshBoundary(sub_meshes[neo_ind])
+    neoCortex_boundary = basicTls.meshBoundary(sub_meshes[neo_ind])
     neocortex_indices = sub_indexes[neo_ind]
     ins_ind = labels.index(insula_tex_value)
     insula_mesh = sub_meshes[ins_ind]
-    insula_boundary = surfTls.meshBoundary(sub_meshes[ins_ind])
+    insula_boundary = basicTls.meshBoundary(sub_meshes[ins_ind])
     insula_indices = sub_indexes[ins_ind]
     cing_ind = labels.index(cingular_tex_value)
     cingular_mesh = sub_meshes[cing_ind]
-    cingular_boundary = surfTls.meshBoundary(sub_meshes[cing_ind])
+    cingular_boundary = basicTls.meshBoundary(sub_meshes[cing_ind])
     cingular_indices = sub_indexes[cing_ind]
     print '------------------poles path, always from insula to cingular pole'
-    cing_tex_boundary = surfTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
-    ins_tex_boundary = surfTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
+    cing_tex_boundary = basicTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
+    ins_tex_boundary = basicTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
     poles_path = getShortestPath(mesh, ins_tex_boundary[0], cing_tex_boundary[0])
     "poles_path to neocortex"
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
@@ -1310,7 +1312,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, side, mode
     model.printArgs()
     model.saveToFile('/home/toz/model_current.txt')
 
-    Lx = surfTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
+    Lx = pdeTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
     (neoCortex_square_cstr, nb_inward_cstr_evol) = solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)

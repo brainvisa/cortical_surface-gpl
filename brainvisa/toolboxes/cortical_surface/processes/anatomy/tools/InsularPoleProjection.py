@@ -31,7 +31,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
 import numpy as np
 from soma import aims
 #from brainvisa import anatomist
@@ -133,7 +133,7 @@ def execution( self, context ):
     else:
         context.write('side must be set to left or right!')     
     context.write('Topological correction...')                           
-    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
+    cingular_tex_clean, cing_tex_boundary = textureTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
     cingular_tex_clean[np.where(cingular_tex_clean == tmp_tex_value)[0]] = 180
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)

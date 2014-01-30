@@ -32,7 +32,7 @@ import numpy as np
 
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map
-  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
   from brainvisa.cortical_surface.parameterization import model as md
 except:
   pass
@@ -132,7 +132,7 @@ def execution( self, context ):
 
     context.write('mapping the insula to a disk')
     insula_lon = map.texture2ROI(lon, insula_indices)
-    insula_boundary = surfTls.meshBoundary(insula_mesh)[0]
+    insula_boundary = basicTls.meshBoundary(insula_mesh)[0]
 #     context.write(insula_boundary)
 #     context.write(len(insula_boundary))
 # 
@@ -166,7 +166,7 @@ def execution( self, context ):
 
     
     
-    #ws.write(surfTls.meshBoundaryMesh(insula_mesh, [insula_boundary]), '/home/toz/ammon_Lwhite_insula_bound.mesh' )
+    #ws.write(basicTls.meshBoundaryMesh(insula_mesh, [insula_boundary]), '/home/toz/ammon_Lwhite_insula_bound.mesh' )
     tex_insula_boundary_lon = aims.TimeTexture_FLOAT()
     tex_insula_boundary_lon[0].assign(insula_lon[insula_boundary])
     #ws.write(tex_insula_boundary_lon,  '/home/toz/ammon_Lwhite_insula_boundary_lon.tex')
@@ -198,7 +198,7 @@ def execution( self, context ):
     lon[insula_indices] = insula_lon
     lat[insula_indices] = insula_lat * model.insularPoleBoundaryCoord
     context.write('mapping the cingular pole to a disk')    
-    cingular_boundary = surfTls.meshBoundary(cingular_mesh)[0]
+    cingular_boundary = basicTls.meshBoundary(cingular_mesh)[0]
     cingular_lon = map.texture2ROI(lon, cingular_indices)
     (cingular_lon, cingular_lat, cingular_disk) = map.mesh2Disk(cingular_mesh, cingular_boundary, cingular_lon)
 #     context.write('cingular_lon = [', np.min(cingular_lon),', ',np.max(cingular_lon),']')

@@ -32,7 +32,7 @@ import numpy as np
 
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map
-  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.surface_tools import readSulcusLabelTranslationFile as rSLT
   from brainvisa.cortical_surface.parameterization import model as md
 except:
   pass
@@ -88,7 +88,7 @@ def execution( self, context ):
     boundary_tex = re.read(self.boundary_texture.fullPath())
     context.write('Reading sulcus-label correspondences file')
     
-    sulc_labels_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
+    sulc_labels_dict = rSLT.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
     
     '''
     boundaries (see mapping.path2Boundary for details:"

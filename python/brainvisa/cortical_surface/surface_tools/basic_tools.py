@@ -1,11 +1,26 @@
-'''
-Created on Jan 15, 2013
+# -*- coding: utf-8 -*-
+# As a counterpart to the access to the source code and  rights to copy,
+# modify and redistribute granted by the license, users are provided only
+# with a limited warranty  and the software's author,  the holder of the
+# economic rights,  and the successive licensors  have only  limited
+# liability.
+#
+# In this respect, the user's attention is drawn to the risks associated
+# with loading,  using,  modifying and/or developing or reproducing the
+# software by the user in light of its specific status of free software,
+# that may mean  that it is complicated to manipulate,  and  that  also
+# therefore means  that it is reserved for developers  and  experienced
+# professionals having in-depth computer knowledge. Users are therefore
+# encouraged to load and test the software's suitability as regards their
+# requirements in conditions enabling the security of their systems and/or 
+# data to be ensured and,  more generally, to use and operate it in the 
+# same conditions as regards security.
+#
+# The fact that you are presently reading this means that you have had
+# knowledge of the CeCILL license version 2 and that you accept its terms.
 
-@author: toz
-'''
 import numpy as np
 from soma import aims
-from soma import aimsalgo
 from scipy import sparse
 np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
 
@@ -23,35 +38,36 @@ def ismember(ar1, ar2):
 # compute the 3 angles of each triangle in a mesh
 #
 ####################################################################
-def meshPolygonAngles(vertex, polygon):
-    angles_out = np.zeros(polygon.shape)
-    print angles_out.shape
-    for ind,p in enumerate(polygon):
-        tet = polygonAngles(vertex[p,:])
-        angles_out[ind,:] = tet
-    return angles_out
+def meshPolygonArea(vert,poly):
+    
+    pp = vert[poly[:, 1], :] - vert[poly[:, 0], :]
+    qq = vert[poly[:, 2], :] - vert[poly[:, 0], :]
+    tex1 = np.sqrt(np.sum(np.power(pp*qq,2),1))/2
+
+    return tex1
 
 ####################################################################
 #
-# compute the 3 angles between the 3 vertices given in parameter
-# for too small or flat triangles, return [0, 0, 0]
+# compute the 3 angles of each triangle in a mesh
 #
 ####################################################################
-def polygonAngles(vertices):
-    tet = np.zeros(3)
-    a = fastNorm(vertices[1,:] - vertices[0,:])
-    b = fastNorm(vertices[2,:] - vertices[0,:])
-    c = fastNorm(vertices[2,:] - vertices[1,:])
-#     print vertices[2,:] - vertices[0,:]
-#     print b
-    if a>0 and b>0 and c>0: #else: flat triangle
-        a2 = a**2
-        b2 = b**2
-        c2 = c**2
-        tet[0] = np.arccos((a2+b2-c2)/(2*a*b))
-        tet[1] = np.arccos((a2+c2-b2)/(2*a*c))
-        tet[2] = np.arccos((c2+b2-a2)/(2*c*b))
-    return tet
+def meshPolygonAngles(vert, poly):
+    angles_out = np.zeros(poly.shape)
+    for i in range(3):
+        i1 = np.mod(i, 3)
+        i2 = np.mod(i + 1, 3)
+        i3 = np.mod(i + 2, 3)
+        print '    ', 3 - i1
+        pp = vert[poly[:, i2], :] - vert[poly[:, i1], :]
+        qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]      
+        noqq = np.sqrt(np.sum(qq * qq, 1))
+        nopp = np.sqrt(np.sum(pp * pp, 1))
+
+        pp = pp / np.vstack((nopp, np.vstack((nopp, nopp)))).transpose()
+        qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
+        angles_out[:,i] = np.arccos(np.sum(pp * qq, 1))
+    return angles_out
+
 
 ####################################################################
 #
@@ -103,26 +119,7 @@ def meshDistortions(mesh1,mesh2,type):
 #             error('type of distortion not valid')
     return distortions_out
 
-####################################################################
-#
-# compute the norm of a vector very fast
-#
-####################################################################
-def fastNorm(x):
-    return np.sqrt(x.dot(x))
 
-####################################################################
-#
-# read sulcus label translation file and return a dictionnary
-#
-####################################################################
-def readSulcusLabelTranslationFile(sulcus_label_file):
-    sulc_labels = []
-    with open(sulcus_label_file,'r') as inf:
-        for line in inf:
-            sulc_labels.append(line.split())    
-    sulc_labels_dict = dict((int(value), key) for (key, value) in sulc_labels)
-    return sulc_labels_dict
     
 ####################################################################
 #
@@ -151,327 +148,6 @@ def meshPolygonNormal(mesh):
 #    normal = normal ./ repmat( d, 1,3 );
 #end
     return normalf
-
-
-####################################################################
-#
-# laplacian smoothing
-#
-####################################################################
-def meshSmoothing(mesh, Niter, dt):
-    print '    Smoothing mesh'
-    mod = 1
-    if Niter > 10:
-        mod = 10
-    if Niter > 100:
-        mod = 100
-    if Niter > 1000:
-        mod = 1000
-    vert = np.array(mesh.vertex())
-    Mvert = sparse.lil_matrix(vert).tocsr()
-    weights = computeMeshWeights(mesh)
-    N = weights.shape[0]
-#    s = weights.sum(axis = 1)
-    s = weights.sum(axis=0)
-#    dia = sparse.lil_matrix((N,N))
-#    dia.setdiag(s)
-    dia = sparse.dia_matrix((1 / s, 0), shape=(N, N))
-#    b = ones(N)
-#    W = sparse.linalg.spsolve(dia.tocsr(),b)*weights
-    W = dia * weights
-    I = sparse.lil_matrix((N, N))
-    I.setdiag(np.ones(N))
-    tL = I.tocsr() - W
-    LI = I.tocsr() - (dt * tL)
-    #    LI = dt*L
-    #    LI = LI.tocsr()
-    #    LI = I.tocsr() + LI
-    #    print '    LI.shape = ', LI.shape
-    print '    Mvert.shape = ', Mvert.shape
-    for i in range(Niter):
-        Mvert = LI * Mvert
-        if (i % mod == 0):
-            print i
-    print '    OK'
-    vv = aims.vector_POINT3DF()
-    for i in range(N):
-        vv.append([Mvert[i, 0], Mvert[i, 1], Mvert[i, 2]])
-
-    smooth = aims.AimsTimeSurface_3()
-    smooth.vertex().assign(vv)
-    smooth.polygon().assign(mesh.polygon())
-    smooth.updateNormals()
-    return(smooth)
-
-
-####################################################################
-# compute_mesh_weight - compute a weight matrix
-#
-#   W = compute_mesh_weight(vertex,face,type,options);
-#
-#   W is sparse weight matrix and W(i,j) = 0 is vertex i and vertex j are not
-#   connected in the mesh.
-#
-#   type is either 
-#       'combinatorial': W(i,j) = 1 is vertex i is conntected to vertex j.
-#       'distance': W(i,j) = 1/d_ij^2 where d_ij is distance between vertex
-#           i and j.
-#       'conformal': W(i,j) = cot(alpha_ij)+cot(beta_ij) where alpha_ij and
-#           beta_ij are the adjacent angle to edge (i,j)
-#
-#   If options.normalize = 1, the the rows of W are normalize to sum to 1.
-#
-####################################################################
-def computeMeshWeights(mesh):
-    threshold = 0.0001 #np.spacing(1)??
-    print '    Computing mesh weights'
-    vert = np.array(mesh.vertex())
-    poly = np.array(mesh.polygon())
-
-    Nbv = vert.shape[0]
-    Nbp = poly.shape[0]
-    W = sparse.lil_matrix((Nbv, Nbv))
-    #W = zeros((Nv,Nv))
-    # this old numpy array representation cannot handle big meshes in memory
-    threshold_needed = 0
-    for i in range(3):
-        i1 = np.mod(i, 3)
-        i2 = np.mod(i + 1, 3)
-        i3 = np.mod(i + 2, 3)
-        print '    ', 3 - i1
-        pp = vert[poly[:, i2], :] - vert[poly[:, i1], :]
-        qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]
-        nopp = np.apply_along_axis(np.linalg.norm, 1, pp)
-        noqq = np.apply_along_axis(np.linalg.norm, 1, qq)
-        thersh_nopp = np.where(nopp<threshold)[0]
-        thersh_noqq = np.where(noqq<threshold)[0]
-        if len(thersh_nopp) > 0:
-            nopp[thersh_nopp] = threshold
-            threshold_needed += len(thersh_nopp)
-        if len(thersh_noqq) > 0:
-            noqq[thersh_noqq] = threshold
-            threshold_needed += len(thersh_noqq)
-#        print np.min(noqq)
-        pp = pp / np.vstack((nopp, np.vstack((nopp, nopp)))).transpose()
-        qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
-        ang = np.arccos(np.sum(pp * qq, 1))
-        for j in range(Nbp):
-#            ind1 = poly[j, i1]
-            ind2 = poly[j, i2]
-            ind3 = poly[j, i3]
-            W[ind2, ind3] = W[ind2, ind3] + 1 / np.tan(ang[j])
-            W[ind3, ind2] = W[ind3, ind2] + 1 / np.tan(ang[j])
-    if threshold_needed > 0:
-        print '    -weight threshold needed for ',threshold_needed,' values-'
-    print '    OK'
-
-    li = np.hstack(W.data)
-    print 'nb of Nan in weights: ', len(np.where(np.isnan(li))[0])
-
-    return W
-
-
-####################################################################
-#
-# compute laplacian of a mesh
-#
-####################################################################
-def computeMeshLaplacian(mesh):
-    print '    Computing Laplacian'
-    weights = computeMeshWeights(mesh)
-    N = weights.shape[0]
-#    s = weights.sum(axis = 1)
-    s = weights.sum(axis=0)
-#    dia = sparse.lil_matrix((N,N))
-#    dia.setdiag(s)
-    dia = sparse.dia_matrix((s, 0), shape=(N, N))
-
-#    print dia - weights
-    L = sparse.lil_matrix(dia - weights)
-    li = np.hstack(L.data)
-    print 'nb Nan in L : ', len(np.where(np.isnan(li))[0])
-    print 'nb Inf in L : ', len(np.where(np.isinf(li))[0])   
-    print '    OK'
-
-    return L
-
-
-####################################################################
-#
-# ensure the texture corresponding to the value tex_val has only one connex component with simple boundary
-#
-####################################################################
-def textureTopologicalCorrection(mesh, atex, tex_val, background_val=0, neigh=None):
-    tex_val_indices = np.where(atex == tex_val)[0]
-    if not tex_val_indices.size:
-        print 'no value ' + str(tex_val) + ' in the input texture!!'
-        return list()
-    else:
-        print str(tex_val_indices.size) + ' vertices have the texture value ' + str(tex_val)
-        if neigh is None:
-            neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
-        labels = np.unique(atex)
-        labels = labels.tolist()
-        #----------------begin:: ensure a single connex component
-        tex2 = aims.TimeTexture_S16()
-        tex2[0].reserve(atex.size)
-        for i in range(atex.size):
-            if i in tex_val_indices:
-                tex2[0].push_back(tex_val)
-            else:
-                tex2[0].push_back(0)
-        conn_tex = aimsalgo.AimsMeshLabelConnectedComponent(mesh, tex2, 0, 0)  # aimsalgo.AimsMeshLabelConnectedComponent(mesh, tex2,1,0)
-#        aconn_tex = conn_tex[0].arraydata()
-        conn_labels = set(conn_tex[0].arraydata())
-        conn_labels = conn_labels.difference(set([-1]))  # value -1 corresponds to background
-        if len(conn_labels) > 1:
-            print len(conn_labels), " connex component(s) for this value in the texture, keeping only the largest component"
-            lab_val_indices_nb = [len(np.where(conn_tex[0].arraydata() == lab)[0]) for lab in conn_labels]#.difference(set([-1]))]
-            #print lab_val_indices_nb#conn_labels#.difference(set([-1])),lab_val_indices_nb
-            index_val_largest_comp = lab_val_indices_nb.index(max(lab_val_indices_nb))
-          #  index_val_largest_comp = index_val_largest_comp.tolist()
-            adeleted_conn_comp_indices = np.where(conn_tex[0].arraydata() == -1)[0]
-            deleted_conn_comp_indices = adeleted_conn_comp_indices.tolist()
-            for conn_labels_index in set(range(len(conn_labels))) - set([index_val_largest_comp]):
-                    deleted_conn_comp_indices.extend(np.where(conn_tex[0].arraydata() == list(conn_labels)[conn_labels_index])[0])
-            atex[deleted_conn_comp_indices] = background_val
-#            conn_tex.erase()
-#            for i in range(atex.size):
-#                if i in deleted_conn_comp_indices:
-#                    conn_tex[0].push_back(0)
-#                else:
-#                    conn_tex[0].push_back(atex[i])
-        #----------------end:: ensure a single connex component
-        #----------------begin:: fill any hole in this single connex component
-        boundary = textureBoundary(mesh, atex, tex_val, neigh)
-        if len(boundary) > 1:
-            print "filling holes in the largest connex component"
-#            ws=aims.Writer()
-#            tex_out = aims.TimeTexture_S16()
-#            i=0
-            while len(boundary) > 1:
-                print 'length of boundaries : ',[len(bound) for bound in boundary]
-#                i+=1
-#                nm= 's12158_Rhippo_cleaned'+str(i)+'.tex'
-#                tex_out[0].assign(atex)
-#                ws.write(tex_out, nm)
-                for l in range(len(boundary) - 1):
-                    atex = dilateTexture(atex, neigh, boundary[l])
-                boundary = textureBoundary(mesh, atex, tex_val, neigh)
-        print 'length of boundaries : ',[len(bound) for bound in boundary]
-        #----------------end:: fill any hole in this single connex component
-        #----------------begin:: ensure that the boundary do not contain the 3 vertices of a triangle
-        print 'cleaning the longest boundary of the texture'
-        atex, boundary = cleanTextureBoundary(mesh, atex, tex_val, boundary[-1], background_val, neigh)
-        #----------------end:: ensure that the boundary do not contain the 3 vertices of a triangle
-
-    return (atex, boundary)
-
-####################################################################
-# ensure that the boundary do not contain the 3 vertices of a triangle
-####################################################################
-def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None):
-    if neigh is None:
-        neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
-    '''check if the 3 vertices of any polygon is on the boundary
-    if it is the case, the vertex that can be removed is selected and removed'''    
-    poly = np.array(mesh.polygon())
-    I = ismember(poly, bound)
-    poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
-    if poly_set.shape[0]==0:
-        return (tex, textureBoundary(mesh, tex, tex_val, neigh))
-    else:
-        while poly_set.shape[0]>0:
-            print 'nb triangles on the boundary ',poly_set.shape[0]
-            pts_to_remove = []
-            for pb_poly in poly_set:
-                ind_V1 = bound.index(pb_poly[0])
-                ind_V2 = bound.index(pb_poly[1])
-                ind_V3 = bound.index(pb_poly[2])
-                list_inds = [ind_V1, ind_V2, ind_V3]
-                m = min(list_inds)
-                M = max(list_inds)
-                pts_to_remove.append( bound[list(set(list_inds).difference(set([m,M])))[0]] )
-#             print 'pts_to_remove ', np.array(pts_to_remove)
-#             print 'poly_set ',poly_set
-#             print 'bound ', bound
-            if len(pts_to_remove) > 0:
-                tex[np.array(pts_to_remove)] = background_val
-            boundary = textureBoundary(mesh, tex, tex_val, neigh)
-            bound = boundary[-1]
-            I = ismember(poly, bound)
-            poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
-        if len(boundary) > 1:
-            print 'complex boundary after cleanTextureBoundary'
-        return (tex, boundary)
-
-
-def dilateTexture(tex, neigh, inds):
-    for i in inds:
-        tex[np.array(neigh[i].list())] = tex[i]
-    return tex
-
-
-####################################################################
-#
-# compute indexes that are the boundary of a region defined by value
-# in a texture
-#
-####################################################################
-def textureBoundary(mesh, atex, val, neigh=None):
-    tex_val_indices = np.where(atex == val)[0]
-    if not tex_val_indices.size:
-        print 'no value ' + str(val) + ' in the input texture!!'
-        return list()
-    else:
-        ####################################################################
-        # print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
-        ####################################################################
-        if neigh is None:
-            neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
-            
-        '''identify the vertices that are on the boundary,         
-        i.e that have at least one neigbor that has not the same value in the texture '''
-        bound_verts = list()
-        for i in tex_val_indices:
-            ne_i = np.array(neigh[i].list())
-            #print ne_i.size
-            #print np.intersect1d_nu(ne_i, tex_val_indices).size
-            if np_ver < [ 1, 6 ]:
-                inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
-            else:
-                inters_size = np.intersect1d(ne_i, tex_val_indices).size
-            if (inters_size != ne_i.size):
-                bound_verts.append(i)
-                
-        ''' select the edges that are on the boundary in the polygons
-        '''
-        adja = meshAdjacencyMatrix(mesh)
-        r = sparse.extract.find(adja)
-#        print bound_verts
-#        print bound_verts[0] in r[0]
-#        print r
-#        inter = set(r[0]).intersection(set(bound_verts))
-#        print inter
-#        print set(r[0])-inter
-#        print np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts))
-#        print r[0] == bound_verts[0]
-#        print bound_verts[0:1]
-#        print np.intersect1d(r[0],bound_verts[0:1]).shape
-#        print np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts))    
-        inr0 = []
-        inr1 = []
-        for v in bound_verts:
-            inr0.extend(np.where(r[0] == v)[0])
-            inr1.extend(np.where(r[1] == v)[0])
-        r[2][inr0] = r[2][inr0] + 1
-        r[2][inr1] = r[2][inr1] + 1
-        li = r[0][np.where(r[2] == 4)]
-        lj = r[1][np.where(r[2] == 4)]
-#        print 'li lj = '
-#        print li
-#        print lj
-        return edges2Boundary(li, lj)
 
 
 ####################################################################
@@ -847,6 +523,67 @@ def meshBoundary(mesh):
     else:
         return edges2Boundary(li, lj)
 
+
+####################################################################
+#
+# compute indexes that are the boundary of a region defined by value
+# in a texture
+#
+####################################################################
+def textureBoundary(mesh, atex, val, neigh=None):
+    tex_val_indices = np.where(atex == val)[0]
+    if not tex_val_indices.size:
+        print 'no value ' + str(val) + ' in the input texture!!'
+        return list()
+    else:
+        ####################################################################
+        # print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
+        ####################################################################
+        if neigh is None:
+            neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+            
+        '''identify the vertices that are on the boundary,         
+        i.e that have at least one neigbor that has not the same value in the texture '''
+        bound_verts = list()
+        for i in tex_val_indices:
+            ne_i = np.array(neigh[i].list())
+            #print ne_i.size
+            #print np.intersect1d_nu(ne_i, tex_val_indices).size
+            if np_ver < [ 1, 6 ]:
+                inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
+            else:
+                inters_size = np.intersect1d(ne_i, tex_val_indices).size
+            if (inters_size != ne_i.size):
+                bound_verts.append(i)
+                
+        ''' select the edges that are on the boundary in the polygons
+        '''
+        adja = meshAdjacencyMatrix(mesh)
+        r = sparse.extract.find(adja)
+#        print bound_verts
+#        print bound_verts[0] in r[0]
+#        print r
+#        inter = set(r[0]).intersection(set(bound_verts))
+#        print inter
+#        print set(r[0])-inter
+#        print np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts))
+#        print r[0] == bound_verts[0]
+#        print bound_verts[0:1]
+#        print np.intersect1d(r[0],bound_verts[0:1]).shape
+#        print np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts))    
+        inr0 = []
+        inr1 = []
+        for v in bound_verts:
+            inr0.extend(np.where(r[0] == v)[0])
+            inr1.extend(np.where(r[1] == v)[0])
+        r[2][inr0] = r[2][inr0] + 1
+        r[2][inr1] = r[2][inr1] + 1
+        li = r[0][np.where(r[2] == 4)]
+        lj = r[1][np.where(r[2] == 4)]
+#        print 'li lj = '
+#        print li
+#        print lj
+        return edges2Boundary(li, lj)
 
 ####################################################################
 #

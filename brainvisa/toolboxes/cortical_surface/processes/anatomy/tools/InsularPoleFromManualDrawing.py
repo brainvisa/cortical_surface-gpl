@@ -22,11 +22,11 @@
 
 def validation():
   try:
-    from brainvisa.cortical_surface.surface_tools import surface_tools
+    from brainvisa.cortical_surface.surface_tools import texture_tools
   except:
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.surface_tools module can not be imported.' )
   
-from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
 from brainvisa.processes import *
 import shfjGlobals  
 from soma import aims
@@ -64,7 +64,7 @@ def execution( self, context ):
     atex = np.zeros(input_tex[0].arraydata().shape)
     atex[input_tex[0].arraydata() > 0] = 180
     context.write('Topological correction...')  
-    insular_tex_clean, insula_tex_boundary = surfTls.textureTopologicalCorrection(mesh, atex, 180)
+    insular_tex_clean, insula_tex_boundary = textureTls.textureTopologicalCorrection(mesh, atex, 180)
 
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(insular_tex_clean)

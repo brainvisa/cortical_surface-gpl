@@ -34,7 +34,7 @@ from brainvisa.processes import *
 import shfjGlobals
 # from brainvisa import anatomist
 from soma import aims
-from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
 import numpy as np
 
 name = 'Cingular Pole Projection'
@@ -106,7 +106,7 @@ def execution( self, context ):
     context.write('Topological correction...')
     mesh = re.read(self.white_mesh.fullPath())
     tex = re.read(self.pole.fullPath())
-    cingular_tex_clean, cing_tex_boundary = surfTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), cingular_tex_value)
+    cingular_tex_clean, cing_tex_boundary = textureTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), cingular_tex_value)
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(cingular_tex_clean)
     ws.write(tex_out, self.pole.fullPath())

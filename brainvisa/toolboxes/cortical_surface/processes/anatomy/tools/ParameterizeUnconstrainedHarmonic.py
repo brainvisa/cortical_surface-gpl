@@ -32,7 +32,7 @@ import numpy as np
 
 try:
   from brainvisa.cortical_surface.parameterization import mapping as map#hipHop
-  from brainvisa.cortical_surface.surface_tools import surface_tools as surfTls
+  from brainvisa.cortical_surface.surface_tools import readSulcusLabelTranslationFile as rSLT
   from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
   from brainvisa.cortical_surface.parameterization import model as md
 except:
@@ -95,7 +95,7 @@ def execution( self, context ):
     sulcal_lines = re.read(self.white_sulcalines.fullPath())
     mesh = re.read(self.white_mesh.fullPath())
     context.write('Reading sulcus-label correspondences file')
-    sulc_labels_dict = surfTls.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
+    sulc_labels_dict = rSLT.readSulcusLabelTranslationFile(self.sulcus_labels.fullPath())
 
 #     if self.model_file is not None:
 #         context.write('Reading model')
