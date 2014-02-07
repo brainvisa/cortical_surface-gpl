@@ -127,7 +127,7 @@ def cleanTextureBoundary(mesh, tex, tex_val, bound, background_val=0, neigh=None
                 tex[np.array(pts_to_remove)] = background_val
             boundary = basicTls.textureBoundary(mesh, tex, tex_val, neigh)
             bound = boundary[-1]
-            I = ismember(poly, bound)
+            I = basicTls.ismember(poly, bound)
             poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
         if len(boundary) > 1:
             print 'complex boundary after cleanTextureBoundary'

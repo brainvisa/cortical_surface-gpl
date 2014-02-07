@@ -42,9 +42,9 @@ def meshPolygonArea(vert,poly):
     
     pp = vert[poly[:, 1], :] - vert[poly[:, 0], :]
     qq = vert[poly[:, 2], :] - vert[poly[:, 0], :]
-    tex1 = np.sqrt(np.sum(np.power(pp*qq,2),1))/2
+    area = np.sqrt(np.sum(np.power(pp*qq,2),1))/2
 
-    return tex1
+    return area
 
 ####################################################################
 #
@@ -57,7 +57,6 @@ def meshPolygonAngles(vert, poly):
         i1 = np.mod(i, 3)
         i2 = np.mod(i + 1, 3)
         i3 = np.mod(i + 2, 3)
-        print '    ', 3 - i1
         pp = vert[poly[:, i2], :] - vert[poly[:, i1], :]
         qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]      
         noqq = np.sqrt(np.sum(qq * qq, 1))

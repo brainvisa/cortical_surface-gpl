@@ -112,7 +112,6 @@ def computeMeshWeights(mesh, weight_type=None):
             i1 = np.mod(i, 3)
             i2 = np.mod(i + 1, 3)
             i3 = np.mod(i + 2, 3)
-            print '    ', 3 - i1
             pp = vert[poly[:, i2], :] - vert[poly[:, i1], :]
             qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]
 #             nopp = np.apply_along_axis(np.linalg.norm, 1, pp)
@@ -132,6 +131,7 @@ def computeMeshWeights(mesh, weight_type=None):
             qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
             ang = np.arccos(np.sum(pp * qq, 1))
             cot = 1 / np.tan(ang)
+#            cot[cot<0]=threshold
             W = W + sparse.coo_matrix((cot,(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
             W = W + sparse.coo_matrix((cot,(poly[:, i3],poly[:, i2])),shape=(Nbv, Nbv))
 
@@ -145,12 +145,11 @@ def computeMeshWeights(mesh, weight_type=None):
 #            W[poly[:, i2],poly[:, i3]] = W[poly[:, i2],poly[:, i3]] + cot
 #            W[poly[:, i3],poly[:, i2]] = W[poly[:, i3],poly[:, i2]] + cot
            
-        if threshold_needed > 0:
-            print '    -weight threshold needed for ',threshold_needed,' values-'
-        print '    OK'
+
+        print '    -weight threshold needed for ',threshold_needed,' values-'
     li = np.hstack(W.data)
-    print 'percent of Nan in weights: ', 100*len(np.where(np.isnan(li))[0])/len(li)
-    print 'percent of Negative values in weights: ', 100*len(np.where(li<0)[0])/len(li)
+    print '    -percent of Nan in weights: ', 100*len(np.where(np.isnan(li))[0])/len(li)
+    print '    -percent of Negative values in weights: ', 100*len(np.where(li<0)[0])/len(li)
 
     return W
 
@@ -174,9 +173,8 @@ def computeMeshLaplacian(mesh, weights=None):
 #    print dia - weights
     L = sparse.lil_matrix(dia - weights)
     li = np.hstack(L.data)
-    print 'nb Nan in L : ', len(np.where(np.isnan(li))[0])
-    print 'nb Inf in L : ', len(np.where(np.isinf(li))[0])   
-    print '    OK'
+    print '    -nb Nan in L : ', len(np.where(np.isnan(li))[0])
+    print '    -nb Inf in L : ', len(np.where(np.isinf(li))[0])   
 
     return L
 
@@ -188,51 +186,58 @@ def computeMeshLaplacian(mesh, weights=None):
 #    Visualization and Mathematics, 1–26.
 #
 ####################################################################
-def vertexVoronoi(mesh, weights=None):
-    if weights is None:
-        weights = computeMeshWeights(mesh)
-
-#     I = np.array([0,0,1,3,1,0,0])
-#     J = np.array([0,2,1,3,1,0,0])
-#     V = np.array([1,1,1,1,1,1,1])
-#     B = sparse.coo_matrix((V,(I,J)),shape=(4,4)).tocsr()
-#     print 'B',B
-#  
-#     I = np.array([0,0,1,3,1,0,0])
-#     J = np.array([0,2,1,3,1,0,0])
-#     V = np.array([1,1,1,1,1,1,1])
-#     B1 = sparse.coo_matrix((V,(I,J)),shape=(4,4)).tocsr()
-#     print 'B1*B',B1*B
-#     print 'B*B1',B*B1
-
+def vertexVoronoi(mesh, angs=None):
     print '    Computing Vertex Voronoi'
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
-
+    if angs is None:
+        angs = basicTls.meshPolygonAngles(vert, poly)
     Nbv = vert.shape[0]
-
-    adja = basicTls.meshAdjacencyMatrix(mesh)
-    (i,j) = adja.nonzero()
-    d = np.sum( np.power(vert[i,:] - vert[j,:],2), 1)
-    W1 = sparse.coo_matrix((d, (i, j)),shape=(Nbv, Nbv))  #    W1(i,j) = d_ij^2
-    Ae = W1.multiply(weights).tolil()
-    print type(Ae)
-    (I,J,V) = sparse.find(Ae)
-    inds_negs=np.where(V<0)[0]
-    V[inds_negs]=0
-    Ae2 = sparse.coo_matrix((V,(I,J)),shape=(Nbv, Nbv))
-    (I,J,V) = sparse.find(Ae2)
-    print len(np.where(V<0)[0])
-
-
-#    print 'neigh[0].list()',neigh[0].list()
-    vert_voronoi = Ae2.sum(0)
-    vert_voronoi = vert_voronoi/4
-#     for i,nei in enumerate(neigh):
-#         ne_i = np.array(neigh[i].list())
-#         vert_voronoi[i]=1/2*np.sum(Ae,0)
-
-    return np.array(vert_voronoi.transpose()).squeeze()
+    Nbp = poly.shape[0]
+    areas = basicTls.meshPolygonArea(vert,poly)
+    obt_angs = angs>np.pi/2
+    obt_poly = obt_angs[:,0]|obt_angs[:,1]|obt_angs[:,2]
+    print '    -percent polygon with obtuse angle ',100.0*len(np.where(obt_poly)[0])/Nbp
+    cot = 1 / np.tan(angs)
+    vert_voronoi = np.zeros(Nbv)
+    for ind_p,p in enumerate(poly):
+        if obt_poly[ind_p]:
+            obt_verts = p[obt_angs[ind_p,:]]
+            vert_voronoi[obt_verts] = vert_voronoi[obt_verts] + areas[ind_p]/2.0
+            non_obt_verts = p[[not x for x in obt_angs[ind_p,:]]]
+            vert_voronoi[non_obt_verts] = vert_voronoi[non_obt_verts] + areas[ind_p]/4.0
+        else:
+            d0 = np.sum( np.power(vert[p[1], :] - vert[p[2], :],2))
+            d1 = np.sum( np.power(vert[p[2], :] - vert[p[0], :],2))
+            d2 = np.sum( np.power(vert[p[0], :] - vert[p[1], :],2))
+            vert_voronoi[p[0]] = vert_voronoi[p[0]] + (d1*cot[ind_p,1] + d2*cot[ind_p,2])/8.0
+            vert_voronoi[p[1]] = vert_voronoi[p[1]] + (d2*cot[ind_p,2] + d0*cot[ind_p,0])/8.0
+            vert_voronoi[p[2]] = vert_voronoi[p[2]] + (d0*cot[ind_p,0] + d1*cot[ind_p,1])/8.0
+# 
+#         
+#     print cot.shape
+#     W = sparse.lil_matrix((Nbv, Nbv))
+#     W1 = sparse.lil_matrix((Nbv, Nbv))
+#     for i in range(3):
+#         i1 = np.mod(i, 3)
+#         i2 = np.mod(i + 1, 3)
+#         i3 = np.mod(i + 2, 3)
+#         print (i2,i3)
+#         d = np.sum( np.power(vert[poly[:, i2], :] - vert[poly[:, i3], :],2), 1)
+#         W1 = W1 + sparse.coo_matrix((d,(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
+#         W = W + sparse.coo_matrix((cot[:,i],(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
+#         W = W + sparse.coo_matrix((cot[:,i],(poly[:, i3],poly[:, i2])),shape=(Nbv, Nbv))
+# 
+#     Af = W1.multiply(W).tolil()
+#     tAf = sparse.triu(Af,0)
+#     vert_voronoi2 = tAf.sum(0)
+#     vert_voronoi2 = vert_voronoi2/4
+#     vert_voronoi2 = np.array(vert_voronoi2.transpose()).squeeze()
+#     diff = vert_voronoi2-vert_voronoi
+#     print len(np.where(diff)[0])
+#     print vert_voronoi.sum()
+#     print vert_voronoi2.sum()
+    return vert_voronoi
 
 ####################################################################
 #
@@ -244,12 +249,8 @@ def vertexVoronoi(mesh, weights=None):
 #
 ####################################################################
 def depthPotentialFunction(mesh, curvature, alpha):
-    weights = computeMeshWeights(mesh)
-    vert_voronoi = vertexVoronoi(mesh, weights)
-    L = computeMeshLaplacian(mesh, weights)
-    print vert_voronoi.shape
-    print type(vert_voronoi)
-    print vert_voronoi.sum()
+    vert_voronoi = vertexVoronoi(mesh)
+    L = computeMeshLaplacian(mesh)
 #     v=np.array(vert_voronoi).squeeze()
 #     print 'min',np.min(v)
 #     print 'max',np.max(v)
@@ -263,13 +264,42 @@ def depthPotentialFunction(mesh, curvature, alpha):
 #    B = sparse.dia_matrix((2 * np.array(vert_voronoi).squeeze() * (k-( np.sum(k*np.array(vert_voronoi).squeeze()) / vert_voronoi.sum() )), 0), shape=(Nbv, Nbv))
 #    B = B.tocsr()
     B = 2 * vert_voronoi * (curvature-( np.sum(curvature*vert_voronoi) / vert_voronoi.sum() ))
-    print B.shape
     B=B.squeeze()
-    print B.shape
 #    B = sparse.csr_matrix(B)
-    print M.shape
-    print B.shape
     dpf, info = lgmres(M.tocsr(), B, tol=solver_tolerance)
     
     return dpf
 
+####################################################################
+#
+# compute the mean curvature as detailed in
+#    Meyer, M., Desbrun, M., Schröder, P., & Barr, A. (2002). 
+#    Discrete differential-geometry operators for triangulated 2-manifolds. 
+#    Visualization and Mathematics, 1–26.
+
+#
+####################################################################
+def meanCurvature(mesh):
+    vert = np.array(mesh.vertex())
+    poly = np.array(mesh.polygon())
+    angs = basicTls.meshPolygonAngles(vert, poly)
+    Nbv = len(vert)
+
+    vert_voronoi = vertexVoronoi(mesh,angs)
+    mean_curv = np.pi*np.ones(Nbv)
+    for ind_p,p in enumerate(poly):
+        mean_curv[p[0]] = mean_curv[p[0]] - angs[ind_p,0]
+        mean_curv[p[1]] = mean_curv[p[1]] - angs[ind_p,1]
+        mean_curv[p[2]] = mean_curv[p[2]] - angs[ind_p,2]
+    mean_curv_out = 3*mean_curv / vert_voronoi
+#     cot = 1 / np.tan(angs)
+#     mean_curv = np.zeros((Nbv,3))
+#     for ind_p,p in enumerate(poly):
+#         d0 = vert[p[1], :] - vert[p[2], :]
+#         d1 = vert[p[2], :] - vert[p[0], :]
+#         d2 = vert[p[0], :] - vert[p[1], :]
+#         mean_curv[p[0],:] = mean_curv[p[0],:] + d1*cot[ind_p,1] + d2*cot[ind_p,2]
+#         mean_curv[p[1],:] = mean_curv[p[1],:] + d2*cot[ind_p,2] + d0*cot[ind_p,0]
+#         mean_curv[p[2],:] = mean_curv[p[2],:] + d0*cot[ind_p,0] + d1*cot[ind_p,1]
+#     mean_curv_out = np.sqrt(np.sum( np.power(mean_curv,2),1)) / (2*vert_voronoi)
+    return mean_curv_out
