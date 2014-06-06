@@ -194,7 +194,148 @@ def sphereConformalMapping( mesh, lap, ps, pn, radius ):
      sphere.updateNormals()
      return(sphere)
 
+####################################################################
+# 
+# compute iso-parameter lines on the mesh
+#
+####################################################################  
+
+def meshIsoLine(mesh, tex, val):
+     #print 'Looking for isoLine'
+     points=array(mesh.vertex())
+     values=array(tex[0])
+     #print('isoLine: points:', points.shape)
+     #print('isoLine: values:', values.shape)
+     sign=zeros(values.size)
+     sign[where(values < val)[0]]=10
+     sign[where(values >= val)[0]]=20
+     line=aims.AimsTimeSurface_2()
+     isoV=aims.vector_POINT3DF()
+     isoP=aims.vector_AimsVector_U32_2()
      
+     triangles=array(mesh.polygon())
+     for tr in triangles:
+          count=sign[tr].sum()
+          if (count==40):
+               if (sign[tr[0]]==20):
+                    v1=interpolateVertices(tr[0], tr[1], points, values, val)
+                    v2=interpolateVertices(tr[0], tr[2], points, values, val)
+               elif (sign[tr[1]]==20):
+                    v1=interpolateVertices(tr[1], tr[0], points, values, val)
+                    v2=interpolateVertices(tr[1], tr[2], points, values, val)
+               elif (sign[tr[2]]==20):
+                    v1=interpolateVertices(tr[2], tr[0], points, values, val)
+                    v2=interpolateVertices(tr[2], tr[1], points, values, val)
+               isoV, isoP = addSegment(v1, v2, isoV, isoP)       
+          elif (count==50):
+               if (sign[tr[0]]==10):
+                    v1=interpolateVertices(tr[0], tr[1], points, values, val)
+                    v2=interpolateVertices(tr[0], tr[2], points, values, val)
+               elif (sign[tr[1]]==10):
+                    v1=interpolateVertices(tr[1], tr[0], points, values, val)
+                    v2=interpolateVertices(tr[1], tr[2], points, values, val)
+               elif (sign[tr[2]]==10):
+                    v1=interpolateVertices(tr[2], tr[0], points, values, val)
+                    v2=interpolateVertices(tr[2], tr[1], points, values, val)
+               isoV, isoP=addSegment(v1, v2, isoV, isoP)
+
+     line.vertex().assign(isoV)
+     line.polygon().assign(isoP)
+     return line
+
+# THIS ONE DOES NOT INTERPOLATE ON EDGES: 
+# it sends back a list of vertex indices closest to the iso-line
+
+def meshAlmostIsoLine(mesh, tex, val):
+     #print 'Looking for isoLine'
+     points=array(mesh.vertex())
+     values=array(tex[0])
+     #print('isoLine: points:', points.shape)
+     #print('isoLine: values:', values.shape)
+     sign=zeros(values.size)
+     sign[where(values < val)[0]]=10
+     sign[where(values >= val)[0]]=20
+     
+     si=set()
+     
+     triangles=array(mesh.polygon())
+     for tr in triangles:
+          count=sign[tr].sum()
+          if (count==40):
+               if (sign[tr[0]]==20):
+                    i1=bestVertex(tr[0], tr[1], values, val)
+                    i2=bestVertex(tr[0], tr[2], values, val)
+               elif (sign[tr[1]]==20):
+                    i1=bestVertex(tr[1], tr[0], values, val)
+                    i2=bestVertex(tr[1], tr[2], values, val)
+               elif (sign[tr[2]]==20):
+                    i1=bestVertex(tr[2], tr[0], values, val)
+                    i2=bestVertex(tr[2], tr[1], values, val)
+               si.add(i1)
+               si.add(i2)
+          elif (count==50):
+               if (sign[tr[0]]==10):
+                    i1=bestVertex(tr[0], tr[1], values, val)
+                    i2=bestVertex(tr[0], tr[2], values, val)
+               elif (sign[tr[1]]==10):
+                    i1=bestVertex(tr[1], tr[0], values, val)
+                    i2=bestVertex(tr[1], tr[2], values, val)
+               elif (sign[tr[2]]==10):
+                    i1=bestVertex(tr[2], tr[0], values, val)
+                    i2=bestVertex(tr[2], tr[1], values, val)
+               si.add(i1)
+               si.add(i2)
+     return array(list(si))
+               
+def interpolateVertices(v1, v2, points, texture, valeur):
+     t=abs(valeur - texture[v1])/abs(texture[v1] - texture[v2])
+     new=(1-t)*points[v1] + t*points[v2]
+     return new
+     
+def bestVertex(v1, v2, texture, valeur):
+     t=abs(valeur - texture[v1])/abs(texture[v1] - texture[v2])
+     if t<0.5:
+          return v1
+     else:
+          return v2
+     
+def addSegment(v1, v2, vert, seg):
+     nv=vert.size()
+     a1=0
+     a2=0
+     
+     for i in range(nv):
+          v=vert[i]
+          d1=v-v1
+          d2=v-v2
+          if (sqrt(d1[0]*d1[0] + d1[1]*d1[1] + d1[2]*d1[2]))<0.0001:
+               i1=i
+               a1=1
+          if (sqrt(d2[0]*d2[0] + d2[1]*d2[1] + d2[2]*d2[2]))<0.0001:
+               i2=i
+               a2=1
+ 
+     if (a1==0):
+          vert.append(v1)
+          i1=vert.size()-1
+     if (a2==0):
+          vert.append(v2)
+          i2=vert.size()-1
+     seg.append([i1, i2])
+     return vert, seg 
+     
+
+     
+####################################################################
+# 
+# find the vertex of a mesh closest to a point p
+#
+####################################################################
+
+def closerVert(p, mesh):
+     diff=p-mesh
+     return(dot(diff,diff.transpose()).diagonal().argmin())
+
 ######################################################################
 
 def execution( self, context ):
@@ -342,17 +483,6 @@ def execution( self, context ):
  
      ws.write( texOut, tempParam.fullPath() )
      
-     ########################################################
-     # mapping to a sphere
-     ########################################################
-     
-     #context.write('Computing spherical mapping')
-     
-     #sphere=sphereConformalMapping( mesh, L, bot, top, 20.0 )
-     #ws.write(sphere, '/home/olivier/sphere.mesh')
-     
-     #context.write('Sphere written on disk')
-     
      context.write('Recomputing isometric parameterization')
      
      ########################################################
@@ -360,7 +490,6 @@ def execution( self, context ):
      # (par morceaux) a partir de sa longueur
      ########################################################
      axis=aims.AimsSurfaceTriangle()
-     contour=context.temporary( 'MESH mesh')
      gen=aims.SurfaceGenerator()
      vx=0
      vy=0
@@ -375,22 +504,12 @@ def execution( self, context ):
      points[100]=vert[bot]
 
      for i in range(1,100):
-          iso = [ 'AimsMeshIsoLine',
-              '-i', self.sulcus_mesh.fullPath(),
-              '-t', tempParam.fullPath(),
-              '-o', contour.fullPath(),
-              '-v', i ]
-          apply(context.system, iso)
-          cont=re.read(contour.fullPath())
+          cont= meshIsoLine(mesh, texOut, i)
           vertC=array(cont.vertex())
           bary=vertC.mean(axis=0)
           points[i]=bary
           vec=points[i] - points[i-1]
           dist[i]=dist[i-1]+sqrt( vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2] )
-          #context.write(vertC)
-          #context.write(bary)
-          #axis += gen.sphere(bary,  0.5, 10)
-     #ws.write( axis, '/home/olivier/axis.mesh')
      vec=points[100] - points[99]
      dist[100]=dist[99]+sqrt( vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2] )
      
@@ -404,36 +523,14 @@ def execution( self, context ):
      for i in range(0, 100):
           a[i]=(newCoord[i+1]-newCoord[i])
           b[i]=(newCoord[i]*(i+1)-newCoord[i+1]*i)
-     
-     #print 'a', a
-     #print 'b', b
-     
-     
      for i in range(N):
           ind=math.floor(texOut[0][i])
           isoParam[0][i]=(texOut[0][i]*a[ind]) + b[ind]
      ws.write( isoParam, self.texture_param1.fullPath() )
      
      context.write('Isometric reparameterization done')
-
- #    axis += gen.sphere(vert[top], 0.5, 10)
- #    axis += gen.sphere(vert[bot], 0.5, 10)
- #    for i in range(1,100):
- #         iso = [ 'AimsMeshIsoLine',
- #             '-i', self.sulcus_mesh.fullPath(),
-              #'-t', self.texture_param1.fullPath(),
-              #'-o', contour.fullPath(),
-              #'-v', i ]
-          #apply(context.system, iso)
-          #cont=re.read(contour.fullPath())
-          #vertC=array(cont.vertex())
-          #bary=vertC.mean(axis=0)
-          #axis += gen.sphere(bary,  0.5, 10)
-     #ws.write( axis, '/home/olivier/axis.mesh')
      
      ########################################################
-
-     
      context.write('Computing coordinate grid')
 
      i=0;
@@ -463,12 +560,11 @@ def execution( self, context ):
           i=i+5
           
      read=aims.Reader()
-     sulc=read.read(self.sulcus_mesh.fullPath())
-     mesh=array(sulc.vertex())
-     bary=mean(mesh, axis=0)
-     mesh=mesh-bary
-     tmesh=mesh.transpose()
-     coord=dot(tmesh,mesh)
+
+     bary=mean(vert, axis=0)
+     vert=vert-bary
+     tmesh=vert.transpose()
+     coord=dot(tmesh,vert)
      val,vect=linalg.eig(coord)
      i=argmin(val)
      k=argmax(val)
@@ -481,21 +577,38 @@ def execution( self, context ):
      u3=vect[:,k]
 
      texturex=aims.TimeTexture_FLOAT() 
-     nn= mesh.shape[0]
+     nn= vert.shape[0]
      for i in range(nn):
-          texturex.push_back(dot(mesh[i], -u1))
-    
-     w=aims.Writer()
-     w.write(texturex, distToPlan.fullPath())
-          
-     context.write('Computing depth profile')
-     depth = [ 'AimsSulcusNormalizeDepthProfile',
-               '-m', self.sulcus_mesh.fullPath(),
-               '-x', self.texture_param1.fullPath(),
-               '-y', self.texture_param1.fullPath(),
-               '-d', distToPlan.fullPath(),
-               '-o', self.depth_profile.fullPath() ]
-     apply(context.system, depth)
+          texturex.push_back(dot(vert[i], -u1))
+
+     dist=array(texturex[0])    
+     context.write('Computing morphological curves (depth and profile)')
+     
+     morpho=zeros((101, 3))
+     vert=array(mesh.vertex())
+     for i in range(101):
+          line=meshIsoLine(mesh, isoParam, i)
+          vline=meshAlmostIsoLine(mesh, isoParam, i)
+          depth=0
+          prof=0
+          prof2=0
+          vl=array(line.vertex())
+          pl=array(line.polygon())
+          for p in pl:
+               i1=p[0]
+               i2=p[1]
+               depth+=sqrt(dot((vl[i2]-vl[i1]), (vl[i2]-vl[i1])))
+          for v in vline:
+               prof+=dist[v]
+          depth=depth/2.0
+          if (depth==0):
+               prof=0
+               prof2=0
+          else:
+               prof2=prof/vl.size
+               prof=prof/(2.0*depth)    
+          morpho[i]=array([i, depth, prof])
+     savetxt(self.depth_profile.fullPath(), morpho, delimiter='\t')
 
      context.write('Finished')
 
