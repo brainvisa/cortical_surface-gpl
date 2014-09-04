@@ -3,7 +3,12 @@ include( 'sulci' )
 
 insert( '{center}/{subject}',
   'surface', SetContent(
-      ## que mettre dans les niveaux aquisition et analysis?
+    ## que mettre dans les niveaux aquisition et analysis?
+
+    ## Depth Potential Function
+    '<subject>_Lwhite_DPF', SetType( 'Left DPF texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_DPF', SetType( 'Right DPF texture' ), SetWeakAttr( 'side', 'right' ),
+
     '<subject>_Lwhite_remeshed', SetType( 'Left remeshed mesh' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_remeshed', SetType( 'Right remeshed mesh' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_rectangular_flat', SetType( 'Rectangular flat texture' ),

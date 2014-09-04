@@ -27,6 +27,82 @@ from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 
 ####################################################################
 #
+# distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
+#
+####################################################################
+def meshFiedlerLength(mesh):
+    from scipy.sparse.linalg import eigsh
+    L=computeMeshLaplacian(mesh)
+    Lap=0.5*(L+L.transpose())
+    print 'Computing fiedler vector'
+    w,v=eigsh(Lap, 2, which='LM', sigma = 0)
+ 
+    fiedler=v[:,1]
+    
+    imin=fiedler.argmin()
+    imax=fiedler.argmax()
+    vert = np.array(mesh.vertex())
+    min_max = vert[imin,:]-vert[imax,:]
+    dist = np.sqrt(np.sum(min_max * min_max, 0))
+    return(dist,fiedler)
+
+####################################################################
+#
+# laplacian pits smoothing
+#
+####################################################################
+def meshPitsSmoothing(mesh, tex,Niter, dt):
+    print '    Smoothing mesh'
+    mod = 1
+    if Niter > 10:
+        mod = 10
+    if Niter > 100:
+        mod = 100
+    if Niter > 1000:
+        mod = 1000
+    #vert = np.array(mesh.vertex())
+    print 'using conformal weights with angular threshold at 0.0001'
+    weights = computeMeshWeights(mesh,'conformal',0.0001)
+    N = weights.shape[0]
+#    s = weights.sum(axis = 1)
+    s = weights.sum(axis=0)
+#    dia = sparse.lil_matrix((N,N))
+#    dia.setdiag(s)
+    dia = sparse.dia_matrix((1 / s, 0), shape=(N, N))
+#    b = ones(N)
+#    W = sparse.linalg.spsolve(dia.tocsr(),b)*weights
+    W = dia * weights
+    I = sparse.lil_matrix((N, N))
+    I.setdiag(np.ones(N))
+    tL = I.tocsr() - W
+    LI = I.tocsr() - (dt * tL)
+    #    LI = dt*L
+    #    LI = LI.tocsr()
+    #    LI = I.tocsr() + LI
+    #    print '    LI.shape = ', LI.shape
+    vert=np.array(tex[0]).reshape(N,1)
+    Mtex = vert#sparse.lil_matrix(vert).tocsr()
+    inds_pits=np.where(vert==1)[0]
+    #print inds_pits[:10]
+    #print '    Mtex.shape = ', Mtex.shape
+    #print inds_pits.shape
+    #print Mtex[inds_pits]
+    o = np.ones((inds_pits.shape[0],1))
+
+    #LI2 = I.tocsr() + (dt * tL)
+    #Mtex = lgmres(LI2.tocsr(), Mtex, tol=solver_tolerance)
+    print 'iterative filtering the texture...'
+    for i in range(Niter):
+        Mtex= LI * Mtex
+        Mtex[inds_pits]=o
+        if (i % mod == 0):
+            print i
+    print '    OK'
+
+    return(Mtex)
+
+####################################################################
+#
 # laplacian smoothing
 #
 ####################################################################
@@ -75,7 +151,6 @@ def meshSmoothing(mesh, Niter, dt):
     smooth.updateNormals()
     return(smooth)
 
-
 ####################################################################
 # compute_mesh_weight - compute a weight matrix
 #
@@ -94,7 +169,9 @@ def meshSmoothing(mesh, Niter, dt):
 #   If options.normalize = 1, the the rows of W are normalize to sum to 1.
 #
 ####################################################################
-def computeMeshWeights(mesh, weight_type=None):
+def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
+#    angle_threshold=0.00001
+ #   print 'angle threshold'
     if weight_type is None:
         weight_type = 'conformal'
     print '    Computing mesh weights'
@@ -108,6 +185,7 @@ def computeMeshWeights(mesh, weight_type=None):
     if weight_type == 'conformal':
         threshold = 0.0001 #np.spacing(1)??
         threshold_needed = 0
+        threshold_needed_angle = 0
         for i in range(3):
             i1 = np.mod(i, 3)
             i2 = np.mod(i + 1, 3)
@@ -131,7 +209,10 @@ def computeMeshWeights(mesh, weight_type=None):
             qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
             ang = np.arccos(np.sum(pp * qq, 1))
             cot = 1 / np.tan(ang)
-#            cot[cot<0]=threshold
+            if angle_threshold is not None:
+                thresh_inds = cot<0
+                cot[thresh_inds]=angle_threshold
+                threshold_needed_angle += np.count_nonzero(thresh_inds)
             W = W + sparse.coo_matrix((cot,(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
             W = W + sparse.coo_matrix((cot,(poly[:, i3],poly[:, i2])),shape=(Nbv, Nbv))
 
@@ -145,7 +226,7 @@ def computeMeshWeights(mesh, weight_type=None):
 #            W[poly[:, i2],poly[:, i3]] = W[poly[:, i2],poly[:, i3]] + cot
 #            W[poly[:, i3],poly[:, i2]] = W[poly[:, i3],poly[:, i2]] + cot
            
-
+        print '    -angle threshold needed for ',threshold_needed_angle,' values-'
         print '    -weight threshold needed for ',threshold_needed,' values-'
     li = np.hstack(W.data)
     print '    -percent of Nan in weights: ', 100*len(np.where(np.isnan(li))[0])/len(li)
@@ -248,7 +329,7 @@ def vertexVoronoi(mesh, angs=None):
 #    doi:10.1016/j.media.2008.09.001
 #
 ####################################################################
-def depthPotentialFunction(mesh, curvature, alpha):
+def depthPotentialFunction(mesh, curvature, alphas):
     vert_voronoi = vertexVoronoi(mesh)
     L = computeMeshLaplacian(mesh)
 #     v=np.array(vert_voronoi).squeeze()
@@ -258,16 +339,18 @@ def depthPotentialFunction(mesh, curvature, alpha):
 #     print len(np.where(v<0)[0])
     Nbv = len(np.array(mesh.vertex()))
     solver_tolerance = 1e-6
-    A = sparse.dia_matrix((alpha*vert_voronoi, 0), shape=(Nbv, Nbv))
-    M = A+L
-    M = M.tocsr()
 #    B = sparse.dia_matrix((2 * np.array(vert_voronoi).squeeze() * (k-( np.sum(k*np.array(vert_voronoi).squeeze()) / vert_voronoi.sum() )), 0), shape=(Nbv, Nbv))
 #    B = B.tocsr()
     B = 2 * vert_voronoi * (curvature-( np.sum(curvature*vert_voronoi) / vert_voronoi.sum() ))
     B=B.squeeze()
 #    B = sparse.csr_matrix(B)
-    dpf, info = lgmres(M.tocsr(), B, tol=solver_tolerance)
-    
+    dpf=[]
+    for ind, alpha in enumerate(alphas): 
+        A = sparse.dia_matrix((alpha*vert_voronoi, 0), shape=(Nbv, Nbv))
+        M = A+L
+        M = M.tocsr()
+        dpf_t, info = lgmres(M.tocsr(), B, tol=solver_tolerance)
+        dpf.append(dpf_t)
     return dpf
 
 ####################################################################

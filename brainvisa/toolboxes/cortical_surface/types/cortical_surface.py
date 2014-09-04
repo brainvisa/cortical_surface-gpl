@@ -34,6 +34,11 @@ include( 'builtin' )
 include( 'registration' )
 include( 'anatomy' )
 
+## Depth Potential Function
+FileType( 'DPF texture', 'Texture' )
+FileType( 'Left DPF texture', 'DPF texture' )
+FileType( 'Right DPF texture', 'DPF texture' )
+
 ## surface coordinates
 FileType( 'Poles texture', 'Texture' )
 FileType( 'Left poles texture', 'Poles texture' )
