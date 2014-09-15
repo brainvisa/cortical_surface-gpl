@@ -13,49 +13,37 @@ from brainvisa.processes import *
 
 # soma import
 from soma import aims
-from soma.aimsalgo import mesh_coordinates_sphere_resampling
+from soma.path import find_in_path
 
-name = 'Make Template Spherical Mesh'
+name = "Make Template Spherical Mesh"
 userlevel = 2
 
 signature = Signature(
-    'sphere', ReadDiskItem('Ico Mesh', 'GIFTI File'),
-    'mesh', ListOf(
-        ReadDiskItem('Hemisphere White Mesh', 'Aims mesh formats')),
-    'latitude', ListOf(
-        ReadDiskItem('Latitude coordinate texture', 'aims Texture formats')),
-    'longitude', ListOf(
-        ReadDiskItem('Longitude coordinate texture', 'aims Texture formats')),
-    'distance', Float(),
-    'refined_mesh', WriteDiskItem('Ico Mesh', 'aims Texture formats'))
+    "sphere", ReadDiskItem("Ico Mesh", "GIFTI File"),
+    "mesh", ListOf(
+        ReadDiskItem("Hemisphere White Mesh", "Aims mesh formats")),
+    "latitude", ListOf(
+        ReadDiskItem("Latitude coordinate texture", "aims Texture formats")),
+    "longitude", ListOf(
+        ReadDiskItem("Longitude coordinate texture", "aims Texture formats")),
+    "distance", Float(),
+    "refined_mesh", WriteDiskItem("Ico Mesh", "aims Texture formats"))
 
 def initialization(self):
     self.distance = 2.2
+    self.linkParameters("latitude", "mesh")
+    self.linkParameters("longitude", "latitude")
 
 def execution(self, context):
-    sphere = aims.read(self.sphere.fullPath())
-    for index, mesh in enumerate(self.mesh):
-        # load object
-        lat = aims.read(self.latitude[index].fullPath())
-        lon = aims.read(self.longitude[index].fullPath())
-        m = aims.read(self.mesh[index].fullPath())
-        resampled_mesh = mesh_coordinates_sphere_resampling.resample_mesh_to_sphere(
-            m, sphere, lon, lat)
-        distance_texture = aims.SurfaceManip.meshEdgeLengthRatioTexture(
-            resampled_mesh, sphere)
-        if index == 0:
-            averaged_texture = distance_texture[0].arraydata()
-        else:
-            averaged_texture = averaged_texture + distance_texture[0].arraydata()
-        
-
-    averaged_texture = averaged_texture / len(self.mesh)
-    averaged_texture = aims.TimeTexture(averaged_texture)
-
-    # Builds a sphere mesh with vertices density driven by an average 
-    # distance map
-    resampled_mesh = mesh_coordinates_sphere_resampling.spere_mesh_from_distance_map(
-        sphere, averaged_texture, self.distance)
-    
-    aims.write(resampled_mesh, self.refined_mesh.fullPath())
-    
+    cmd_args = []
+    for m in self.mesh:
+        cmd_args += ["-m", m]
+    for lat in self.latitude:
+        cmd_args += ["-l", lat]
+    for lon in self.longitude:
+        cmd_args += ["-g", lon]
+    cmd_args += ["-s", self.sphere, "-d", str(self.distance), 
+                 "-o", self.refined_mesh]
+    context.system("python", find_in_path("make_spherical_mesh.py"),
+        *cmd_args
+    )
