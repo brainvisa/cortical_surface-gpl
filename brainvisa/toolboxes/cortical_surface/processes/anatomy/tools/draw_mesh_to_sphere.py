@@ -12,7 +12,6 @@
 from brainvisa.processes import *
 
 # soma import
-from soma import aims
 from soma.path import find_in_path
 
 name = "Draw a sphere"
@@ -24,14 +23,17 @@ signature = Signature(
         "Latitude coordinate texture", "aims Texture formats"),
     "longitude", ReadDiskItem(
         "Longitude coordinate texture", "aims Texture formats"),
-    "sphere_mesh", WriteDiskItem("Hemisphere White Mesh", "aims Texture formats"))
+    "sphere_mesh", WriteDiskItem(
+        "Hemisphere White Mesh", "aims Texture formats"))
+
 
 def initialization(self):
     self.linkParameters("latitude", "white_mesh")
     self.linkParameters("longitude", "latitude")
 
+
 def execution(self, context):
-    command_draw_sphere = [sys.executable,find_in_path("mesh_to_sphere.py"),
+    command_draw_sphere = [sys.executable, find_in_path("mesh_to_sphere.py"),
                            "-m", self.white_mesh,
                            "-l", self.latitude,
                            "-g", self.longitude,

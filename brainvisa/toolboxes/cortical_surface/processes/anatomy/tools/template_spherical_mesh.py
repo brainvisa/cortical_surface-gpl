@@ -12,7 +12,6 @@
 from brainvisa.processes import *
 
 # soma import
-from soma import aims
 from soma.path import find_in_path
 
 name = "Make Template Spherical Mesh"
@@ -29,10 +28,12 @@ signature = Signature(
     "distance", Float(),
     "refined_mesh", WriteDiskItem("Ico Mesh", "aims Texture formats"))
 
+
 def initialization(self):
     self.distance = 2.2
     self.linkParameters("latitude", "mesh")
     self.linkParameters("longitude", "latitude")
+
 
 def execution(self, context):
     cmd_args = []
@@ -42,8 +43,7 @@ def execution(self, context):
         cmd_args += ["-l", lat]
     for lon in self.longitude:
         cmd_args += ["-g", lon]
-    cmd_args += ["-s", self.sphere, "-d", str(self.distance), 
-                 "-o", self.refined_mesh]
-    context.system("python", find_in_path("make_spherical_mesh.py"),
-        *cmd_args
-    )
+    cmd_args += [
+        "-s", self.sphere, "-d", str(self.distance), "-o", self.refined_mesh]
+    context.system(
+        "python", find_in_path("make_spherical_mesh.py"), *cmd_args)
