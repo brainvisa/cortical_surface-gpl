@@ -38,13 +38,16 @@ def parseOpts(argv):
 def main():
     parser, (options, args) = parseOpts(sys.argv)
 
+    # load objects
     mesh = aims.read(options.mesh)
     latitude = aims.read(options.latitude)
     longitude = aims.read(options.longitude)
 
+    # a spherical triangulation of the subject of its cortical hemisphere,
+    # projected on a sphere
     sphere_mesh = mesh_coordinates_sphere_resampling.draw_sphere(
         mesh, longitude, latitude)
-    print sphere_mesh
+
     # write the new mesh
     aims.write(sphere_mesh, options.sphere_mesh)
 
