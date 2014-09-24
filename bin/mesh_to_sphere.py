@@ -31,6 +31,12 @@ def parseOpts(argv):
     parser.add_option("-o", "--output",
                       dest="sphere_mesh",
                       help="Spherical triangulation on a sphere")
+    parser.add_option("-t", "--trueinversion",
+                      dest="inversion", default=False, action="store_true",
+                      help="Check in the case of righ hemisphere")
+    parser.add_option("-f", "--falseinversion",
+                      dest="inversion", default=False, action="store_false",
+                      help="Check in the case of righ hemisphere")
 
     return parser, parser.parse_args(argv)
 
@@ -46,7 +52,7 @@ def main():
     # a spherical triangulation of the subject of its cortical hemisphere,
     # projected on a sphere
     sphere_mesh = mesh_coordinates_sphere_resampling.draw_sphere(
-        mesh, longitude, latitude)
+        mesh, longitude, latitude, inversion=options.inversion)
 
     # write the new mesh
     aims.write(sphere_mesh, options.sphere_mesh)
