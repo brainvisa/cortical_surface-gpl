@@ -18,32 +18,39 @@ name = "Make Template Spherical Mesh"
 userlevel = 2
 
 signature = Signature(
-    "sphere", ReadDiskItem("Ico Mesh", "GIFTI File"),
+    "sphere", ReadDiskItem("Ico Mesh", "Aims mesh formats"),
     "mesh", ListOf(
         ReadDiskItem("Hemisphere White Mesh", "Aims mesh formats")),
     "latitude", ListOf(
-        ReadDiskItem("Latitude coordinate texture", "aims Texture formats")),
+        ReadDiskItem("Latitude coordinate texture", "Aims texture formats")),
     "longitude", ListOf(
-        ReadDiskItem("Longitude coordinate texture", "aims Texture formats")),
+        ReadDiskItem("Longitude coordinate texture", "Aims texture formats")),
     "distance", Float(),
-    "refined_mesh", WriteDiskItem("Ico Mesh", "aims Texture formats"))
+    "refined_mesh", WriteDiskItem("Spherical Mesh", "Aims mesh formats"),
+    "inversion", Boolean())
 
 
 def initialization(self):
-    self.distance = 2.2
+    self.distance = 4.0
+    self.inversion = False
     self.linkParameters("latitude", "mesh")
     self.linkParameters("longitude", "latitude")
 
 
 def execution(self, context):
     cmd_args = []
+    context.write("inversion: ", self.inversion)
+    if self.inversion:
+        cmd_args += ["-t", self.inversion]
+    else:
+        cmd_args += ["-f", self.inversion]
     for m in self.mesh:
         cmd_args += ["-m", m]
     for lat in self.latitude:
         cmd_args += ["-l", lat]
     for lon in self.longitude:
         cmd_args += ["-g", lon]
-    cmd_args += [
-        "-s", self.sphere, "-d", str(self.distance), "-o", self.refined_mesh]
+    cmd_args += ["-s", self.sphere, "-d", str(self.distance),
+                 "-o", self.refined_mesh]
     context.system(
         "python", find_in_path("make_spherical_mesh.py"), *cmd_args)
