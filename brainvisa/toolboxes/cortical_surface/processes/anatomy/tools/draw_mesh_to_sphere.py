@@ -24,18 +24,27 @@ signature = Signature(
     "longitude", ReadDiskItem(
         "Longitude coordinate texture", "aims Texture formats"),
     "sphere_mesh", WriteDiskItem(
-        "Hemisphere White Mesh", "aims Texture formats"))
+        "Spherical Mesh", "aims Texture formats"),
+    "inversion", Boolean())
 
 
 def initialization(self):
+    self.inversion = False
     self.linkParameters("latitude", "white_mesh")
     self.linkParameters("longitude", "latitude")
 
 
 def execution(self, context):
-    command_draw_sphere = [sys.executable, find_in_path("mesh_to_sphere.py"),
-                           "-m", self.white_mesh,
-                           "-l", self.latitude,
-                           "-g", self.longitude,
-                           "-o", self.sphere_mesh]
-    context.system(*command_draw_sphere)
+    cmd_args = []
+    
+    if self.inversion:
+        cmd_args += ["-t", self.inversion]
+    else:
+        cmd_args += ["-f", self.inversion]  
+        
+    cmd_args += ["-m", self.white_mesh, "-l", self.latitude, 
+                 "-g", self.longitude, "-o", self.sphere_mesh]
+                 
+    context.system(
+        sys.executable, find_in_path("mesh_to_sphere.py"), *cmd_args)
+  
