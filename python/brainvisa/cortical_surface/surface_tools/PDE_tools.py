@@ -27,7 +27,7 @@ from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 
 ####################################################################
 #
-# distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
+# EUCLIDIAN distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
 #
 ####################################################################
 def meshFiedlerLength(mesh):
@@ -38,7 +38,7 @@ def meshFiedlerLength(mesh):
     w,v=eigsh(Lap, 2, which='LM', sigma = 0)
  
     fiedler=v[:,1]
-    
+    print 'Computing EUCLIDIAN distance between the max and min'
     imin=fiedler.argmin()
     imax=fiedler.argmax()
     vert = np.array(mesh.vertex())
