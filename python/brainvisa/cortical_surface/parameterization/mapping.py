@@ -558,7 +558,7 @@ def computeCoordinates(nb_vert_full_mesh, neocortex_indices, rect_mesh, rect_mes
 #
 ####################################################################
 def getShortestPath(mesh, ind1, ind2):
-    gp = aim.GeodesicPath(mesh, 3, 0)
+    gp = aims.GeodesicPath(mesh, 3, 0)
     v = aims.vector_U32(ind2)
     lmin = 1000
     imin = 0
