@@ -190,7 +190,7 @@ class SulcalLine(object):
         if color == None:
             color = ['b']
         for s in self.segm:
-            plt.plot(self.vertices[s, 0], self.vertices[s, 1], color)
+            plt.plot(self.vertices[s, 0], self.vertices[s, 1], color, linewidth=3.0)
         if plot_target & isinstance(self, SulcalConstraint):
             self.plotTarget(plt, modele)
 
@@ -223,11 +223,11 @@ class SulcalConstraint(SulcalLine):
 
     def plotTarget(self, plt, modele):
         if self.isLat:
-            coord = modele.latitudeAxisCoord[modele.latitudeAxis.index(self.axisID)]
+            coord = modele.latitudeAxisCoord[modele.latitudeAxisID.index(self.axisID)]
             for v in range(self.nbVertices):
                 plt.plot([self.vertices[v, 0], self.vertices[v, 0]], [self.vertices[v, 1],coord],'g')
         if self.isLon:
-            coord = modele.longitudeAxisCoord[modele.longitudeAxis.index(self.axisID)]
+            coord = modele.longitudeAxisCoord[modele.longitudeAxisID.index(self.axisID)]
             for v in range(self.nbVertices):
                 plt.plot([self.vertices[v, 0], coord], [self.vertices[v, 1],self.vertices[v, 1]],'r')
 

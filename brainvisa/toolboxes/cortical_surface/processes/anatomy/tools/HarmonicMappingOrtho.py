@@ -118,10 +118,10 @@ def execution( self, context ):
     context.write('HOP')
     (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side, model)
     (nb_inward, inward) = map.invertedPolygon(cstr_mesh)
-    vert = np.array(cstr_mesh.vertex())
-    context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
+    #vert = np.array(cstr_mesh.vertex())
+    context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / len(cstr_mesh.polygon()))+' %')
 
-    if self.unfold_reversed_triangles == 'yes':
+    if self.unfold_reversed_triangles == 'yes' and nb_inward>0:
         context.write('------------------unfolding reversed triangles')
         (cstr_mesh, nb_inward_evol, inward_evol) = map.solveInvertedPolygon(cstr_mesh, boundary, self.nb_it_local_smoothing_for_unfolding)
         context.write('------------------number of vertices on folded triangles : '+str(nb_inward_evol))

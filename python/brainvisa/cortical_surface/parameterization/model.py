@@ -206,14 +206,14 @@ class Model(object):
     def plot(self, plt):
         for ax in self.longitudeAxisCoord:
             if ax is not None:
-                plt.plot([ax, ax], [self.top, self.bottom])
+                plt.plot([ax, ax], [self.top, self.bottom], 'k')
         for ax in self.latitudeAxisCoord:
             if ax is not None:
-                plt.plot([self.left, self.right], [ax, ax])
-        plt.plot([self.left, self.right], [self.top, self.top], 'r')
-        plt.plot([self.right, self.right], [self.top, self.bottom], 'g')
-        plt.plot([self.left, self.right], [self.bottom, self.bottom], 'b')
-        plt.plot([self.left, self.left], [self.top, self.bottom], 'm')
+                plt.plot([self.left, self.right], [ax, ax], 'k')
+        plt.plot([self.left, self.right], [self.top, self.top], 'k', linewidth=3.0)
+        plt.plot([self.right, self.right], [self.top, self.bottom], 'k', linewidth=3.0)
+        plt.plot([self.left, self.right], [self.bottom, self.bottom], 'k', linewidth=3.0)
+        plt.plot([self.left, self.left], [self.top, self.bottom], 'k', linewidth=3.0)
 
 ##########################################################################
 # replaced by sulcus2Axis, should not be used anymore

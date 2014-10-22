@@ -818,7 +818,7 @@ def invertedPolygon(mesh, shape=None):
     else:
         inward = np.where(norms[:, 2] > 0)[0]
         nb_inward = len(inward)
-        if nb_inward > len(mesh.vertex()) / 2:
+        if nb_inward > (len(mesh.polygon()) / 2):
             inward = np.where(norms[:, 2] < 0)[0]
             nb_inward = len(inward)
     return(nb_inward, inward)
@@ -846,7 +846,49 @@ def crossp(x,y):
     z[:,2] = x[:,0]*y[:,1] - x[:,1]*y[:,0]
     return z
 
+####################################################################
+#
+# reverse properly the 4 boundaries of a rectangular mesh
+#
+####################################################################
+def recantgleBoundaryFlip(neoCortex_boundary):
+    rotate = lambda l, n :l[n:] + l[:n]  # list rotation fct
+    fliped_neoCortex_boundary = []
+    fliped_neoCortex_boundary.append(neoCortex_boundary[0])
+    fliped_neoCortex_boundary.append(neoCortex_boundary[3])
+    fliped_neoCortex_boundary.append(neoCortex_boundary[2])
+    fliped_neoCortex_boundary.append(neoCortex_boundary[1])
+    
+    fliped_neoCortex_boundary[0].reverse()
+    fliped_neoCortex_boundary[0] = rotate(fliped_neoCortex_boundary[0], -1)
+    fliped_neoCortex_boundary[2].reverse()
+    fliped_neoCortex_boundary[2] = rotate(fliped_neoCortex_boundary[2], -1)
+     
+    return fliped_neoCortex_boundary
 
+####################################################################
+#
+# flip a rectangular mesh following the first axis (vert[:,0])
+#
+####################################################################
+def recantgleFlip(rect_mesh):
+    vert = np.array(rect_mesh.vertex())
+    # mesh vertices to square [0 1] [0 1]
+    m = vert.min(0)
+    M = vert.max(0)
+
+    vert[:, 0] = -vert[:,0] + (M[0] - m[0])
+    m2 = vert.min(0)
+    M2 = vert.max(0)
+    print 'm',m
+    print 'M',M
+    print 'm2',m2
+    print 'M2',M2
+    vv = aims.vector_POINT3DF()
+    for x in vert:
+         vv.append(x)
+    rect_mesh.vertex().assign(vv)
+    return rect_mesh
 
 def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=None):
     if parcellation_type is None:
@@ -1160,15 +1202,26 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     
     '''
     realign the S.C. to 0, should already be the case!
-    '''    
-    SC_ind = full_sulci.names.index(('S.C._'+side))   
-    SC_label = full_sulci.labels[SC_ind]
-    print 'SC_label: ', SC_label
+    '''
+    try :
+        SC_ind = full_sulci.names.index(('S.C._'+side))   
+        SC_label = full_sulci.labels[SC_ind]
+        print 'SC_label: ', SC_label
 #    full_sulci.sulcalLines[SC_ind].printArgs()
-    translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
+        translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
+    except ValueError:
+        print '----------------------------------------------------------------'
+        print 'Central sulcus is missing!'
+        if model is not None:
+            translation = model.left
+            print 'translation is driven by the boundaries'
+        else:
+            translation = 0
+            print 'no translation applied'
+        print '----------------------------------------------------------------'
+
     vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
     neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
-#    neoCortex_square.updateNormals()
     full_sulci.updateVertices(vert)
 
     if model is None:

@@ -35,6 +35,7 @@ try:
   from brainvisa.cortical_surface.surface_tools import readSulcusLabelTranslationFile as rSLT
   from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
   from brainvisa.cortical_surface.parameterization import model as md
+  from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 except:
   pass
 
@@ -109,14 +110,17 @@ def execution( self, context ):
 
     context.write('HIP')
     (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh) = map.hip(mesh, insula_pole[0].arraydata(), cing_pole[0].arraydata(), self.rectangle_length, self.rectangle_width)
+    # flip the rectangle if needed
+    norms = basicTls.meshPolygonNormal(neoCortex_square)
+    mean_norm = np.mean(norms[:, 2])
+    if self.side == 'left' and mean_norm<0:# the rectangle must be flipped
+        neoCortex_square = map.recantgleFlip(neoCortex_square)
+    # check and unfold inverted polygons
     (nb_inward, inward) = map.invertedPolygon(neoCortex_square)
-    vert = np.array(neoCortex_square.vertex())
-    context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / vert.shape[0])+' %')
-    if self.unfold_reversed_triangles == 'yes':
-        poly = np.array(neoCortex_square.polygon())
+    context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / len(neoCortex_square.polygon()))+' %')
+    if self.unfold_reversed_triangles == 'yes' and nb_inward>0:
         context.write('------------------unfolding reversed triangles')
         (neoCortex_square, nb_inward_evol, inward_evol) = map.solveInvertedPolygon(neoCortex_square, neoCortex_open_boundary, self.nb_it_local_smoothing_for_unfolding)
-        vert = np.array(neoCortex_square.vertex())
         context.write('------------------evolution of the iterative unfolding : '+str(nb_inward_evol))
 #         inward_tex = 'tmp.tex'
 #         context.write('------------------writing inward tex in : '+inward_tex)
@@ -129,7 +133,7 @@ def execution( self, context ):
     context.write('Translating the barycenter of S.C. to 0')
     output_SL_tex = aims.TimeTexture(sulcal_lines)
     output_tex_tmp = sulcal_lines[0].arraydata()[neocortex_indices]
-    tex_square_sulci = np.zeros(vert.shape[0], sulcal_lines[0].arraydata().dtype )
+    tex_square_sulci = np.zeros(len(neoCortex_square.vertex()), sulcal_lines[0].arraydata().dtype )
     tex_square_sulci[range( len(neocortex_indices) )] = output_tex_tmp
     for b in neoCortex_open_boundary:
         tex_square_sulci[b] = 0
@@ -144,13 +148,19 @@ def execution( self, context ):
     context.write(labels)
     full_sulci = slSet.SulcalLinesSet() 
     full_sulci.extractFromTexture(tex_square_sulci, neoCortex_square, sulc_labels_dict)
-    SC_ind = full_sulci.names.index(('S.C._'+self.side))   
-    SC_label = full_sulci.labels[SC_ind]
+    try :
+      SC_ind = full_sulci.names.index(('S.C._'+self.side))   
+      SC_label = full_sulci.labels[SC_ind]
 #    full_sulci.sulcalLines[SC_ind].printArgs()
-    translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
-    vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
-    neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
-    
+      translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
+      vert = np.array(neoCortex_square.vertex())
+      vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
+      neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
+    except ValueError:
+      context.write('----------------------------------------------------------------')
+      context.write('Central sulcus is missing, no translation applied!')
+      context.write('----------------------------------------------------------------')
+
     context.write('Writing meshes and textures')
     if self.side == 'right':
         poly = np.array(neoCortex_square.polygon())
