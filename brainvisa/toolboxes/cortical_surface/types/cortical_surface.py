@@ -34,6 +34,20 @@ include( 'builtin' )
 include( 'registration' )
 include( 'anatomy' )
 
+## sulcal pits
+FileType( 'pits texture', 'Texture' )
+FileType( 'Left pits texture', 'pits texture' )
+FileType( 'Right pits texture', 'pits texture' )
+FileType( 'noisy pits texture', 'Texture' )
+FileType( 'Left noisy pits texture', 'noisy pits texture' )
+FileType( 'Right noisy pits texture', 'noisy pits texture' )
+FileType( 'ridges texture', 'Texture' )
+FileType( 'Left ridges texture', 'ridges texture' )
+FileType( 'Right ridges texture', 'ridges texture' )
+FileType( 'basins texture', 'Texture' )
+FileType( 'Left basins texture', 'basins texture' )
+FileType( 'Right basins texture', 'basins texture' )
+
 ## Depth Potential Function
 FileType( 'DPF texture', 'Texture' )
 FileType( 'Left DPF texture', 'DPF texture' )

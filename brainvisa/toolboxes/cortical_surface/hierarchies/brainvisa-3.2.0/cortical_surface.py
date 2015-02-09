@@ -5,6 +5,16 @@ insert( '{center}/{subject}',
   'surface', SetContent(
     ## que mettre dans les niveaux aquisition et analysis?
 
+    ## sulcal pits
+    '<subject>_Lwhite_pits', SetType( 'Left pits texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_pits', SetType( 'Right pits texture' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_noisy_pits', SetType( 'Left noisy pits texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_noisy_pits', SetType( 'Right noisy pits texture' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_ridges', SetType( 'Left ridges texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_ridges', SetType( 'Right ridges texture' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_basins', SetType( 'Left basins texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_basins', SetType( 'Right basins texture' ), SetWeakAttr( 'side', 'right' ),
+
     ## Depth Potential Function
     '<subject>_Lwhite_DPF', SetType( 'Left DPF texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_DPF', SetType( 'Right DPF texture' ), SetWeakAttr( 'side', 'right' ),

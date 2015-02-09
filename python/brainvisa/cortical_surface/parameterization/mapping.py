@@ -968,7 +968,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     #     tex_parcels[tex_parcels ==47] = 44
     #     tex_parcels[tex_parcels ==48] = 44 
 
-    else:#default parcellation <=> model axes
+    elif parcellation_type == 'model':
 
     #     # concatenate some parcels
     #     # INSULA
@@ -986,18 +986,57 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 34] = 30
         tex_parcels[tex_parcels == 35] = 30
         tex_parcels[tex_parcels == 36] = 30
+
+    elif parcellation_type == 'model_foetus':
+        #print 'modif'
+    #     # concatenate some parcels
+    #     # INSULA
+        tex_parcels[tex_parcels == 7] = 2
+        tex_parcels[tex_parcels == 12] = 2
+        tex_parcels[tex_parcels == 17] = 2
+        tex_parcels[tex_parcels == 22] = 2
+        tex_parcels[tex_parcels == 27] = 2
+        tex_parcels[tex_parcels == 32] = 2
+        tex_parcels[tex_parcels == 37] = 2
+        # arround the path between the poles
+        tex_parcels[tex_parcels == 19] = 18
+        tex_parcels[tex_parcels == 20] = 18
+        tex_parcels[tex_parcels == 21] = 18
+        # post sup temporal gyrus
+        tex_parcels[tex_parcels == 28] = 23
+        # post inf temporal gyrus
+        tex_parcels[tex_parcels == 29] = 24
+        # int frontal gyrus
+        tex_parcels[tex_parcels == 16] = 11
+        # sup frontal gyrus
+        tex_parcels[tex_parcels == 15] = 10
+        # med frontal gyrus
+        tex_parcels[tex_parcels == 14] = 9
+        # inf frontal gyrus
+        tex_parcels[tex_parcels == 13] = 8
+        # precentral gyrus
+        tex_parcels[tex_parcels == 4] = 3
+        tex_parcels[tex_parcels == 5] = 3
+        # postcentral gyrus
+        tex_parcels[tex_parcels == 39] = 38
+        tex_parcels[tex_parcels == 40] = 38
+        # med cingular gyrus
+        tex_parcels[tex_parcels == 41] = 6
+        # precuneus
+        tex_parcels[tex_parcels == 31] = 36
+
         
     # cingular pole
     tex_parcels[tex_parcels == 0] = 1
     
     
     uparcells = np.unique(tex_parcels)
-    
-    tex_parcels_tmp = tex_parcels.copy()
-    reord_parc = 1
-    for u_parc in uparcells:
-        tex_parcels[tex_parcels_tmp == u_parc] = reord_parc
-        reord_parc = reord_parc+2
+##    
+##    tex_parcels_tmp = tex_parcels.copy()
+##    reord_parc = 1
+##    for u_parc in uparcells:
+##        tex_parcels[tex_parcels_tmp == u_parc] = reord_parc
+##        reord_parc = reord_parc+2
 
     return (tex_parcels, uparcells.shape[0])
 
@@ -1212,12 +1251,14 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
     except ValueError:
         print '----------------------------------------------------------------'
         print 'Central sulcus is missing!'
-        if model is not None:
-            translation = model.left
-            print 'translation is driven by the boundaries'
-        else:
-            translation = 0
-            print 'no translation applied'
+        translation = 0
+        print 'no translation applied'
+##        if model is not None:
+##            translation = model.left
+##            print 'translation is driven by the boundaries'
+##        else:
+##            translation = 0
+##            print 'no translation applied'
         print '----------------------------------------------------------------'
 
     vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
@@ -1238,6 +1279,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
     return neoCortex_square_cstr
+
 ####################################################################
 #
 # compute comformal mapping of a mesh to a disk

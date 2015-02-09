@@ -13,7 +13,7 @@ class SulcalLinesSet(object):
     classdocs
     '''
 
-    def __init__(self, sls=[sln.SulcalLine()]):
+    def __init__(self, sls=None):
         '''
         Constructor
         '''
@@ -26,21 +26,22 @@ class SulcalLinesSet(object):
         self.latitudeCstrAxis = []
 
         self.nbSulci = 0
-        for sl in sls:
-            if isinstance(sl, sln.SulcalConstraint):
-                if sl.axisID == []:
-                    print 'should not happen!!'
-                    sl.label2Axis()
-                if sl.isLon:
-                    self.longitudeCstrIndex.append(self.nbSulci)
-                    self.longitudeCstrAxis.append(sl.axisID)
-                elif sl.isLat:
-                    self.latitudeCstrIndex.append(self.nbSulci)
-                    self.latitudeCstrAxis.append(sl.axisID)
-            self.sulcalLines.append(sl)
-            self.labels.append(sl.label)
-            self.names.append(sl.name)
-            self.nbSulci += 1
+        if sls is not None:
+            for sl in sls:
+                if isinstance(sl, sln.SulcalConstraint):
+                    if sl.axisID == []:
+                        print 'should not happen!!'
+                        sl.label2Axis()
+                    if sl.isLon:
+                        self.longitudeCstrIndex.append(self.nbSulci)
+                        self.longitudeCstrAxis.append(sl.axisID)
+                    elif sl.isLat:
+                        self.latitudeCstrIndex.append(self.nbSulci)
+                        self.latitudeCstrAxis.append(sl.axisID)
+                self.sulcalLines.append(sl)
+                self.labels.append(sl.label)
+                self.names.append(sl.name)
+                self.nbSulci += 1
 
     def cat(self, sl_set):
         for sl in sl_set.sulcalLines:
@@ -48,6 +49,10 @@ class SulcalLinesSet(object):
                 place = self.labels.index(sl.label)
                 self.sulcalLines[place].cat(sl)
             else:
+                self.sulcalLines.append(sl)
+                self.labels.append(sl.label)
+                self.names.append(sl.name)
+                self.nbSulci += 1
                 if isinstance(sl, sln.SulcalConstraint):
                     if sl.axisID == []:
                         print 'should not happen!!'
@@ -56,9 +61,7 @@ class SulcalLinesSet(object):
                         self.longitudeCstrIndex.append(self.nbSulci)
                     elif sl.isLat:
                         self.latitudeCstrIndex.append(self.nbSulci)
-                self.sulcalLines.append(sl)
-                self.labels.append(sl.label)
-                self.nbSulci += 1
+                
                 
 
     def updateVertices(self, vertices=None):
@@ -178,7 +181,7 @@ class SulcalLinesSet(object):
         return out_tex
 
     def plot(self, plt, modele=None):
-        colors = ['b', 'g', 'r', 'm', 'y', 'k']
+        colors = ['b', 'g', 'r', 'm', 'y']
         i_col = 0
         for sl in self.sulcalLines:
             sl.plot(plt, colors[i_col], modele)

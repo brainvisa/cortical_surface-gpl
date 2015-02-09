@@ -341,7 +341,7 @@ def depthPotentialFunction(mesh, curvature, alphas):
     solver_tolerance = 1e-6
 #    B = sparse.dia_matrix((2 * np.array(vert_voronoi).squeeze() * (k-( np.sum(k*np.array(vert_voronoi).squeeze()) / vert_voronoi.sum() )), 0), shape=(Nbv, Nbv))
 #    B = B.tocsr()
-    B = 2 * vert_voronoi * (curvature-( np.sum(curvature*vert_voronoi) / vert_voronoi.sum() ))
+    B = -2 * vert_voronoi * (curvature-( np.sum(curvature*vert_voronoi) / vert_voronoi.sum() ))
     B=B.squeeze()
 #    B = sparse.csr_matrix(B)
     dpf=[]
