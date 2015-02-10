@@ -68,3 +68,4 @@ def initialization( self ):
 def execution( self, context ):
     #compute the DPF
     #apply the watershed
+    print 'will compute the DPF followed by the watershed'

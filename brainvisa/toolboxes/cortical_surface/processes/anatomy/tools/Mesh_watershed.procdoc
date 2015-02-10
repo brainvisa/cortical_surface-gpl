@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Compute the watershed, initially for the extraction of sulcal pits as described in:<br/>
+<span style="color: rgb(51, 51, 255);">Auzias, G, Brun, L, Deruelle, C, Coulon, O, <span style="font-style: italic;">Deep sulcal landmarks: algorithmic and conceptual improvements in the definition and extraction of sulcal pits, </span> <span style="font-weight: bold;">NeuroImage, </span>  2015.</span><br/>
+<img SRC="../../images/pits_results.png" ALT="" border="0"/>
+</xhtml>
+    <d name="parameters">
+      <xhtml name="noisypits_texture"/>
+      <xhtml name="ridges_texture"/>
+      <xhtml name="thresh_dist"/>
+      <xhtml name="mask_texture"/>
+      <xhtml name="input_mesh"/>
+      <xhtml name="basins_texture"/>
+      <xhtml name="DPF_texture"/>
+      <xhtml name="pits_texture"/>
+      <xhtml name="thresh_area"/>
+      <xhtml name="thresh_ridge"/>
+    </d>
+    <xhtml name="long">During the flooding, the shallowest basin is merged with the deeper one if R inf thr and D inf ThD;<br/>
+After the end of the flooding, if A inf ThA then merge the basin with its neighbor with which it shares the longest border.
+<img SRC="../../images/pits_params.png" ALT="" border="0"/>
+</xhtml>
+  </d>
+</d>
+</minf>

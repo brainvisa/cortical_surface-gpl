@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Compute the Depth Potential Function as described in:<br/>
+<span style="color: rgb(51, 51, 255);">Boucher, M, Whitesides, A, Evans, AC, <span style="font-style: italic;">Depth potential function for folding pattern representation, registration and analysis, </span> <span style="font-weight: bold;">Medical Image Analysis, </span> 13(2):203-14, 2009.</span><br/>
+<img SRC="../../images/dpf.png" ALT="" border="0"/>
+</xhtml>
+    <d name="parameters">
+      <xhtml name="alphas">list of values for the parameter alpha.
+The output DPF texture will have the same number of times as the number of values given for this parameter.</xhtml>
+      <xhtml name="input_mesh">the DPF can be computed for any mesh with a spherical topology</xhtml>
+      <xhtml name="DPF_texture"/>
+    </d>
+    <xhtml name="long">The DPF is an estimation of the depth of the folds based on the concept of bending distance for
+curves. Technically, DPF is a scalar field corresponding to the signed traveled distance that quantifies how
+much a curve is bent inward or outward and can thus be interpreted in term of average convexity.
+Formally, it represents the overall shape of a fold as the function whose Laplacian is as close as possible
+to the mean curvature of the surface.<br/>
+Therefore, the DPF can also be interpreted as a representation of the mean curvature at multiple scales
+with alpha being the parameter that controls how much emphasis to put on the finer scales. Thus, DPF relates
+to both average convexity and curvature through the trade-off parameter alpha, as illustrated on the figure. When alpha tends to infinity, the DPF tends to the mean curvature, when alpha tends to 0 the DPF tends to the average convexity, and for intermediate values of alpha, the DPF integrates both types of geometrical information.</xhtml>
+  </d>
+</d>
+</minf>
