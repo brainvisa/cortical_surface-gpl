@@ -22,16 +22,21 @@
 
 def validation():
     try:
+        from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
         from brainvisa.cortical_surface.surface_tools import mesh_watershed as watershed
     except:
         raise ValidationError( 'brainvisa.cortical_surface.surface_tools.mesh_watershed module can not be imported.' )
   
 
 from brainvisa.processes import *
-from brainvisa.cortical_surface.surface_tools import mesh_watershed as watershed
+try:
+    from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+    from brainvisa.cortical_surface.surface_tools import mesh_watershed as watershed
+except:
+    pass
+
 from soma import aims
 import numpy as np
-from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
 
 name = 'Mesh Watershed'
 userLevel = 0

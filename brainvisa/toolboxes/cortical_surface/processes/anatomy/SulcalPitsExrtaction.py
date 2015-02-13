@@ -28,7 +28,11 @@ def validation():
   
 
 from brainvisa.processes import *
-from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+
+try:
+    from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+except:
+    pass
 
 name = 'Sulcal Pits Extraction'
 userLevel = 2
