@@ -39,7 +39,7 @@ userLevel = 0
 
 signature = Signature(
       'intmesh', ReadDiskItem( 'Hemisphere White Mesh', 'BrainVISA mesh formats'), 
-      'output', WriteDiskItem('Projection convolution kernels', 'BrainVISA volume formats'),
+      'output', WriteDiskItem('Projection convolution kernels', 'GIS image'),
       'size', Integer(),
       'resolution', ListOf(Float()),
       'geod_decay', Float(),
