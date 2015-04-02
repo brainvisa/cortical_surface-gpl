@@ -41,29 +41,29 @@ try:
 except:
     pass
 
-def voronoiArea(mesh):
-
-    # Comput Voronoi region area for each vertex
-    #
-    # Meyer M, Desbrun M, Schroder P, Barr AH. 2002. Discrete differential-geometry operators for triangulated 2-manifolds. VisMath. 35-38.
-    #
-    # INPUTS
-    #
-    # mesh : white matter triangular mesh of subject (gifti)
-    #
-    # OUTPUTS
-    #
-    # labelVoronoi : texture where each label corresponds to the vertex area
-
-    r=aims.Reader()
-    
-    white=r.read(mesh)
-    vert_area=pdeTls.vertexVoronoi(white)
-    labelVoronoi=aims.TimeTexture_FLOAT(1,vert_area.size)
-    for i in range(vert_area.size):
-        labelVoronoi[0][i]=vert_area[i]
-
-    return labelVoronoi
+##def voronoiArea(mesh):
+##
+##    # Comput Voronoi region area for each vertex
+##    #
+##    # Meyer M, Desbrun M, Schroder P, Barr AH. 2002. Discrete differential-geometry operators for triangulated 2-manifolds. VisMath. 35-38.
+##    #
+##    # INPUTS
+##    #
+##    # mesh : white matter triangular mesh of subject (gifti)
+##    #
+##    # OUTPUTS
+##    #
+##    # labelVoronoi : texture where each label corresponds to the vertex area
+##
+##    r=aims.Reader()
+##    
+##    white=r.read(mesh)
+##    vert_area=pdeTls.vertexVoronoi(white)
+##    labelVoronoi=aims.TimeTexture_FLOAT(1,vert_area.size)
+##    for i in range(vert_area.size):
+##        labelVoronoi[0][i]=vert_area[i]
+##
+##    return labelVoronoi
 
 def fiedlerLength(mesh):
 

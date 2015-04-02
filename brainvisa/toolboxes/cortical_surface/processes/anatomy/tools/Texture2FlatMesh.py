@@ -43,11 +43,11 @@ userLevel = 0
     
 signature = Signature(
 #    'input_texture',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),                     
-    'input_texture',ReadDiskItem('Texture', 'Texture'),
-    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
-    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'Texture'),
+    'input_texture',ReadDiskItem('Texture', 'aims Texture formats'),
+    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'aims Texture formats'),
+    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'aims Texture formats'),
 #    'output_texture',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' )
-    'output_texture',WriteDiskItem( 'Texture', 'Texture')
+    'output_texture',WriteDiskItem( 'Texture', 'aims Texture formats')
 )
 
 def initialization( self ):

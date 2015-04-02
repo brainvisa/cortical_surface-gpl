@@ -921,7 +921,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
     
-    if parcellation_type == 'coarse':
+    if parcellation_type == 'coarse' or parcellation_type == 'marsAtlas':
         # add suplementary axes to the model <=> subdivise parcels
         # antero-posterior subdivision of the prefrontal lobe
         sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
@@ -944,15 +944,14 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
             lab_parcel = lab_parcel+1
 
     if parcellation_type == 'coarse':
-        print 'il faut concatener autour du path!'
-    #     # INSULA sup ant
+        # INSULA sup ant
         tex_parcels[tex_parcels == 16] = 9
         tex_parcels[tex_parcels == 23] = 9
         tex_parcels[tex_parcels == 30] = 9
-#     #     # INSULA sup post
+        # INSULA sup post
         tex_parcels[tex_parcels == 65] = 2
         tex_parcels[tex_parcels == 72] = 2
-#     #     # INSULA inf
+        # INSULA inf
         tex_parcels[tex_parcels == 51] = 44
         tex_parcels[tex_parcels == 58] = 44
         # arround the path between the poles
@@ -986,6 +985,74 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 34] = 30
         tex_parcels[tex_parcels == 35] = 30
         tex_parcels[tex_parcels == 36] = 30
+
+    elif parcellation_type == 'marsAtlas':
+        print 'marsAtlas'
+        # same as 'coarse'
+        # INSULA sup ant
+        tex_parcels[tex_parcels == 16] = 9
+        tex_parcels[tex_parcels == 23] = 9
+        tex_parcels[tex_parcels == 30] = 9
+        # INSULA sup post
+        tex_parcels[tex_parcels == 65] = 2
+        tex_parcels[tex_parcels == 72] = 2
+        # INSULA inf
+        tex_parcels[tex_parcels == 51] = 44
+        tex_parcels[tex_parcels == 58] = 44
+        # arround the path between the poles
+        tex_parcels[tex_parcels == 38] = 37
+        tex_parcels[tex_parcels == 39] = 37
+        tex_parcels[tex_parcels == 40] = 37
+        tex_parcels[tex_parcels == 41] = 37
+        tex_parcels[tex_parcels == 42] = 37
+        tex_parcels[tex_parcels == 43] = 37
+
+        # additional parcels merging compared to 'coarse', parcel names correspond to the nomenclature given in the paper
+        # path between poles = cingular pole
+        tex_parcels[tex_parcels == 37] = 1  # 1] = 67
+        # ITCm
+        tex_parcels[tex_parcels == 48] = 49  # 77] = 79
+        # VCs
+        tex_parcels[tex_parcels == 60] = 61  # 97] = 99
+        # Cu
+        tex_parcels[tex_parcels == 62] = 63  # 101] = 103
+        # ICC
+        tex_parcels[tex_parcels == 57] = 64  # 81] = 105
+        tex_parcels[tex_parcels == 50] = 64  # 93] = 105
+        # PCC
+        tex_parcels[tex_parcels == 71] = 78  # 117] = 129
+        # MCC
+        tex_parcels[tex_parcels == 15] = 22  # 15] = 41
+        tex_parcels[tex_parcels == 8] = 22  # 29] = 41
+        # IPCv
+        tex_parcels[tex_parcels == 59] = 66  # 95] = 107
+        # Sdl
+        tex_parcels[tex_parcels == 74] = 75  # 121] = 123
+        # Sdm
+        tex_parcels[tex_parcels == 76] = 77  # 125] = 127
+        # PFC vm
+        tex_parcels[tex_parcels == 34] = 35  # 61] = 63
+        # Mdl
+        tex_parcels[tex_parcels == 4] = 5  # 7] = 9
+        # Mdm
+        tex_parcels[tex_parcels == 6] = 7  # 11] = 13
+        # PMrV
+        tex_parcels[tex_parcels == 10] = 17  # 19] = 31
+        # PMdl
+        tex_parcels[tex_parcels == 11] = 12  # 21] = 23
+        # PMdm
+        tex_parcels[tex_parcels == 13] = 14  # 25] = 27
+        # PFcdl
+        tex_parcels[tex_parcels == 18] = 19  # 33] = 35
+        # PFcdm
+        tex_parcels[tex_parcels == 20] = 21  # 37] = 39
+        # ACC
+        tex_parcels[tex_parcels == 29] = 36  # 53] = 65
+        # INSULA
+        tex_parcels[tex_parcels == 2] = 44  # 3] = 69
+        tex_parcels[tex_parcels == 9] = 44  # 17] = 69
+
+
 
     elif parcellation_type == 'model_foetus':
         #print 'modif'
@@ -1032,11 +1099,12 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     
     uparcells = np.unique(tex_parcels)
 ##    
-##    tex_parcels_tmp = tex_parcels.copy()
-##    reord_parc = 1
-##    for u_parc in uparcells:
-##        tex_parcels[tex_parcels_tmp == u_parc] = reord_parc
-##        reord_parc = reord_parc+2
+    tex_parcels_tmp = tex_parcels.copy()
+    reord_parc = 1
+    for u_parc in uparcells:
+        tex_parcels[tex_parcels_tmp == u_parc] = reord_parc
+        reord_parc = reord_parc+2
+
 
     return (tex_parcels, uparcells.shape[0])
 

@@ -43,9 +43,9 @@ userLevel = 0
 #     anatomist.validation()
     
 signature = Signature(
-    'input_texture',ReadDiskItem( 'Texture', 'Texture' ),      
+    'input_texture',ReadDiskItem( 'Texture', 'Aims Texture formats' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'pole',WriteDiskItem( 'insula pole texture','Texture' )
+    'pole',WriteDiskItem( 'insula pole texture','Aims Texture formats' )
 )
 
 def initialization( self ):

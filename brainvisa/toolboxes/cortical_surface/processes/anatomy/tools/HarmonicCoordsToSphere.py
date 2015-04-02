@@ -46,8 +46,8 @@ signature = Signature(
                       
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),
     'side', Choice('left', 'right'),
-    'latitude',ReadDiskItem( 'Latitude coordinate texture','Texture' ),
-    'longitude',ReadDiskItem( 'Longitude coordinate texture','Texture' ),
+    'latitude',ReadDiskItem( 'Latitude coordinate texture','Aims Texture formats' ),
+    'longitude',ReadDiskItem( 'Longitude coordinate texture','Aims Texture formats' ),
     'sphere_radius', Float(),
     'spherical_mesh', WriteDiskItem( 'spherical mesh', 'Aims mesh formats' )
 )

@@ -74,12 +74,8 @@ def execution( self, context ):
     ws = aims.Writer()
 
 
-    #labelVoronoi=watershed.voronoiArea(mesh_file)
     mesh = re.read( self.input_mesh.fullPath() )
     vert_area = pdeTls.vertexVoronoi( mesh )
-    #diff = np.max(np.array(labelVoronoi[0])-vert_area)
-    #print diff
-    #area=np.sum(labelVoronoi[0])
 
     depthTex = re.read( self.DPF_texture.fullPath() )
     depthArray = np.array( depthTex[0] )
@@ -137,3 +133,10 @@ def execution( self, context ):
     ##areasTexture=aims.TimeTexture_FLOAT(1,len(labels))
     ##areasTexture[0].assign(AREAS)
     ##ws.write(areasTexture, areasTexture_file)
+
+##    txt_rigdes=''
+##    txt_ridges+=
+##    np.savetxt(output_prefix+'D'+str(D)+'R'+str(R)+'A'+str(A)+'_ridgePoints.txt',ridgePoints)
+##    np.savetxt(output_prefix+'D'+str(D)+'R'+str(R)+'A'+str(A)+'_infoBasins.txt',infoBasins)
+##    np.savetxt(output_prefix+'D'+str(D)+'R'+str(R)+'A'+str(A)+'_pitsParents.txt',list(parent[:,0]))
+

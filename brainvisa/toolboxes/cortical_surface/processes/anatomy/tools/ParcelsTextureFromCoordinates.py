@@ -51,6 +51,7 @@ signature = Signature(
 #=    'parcellation_resolution', Choice('model', 'coarse'),
     'texture_model_parcels', WriteDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'model', 'regularized': 'false' }),
     'texture_coarse_parcels', WriteDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'coarse', 'regularized': 'false' }),
+    'texture_marsAtlas_parcels', WriteDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'marsAtlas', 'regularized': 'false' }),
 )
 
 def initialization( self ):
@@ -64,6 +65,7 @@ def initialization( self ):
     self.linkParameters( 'model_file', 'latitude' )
     self.linkParameters( 'texture_model_parcels', 'latitude')
     self.linkParameters( 'texture_coarse_parcels', 'latitude')
+    self.linkParameters( 'texture_marsAtlas_parcels', 'latitude')
 #=    def linkRes( self, dummy ):
 #=        if self.latitude is not None:
 #=            return self.signature[ 'texture_parcels' ].findValue( self.latitude, requiredAttributes={ 'parcellation_type' : self.parcellation_resolution } )
@@ -86,7 +88,7 @@ def execution( self, context ):
 
     (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'model')
  #=   context.write('----------------------------------------------------------')
-    context.write('number of parcels created for the model=based parcellation (including the cingular pole) :')
+    context.write('number of parcels created for the model-based parcellation (including the cingular pole) :')
     context.write(nb_parcels)
     if self.side =='right':
         tex_parcels = tex_parcels + 1
@@ -97,7 +99,7 @@ def execution( self, context ):
 
     (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'coarse')
  #=   context.write('----------------------------------------------------------')
-    context.write('number of parcels created for the coarse poarcellation (including the cingular pole) :')
+    context.write('number of parcels created for the coarse parcellation (including the cingular pole) :')
     context.write(nb_parcels)
     if self.side =='right':
         tex_parcels = tex_parcels + 1
@@ -105,6 +107,17 @@ def execution( self, context ):
     aims_tex_parcels = aims.TimeTexture_S16()
     aims_tex_parcels[0].assign(tex_parcels)
     ws.write(aims_tex_parcels, self.texture_coarse_parcels.fullPath())
+
+    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'marsAtlas')
+ #=   context.write('----------------------------------------------------------')
+    context.write('number of parcels created for the marsAtlas parcellation (including the cingular pole) :')
+    context.write(nb_parcels)
+    if self.side =='right':
+        tex_parcels = tex_parcels + 1
+    context.write('Writing texture')
+    aims_tex_parcels = aims.TimeTexture_S16()
+    aims_tex_parcels[0].assign(tex_parcels)
+    ws.write(aims_tex_parcels, self.texture_marsAtlas_parcels.fullPath())
 
     context.write('Done')
             

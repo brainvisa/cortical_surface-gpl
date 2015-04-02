@@ -40,10 +40,10 @@ name = 'Coordinate Grid Mesh'
 userLevel = 0
 
 signature = Signature(
-    'mesh', ReadDiskItem( 'Mesh', 'MESH mesh'),
-    'latitude', ReadDiskItem( 'Latitude coordinate texture','Texture'),
-    'longitude', ReadDiskItem( 'Longitude coordinate texture','Texture'),
-    'grid', WriteDiskItem( 'Coordinate grid', 'MESH mesh' ),
+    'mesh', ReadDiskItem( 'Mesh', 'Aims mesh formats'),
+    'latitude', ReadDiskItem( 'Latitude coordinate texture','aims Texture formats'),
+    'longitude', ReadDiskItem( 'Longitude coordinate texture','aims Texture formats'),
+    'grid', WriteDiskItem( 'Coordinate grid', 'Aims mesh formats' ),
     'mode', Choice('Constraints', 'Regular', 'Sulcus'),
     'tube_size', Float()
     )
