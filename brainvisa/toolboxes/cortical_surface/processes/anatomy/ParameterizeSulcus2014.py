@@ -437,6 +437,7 @@ def execution( self, context ):
      mesh=re.read(self.sulcus_mesh.fullPath())
      vert=array(mesh.vertex())
      N= mesh.vertex().size()
+     parameter=zeros(N)
      
      print 'Computing Laplacian'
      L=computeMeshLaplacian(mesh)
@@ -526,6 +527,7 @@ def execution( self, context ):
      for i in range(N):
           ind=math.floor(texOut[0][i])
           isoParam[0][i]=(texOut[0][i]*a[ind]) + b[ind]
+          parameter[i]=(texOut[0][i]*a[ind]) + b[ind]
      ws.write( isoParam, self.texture_param1.fullPath() )
      
      context.write('Isometric reparameterization done')
@@ -561,10 +563,19 @@ def execution( self, context ):
           
      read=aims.Reader()
 
-     bary=mean(vert, axis=0)
+     # here we compute the signed distance to the inertia plane
+     # inertia plane is computed with a PCA of the vertices.
+     # extremities (defined with 'offset') are removed.
+     
+     offset=10
+     vert2=vert[where((parameter >= offset) & (parameter <= (100-offset)))].copy()
+     bary=mean(vert2, axis=0)
+     vert2=vert2-bary
      vert=vert-bary
-     tmesh=vert.transpose()
-     coord=dot(tmesh,vert)
+     tvert2=vert2.transpose()
+     coord=dot(tvert2,vert2)
+     
+ 
      val,vect=linalg.eig(coord)
      i=argmin(val)
      k=argmax(val)
@@ -583,6 +594,9 @@ def execution( self, context ):
 
      dist=array(texturex[0])    
      context.write('Computing morphological curves (depth and profile)')
+     
+     
+     # Computing curves for depth and profile
      
      morpho=zeros((101, 3))
      vert=array(mesh.vertex())

@@ -29,16 +29,18 @@ def Diffusion(signal, dt, t):
 def GetL1L2(signal, t):
     dt=0.05
     smooth=Diffusion(signal, dt, t)
+    st=signal.std()
     minP=100
-    maxP=0
+    maxP=-100
     l1=0
     l2=0
     for i in range(20, 50):
-        if ((smooth[i]<minP)): #& (smooth[i]<=smooth[i+1]) & (smooth[i]<=smooth[i-1])):
+        if ((smooth[i]<minP) & (smooth[i]<=smooth[i+1]) & (smooth[i]<=smooth[i-1])):
             l1=i
             minP=smooth[i]
     for i in range(l1+1, 80):
-        if ((smooth[i]>maxP)): # & (smooth[i]>=smooth[i+1]) & (smooth[i]>=smooth[i-1])):
+        if ((smooth[i]>maxP) & (smooth[i]>=smooth[i+1]) & (smooth[i]>=smooth[i-1]) & ((smooth[i]-minP) > 0.5*st)):
             l2=i
             maxP=smooth[i]
+            break
     return l1, l2, smooth
