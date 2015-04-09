@@ -41,52 +41,6 @@ try:
 except:
     pass
 
-##def voronoiArea(mesh):
-##
-##    # Comput Voronoi region area for each vertex
-##    #
-##    # Meyer M, Desbrun M, Schroder P, Barr AH. 2002. Discrete differential-geometry operators for triangulated 2-manifolds. VisMath. 35-38.
-##    #
-##    # INPUTS
-##    #
-##    # mesh : white matter triangular mesh of subject (gifti)
-##    #
-##    # OUTPUTS
-##    #
-##    # labelVoronoi : texture where each label corresponds to the vertex area
-##
-##    r=aims.Reader()
-##    
-##    white=r.read(mesh)
-##    vert_area=pdeTls.vertexVoronoi(white)
-##    labelVoronoi=aims.TimeTexture_FLOAT(1,vert_area.size)
-##    for i in range(vert_area.size):
-##        labelVoronoi[0][i]=vert_area[i]
-##
-##    return labelVoronoi
-
-def fiedlerLength(mesh):
-
-    # Comput geodesic distance of Fiedler
-    #
-    # INPUTS
-    #
-    # mesh : white matter triangular mesh of subject (gifti)
-    #
-    # OUTPUTS
-    #
-    # fiedlerGeodesic : geodesic distance of Fiedler
-
-    r=aims.Reader()
-    white=r.read(mesh)
-    (d,fiedler) = pdeTls.meshFiedlerLength(white)
-    imin=fiedler.argmin()
-    imax=fiedler.argmax()
-    g=aims.GeodesicPath(white, 3, 0)
-    fiedlerGeodesic=g.shortestPath_1_1_len(int(imin),int(imax))
-
-    return fiedlerGeodesic
-    
 
 def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
     

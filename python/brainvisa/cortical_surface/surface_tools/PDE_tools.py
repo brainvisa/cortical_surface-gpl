@@ -24,27 +24,35 @@ import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import lgmres
 from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
+from soma import aims
 
 ####################################################################
 #
-# EUCLIDIAN distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
+# distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
 #
 ####################################################################
-def meshFiedlerLength(mesh):
+def meshFiedlerLength(mesh, dist_type='geodesic'):
     from scipy.sparse.linalg import eigsh
-    L=computeMeshLaplacian(mesh)
-    Lap=0.5*(L+L.transpose())
+    L = computeMeshLaplacian(mesh)
+    Lap = 0.5*(L+L.transpose())
     print 'Computing fiedler vector'
-    w,v=eigsh(Lap, 2, which='LM', sigma = 0)
+    w,v = eigsh(Lap, 2, which='LM', sigma = 0)
  
-    fiedler=v[:,1]
-    print 'Computing EUCLIDIAN distance between the max and min'
-    imin=fiedler.argmin()
-    imax=fiedler.argmax()
+    fiedler = v[:,1]
+    imin = fiedler.argmin()
+    imax = fiedler.argmax()
     vert = np.array(mesh.vertex())
-    min_max = vert[imin,:]-vert[imax,:]
-    dist = np.sqrt(np.sum(min_max * min_max, 0))
-    return(dist,fiedler)
+
+    if dist_type == 'geodesic':
+        print 'Computing GEODESIC distance between the max and min'
+        g = aims.GeodesicPath(mesh, 3, 0)
+        dist = g.shortestPath_1_1_len(int(imin), int(imax))
+
+    else:
+        print 'Computing EUCLIDIAN distance between the max and min'
+        min_max = vert[imin, :]-vert[imax, :]
+        dist = np.sqrt(np.sum(min_max * min_max, 0))
+    return(dist, fiedler)
 
 ####################################################################
 #
