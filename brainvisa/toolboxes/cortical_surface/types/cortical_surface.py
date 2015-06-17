@@ -99,10 +99,6 @@ FileType( 'Coordinate grid', 'Mesh' )
 FileType( 'Left hemisphere coordinate grid', 'Coordinate grid')
 FileType( 'Right hemisphere coordinate grid', 'Coordinate grid')
 
-FileType( 'Spherical mesh', 'Mesh' )
-FileType( 'Left spherical mesh', 'Spherical mesh')
-FileType( 'Right spherical mesh', 'Spherical mesh')
-
 FileType( 'Remeshed mesh', 'Mesh' )
 FileType( 'Left remeshed mesh', 'Remeshed mesh')
 FileType( 'Right remeshed mesh', 'Remeshed mesh')
