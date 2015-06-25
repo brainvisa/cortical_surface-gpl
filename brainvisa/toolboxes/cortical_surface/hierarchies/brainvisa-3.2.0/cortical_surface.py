@@ -73,16 +73,12 @@ insert( '{center}/{subject}',
 #    ## Parcels from HIP-HOP parameterization
     '<subject>_Lwhite_parcels_model', SetType( 'Left hemisphere model parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'parcellation_type', 'model' ), SetWeakAttr( 'regularized', 'false' ),
     '<subject>_Rwhite_parcels_model', SetType( 'Right hemisphere model parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'parcellation_type', 'model' ), SetWeakAttr( 'regularized', 'false' ),
-    '<subject>_Lwhite_parcels_coarse', SetType( 'Left hemisphere coarse parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'parcellation_type', 'coarse' ), SetWeakAttr( 'regularized', 'false' ),
-    '<subject>_Rwhite_parcels_coarse', SetType( 'Right hemisphere coarse parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'parcellation_type', 'coarse' ), SetWeakAttr( 'regularized', 'false' ),
     '<subject>_Lwhite_parcels_marsAtlas', SetType( 'Left hemisphere marsAtlas parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'parcellation_type', 'marsAtlas' ), SetWeakAttr( 'regularized', 'false' ),
     '<subject>_Rwhite_parcels_marsAtlas', SetType( 'Right hemisphere marsAtlas parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'parcellation_type', 'marsAtlas' ), SetWeakAttr( 'regularized', 'false' ),
 #
 ## may be used to replace gyri regularized parcellation texture
 ##    '<subject>_Lwhite_model_parcels_regul', SetType( 'Left hemisphere regularized model parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'model' ),
 ##    '<subject>_Rwhite_model_parcels_regul', SetType( 'Right hemisphere regularized model parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'model' ),
-##    '<subject>_Lwhite_coarse_parcels_regul', SetType( 'Left hemisphere regularized coarse parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'coarse' ),
-##    '<subject>_Rwhite_coarse_parcels_regul', SetType( 'Right hemisphere regularized coarse parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'coarse' ),
 #
 #    '<subject>_L_model_parcelsVolume', SetType( 'Left model parcellation volume' ), SetWeakAttr( 'side', 'left' ),
 #    '<subject>_R_model_parcelsVolume', SetType( 'Right model parcellation volume' ), SetWeakAttr( 'side', 'right' ),

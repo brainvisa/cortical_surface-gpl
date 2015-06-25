@@ -921,13 +921,13 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
     
-    if parcellation_type == 'coarse' or parcellation_type == 'marsAtlas':
+    if parcellation_type == 'marsAtlas':
         # add suplementary axes to the model <=> subdivise parcels
         # antero-posterior subdivision of the prefrontal lobe
         sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
         # antero-posterior subdivision of the temporal lobe
         sort_axes_lon.append(sort_axes_lon[5] + 3 * (sort_axes_lon[6] - sort_axes_lon[5]) / 4)
-#        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcell_width)
+#        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcel_width)
         sort_axes_lon.sort()
 
 #    sort_axes_lat.append(180)
@@ -943,34 +943,9 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
 #            print 'lab_parcel', lab_parcel
             lab_parcel = lab_parcel+1
 
-    if parcellation_type == 'coarse':
-        # INSULA sup ant
-        tex_parcels[tex_parcels == 16] = 9
-        tex_parcels[tex_parcels == 23] = 9
-        tex_parcels[tex_parcels == 30] = 9
-        # INSULA sup post
-        tex_parcels[tex_parcels == 65] = 2
-        tex_parcels[tex_parcels == 72] = 2
-        # INSULA inf
-        tex_parcels[tex_parcels == 51] = 44
-        tex_parcels[tex_parcels == 58] = 44
-        # arround the path between the poles
-        tex_parcels[tex_parcels == 38] = 37
-        tex_parcels[tex_parcels == 39] = 37
-        tex_parcels[tex_parcels == 40] = 37
-        tex_parcels[tex_parcels == 41] = 37
-        tex_parcels[tex_parcels == 42] = 37
-        tex_parcels[tex_parcels == 43] = 37
-        # temporal anterior
-    #     tex_parcels[tex_parcels ==45] = 44
-    #     tex_parcels[tex_parcels ==46] = 44
-    #     tex_parcels[tex_parcels ==47] = 44
-    #     tex_parcels[tex_parcels ==48] = 44 
-
-    elif parcellation_type == 'model':
-
-    #     # concatenate some parcels
-    #     # INSULA
+    if parcellation_type == 'model':
+        # parcels merging
+        # INSULA
         tex_parcels[tex_parcels == 9] = 2
         tex_parcels[tex_parcels == 16] = 2
         tex_parcels[tex_parcels == 23] = 2
@@ -985,79 +960,181 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 34] = 30
         tex_parcels[tex_parcels == 35] = 30
         tex_parcels[tex_parcels == 36] = 30
+        # cingular pole
+        tex_parcels[tex_parcels == 0] = 1
+
+        (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
 
     elif parcellation_type == 'marsAtlas':
-        print 'marsAtlas'
-        # same as 'coarse'
+        # parcels merging, parcel names correspond to the nomenclature given in the paper
         # INSULA sup ant
-        tex_parcels[tex_parcels == 16] = 9
-        tex_parcels[tex_parcels == 23] = 9
-        tex_parcels[tex_parcels == 30] = 9
+        # tex_parcels[tex_parcels == 16] = 9
+        # tex_parcels[tex_parcels == 23] = 9
+        # tex_parcels[tex_parcels == 30] = 9
         # INSULA sup post
-        tex_parcels[tex_parcels == 65] = 2
-        tex_parcels[tex_parcels == 72] = 2
+        # tex_parcels[tex_parcels == 65] = 2
+        # tex_parcels[tex_parcels == 72] = 2
         # INSULA inf
-        tex_parcels[tex_parcels == 51] = 44
-        tex_parcels[tex_parcels == 58] = 44
-        # arround the path between the poles
-        tex_parcels[tex_parcels == 38] = 37
-        tex_parcels[tex_parcels == 39] = 37
-        tex_parcels[tex_parcels == 40] = 37
-        tex_parcels[tex_parcels == 41] = 37
-        tex_parcels[tex_parcels == 42] = 37
-        tex_parcels[tex_parcels == 43] = 37
-
-        # additional parcels merging compared to 'coarse', parcel names correspond to the nomenclature given in the paper
-        # path between poles = cingular pole
-        tex_parcels[tex_parcels == 37] = 1  # 1] = 67
-        # ITCm
-        tex_parcels[tex_parcels == 48] = 49  # 77] = 79
-        # VCs
-        tex_parcels[tex_parcels == 60] = 61  # 97] = 99
-        # Cu
-        tex_parcels[tex_parcels == 62] = 63  # 101] = 103
-        # ICC
-        tex_parcels[tex_parcels == 57] = 64  # 81] = 105
-        tex_parcels[tex_parcels == 50] = 64  # 93] = 105
-        # PCC
-        tex_parcels[tex_parcels == 71] = 78  # 117] = 129
-        # MCC
-        tex_parcels[tex_parcels == 15] = 22  # 15] = 41
-        tex_parcels[tex_parcels == 8] = 22  # 29] = 41
-        # IPCv
-        tex_parcels[tex_parcels == 59] = 66  # 95] = 107
-        # Sdl
-        tex_parcels[tex_parcels == 74] = 75  # 121] = 123
-        # Sdm
-        tex_parcels[tex_parcels == 76] = 77  # 125] = 127
-        # PFC vm
-        tex_parcels[tex_parcels == 34] = 35  # 61] = 63
-        # Mdl
-        tex_parcels[tex_parcels == 4] = 5  # 7] = 9
-        # Mdm
-        tex_parcels[tex_parcels == 6] = 7  # 11] = 13
-        # PMrV
-        tex_parcels[tex_parcels == 10] = 17  # 19] = 31
-        # PMdl
-        tex_parcels[tex_parcels == 11] = 12  # 21] = 23
-        # PMdm
-        tex_parcels[tex_parcels == 13] = 14  # 25] = 27
-        # PFcdl
-        tex_parcels[tex_parcels == 18] = 19  # 33] = 35
-        # PFcdm
-        tex_parcels[tex_parcels == 20] = 21  # 37] = 39
-        # ACC
-        tex_parcels[tex_parcels == 29] = 36  # 53] = 65
+        # tex_parcels[tex_parcels == 51] = 44
+        # tex_parcels[tex_parcels == 58] = 44
         # INSULA
-        tex_parcels[tex_parcels == 2] = 44  # 3] = 69
-        tex_parcels[tex_parcels == 9] = 44  # 17] = 69
+        # tex_parcels[tex_parcels == 2] = 44  # 3] = 69
+        # tex_parcels[tex_parcels == 9] = 44  # 17] = 69
+
+        tex_parcels_tmp = tex_parcels.copy()
+        # INSULA
+        tex_parcels_tmp[tex_parcels == 9] = 44
+        tex_parcels_tmp[tex_parcels == 2] = 44
+        tex_parcels_tmp[tex_parcels == 16] = 44
+        tex_parcels_tmp[tex_parcels == 23] = 44
+        tex_parcels_tmp[tex_parcels == 30] = 44
+        tex_parcels_tmp[tex_parcels == 65] = 44
+        tex_parcels_tmp[tex_parcels == 72] = 44
+        tex_parcels_tmp[tex_parcels == 51] = 44
+        tex_parcels_tmp[tex_parcels == 58] = 44
+        # arround the path between the poles
+        tex_parcels_tmp[tex_parcels == 38] = 37
+        tex_parcels_tmp[tex_parcels == 39] = 37
+        tex_parcels_tmp[tex_parcels == 40] = 37
+        tex_parcels_tmp[tex_parcels == 41] = 37
+        tex_parcels_tmp[tex_parcels == 42] = 37
+        tex_parcels_tmp[tex_parcels == 43] = 37
+        # ITCm
+        tex_parcels_tmp[tex_parcels == 48] = 49  # 77] = 79
+        # VCs
+        tex_parcels_tmp[tex_parcels == 60] = 61  # 97] = 99
+        # Cu
+        tex_parcels_tmp[tex_parcels == 62] = 63  # 101] = 103
+        # ICC
+        tex_parcels_tmp[tex_parcels == 57] = 64  # 81] = 105
+        tex_parcels_tmp[tex_parcels == 50] = 64  # 93] = 105
+        # PCC
+        tex_parcels_tmp[tex_parcels == 71] = 78  # 117] = 129
+        # MCC
+        tex_parcels_tmp[tex_parcels == 15] = 22  # 15] = 41
+        tex_parcels_tmp[tex_parcels == 8] = 22  # 29] = 41
+        # IPCv
+        tex_parcels_tmp[tex_parcels == 59] = 66  # 95] = 107
+        # Sdl
+        tex_parcels_tmp[tex_parcels == 74] = 75  # 121] = 123
+        # Sdm
+        tex_parcels_tmp[tex_parcels == 76] = 77  # 125] = 127
+        # PFC vm
+        tex_parcels_tmp[tex_parcels == 34] = 35  # 61] = 63
+        # Mdl
+        tex_parcels_tmp[tex_parcels == 4] = 5  # 7] = 9
+        # Mdm
+        tex_parcels_tmp[tex_parcels == 6] = 7  # 11] = 13
+        # PMrV
+        tex_parcels_tmp[tex_parcels == 10] = 17  # 19] = 31
+        # PMdl
+        tex_parcels_tmp[tex_parcels == 11] = 12  # 21] = 23
+        # PMdm
+        tex_parcels_tmp[tex_parcels == 13] = 14  # 25] = 27
+        # PFcdl
+        tex_parcels_tmp[tex_parcels == 18] = 19  # 33] = 35
+        # PFcdm
+        tex_parcels_tmp[tex_parcels == 20] = 21  # 37] = 39
+        # ACC
+        tex_parcels_tmp[tex_parcels == 29] = 36  # 53] = 65
+
+        tex_parcels = np.zeros(tex_parcels_tmp.shape)
+        # cingular pole = 0
+        # tex_parcels_tmp[tex_parcels == 0] = 1
+        # path between poles = cingular pole
+        tex_parcels[tex_parcels_tmp == 37] =  255
+
+        # reorganization of the labels to match the nomenclature of the paper
+        #	VCcm
+        tex_parcels[tex_parcels_tmp == 55] = 1
+        #	VCl
+        tex_parcels[tex_parcels_tmp == 54] = 2
+        # VCs
+        tex_parcels[tex_parcels_tmp == 61] = 3
+        # Cu
+        tex_parcels[tex_parcels_tmp == 63] = 4
+        #	VCrm
+        tex_parcels[tex_parcels_tmp == 56] = 5
+        # ITCm
+        tex_parcels[tex_parcels_tmp == 49] = 6
+        #	ITCr
+        tex_parcels[tex_parcels_tmp == 47] = 7
+        #	MTCc
+        tex_parcels[tex_parcels_tmp == 53] = 8
+        #	STCc
+        tex_parcels[tex_parcels_tmp == 52] = 9
+        #	STCr
+        tex_parcels[tex_parcels_tmp == 45] = 10
+        #	MTCr
+        tex_parcels[tex_parcels_tmp == 46] = 11
+        # ICC
+        tex_parcels[tex_parcels_tmp == 64] = 12
+        # IPCv
+        tex_parcels[tex_parcels_tmp == 66] = 13
+        #	IPCd
+        tex_parcels[tex_parcels_tmp == 67] = 14
+        #	SPC
+        tex_parcels[tex_parcels_tmp == 68] = 15
+        #	SPCm
+        tex_parcels[tex_parcels_tmp == 69] = 16
+        #	PCm
+        tex_parcels[tex_parcels_tmp == 70] = 17
+        # PCC
+        tex_parcels[tex_parcels_tmp == 78] = 18
+        #	Sv
+        tex_parcels[tex_parcels_tmp == 73] = 19
+        # Sdl
+        tex_parcels[tex_parcels_tmp == 75] = 20
+        # Sdm
+        tex_parcels[tex_parcels_tmp == 77] = 21
+        #	Mv
+        tex_parcels[tex_parcels_tmp == 3] = 22
+        # Mdl
+        tex_parcels[tex_parcels_tmp == 5] = 23
+        # Mdm
+        tex_parcels[tex_parcels_tmp == 7] = 24
+        # PMrV
+        tex_parcels[tex_parcels_tmp == 17] = 25
+        # PMdl
+        tex_parcels[tex_parcels_tmp == 12] = 26
+        # PMdm
+        tex_parcels[tex_parcels_tmp == 14] = 27
+        # PFcdl
+        tex_parcels[tex_parcels_tmp == 19] = 28
+        # PFcdm
+        tex_parcels[tex_parcels_tmp == 21] = 29
+        # MCC
+        tex_parcels[tex_parcels_tmp == 22] = 30
+        #PFrvl
+        tex_parcels[tex_parcels_tmp == 24] = 31
+        #	Pfrdli
+        tex_parcels[tex_parcels_tmp == 25] = 32
+        #	Pfrdls
+        tex_parcels[tex_parcels_tmp == 26] = 33
+        #	PFrd
+        tex_parcels[tex_parcels_tmp == 27] = 34
+        #	PFrm
+        tex_parcels[tex_parcels_tmp == 28] = 35
+        #	OFCvl
+        tex_parcels[tex_parcels_tmp == 31] = 36
+        #	OFCv
+        tex_parcels[tex_parcels_tmp == 32] = 37
+        #	OFCvm
+        tex_parcels[tex_parcels_tmp == 33] = 38
+        # PFC vm
+        tex_parcels[tex_parcels_tmp == 35] = 39
+        # ACC
+        tex_parcels[tex_parcels_tmp == 36] = 40
+        # insula
+        tex_parcels[tex_parcels_tmp == 44] = 41
+
+        nb_parcels = np.unique(tex_parcels).shape[0]
 
 
 
     elif parcellation_type == 'model_foetus':
-        #print 'modif'
-    #     # concatenate some parcels
-    #     # INSULA
+        # concatenate some parcels
+        # INSULA
         tex_parcels[tex_parcels == 7] = 2
         tex_parcels[tex_parcels == 12] = 2
         tex_parcels[tex_parcels == 17] = 2
@@ -1091,22 +1168,27 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 41] = 6
         # precuneus
         tex_parcels[tex_parcels == 31] = 36
+        # cingular pole
+        tex_parcels[tex_parcels == 0] = 1
 
-        
-    # cingular pole
-    tex_parcels[tex_parcels == 0] = 1
-    
-    
+        (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+
+    return (tex_parcels, nb_parcels)
+
+
+####################################################################
+#
+# reorganization of the labels in parcels texture in order to have values that follows each other (1 to nb_parcels)
+#
+####################################################################
+def reorganize_parcels(tex_parcels):
     uparcells = np.unique(tex_parcels)
-##    
     tex_parcels_tmp = tex_parcels.copy()
-    reord_parc = 1
-    for u_parc in uparcells:
-        tex_parcels[tex_parcels_tmp == u_parc] = reord_parc
-        reord_parc = reord_parc+2
-
-
+    for ind,u_parc in enumerate(uparcells): # note that ind>=1
+        tex_parcels[tex_parcels_tmp == u_parc] = ind
     return (tex_parcels, uparcells.shape[0])
+
+
 
 
 ####################################################################
