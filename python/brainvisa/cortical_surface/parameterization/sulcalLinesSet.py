@@ -157,7 +157,7 @@ class SulcalLinesSet(object):
             #outn_tmp.append(sl_mesh.normals())
 #             out_mesh.vertex(sl_ind).assign(sl_mesh.vertex())
 #             out_mesh.polygon(sl_ind).assign(sl_mesh.polygon())
-        out_mesh = aims.AimsTimeSurface_2()
+        out_mesh = aims.AimsTimeSurface_2_VOID()
         vv = aims.vector_POINT3DF()
         vp = aims.vector_AimsVector_U32_2()
         for x in np.vstack(outv_tmp):

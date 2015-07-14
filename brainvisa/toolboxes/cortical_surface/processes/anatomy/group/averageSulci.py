@@ -139,7 +139,7 @@ def execution ( self, context ):
      context.write("Calling PCA")
      meanS, valS, vectS=pcaSulci(v)
      context.write("PCA done, reconstructing vectors and saving")
-     #m = aims.AimsTimeSurface_3()
+     #m = aims.AimsTimeSurface_3_VOID()
      #vertM=vector2vertices(meanS)
      #m.vertex(0).assign(vertM)
      #m.polygon(0).assign(sulcus[0].polygon(0))
@@ -177,7 +177,7 @@ def execution ( self, context ):
      imax=i;
      vmax=vectS[imax]
      vertMax=vector2vertices(vmax)
-     modeS=aims.AimsTimeSurface_3()
+     modeS=aims.AimsTimeSurface_3_VOID()
      context.write("Computing variations")
 
      for k in xrange(imax) :

@@ -84,7 +84,7 @@ def sphereConformalMapping(mesh):
     for i in range(Nv):
         vv.append([x[i], y[i], z[i]])
 
-    disk = aims.AimsTimeSurface_3()
+    disk = aims.AimsTimeSurface_3_VOID()
     disk.vertex().assign(vv)
     disk.polygon().assign(mesh.polygon())
     disk.updateNormals()
@@ -139,7 +139,7 @@ def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
     for i in range(Nv):
         vv.append([x[i], y[i], z[i]])
 
-    disk = aims.AimsTimeSurface_3()
+    disk = aims.AimsTimeSurface_3_VOID()
     disk.vertex().assign(vv)
     disk.polygon().assign(mesh.polygon())
     disk.updateNormals()
@@ -298,7 +298,7 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
     for i in range(Nbv):
         vv.append([x[i], y[i], z[i]])
 
-    rect = aims.AimsTimeSurface_3()
+    rect = aims.AimsTimeSurface_3_VOID()
     rect.vertex().assign(vv)
     rect.polygon().assign(mesh.polygon())
     rect.updateNormals()
@@ -443,7 +443,7 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     for i in range(Nbv):
         vv.append([x[i], y[i], z[i]])
 
-    rect = aims.AimsTimeSurface_3()
+    rect = aims.AimsTimeSurface_3_VOID()
     rect.vertex().assign(vv)
     rect.polygon().assign(mesh.polygon())
     rect.updateNormals()
@@ -644,7 +644,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     for i in range(vert.shape[0]):
         vv.append([vert[i, 0], vert[i, 1], vert[i, 2]])
 
-    neoCortex_open_mesh = aims.AimsTimeSurface_3()
+    neoCortex_open_mesh = aims.AimsTimeSurface_3_VOID()
     neoCortex_open_mesh.vertex().assign(vv)
     neoCortex_open_mesh.polygon().assign(pp)
     neoCortex_open_mesh.updateNormals()

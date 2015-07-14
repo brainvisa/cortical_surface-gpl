@@ -172,7 +172,7 @@ class Model(object):
     def toMesh(self, z_coord=None):
         if z_coord is None:
             z_coord = 0
-        out_mesh = aims.AimsTimeSurface_2()
+        out_mesh = aims.AimsTimeSurface_2_VOID()
         verts = aims.vector_POINT3DF()
         poly = aims.vector_AimsVector_U32_2()
         #-------- boundaries

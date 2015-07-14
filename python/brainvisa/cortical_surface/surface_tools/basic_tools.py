@@ -487,7 +487,7 @@ def edges2SimpleBoundary(li, lj):
 
 def meshBoundaryMesh(mesh, boundary):
     vert = np.array(mesh.vertex())
-    bound_mesh = aims.AimsTimeSurface_2()
+    bound_mesh = aims.AimsTimeSurface_2_VOID()
 
     for bound_ind in range(len(boundary)):
         vv = aims.vector_POINT3DF()
@@ -632,7 +632,7 @@ def subCutMesh(mesh, atex, val):
         (uni, inds) = np.unique1d(poly_set, False, True)
     else:
         (uni, inds) = np.unique(poly_set, False, True)        
-    submesh = aims.AimsTimeSurface_3()
+    submesh = aims.AimsTimeSurface_3_VOID()
     vv = aims.vector_POINT3DF()
     for i in vert[uni, :]:
         vv.append(i)
@@ -682,7 +682,7 @@ def meshIsoLine(mesh, tex, val):
      sign=np.zeros(values.size)
      sign[where(values < val)[0]]=10
      sign[where(values >= val)[0]]=20
-     line=aims.AimsTimeSurface_2()
+     line=aims.AimsTimeSurface_2_VOID()
      isoV=aims.vector_POINT3DF()
      isoP=aims.vector_AimsVector_U32_2()
      

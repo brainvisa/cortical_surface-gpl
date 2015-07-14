@@ -64,7 +64,7 @@ def execution( self, context ):
             else:
                 raise Exception('mesh # '+str(ind_mesh)+' do not have the good number of vertices')
     avg_verts = avg_verts / nb_mesh
-    avg_mesh = aims.AimsTimeSurface_3()
+    avg_mesh = aims.AimsTimeSurface_3_VOID()
     avg_mesh.vertex().assign([ aims.Point3df(x) for x in avg_verts ])
 #     if self.side == 'right':
 #         poly = np.array(mesh.polygon())

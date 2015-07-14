@@ -157,7 +157,7 @@ class SulcalLine(object):
             return self.__init__(label, np.array(tex_val_indices, np.uint32), verts[tex_val_indices, :], np.array(segm, np.uint32), sulc_labels_dict)
             
     def toMesh(self):
-        out_mesh = aims.AimsTimeSurface_2()
+        out_mesh = aims.AimsTimeSurface_2_VOID()
         verts = aims.vector_POINT3DF()
         poly = aims.vector_AimsVector_U32_2()
         for v in self.vertices:

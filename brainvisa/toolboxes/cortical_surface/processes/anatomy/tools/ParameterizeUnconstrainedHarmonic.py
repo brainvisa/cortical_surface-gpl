@@ -176,7 +176,7 @@ def execution( self, context ):
         neoCortex_square.updateNormals()
     ws.write( neoCortex_square, self.rectangular_mesh.fullPath() )
     ws.write(output_SL_tex, self.rectangular_white_sulcalines.fullPath())
-    mesh_parts = aims.AimsTimeSurface_3()
+    mesh_parts = aims.AimsTimeSurface_3_VOID()
     '''
     mesh_parts[0] = neoCortex
     mesh_parts[1] = insula

@@ -153,7 +153,7 @@ def meshSmoothing(mesh, Niter, dt):
     for i in range(N):
         vv.append([Mvert[i, 0], Mvert[i, 1], Mvert[i, 2]])
 
-    smooth = aims.AimsTimeSurface_3()
+    smooth = aims.AimsTimeSurface_3_VOID()
     smooth.vertex().assign(vv)
     smooth.polygon().assign(mesh.polygon())
     smooth.updateNormals()

@@ -76,7 +76,7 @@ def execution( self, context ):
 #     for i in range(spherical_verts.shape[0]):
 #         vv.append([spherical_verts[i, 0], spherical_verts[i, 1], spherical_verts[i, 2]])
     mesh = re.read(self.white_mesh.fullPath())
-    new_mesh = aims.AimsTimeSurface_3()
+    new_mesh = aims.AimsTimeSurface_3_VOID()
     new_mesh.vertex().assign(vv)
     new_mesh.polygon().assign(mesh.polygon())
     if self.side == 'right':

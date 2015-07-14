@@ -188,7 +188,7 @@ def sphereConformalMapping( mesh, lap, ps, pn, radius ):
           no=sqrt(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])
           vv.append([x[i]/no, y[i]/no, z[i]/no])
 
-     sphere=aims.AimsTimeSurface_3()
+     sphere=aims.AimsTimeSurface_3_VOID()
      sphere.vertex().assign(vv)
      sphere.polygon().assign(mesh.polygon())
      sphere.updateNormals()
@@ -209,7 +209,7 @@ def meshIsoLine(mesh, tex, val):
      sign=zeros(values.size)
      sign[where(values < val)[0]]=10
      sign[where(values >= val)[0]]=20
-     line=aims.AimsTimeSurface_2()
+     line=aims.AimsTimeSurface_2_VOID()
      isoV=aims.vector_POINT3DF()
      isoP=aims.vector_AimsVector_U32_2()
      

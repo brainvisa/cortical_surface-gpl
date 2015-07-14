@@ -97,11 +97,11 @@ def execution( self, context ):
     mesh_parts[1] = insula
     mesh_parts[2] = cingular pole
     '''
-    insula_mesh = aims.AimsTimeSurface_3()
+    insula_mesh = aims.AimsTimeSurface_3_VOID()
     insula_mesh.vertex().assign( mesh_parts.vertex(1) )
     insula_mesh.normal().assign( mesh_parts.normal(1) )
     insula_mesh.polygon().assign( mesh_parts.polygon(1) )
-    cingular_mesh = aims.AimsTimeSurface_3()
+    cingular_mesh = aims.AimsTimeSurface_3_VOID()
     cingular_mesh.vertex().assign( mesh_parts.vertex(2) )
     cingular_mesh.normal().assign( mesh_parts.normal(2) )
     cingular_mesh.polygon().assign( mesh_parts.polygon(2) )
@@ -152,7 +152,7 @@ def execution( self, context ):
     insula_bound_rad = np.pi * (insula_lon[insula_boundary] - 180) / 180 
     circle = np.array([np.cos(insula_bound_rad), np.sin(insula_bound_rad)])
 #     context.write(circle)
-    bound_mesh = aims.AimsTimeSurface_2() 
+    bound_mesh = aims.AimsTimeSurface_2_VOID()
     vv = aims.vector_POINT3DF()
     ee = aims.vector_AimsVector_U32_2()
     for i in range(len(circle)):
