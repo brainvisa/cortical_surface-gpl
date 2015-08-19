@@ -1278,24 +1278,20 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     neocortex_tex_value = 0
     insula_tex_value = 180
     cingular_tex_value = 1
-    write_all_steps_to_disk = 0
-    cingular_inds = np.where(cingular_tex_clean == cingular_tex_value)[0]
-    insular_inds = np.where(insula_tex_clean == insula_tex_value)[0]
+    #write_all_steps_to_disk = 0
+    cingular_inds_in = np.where(cingular_tex_clean == cingular_tex_value)[0]
+    insula_inds_in = np.where(insula_tex_clean == insula_tex_value)[0]
     # test that there is no intersection between the two poles
-    inter = set(cingular_inds).intersection(insular_inds)
+    inter = set(cingular_inds_in).intersection(insula_inds_in)
     if inter:
-        print ('problem: the two poles are connected, cannot cut the mesh!!')
-        raise Exception('Cingular and Insular poles are connected ! You should rerun the insular pole extaction with a larger erosion parameter value.')
+        raise Exception('Cingular and Insular poles are connected ! You should run the poles textures sanity check')
         return
 
-    tex_poles_clean = np.zeros(cingular_tex_clean.size)
-    tex_poles_clean[cingular_inds] = cingular_tex_value
-    tex_poles_clean[insular_inds] = insula_tex_value
+    tex_poles_clean = np.zeros(mesh.vertex().size())
+    tex_poles_clean[cingular_inds_in] = cingular_tex_value
+    tex_poles_clean[insula_inds_in] = insula_tex_value
 
-    print 'max(cingular_tex_clean) : ', np.max(cingular_tex_clean)
-    print 'max(insula_tex_clean) : ', np.max(insula_tex_clean)
     neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
-    #    cingular_tex_clean, cing_tex_boundary = poleTextureClean(mesh, texture_poles, cingular_tex_value)    #    insula_tex_clean, ins_tex_boundary = poleTextureClean(mesh, texture_poles, insula_tex_value)
     print '------------------CutMesh'
     (sub_meshes, labels, sub_indexes) = basicTls.cutMesh(mesh, tex_poles_clean)
     print 'labels found in the texture ', labels
@@ -1345,7 +1341,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
     print '------------------path2Boundary'
     (neoCortex_open_mesh, neoCortex_open_boundary) = path2Boundary(neoCortex_mesh,neoCortex_boundary,neocortex_poles_path)
-    vert = np.array(neoCortex_open_mesh.vertex())
+    #vert = np.array(neoCortex_open_mesh.vertex())
     print '------------------rectConformalMapping'
     neoCortex_square = rectConformalMapping(neoCortex_open_mesh, neoCortex_open_boundary, length, width, 0)
     return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh)
