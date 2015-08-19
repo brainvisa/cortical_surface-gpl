@@ -78,13 +78,13 @@ def initialization( self ):
     eNode.addDoubleLink( 'InsularPole.graph', 'graph')
     eNode.addDoubleLink( 'InsularPole.sulcus_identification', 'sulcus_identification')
 
-    # eNode.PolesTexturesSanityCheck.removeLink('cingular_pole_texture_in', 'white_mesh')
-    # eNode.PolesTexturesSanityCheck.removeLink('insula_pole_texture_in', 'white_mesh')
+    eNode.PolesTexturesSanityCheck.removeLink('cingular_pole_texture_in', 'white_mesh')
+    eNode.PolesTexturesSanityCheck.removeLink('insula_pole_texture_in', 'white_mesh')
     # eNode.PolesTexturesSanityCheck.removeLink('cingular_pole_texture_out', 'white_mesh')
     # eNode.PolesTexturesSanityCheck.removeLink('insula_pole_texture_out', 'white_mesh')
     eNode.addDoubleLink( 'PolesTexturesSanityCheck.white_mesh', 'CingularPole.white_mesh' )
-    # eNode.addDoubleLink( 'PolesTexturesSanityCheck.cingular_pole_texture_in', 'CingularPole.white_mesh' )
-    # eNode.addDoubleLink( 'PolesTexturesSanityCheck.insula_pole_texture_in', 'CingularPole.white_mesh' )
+    eNode.addDoubleLink( 'PolesTexturesSanityCheck.cingular_pole_texture_in', 'CingularPole.pole' )
+    eNode.addDoubleLink( 'PolesTexturesSanityCheck.insula_pole_texture_in', 'InsularPole.pole' )
     # eNode.addDoubleLink( 'PolesTexturesSanityCheck.cingular_pole_texture_out', 'CingularPole.white_mesh' )
     # eNode.addDoubleLink( 'PolesTexturesSanityCheck.insula_pole_texture_out', 'CingularPole.white_mesh' )
 
@@ -102,8 +102,8 @@ def initialization( self ):
     eNode.ParameterizeUnconstrainedHarmonic.removeLink('sulcus_labels', 'white_mesh')
     eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.white_mesh', 'CingularPole.white_mesh' )
     eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.side', 'side' )
-    eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.cingular_pole_texture', 'CingularPole.pole' )
-    eNode.addDoubleLink(  'ParameterizeUnconstrainedHarmonic.insular_pole_texture', 'InsularPole.pole' )
+    eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.cingular_pole_texture', 'PolesTexturesSanityCheck.cingular_pole_texture_out' )
+    eNode.addDoubleLink(  'ParameterizeUnconstrainedHarmonic.insular_pole_texture', 'PolesTexturesSanityCheck.insula_pole_texture_out' )
     eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.white_sulcalines', 'SulcalinesExtraction.white_sulcalines')
     eNode.addDoubleLink( 'ParameterizeUnconstrainedHarmonic.sulcus_labels', 'SulcalinesExtraction.graph_label_basins')
 
