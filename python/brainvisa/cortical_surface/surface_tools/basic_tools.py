@@ -522,6 +522,38 @@ def meshBoundary(mesh):
     else:
         return edges2Boundary(li, lj)
 
+####################################################################
+#
+# compute indices that are the boundary of a region defined by value
+# in a texture, without any topological or ordering constraint
+#
+####################################################################
+def textureSimpleBoundary(mesh, atex, val, neigh=None):
+    tex_val_indices = np.where(atex == val)[0]
+    if not tex_val_indices.size:
+        print 'no value ' + str(val) + ' in the input texture!!'
+        return list()
+    else:
+        ####################################################################
+        # print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
+        ####################################################################
+        if neigh is None:
+            neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+
+        '''identify the vertices that are on the boundary,
+        i.e that have at least one neigbor that has not the same value in the texture '''
+        bound_verts = list()
+        for i in tex_val_indices:
+            ne_i = np.array(neigh[i].list())
+            #print ne_i.size
+            #print np.intersect1d_nu(ne_i, tex_val_indices).size
+            if np_ver < [ 1, 6 ]:
+                inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
+            else:
+                inters_size = np.intersect1d(ne_i, tex_val_indices).size
+            if (inters_size != ne_i.size):
+                bound_verts.append(i)
+        return bound_verts
 
 ####################################################################
 #
@@ -535,26 +567,7 @@ def textureBoundary(mesh, atex, val, neigh=None):
         print 'no value ' + str(val) + ' in the input texture!!'
         return list()
     else:
-        ####################################################################
-        # print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
-        ####################################################################
-        if neigh is None:
-            neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
-            
-        '''identify the vertices that are on the boundary,         
-        i.e that have at least one neigbor that has not the same value in the texture '''
-        bound_verts = list()
-        for i in tex_val_indices:
-            ne_i = np.array(neigh[i].list())
-            #print ne_i.size
-            #print np.intersect1d_nu(ne_i, tex_val_indices).size
-            if np_ver < [ 1, 6 ]:
-                inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
-            else:
-                inters_size = np.intersect1d(ne_i, tex_val_indices).size
-            if (inters_size != ne_i.size):
-                bound_verts.append(i)
-                
+        bound_verts =  textureSimpleBoundary(mesh, atex, val, neigh)
         ''' select the edges that are on the boundary in the polygons
         '''
         adja = meshAdjacencyMatrix(mesh)

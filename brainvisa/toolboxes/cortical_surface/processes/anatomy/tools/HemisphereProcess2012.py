@@ -52,6 +52,9 @@ def initialization( self ):
     eNode.addChild( 'InsularPole',
                     ProcessExecutionNode( 'InsularPoleProjection', optional = 1 ) )
 
+    eNode.addChild( 'PolesTexturesSanityCheck',
+                    ProcessExecutionNode( 'PolesTexturesSanityCheck', optional = 1 ) )
+
     eNode.addChild( 'SulcalinesExtraction',
                     ProcessExecutionNode( 'SulcalinesExtraction', optional = 1 ) )
 
@@ -74,6 +77,16 @@ def initialization( self ):
     eNode.addDoubleLink( 'InsularPole.side', 'side')
     eNode.addDoubleLink( 'InsularPole.graph', 'graph')
     eNode.addDoubleLink( 'InsularPole.sulcus_identification', 'sulcus_identification')
+
+    # eNode.PolesTexturesSanityCheck.removeLink('cingular_pole_texture_in', 'white_mesh')
+    # eNode.PolesTexturesSanityCheck.removeLink('insula_pole_texture_in', 'white_mesh')
+    # eNode.PolesTexturesSanityCheck.removeLink('cingular_pole_texture_out', 'white_mesh')
+    # eNode.PolesTexturesSanityCheck.removeLink('insula_pole_texture_out', 'white_mesh')
+    eNode.addDoubleLink( 'PolesTexturesSanityCheck.white_mesh', 'CingularPole.white_mesh' )
+    # eNode.addDoubleLink( 'PolesTexturesSanityCheck.cingular_pole_texture_in', 'CingularPole.white_mesh' )
+    # eNode.addDoubleLink( 'PolesTexturesSanityCheck.insula_pole_texture_in', 'CingularPole.white_mesh' )
+    # eNode.addDoubleLink( 'PolesTexturesSanityCheck.cingular_pole_texture_out', 'CingularPole.white_mesh' )
+    # eNode.addDoubleLink( 'PolesTexturesSanityCheck.insula_pole_texture_out', 'CingularPole.white_mesh' )
 
     eNode.SulcalinesExtraction.removeLink( 'white_mesh', 'graph' )
     eNode.SulcalinesExtraction.removeLink( 'mri', 'white_mesh' )

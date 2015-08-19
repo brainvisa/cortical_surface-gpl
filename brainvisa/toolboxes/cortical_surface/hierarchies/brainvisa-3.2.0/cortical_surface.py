@@ -1,8 +1,8 @@
 include( 'base' )
 include( 'sulci' )
 
-insert( '{center}/{subject}',
-  'surface', SetContent(
+insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
+  'surface_analysis', SetContent(
     ## que mettre dans les niveaux aquisition et analysis?
 
     ## sulcal pits
@@ -98,8 +98,7 @@ insert( '{center}/{subject}',
 )
 
 
-insert( '{center}/{subject}/surface',
-
+insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh/surface_analysis', 
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface    
     '<subject>_L_gyriGraph', SetType( 'Left Gyri Graph' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_R_gyriGraph', SetType( 'Right Gyri Graph' ), SetWeakAttr( 'side', 'right' ),
@@ -138,7 +137,7 @@ insert( '{center}/{subject}/surface',
 
 # Cortical Surface Functional-related Types
 
-insert( '{center}/{subject}/surface',
+insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh/surface_analysis',
   'functional', SetDefaultAttributeValue( 'contrast', 'con' ), SetDefaultAttributeValue( 'volume', 'vol' ), SetContent(
       '<subject>_Anatomy_To_Mean_Function_Transformation', SetType( 'Anatomy To Mean Functional Volume Transformation' ),
       '<subject>_Mean_Function_To_Anatomy_Transformation', SetType( 'Mean Functional Volume To Anatomy Transformation' ),
