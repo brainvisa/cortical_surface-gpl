@@ -40,7 +40,7 @@ userLevel = 2
 # Argument declaration
 signature = Signature(
     'input_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'Aims mesh formats' ),
-    'mask_texture',ReadDiskItem( 'Hippocampus pole texture','Aims Texture formats' ),
+    'mask_texture',ReadDiskItem( 'Cingular pole texture','Aims Texture formats' ),
     'DPF_alpha', Float(),
     'thresh_ridge', Float(),
     'thresh_dist', Float(),

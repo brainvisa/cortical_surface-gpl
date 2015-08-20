@@ -45,7 +45,7 @@ signature = Signature(
     'Side', Choice("Right"),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'right_pole_template',ReadDiskItem( 'Right Cingular Pole Template Subject' , 'Aims readable volume formats' ),
-    'right_pole',WriteDiskItem( 'Right hippocampus pole texture','Texture',requiredAttributes={ 'side': 'right' } )
+    'right_pole',WriteDiskItem( 'Right cingular pole texture','Texture',requiredAttributes={ 'side': 'right' } )
 )
 
 def initialization( self ):

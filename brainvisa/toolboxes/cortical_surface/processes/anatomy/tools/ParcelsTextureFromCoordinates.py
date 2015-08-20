@@ -49,8 +49,8 @@ signature = Signature(
     'longitude',ReadDiskItem( 'Longitude coordinate texture', 'aims Texture formats' ),
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
 #=    'parcellation_resolution', Choice('model', 'coarse'),
-    'texture_model_parcels', WriteDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'model', 'regularized': 'false' }),
-    'texture_marsAtlas_parcels', WriteDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'marsAtlas', 'regularized': 'false' }),
+    'texture_model_parcels', WriteDiskItem('hemisphere model parcellation texture', 'aims Texture formats', requiredAttributes={'regularized': 'false' }),
+    'texture_marsAtlas_parcels', WriteDiskItem('hemisphere marsAtlas parcellation texture', 'aims Texture formats', requiredAttributes={'regularized': 'false' }),
 )
 
 def initialization( self ):

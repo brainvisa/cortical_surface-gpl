@@ -55,7 +55,7 @@ signature = Signature(
     'dilation_1', Integer(),
     'erosion', Integer(),
     'dilation_2', Integer(),
-    'pole',WriteDiskItem( 'Hippocampus pole texture', 'aims Texture formats' )
+    'pole',WriteDiskItem( 'Cingular pole texture', 'aims Texture formats' )
 )
 
 def initialization( self ):

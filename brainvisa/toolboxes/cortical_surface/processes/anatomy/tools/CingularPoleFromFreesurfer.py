@@ -37,7 +37,7 @@ signature = Signature(
 #    'side', Choice( ( 'left', 'lh' ), ( 'right', 'rh' ), None ),
     'database', ReadDiskItem( 'Directory', 'Directory' ),
     'subject', String(),
-    'pole',WriteDiskItem( 'Hippocampus pole texture','Aims Texture formats' ),
+    'pole',WriteDiskItem( 'Cingular pole texture','Aims Texture formats' ),
     )
 
 def initialization(self):

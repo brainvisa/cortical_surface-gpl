@@ -42,7 +42,7 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-  'texture_marsAtlas_parcels', ReadDiskItem('hemisphere parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'marsAtlas', 'regularized': 'false' }),
+  'texture_marsAtlas_parcels', ReadDiskItem('hemisphere marsAtlas parcellation texture', 'aims Texture formats', requiredAttributes={ 'regularized': 'false' }),
   'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
 )
 

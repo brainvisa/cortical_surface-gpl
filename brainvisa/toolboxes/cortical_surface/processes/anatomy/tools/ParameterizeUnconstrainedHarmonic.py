@@ -52,7 +52,7 @@ signature = Signature(
 
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
     'side', Choice('left', 'right'),
-    'cingular_pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'aims Texture formats'),
+    'cingular_pole_texture',ReadDiskItem( 'Cingular pole texture', 'aims Texture formats'),
     'insular_pole_texture',ReadDiskItem( 'Insula pole texture', 'aims Texture formats'),
     'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'aims Texture formats' ),
     'sulcus_labels',ReadDiskItem( 'Graph Label Translation', 'Text File'),

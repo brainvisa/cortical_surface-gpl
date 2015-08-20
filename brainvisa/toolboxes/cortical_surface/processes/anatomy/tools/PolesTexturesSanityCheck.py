@@ -49,10 +49,10 @@ signature = Signature(
 
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
     'side', Choice('left', 'right'),
-    'cingular_pole_texture_in',ReadDiskItem( 'Hippocampus pole texture', 'aims Texture formats'),
+    'cingular_pole_texture_in',ReadDiskItem( 'Cingular pole texture', 'aims Texture formats'),
     'insula_pole_texture_in',ReadDiskItem( 'Insula pole texture', 'aims Texture formats'),
     'dilation_size', Integer(),
-    'cingular_pole_texture_out',WriteDiskItem( 'Hippocampus pole texture', 'aims Texture formats'),
+    'cingular_pole_texture_out',WriteDiskItem( 'Cingular pole texture', 'aims Texture formats'),
     'insula_pole_texture_out',WriteDiskItem( 'Insula pole texture', 'aims Texture formats')
 )
 
@@ -81,6 +81,7 @@ def execution( self, context ):
     insula_inds_in = np.where(ainsula_tex_clean_in >0 )[0]
     # test if there is an intersection between the two poles
     inter = list(set(cingular_inds_in).intersection(insula_inds_in))
+    ##prendre les voisins
     if inter:
         context.write('Cingular and Insula poles are connected by '+str(len(inter))+' vertices')
         context.write('dilation of the intersection')
@@ -94,7 +95,7 @@ def execution( self, context ):
         inds_inter = np.where(inter_tex >0 )[0]
         acingular_tex_clean_in[inds_inter] = 0
         ainsula_tex_clean_in[inds_inter] = 0
-
+        ##correction topologique
         tex_out = aims.TimeTexture_S16()
         tex_out[0].assign(acingular_tex_clean_in)
         ws.write(tex_out, self.cingular_pole_texture_out.fullPath())

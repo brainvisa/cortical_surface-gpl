@@ -41,7 +41,7 @@ userLevel = 2
 
 signature = Signature(
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'right_cingular_pole',ReadDiskItem( 'Right hippocampus pole texture'  , 'Texture',requiredAttributes={ 'side': 'right' } ),
+    'right_cingular_pole',ReadDiskItem( 'Right cingular pole texture'  , 'Texture',requiredAttributes={ 'side': 'right' } ),
     'right_white_sulci_mer',ReadDiskItem( 'Right hemisphere longitude constraints texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
     'right_white_sulci_par',ReadDiskItem( 'Right hemisphere latitude constraints texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
     'file_correspondance_constraint',ReadDiskItem( 'Constraint coordinates values', 'Text File' ),
