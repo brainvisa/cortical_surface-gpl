@@ -35,7 +35,7 @@ signature = Signature(
                       
     'Side', Choice('right'),    
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats,requiredAttributes={ 'side': 'right' } ),    
-    'cingular_pole_texture',ReadDiskItem( 'Right hippocampus pole texture','Texture',requiredAttributes={ 'side': 'right' } ),
+    'cingular_pole_texture',ReadDiskItem( 'Right cingular pole texture','Texture',requiredAttributes={ 'side': 'right' } ),
     'insular_pole_texture',ReadDiskItem( 'Right insula pole texture','Texture',requiredAttributes={ 'side': 'right' } ),
     'white_sulcalines',ReadDiskItem( 'Right hemisphere Sulcal Lines texture', 'Texture' ,requiredAttributes={ 'side': 'right' } ),
     'sulcus_labels',ReadDiskItem( 'Right Graph Label Translation', 'Text File',requiredAttributes={ 'side': 'right' }),

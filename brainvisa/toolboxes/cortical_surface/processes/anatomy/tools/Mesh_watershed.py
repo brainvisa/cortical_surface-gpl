@@ -45,7 +45,7 @@ userLevel = 0
 signature = Signature(
     'input_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'Aims mesh formats' ),
     'DPF_texture',ReadDiskItem( 'DPF texture',  'Aims texture formats' ),
-    'mask_texture',ReadDiskItem( 'Hippocampus pole texture','Aims Texture formats' ),
+    'mask_texture',ReadDiskItem( 'Cingular pole texture','Aims Texture formats' ),
     'thresh_dist', Float(),
     'group_average_Fiedler_length', Float(),
     'thresh_area', Float(),

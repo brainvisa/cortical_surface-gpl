@@ -60,9 +60,9 @@ FileType( 'Right poles texture', 'Poles texture' )
 FileType( 'Insula pole texture', 'Poles texture')
 FileType( 'Left insula pole texture', 'Insula pole texture' )
 FileType( 'Right insula pole texture', 'Insula pole texture' )
-FileType( 'Hippocampus pole texture', 'Poles texture' )
-FileType( 'Left hippocampus pole texture', 'Hippocampus pole texture' )
-FileType( 'Right hippocampus pole texture', 'Hippocampus pole texture' )
+FileType( 'Cingular pole texture', 'Poles texture' )
+FileType( 'Left cingular pole texture', 'Cingular pole texture' )
+FileType( 'Right cingular pole texture', 'Cingular pole texture' )
 
 FileType( 'Constraints texture', 'Label Texture' )
 FileType( 'Latitude constraints texture', 'Constraints texture' )
@@ -170,14 +170,16 @@ FileType( 'Right Gyri Volume', '4D Volume' )
 
 ## Parcels files !! different from Gyri files
 FileType( 'Hemisphere parcellation texture', 'Gyri White Texture' )
-FileType( 'Left hemisphere parcellation texture', 'Hemisphere parcellation texture' )
-FileType( 'Right hemisphere parcellation texture', 'Hemisphere parcellation texture' )
+#FileType( 'Left hemisphere parcellation texture', 'Hemisphere parcellation texture' )
+#FileType( 'Right hemisphere parcellation texture', 'Hemisphere parcellation texture' )
 
-FileType( 'Left hemisphere model parcellation texture', 'Left hemisphere parcellation texture' )
-FileType( 'Right hemisphere model parcellation texture', 'Right hemisphere parcellation texture' )
+FileType( 'Hemisphere model parcellation texture', 'Hemisphere parcellation texture' )
+FileType( 'Left hemisphere model parcellation texture', 'Hemisphere model parcellation texture' )
+FileType( 'Right hemisphere model parcellation texture', 'Hemisphere model parcellation texture' )
 
-FileType( 'Left hemisphere marsAtlas parcellation texture', 'Left hemisphere parcellation texture')
-FileType( 'Right hemisphere marsAtlas parcellation texture', 'Right hemisphere parcellation texture')
+FileType( 'Hemisphere marsAtlas parcellation texture', 'Hemisphere parcellation texture' )
+FileType( 'Left hemisphere marsAtlas parcellation texture', 'Hemisphere marsAtlas parcellation texture')
+FileType( 'Right hemisphere marsAtlas parcellation texture', 'Hemisphere marsAtlas parcellation texture')
 
 # may be used to replace hemisphere regularized parcellation texture
 #FileType( 'Left hemisphere regularized model parcellation texture', 'Hemisphere gyri parcellation texture')

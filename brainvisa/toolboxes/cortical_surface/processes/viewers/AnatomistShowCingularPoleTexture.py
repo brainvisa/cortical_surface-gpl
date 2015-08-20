@@ -42,7 +42,7 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'pole_texture',ReadDiskItem( 'Hippocampus pole texture', 'aims Texture formats' ),
+    'pole_texture',ReadDiskItem( 'Cingular pole texture', 'aims Texture formats' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
 )
 

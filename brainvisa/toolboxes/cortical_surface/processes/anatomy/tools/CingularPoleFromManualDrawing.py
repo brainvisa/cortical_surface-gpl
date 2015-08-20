@@ -45,7 +45,7 @@ userLevel = 0
 signature = Signature(
     'input_texture',ReadDiskItem( 'Texture', 'aims Texture formats' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'pole',WriteDiskItem( 'Hippocampus pole texture','aims Texture formats' )
+    'pole',WriteDiskItem( 'Cingular pole texture','aims Texture formats' )
 )
 
 def initialization( self ):

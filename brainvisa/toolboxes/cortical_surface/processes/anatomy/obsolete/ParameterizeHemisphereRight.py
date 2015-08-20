@@ -43,7 +43,7 @@ signature = Signature(
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
     'right_white_sulci_par',ReadDiskItem( 'Right hemisphere latitude cleaned constraints texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
     'right_white_sulci_mer',ReadDiskItem( 'Right hemisphere longitude cleaned constraints texture', 'Texture',requiredAttributes={ 'side': 'right' }  ),
-    'right_cingular_pole',ReadDiskItem( 'Right hippocampus pole texture'  , 'Texture',requiredAttributes={ 'side': 'right' } ),
+    'right_cingular_pole',ReadDiskItem( 'Right cingular pole texture'  , 'Texture',requiredAttributes={ 'side': 'right' } ),
     'right_poles_texture',ReadDiskItem( 'Right poles texture'  , 'Texture',requiredAttributes={ 'side': 'right' } ),
     'origin_mer', Integer(),
     'stop_criterium', Float(),

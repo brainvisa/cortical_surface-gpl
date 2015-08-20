@@ -1,4 +1,3 @@
-
 #  This software and supporting documentation are distributed by
 #      Institut Federatif de Recherche 49
 #      CEA/NeuroSpin, Batiment 145,
@@ -30,32 +29,29 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
-from brainvisa.processes import *
+
+from neuroProcesses import *
 import shfjGlobals
 from brainvisa import anatomist
 
-name = 'Left Cingular Pole Projection'
-
-userLevel = 2
+name = 'Anatomist Show Model Parcels Texture'
+roles = ('viewer',)
+userLevel = 0
 
 def validation():
-    anatomist.validation()
+  anatomist.validation()
 
 signature = Signature(
-    'Side', Choice("Left"),
-    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'left_pole_template',ReadDiskItem( 'Left Cingular Pole Template Subject' , 'Aims readable volume formats' ),
-    'left_pole',WriteDiskItem( 'Left cingular pole texture','Texture',requiredAttributes={ 'side': 'left' } )
+    'texture_model_parcels', ReadDiskItem('hemisphere model parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'model', 'regularized': 'false' }),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):
-    self.linkParameters( 'left_pole', 'left_white_mesh' )
-    #self.findValue( 'left_pole_template', {} )
-    #self.setOptional('left_pole_template')
-     
+  self.linkParameters('white_mesh','texture_model_parcels' )
+
 def execution( self, context ):
-    a = anatomist.Anatomist()
-    mesh = a.loadObject( self.left_white_mesh.fullPath() )
-    vol = a.loadObject( self.left_pole_template.fullPath() )
-    fusion = a.fusionObjects( [mesh, vol], method='Fusion3DMethod' )
-    fusion.exportTexture(filename=self.left_pole.fullPath())
+  a = anatomist.Anatomist()
+  return a.viewTextureOnMesh( self.white_mesh,
+                                           self.texture_model_parcels,
+                                           a.getPalette('Talairach'),
+                                           interpolation = 'rgb' )
