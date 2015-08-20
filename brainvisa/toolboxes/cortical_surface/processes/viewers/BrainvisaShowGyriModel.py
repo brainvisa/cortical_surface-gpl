@@ -41,4 +41,4 @@ signature = Signature(
   )
 
 def execution( self, context ):
-  context.system( textEditor, self.gyri_model.fullPath() )
+  context.system( neuroConfig.textEditor, self.gyri_model.fullPath() )
