@@ -39,7 +39,7 @@ import scipy.sparse.linalg as alg
 from scipy.sparse.linalg import spsolve
 from soma import aims
 
-name = 'Sulcus Parameterization 2014'
+name = 'Sulcus Parameterization 2015'
 
 userLevel = 0
 
