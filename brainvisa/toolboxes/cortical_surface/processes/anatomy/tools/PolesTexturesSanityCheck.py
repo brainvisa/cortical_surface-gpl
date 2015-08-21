@@ -75,17 +75,26 @@ def execution( self, context ):
     cingular_tex_clean_in = re.read(self.cingular_pole_texture_in.fullPath())
     insula_tex_clean_in = re.read(self.insula_pole_texture_in.fullPath())
     mesh = re.read(self.white_mesh.fullPath())
-    acingular_tex_clean_in = cingular_tex_clean_in[0].arraydata()
-    ainsula_tex_clean_in = insula_tex_clean_in[0].arraydata()
+    acingular_tex_clean_in = cingular_tex_clean_in[0].arraydata().copy()
+    ainsula_tex_clean_in = insula_tex_clean_in[0].arraydata().copy()
+
+    cingular_tex_value = acingular_tex_clean_in.max()
+    insula_tex_value = ainsula_tex_clean_in.max()
+    neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+    ## dilation of the two poles will ensure that the gap between them is least of 2*dilation_size vertices
+    for it in range(self.dilation_size):
+        simple_boundary = basicTls.textureSimpleBoundary(mesh, acingular_tex_clean_in, cingular_tex_value, neigh)
+        acingular_tex_clean_in = texTls.dilateTexture(acingular_tex_clean_in, neigh, simple_boundary)
+        simple_boundary = basicTls.textureSimpleBoundary(mesh, ainsula_tex_clean_in, insula_tex_value, neigh)
+        ainsula_tex_clean_in = texTls.dilateTexture(ainsula_tex_clean_in, neigh, simple_boundary)
+
     cingular_inds_in = np.where(acingular_tex_clean_in > 0)[0]
     insula_inds_in = np.where(ainsula_tex_clean_in >0 )[0]
     # test if there is an intersection between the two poles
     inter = list(set(cingular_inds_in).intersection(insula_inds_in))
-    ##prendre les voisins
     if inter:
         context.write('Cingular and Insula poles are connected by '+str(len(inter))+' vertices')
         context.write('dilation of the intersection')
-        neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
         inter_tex = np.zeros(mesh.vertex().size())
         inter_tex[inter] = 1
         for it in range(self.dilation_size):
@@ -93,18 +102,23 @@ def execution( self, context ):
             inter_tex = texTls.dilateTexture(inter_tex, neigh, simple_boundary)
         context.write('deleting intersection from insular and cingular poles')
         inds_inter = np.where(inter_tex >0 )[0]
-        acingular_tex_clean_in[inds_inter] = 0
-        ainsula_tex_clean_in[inds_inter] = 0
-        ##correction topologique
+        acingular_tex_clean_out = cingular_tex_clean_in[0].arraydata()
+        ainsula_tex_clean_out = insula_tex_clean_in[0].arraydata()
+        acingular_tex_clean_out[inds_inter] = 0
+        ainsula_tex_clean_out[inds_inter] = 0
+        ## topological correction of the new poles textures
+        context.write('topological correction of the new cingular pole texture')
+        acingular_tex_clean_out, boundary = texTls.textureTopologicalCorrection(mesh, acingular_tex_clean_out, cingular_tex_value)
+        context.write('topological correction of the new insula pole texture')
+        ainsula_tex_clean_out, boundary = texTls.textureTopologicalCorrection(mesh, ainsula_tex_clean_out,  insula_tex_value)
         tex_out = aims.TimeTexture_S16()
-        tex_out[0].assign(acingular_tex_clean_in)
+        tex_out[0].assign(acingular_tex_clean_out)
         ws.write(tex_out, self.cingular_pole_texture_out.fullPath())
         tex_out = aims.TimeTexture_S16()
-        tex_out[0].assign(ainsula_tex_clean_in)
+        tex_out[0].assign(ainsula_tex_clean_out)
         ws.write(tex_out, self.insula_pole_texture_out.fullPath())
 
     else:
-        context.write('Cingular and Insular poles are not connected, OK')
+        context.write('Cingular and Insular poles are separated by more than '+str(2*self.dilation_size)+' vertices, OK')
     context.write('Done')
-            
-      
+
