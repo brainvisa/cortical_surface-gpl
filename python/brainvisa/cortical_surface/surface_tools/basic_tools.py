@@ -742,8 +742,8 @@ def meshAlmostIsoLine(mesh, tex, val):
      #print('isoLine: points:', points.shape)
      #print('isoLine: values:', values.shape)
      sign=np.zeros(values.size)
-     sign[where(values < val)[0]]=10
-     sign[where(values >= val)[0]]=20
+     sign[np.where(values < val)[0]]=10
+     sign[np.where(values >= val)[0]]=20
      
      si=set()
      
