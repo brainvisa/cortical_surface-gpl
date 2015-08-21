@@ -33,8 +33,8 @@ include( 'base' )
 
 insert( '{protocol}/{subject}',
   'surface', SetContent(
-    '<subject>_Lhippo', SetType( 'Left hippocampus pole texture' ), SetWeakAttr( 'side', 'left' ),
-    '<subject>_Rhippo', SetType( 'Right hippocampus pole texture' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lhippo', SetType( 'Left cingular pole texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rhippo', SetType( 'Right cingular pole texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_L_poles', SetType( 'Left poles texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_R_poles', SetType( 'Right poles texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_L_lat_cleaned', SetType( 'Left hemisphere latitude cleaned constraints texture'), SetWeakAttr( 'side', 'left' ),
