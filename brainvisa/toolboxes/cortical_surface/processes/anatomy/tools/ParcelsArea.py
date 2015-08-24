@@ -46,6 +46,7 @@ signature = Signature(
     'side', Choice('left', 'right'),
     'textures_parcels', ListOf( ReadDiskItem('hemisphere marsAtlas parcellation texture', 'aims Texture formats', requiredAttributes={ 'regularized': 'false' }) ),
     'white_meshes',ListOf( ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ) ),
+    'normalization_by_total_area', Choice('no', 'yes'),
     'output_csv_file', WriteDiskItem( 'CSV file', 'CSV file' )
 )
 
@@ -56,15 +57,17 @@ def initialization( self ):
 def execution( self, context ):
     def compute_parcels_area(mesh, atex_parcels):
         vert_voronoi = pdeTls.vertexVoronoi(mesh)
+        total_area = np.sum(vert_voronoi)
         parcels_labels = np.unique(atex_parcels)
         parcels_area = np.zeros(parcels_labels.shape)
         for ind_lab, lab in enumerate(parcels_labels):
             vert_inds = np.where(atex_parcels == lab)[0]
             parcels_area[ind_lab] = np.sum(vert_voronoi[vert_inds])
-        return parcels_area,  parcels_labels
+        return parcels_area,  parcels_labels, total_area
 
 
     parcels_area = list()
+    total_area = list()
     subjects = list()
     for ind_mesh, r_mesh in enumerate(self.white_meshes):
         context.write('working on mesh nb: ',ind_mesh+1)
@@ -72,21 +75,27 @@ def execution( self, context ):
         mesh = aims.read(r_mesh.fullPath())
         tex_parcels = aims.read(self.textures_parcels[ind_mesh].fullPath())
         atex_parcels = tex_parcels[0].arraydata()
-        (subj_parcels_area, subj_parcels_labels) = compute_parcels_area(mesh, atex_parcels)
+        (subj_parcels_area, subj_parcels_labels, subj_total_area) = compute_parcels_area(mesh, atex_parcels)
         parcels_area.append(subj_parcels_area)
+        total_area.append(subj_total_area)
     nb_parcels = subj_parcels_labels.size
     f = open( self.output_csv_file.fullPath(), 'w' )
-    f.write( 'subject,side' )
+    f.write( 'subject,side,total_area' )
     for lab in subj_parcels_labels:
         f.write( ','+str(lab) )
     f.write('\n')
     for ind_s, subj in enumerate(subjects):
-        f.write( subj + ',' + self.side )
+        tot_a = total_area[ind_s]
+        f.write( subj + ',' + self.side+ ',' + str(tot_a) )
         if parcels_area[ind_s].size !=  nb_parcels:
             print 'subject '+subj+' do not have the same number of parcels!'
             raise Exception('number of parcels not equal across subjects')
-        for pa in parcels_area[ind_s]:
-            f.write( ','+str(pa) )
+        if self.normalization_by_total_area == 'yes':
+            for pa in parcels_area[ind_s]:
+                f.write( ','+str(pa/tot_a) )
+        else:
+            for pa in parcels_area[ind_s]:
+                f.write( ','+str(pa) )
         f.write('\n')
     f.close()
 
