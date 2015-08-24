@@ -4,7 +4,7 @@
 <xhtml name="en">
   <h1>Cortical Surface Toolbox</h1>
   
-  <h2>Présentation</h2>
+  <h2>Presentation</h2>
   
   <p>
   The Cortical Surface toolbox provides surface-based generation and processing methods for MR brain data. It is mostly developed by the <a href="http://www.meca-brain.org/">Methods and Computational Anatomy (MeCA) research group</a> in Marseille, with some help from the LNAO at the Neurospin center. 
