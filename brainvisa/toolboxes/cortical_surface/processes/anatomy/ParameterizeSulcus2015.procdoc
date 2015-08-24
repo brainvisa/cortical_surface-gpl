@@ -16,7 +16,7 @@
       <xhtml name="label_values">valeur du sillon dans le graphe.</xhtml>
     </d>
     <xhtml name="long">L'objectif est de paramétrer (définir un système de coordonnées sur) un sillon. Ce sillon peut-être identifié par nom ou label dans un graphe. En sortie on obtient un maillage du sillon, deux textures de coordonnées, et une "grille" de coordonnées.
-Documentation plus détaillée sur <a href="http://pages-perso.esil.univmed.fr/~coulon.o/sulcal_parameterization.html">la page d'Olivier</a> (si le lien ne marche pas choisissez votre navigateur dans les préférences et redémarrez Brainvisa).
+Documentation plus détaillée sur <a href="http://www.meca-brain.Org/softwares/sulcal-parameterization">la page du groupe MeCA</a> (si le lien ne marche pas choisissez votre navigateur dans les préférences et redémarrez Brainvisa).
 
 
 </xhtml>
