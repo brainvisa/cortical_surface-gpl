@@ -193,7 +193,6 @@ def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
     if weight_type == 'conformal':
         threshold = 0.0001 #np.spacing(1)??
         threshold_needed = 0
-        threshold_needed_angle = 0
         for i in range(3):
             i1 = np.mod(i, 3)
             i2 = np.mod(i + 1, 3)
@@ -216,6 +215,11 @@ def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
             pp = pp / np.vstack((nopp, np.vstack((nopp, nopp)))).transpose()
             qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
             ang = np.arccos(np.sum(pp * qq, 1))
+            ############### preventing infs in weights
+            inds_zeros = np.where(ang == 0)[0]
+            ang[inds_zeros] = threshold
+            threshold_needed_angle = len(inds_zeros)
+            ################################
             cot = 1 / np.tan(ang)
             if angle_threshold is not None:
                 thresh_inds = cot<0
@@ -237,8 +241,10 @@ def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
         print '    -angle threshold needed for ',threshold_needed_angle,' values-'
         print '    -weight threshold needed for ',threshold_needed,' values-'
     li = np.hstack(W.data)
-    print '    -percent of Nan in weights: ', 100*len(np.where(np.isnan(li))[0])/len(li)
-    print '    -percent of Negative values in weights: ', 100*len(np.where(li<0)[0])/len(li)
+    nb_Nan = len(np.where(np.isnan(li))[0])
+    nb_neg = len(np.where(li<0)[0])
+    print '    -number of Nan in weights: ',nb_Nan ,' = ', 100*nb_Nan/len(li),' %'
+    print '    -number of Negative values in weights: ', nb_neg,' = ',100*nb_neg/len(li),' %'
 
     return W
 

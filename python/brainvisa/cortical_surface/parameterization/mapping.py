@@ -613,8 +613,8 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     "identify the anterior bank of the cut :: first vertex of the insula boundary is anterior while last one is posterior"   
     inter_bound0 = set(cluster1).intersection(neoCortex_open_boundary[0])
     print 'inter_bound0 ',inter_bound0 
-    if inter_bound0:
-        if neoCortex_open_boundary[0].index(list(inter_bound0)) < (len(neoCortex_open_boundary[0]) / 2):
+    if len(inter_bound0) > 0:
+        if neoCortex_open_boundary[0].index(list(inter_bound0)[0]) < (len(neoCortex_open_boundary[0]) / 2):
             posterior_cluster = other_verts.difference(cluster1)
         else:
             posterior_cluster = cluster1
@@ -1344,7 +1344,10 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
     #vert = np.array(neoCortex_open_mesh.vertex())
     print '------------------rectConformalMapping'
     neoCortex_square = rectConformalMapping(neoCortex_open_mesh, neoCortex_open_boundary, length, width, 0)
-    return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_mesh)
+################################
+# return neoCortex_open_mesh instead of neoCortex_mesh
+################################
+    return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_open_mesh)
 #     if write_all_steps_to_disk:
 #         print '------------------textureBoundary'
 #         ws.write(neoCortex_mesh, '/home/toz/ammon_Lwhite_neocortex_cut_mesh.mesh')
@@ -1370,7 +1373,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 # HOP
 #
 ####################################################################
-def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, sulci_dict, side, model=None):
+def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, neoCortex_open_mesh,texture_sulci, sulci_dict, side, model=None):
     vert = np.array(neoCortex_square.vertex())
     if vert.shape[0] != len(texture_sulci):
         raise Exception('sulcal lines texture and rectangular mesh are not compatible, run the process --texture to Flat Mesh--')
@@ -1421,7 +1424,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, texture_sulci, s
         model.setAxisCoord(full_sulci)
 
 
-    Lx = pdeTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
+    Lx = pdeTls.computeMeshLaplacian(neoCortex_open_mesh)#neoCortex_square)#
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
     return neoCortex_square_cstr
