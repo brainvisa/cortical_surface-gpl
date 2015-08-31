@@ -93,7 +93,7 @@ def execution( self, context ):
         boundary.append(np.where(boundary_tex[t].arraydata()>0)[0])
     
     '''
-    mesh_parts[0] = neoCortex
+    mesh_parts[0] = neoCortex_open
     mesh_parts[1] = insula
     mesh_parts[2] = cingular pole
     '''

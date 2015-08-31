@@ -47,6 +47,7 @@ signature = Signature(
     'side', Choice('left', 'right'),
     'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'aims Texture formats' ),
     'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'aims Texture formats' ),
+    'white_mesh_parts',ReadDiskItem( 'White Mesh Parts', 'aims mesh formats' ),
     'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'aims Texture formats' ),
     'cstrBalance', Float(),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
@@ -65,6 +66,7 @@ def initialization( self ):
     self.linkParameters( 'side', 'rectangular_mesh', linkSide )
     self.linkParameters( 'boundary_texture','rectangular_mesh')
     self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
+    self.linkParameters('white_mesh_parts', 'rectangular_mesh')
     self.linkParameters( 'white_sulcalines', 'rectangular_mesh')
     self.cstrBalance = 200
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
@@ -116,7 +118,18 @@ def execution( self, context ):
     context.write('associated to the following labels :')
     context.write(labels)
     context.write('HOP')
-    (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary, square_sulci, sulc_labels_dict, self.side, model)
+    mesh_parts = re.read(self.white_mesh_parts.fullPath())
+    '''
+    mesh_parts[0] = neoCortex_open
+    mesh_parts[1] = insula
+    mesh_parts[2] = cingular pole
+    '''
+    open_mesh = aims.AimsTimeSurface_3_VOID()
+    open_mesh.vertex().assign( mesh_parts.vertex(0) )
+    open_mesh.normal().assign( mesh_parts.normal(0) )
+    open_mesh.polygon().assign( mesh_parts.polygon(0) )
+
+    (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary,open_mesh, square_sulci, sulc_labels_dict, self.side, model)
     (nb_inward, inward) = map.invertedPolygon(cstr_mesh)
     #vert = np.array(cstr_mesh.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / len(cstr_mesh.polygon()))+' %')

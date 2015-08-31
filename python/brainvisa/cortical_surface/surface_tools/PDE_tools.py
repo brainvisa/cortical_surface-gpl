@@ -241,8 +241,10 @@ def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
         print '    -angle threshold needed for ',threshold_needed_angle,' values-'
         print '    -weight threshold needed for ',threshold_needed,' values-'
     li = np.hstack(W.data)
-    print '    -percent of Nan in weights: ', 100*len(np.where(np.isnan(li))[0])/len(li)
-    print '    -percent of Negative values in weights: ', 100*len(np.where(li<0)[0])/len(li)
+    nb_Nan = len(np.where(np.isnan(li))[0])
+    nb_neg = len(np.where(li<0)[0])
+    print '    -number of Nan in weights: ',nb_Nan ,' = ', 100*nb_Nan/len(li),' %'
+    print '    -number of Negative values in weights: ', nb_neg,' = ',100*nb_neg/len(li),' %'
 
     return W
 
