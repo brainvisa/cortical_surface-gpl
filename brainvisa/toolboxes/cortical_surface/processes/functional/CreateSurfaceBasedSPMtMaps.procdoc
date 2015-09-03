@@ -10,7 +10,7 @@
 <i>types</i> is a numpy array defining the type of each stimulus (by an integer index)<br/>
 <i>names</i> is a list of strings, giving a name for each stimulation type<br/>
 <br/>
-An example file can be downloaded <a href="http://olivier.coulon.perso.luminy.univ-amu.fr/protocol_file.txt">following this link</a></xhtml>
+An example file can be downloaded <a href="https://dl.dropboxusercontent.com/u/3372764/fichierOnsets.txt">following this link</a></xhtml>
       <xhtml name="spmtmaps"><i>spmtmaps</i> is a set of activation (SPMt) maps, assigning each node with a t-test value from the GLM.</xhtml>
       <xhtml name="boldtextures">The <i>boldtextures</i> represent the surface-based representation of fMRI BOLD volumes. In other terms, it is a set of textures (one per subject) representing fMRI data projected onto the cortical surface (see <b>Create Surface-Based Functional Data</b>)</xhtml>
       <xhtml name="contrast">a <i>contrast</i> is defined by a vector of integers, according to the protocol described in <i>protocol_text</i> text file.</xhtml>
