@@ -343,8 +343,9 @@ def vertexVoronoi(mesh, angs=None):
 #    doi:10.1016/j.media.2008.09.001
 #
 ####################################################################
-def depthPotentialFunction(mesh, curvature, alphas):
-    vert_voronoi = vertexVoronoi(mesh)
+def depthPotentialFunction(mesh, curvature, alphas, vert_voronoi=None):
+    if vert_voronoi is None:
+        vert_voronoi = vertexVoronoi(mesh)
     L = computeMeshLaplacian(mesh)
 #     v=np.array(vert_voronoi).squeeze()
 #     print 'min',np.min(v)

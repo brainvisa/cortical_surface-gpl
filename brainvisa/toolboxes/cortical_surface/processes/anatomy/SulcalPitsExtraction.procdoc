@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="fr">
+
+  </d>
+  <d name="en">
+    <xhtml name="short">Extraction of the sulcal pits as described in:<br/>
+<span style="color: rgb(51, 51, 255);">Auzias, G, Brun, L, Deruelle, C, Coulon, O, <span style="font-style: italic;">Deep sulcal landmarks: algorithmic and conceptual improvements in the definition and extraction of sulcal pits, </span> <span style="font-weight: bold;">NeuroImage, </span>  2015.</span><br/>
+<img SRC="../../images/pits_results.png" ALT="" border="0"/>
+</xhtml>
+    <d name="parameters">
+    'input_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'Aims mesh formats' ),
+    'mask_texture',ReadDiskItem( 'Cingular pole texture','Aims Texture formats' ),
+    'DPF_alpha', Float(),
+    'thresh_ridge', Float(),
+    'thresh_dist', Float(),
+    'group_average_Fiedler_length', Float(),
+    'thresh_area', Float(),
+    'group_average_surface_area', Float(),
+    'DPF_texture',WriteDiskItem( 'DPF texture',  'Aims texture formats' ),
+    'pits_texture',WriteDiskItem( 'pits texture',  'Aims texture formats' ),
+    'noisypits_texture',WriteDiskItem( 'noisy pits texture',  'Aims texture formats' ),
+    'ridges_texture',WriteDiskItem( 'ridges texture',  'Aims texture formats' ),
+    'basins_texture',WriteDiskItem( 'basins texture',  'Aims texture formats' ),
+
+      <xhtml name="input_mesh"/>
+      <xhtml name="mask_texture"/>
+      <xhtml name="DPF_alpha"/>
+      <xhtml name="thresh_ridge"/>
+      <xhtml name="thresh_dist"/>
+      <xhtml name="group_average_Fidler_length"/>
+      <xhtml name="thresh_area"/>
+      <xhtml name="group_average_surface_area"/>
+      <xhtml name="DPF_texture"/>
+      <xhtml name="pits_texture"/>
+      <xhtml name="noisypits_texture"/>
+      <xhtml name="ridges_texture"/>
+      <xhtml name="basins_texture"/>
+
+    </d>
+    <xhtml name="long">
+
+<p>
+This pipeline computes:
+<ul>
+<li>the depth estimation through the Depth Potential Function, see the documentation of the process <a href="DepthPotentialFunction.html"> Depth Potential Function</a>;</li>
+<li>the sulcal pits are computed by applying a watershed algorithm to this depth map using the process <a href="Mesh_watershed.html"> mesh watershed</a>.</li>
+</ul>
+</p>
+
+<p id="warning"><b><font color="#b00000">Important: default parameters setting</font></b><br/>
+As detailed in Auzias et al., NeuroImage 2015, the parameters have a direct influence on the results. The default values of these parameters have been set using a population of healthy adult individuals.
+In particular, the value of the parameter <b> group_average_Fidler_length </b> can be computed for your data using the process <a href="AverageMeshFiedlerLength.html"> Average Mesh Fiedler Length</a>; and the value of the parameter <b> group_average_surface_area </b> can be computed for your data using the process <a href="AverageMeshArea.html"> Average Mesh area</a>
+</p>
+
+
+</xhtml>
+  </d>
+</d>
+</minf>

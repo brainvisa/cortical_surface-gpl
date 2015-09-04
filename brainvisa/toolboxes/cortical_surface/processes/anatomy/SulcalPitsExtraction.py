@@ -25,32 +25,32 @@ def validation():
         from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
         from brainvisa.cortical_surface.surface_tools import mesh_watershed as watershed
     except:
-        raise ValidationError( 'brainvisa.cortical_surface.surface_tools.mesh_watershed module can not be imported.' )
+        raise ValidationError( 'brainvisa.cortical_surface.surface_tools module can not be imported.' )
   
 
 from brainvisa.processes import *
+import numpy as np
+
 try:
     from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
     from brainvisa.cortical_surface.surface_tools import mesh_watershed as watershed
 except:
     pass
 
-from soma import aims
-import numpy as np
-
-name = 'Mesh Watershed'
+name = 'Sulcal Pits Extraction'
 userLevel = 0
 
 # Argument declaration
 signature = Signature(
     'input_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'Aims mesh formats' ),
-    'DPF_texture',ReadDiskItem( 'DPF texture',  'Aims texture formats' ),
     'mask_texture',ReadDiskItem( 'Cingular pole texture','Aims Texture formats' ),
+    'DPF_alpha', Float(),
+    'thresh_ridge', Float(),
     'thresh_dist', Float(),
     'group_average_Fiedler_length', Float(),
     'thresh_area', Float(),
     'group_average_surface_area', Float(),
-    'thresh_ridge', Float(),
+    'DPF_texture',WriteDiskItem( 'DPF texture',  'Aims texture formats' ),
     'pits_texture',WriteDiskItem( 'pits texture',  'Aims texture formats' ),
     'noisypits_texture',WriteDiskItem( 'noisy pits texture',  'Aims texture formats' ),
     'ridges_texture',WriteDiskItem( 'ridges texture',  'Aims texture formats' ),
@@ -62,35 +62,52 @@ signature = Signature(
 # Default values
 def initialization( self ):
     self.linkParameters( 'DPF_texture', 'input_mesh' )
+    self.linkParameters( 'mask_texture', 'input_mesh' )
     self.linkParameters( 'pits_texture', 'input_mesh' )
     self.linkParameters( 'noisypits_texture', 'input_mesh' )
     self.linkParameters( 'ridges_texture', 'input_mesh' )
     self.linkParameters( 'basins_texture', 'input_mesh' )
-    self.thresh_dist = 20
-    self.thresh_ridge = 1.5
-    self.thresh_area = 50
+    self.DPF_alpha = 0.03
+    self.thresh_dist=20
+    self.thresh_ridge=1.5
+    self.thresh_area=50
     self.group_average_surface_area = 88150.64
     self.group_average_Fiedler_length = 233.68
     self.setOptional('mask_texture')
+
+
 
 def execution( self, context ):
     re = aims.Reader()
     ws = aims.Writer()
 
+    mesh = re.read(self.input_mesh.fullPath())
 
-    mesh = re.read( self.input_mesh.fullPath() )
+    #compute the vertex_voronoi of the mesh that will be used in both DPF and watershed hereafter
+    vert_voronoi = pdeTls.vertexVoronoi( mesh )
+
+    #compute the DPF
+    tmp_curv_tex = context.temporary(  'Texture' )
+    context.write('computing DPF')
+    context.system( 'AimsMeshCurvature', '-i', self.input_mesh, '-o', tmp_curv_tex.fullPath() , '-m', 'fem' )
+    curv = re.read(tmp_curv_tex.fullPath())
+    k = curv[0].arraydata()
+    dpf = pdeTls.depthPotentialFunction(mesh, k, [self.DPF_alpha], vert_voronoi)
+    tex_dpf = aims.TimeTexture_FLOAT()
+    tex_dpf[0].assign(dpf[0])
+    ws.write(tex_dpf, self.DPF_texture.fullPath())
+    context.write('DPF done')
+    #apply the watershed
     context.write('Computing the Fiedler geodesic length and surface area')
-    vert_area = pdeTls.vertexVoronoi( mesh )
-    mesh_area = np.sum(vert_area)
+
+    mesh_area = np.sum(vert_voronoi)
     (mesh_fiedler_length, fiedler_tex) = pdeTls.meshFiedlerLength(mesh, 'geodesic')
-    depthTex = re.read( self.DPF_texture.fullPath() )
-    depthArray = np.array( depthTex[0] )
 
     if self.mask_texture is not None:
         maskTex = re.read( self.mask_texture.fullPath() )
         mask = np.array( maskTex[0] )
     else:
-        mask = np.zeros( depthArray.shape )
+        mask = np.zeros( dpf[0].shape )
 
     # Normalization of watershed merging parameters
     thresh_dist = self.thresh_dist * mesh_fiedler_length / self.group_average_Fiedler_length
@@ -99,11 +116,11 @@ def execution( self, context ):
     # Watershed
     # first step : merging online
     context.write('Computing the watershed with distance and ridge criteria for basins merging')
-    labels_1, pitsKept_1, pitsRemoved_1, ridgePoints, parent_1 = watershed.watershed(mesh, vert_area, depthArray, mask, thresh_dist, self.thresh_ridge)
+    labels_1, pitsKept_1, pitsRemoved_1, ridgePoints, parent_1 = watershed.watershed(mesh, vert_voronoi, dpf[0], mask, thresh_dist, self.thresh_ridge)
 
     # second step : merging offline
     context.write('basins merging based on area criterion')
-    labels, infoBasins, pitsKept, pitsRemoved_2, parent = watershed.areaFiltering(mesh, vert_area, labels_1, pitsKept_1, parent_1, thresh_area)
+    labels, infoBasins, pitsKept, pitsRemoved_2, parent = watershed.areaFiltering(mesh, vert_voronoi, labels_1, pitsKept_1, parent_1, thresh_area)
     pitsRemoved = pitsRemoved_1+pitsRemoved_2
 
     # Saving
@@ -112,39 +129,23 @@ def execution( self, context ):
     labelsTexture[0].assign(labels)
     ws.write( labelsTexture, self.basins_texture.fullPath() )
     # texture of pits
-    PITS = np.zeros((len(labels), 1))
+    atex_pits = np.zeros((len(labels), 1))
     for pit in pitsKept:
-        PITS[pit[0]] = 1
+        atex_pits[pit[0]] = 1
     pitsTexture = aims.TimeTexture_FLOAT(1,len(labels))
-    pitsTexture[0].assign(PITS)
+    pitsTexture[0].assign(atex_pits)
     ws.write( pitsTexture, self.pits_texture.fullPath() )
     # texture of noisy pits
-    NOISYPITS = np.zeros((len(labels),1))
+    atex_noisypits = np.zeros((len(labels),1))
     for pit in pitsRemoved:
-        NOISYPITS[pit[0]] = 1
+        atex_noisypits[pit[0]] = 1
     noisypitsTexture = aims.TimeTexture_FLOAT(1, len(labels))
-    noisypitsTexture[0].assign(NOISYPITS)
+    noisypitsTexture[0].assign(atex_noisypits)
     ws.write( noisypitsTexture, self.noisypits_texture.fullPath() )
     # texture of ridges
-    arr_ridges = np.zeros((len(labels), 1))
+    atex_ridges = np.zeros((len(labels), 1))
     for ridge in ridgePoints:
-        arr_ridges[ridge[2]] = 1
+        atex_ridges[ridge[2]] = 1
     ridgesTexture = aims.TimeTexture_FLOAT(1, len(labels))
-    ridgesTexture[0].assign(arr_ridges)
+    ridgesTexture[0].assign(atex_ridges)
     ws.write( ridgesTexture, self.ridges_texture.fullPath() )
-    # texture of basins areas
-    ##AREAS=np.zeros((len(labels),1))
-    ##for basin in infoBasins:
-    ##    verts=np.where(labels==basin[0])[0]
-    ##    for v in verts:
-    ##        AREAS[v]=basin[3]
-    ##areasTexture=aims.TimeTexture_FLOAT(1,len(labels))
-    ##areasTexture[0].assign(AREAS)
-    ##ws.write(areasTexture, areasTexture_file)
-
-##    txt_rigdes=''
-##    txt_ridges+=
-##    np.savetxt(output_prefix+'D'+str(D)+'R'+str(R)+'A'+str(A)+'_ridgePoints.txt',ridgePoints)
-##    np.savetxt(output_prefix+'D'+str(D)+'R'+str(R)+'A'+str(A)+'_infoBasins.txt',infoBasins)
-##    np.savetxt(output_prefix+'D'+str(D)+'R'+str(R)+'A'+str(A)+'_pitsParents.txt',list(parent[:,0]))
-
