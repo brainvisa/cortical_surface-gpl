@@ -44,14 +44,28 @@ userLevel = 0
 
 signature = Signature(
     'side', Choice('left', 'right'),
-    'textures_parcels', ListOf( ReadDiskItem('hemisphere marsAtlas parcellation texture', 'aims Texture formats', requiredAttributes={ 'regularized': 'false' }) ),
-    'white_meshes',ListOf( ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ) ),
+    'textures_parcels', ListOf(
+        ReadDiskItem('hemisphere marsAtlas parcellation texture',
+                     'aims Texture formats',
+                     requiredAttributes={'regularized': 'false',
+                                         'side': 'left'}) ),
+    'white_meshes',ListOf(ReadDiskItem( 'Hemisphere White Mesh',
+                                       'aims mesh formats')),
     'normalization_by_total_area', Choice('no', 'yes'),
     'output_csv_file', WriteDiskItem( 'CSV file', 'CSV file' )
 )
 
+def linkParcels(proc, dummy):
+    proc.signature['textures_parcels'] = ListOf(
+        ReadDiskItem('hemisphere marsAtlas parcellation texture',
+                     'aims Texture formats',
+                     requiredAttributes={'regularized': 'false',
+                                         'side': proc.side}))
+    proc.changeSignature(proc.signature)
+
 def initialization( self ):
-  self.linkParameters('white_meshes','textures_parcels' )
+    self.linkParameters(None, 'side', linkParcels)
+    self.linkParameters('white_meshes','textures_parcels' )
 
 
 def execution( self, context ):
