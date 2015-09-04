@@ -21,8 +21,8 @@
 
 
 from brainvisa.processes import *
-from freesurfer.brainvisaFreesurfer import launchFreesurferCommand
-from glob import glob
+#from freesurfer.brainvisaFreesurfer import launchFreesurferCommand
+#from glob import glob
 from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
 import numpy as np
 
@@ -33,9 +33,9 @@ userlevel = 2
 #     testFreesurferCommand()
 
 signature = Signature(
-    'white_mesh', ReadDiskItem('White', 'Aims mesh formats', enableConversion=0),  
+    'white_mesh', ReadDiskItem('Hemisphere White Mesh', 'Aims mesh formats'),
 #    'side', Choice( ( 'left', 'lh' ), ( 'right', 'rh' ), None ),
-    'database', ReadDiskItem( 'Directory', 'Directory' ),
+    'freesurfer_database', ReadDiskItem( 'Directory', 'Directory' ),
     'subject', String(),
     'pole',WriteDiskItem( 'Cingular pole texture','Aims Texture formats' ),
     )
@@ -52,7 +52,7 @@ def initialization(self):
 #            return self.white_mesh.get( 'side' )
     self.linkParameters('pole', 'white_mesh')
     self.linkParameters('subject', 'white_mesh', linkSubject )
-    self.linkParameters('database', 'white_mesh', linkDB )
+    self.linkParameters('freesurfer_database', 'white_mesh', linkDB )
 
 
 
