@@ -42,8 +42,8 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'rectangular_white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'aims Texture formats' ),
-    'rectangular_mesh',WriteDiskItem( 'Rectangular flat mesh', 'aims mesh formats' ),
+    'rectangular_white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'aims Texture formats' ),
+    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):
