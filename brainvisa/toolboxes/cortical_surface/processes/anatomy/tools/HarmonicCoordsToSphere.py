@@ -49,7 +49,7 @@ signature = Signature(
     'latitude',ReadDiskItem( 'Latitude coordinate texture','Aims Texture formats' ),
     'longitude',ReadDiskItem( 'Longitude coordinate texture','Aims Texture formats' ),
     'sphere_radius', Float(),
-    'spherical_mesh', WriteDiskItem( 'spherical mesh', 'Aims mesh formats' )
+    'spherical_mesh', WriteDiskItem( 'Hemisphere spherical mesh', 'Aims mesh formats' )
 )
 
 def initialization( self ):

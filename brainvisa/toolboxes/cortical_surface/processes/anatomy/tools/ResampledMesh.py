@@ -28,13 +28,14 @@ signature = Signature(
     "longitude", ReadDiskItem(
         "Longitude coordinate texture", "aims Texture formats"),
     "resampled_mesh", WriteDiskItem(
-        "Hemisphere White Mesh", "Aims mesh formats"),
+        "Remeshed mesh", "Aims mesh formats"),
 )
 
 
 def initialization(self):
     self.linkParameters("latitude", "mesh")
-    self.linkParameters("longitude", "latitude")
+    self.linkParameters("longitude", "mesh")
+    self.linkParameters("resampled_mesh", "mesh")
 
 def execution(self, context):
     sphere = aims.read(self.sphere.fullPath())
