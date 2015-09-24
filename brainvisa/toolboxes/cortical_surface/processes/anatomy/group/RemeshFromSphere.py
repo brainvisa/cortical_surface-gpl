@@ -36,8 +36,8 @@ signature = Signature(
                       
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),    
     'side', Choice('left', 'right'),
-    'spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
-    'spherical_template', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
+    'spherical_mesh', ReadDiskItem( 'Hemisphere spherical mesh', 'Aims mesh formats' ),
+    'spherical_template', ReadDiskItem( 'Hemisphere spherical mesh', 'Aims mesh formats' ),
     'remeshed_mesh', WriteDiskItem( 'Remeshed mesh', 'Aims mesh formats' )
 )
 
