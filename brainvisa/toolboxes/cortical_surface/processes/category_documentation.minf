@@ -15,7 +15,7 @@
   <p>
       <span style="color: rgb(255, 51, 51);"><b>NEW IN 4.5:</b></span>
       <ul>
-      <li> A <b>surface template for group studies</b> is now available: <span style="color: rgb(255, 51, 51);">HipHop138</span>. <a href="http://www.meca-brain.org/softwares/cortical-parcellation-marsatlas/">Follow this link for more information</a>.</li>
+      <li> A <b>surface template for group studies</b> is now available: <span style="color: rgb(255, 51, 51);">HipHop138</span>. <a href="http://www.meca-brain.org/softwares/hiphop138-cortical-surface-group-template/">Follow this link for more information</a>.</li>
       <li> <b>New sulcus parameterization</b>, faster, more robust, better properties.</li>
       <li> Improved version of the <b>Hip-Hop cortical parameterization</b> process: it is now a lot more robust</li>
       <li> The <b>MarsAtlas cortical parcellation model</b> has arrived ! Have a look at <a href="http://www.meca-brain.org/softwares/cortical-parcellation-marsatlas/">the following page</a>.</li>
