@@ -5,6 +5,10 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
   'surface_analysis', SetContent(
     ## que mettre dans les niveaux aquisition et analysis?
 
+    ## Laplacian Eigen vectors
+    '<subject>_Lwhite_eigen_vectors', SetType( 'Left eigen vectors texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_eigen_vectors', SetType( 'Right eigen vectors texture' ), SetWeakAttr( 'side', 'right' ),
+
     ## sulcal pits
     '<subject>_Lwhite_pits', SetType( 'Left pits texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_pits', SetType( 'Right pits texture' ), SetWeakAttr( 'side', 'right' ),
@@ -94,7 +98,9 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
     '<subject>_Rwhite_gyri', SetType( 'Right hemisphere gyri parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'false' ),
     '<subject>_Lwhite_gyri_regul', SetType( 'Left hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ),
     '<subject>_Rwhite_gyri_regul', SetType( 'Right hemisphere regularized parcellation texture'), SetWeakAttr( 'side', 'right' ), SetWeakAttr( 'regularized', 'true' ),
-
+    
+    ## volume parcellation s
+    '<subject>_parcellation', SetType( 'Parcellation volume' ),
   ),
 )
 

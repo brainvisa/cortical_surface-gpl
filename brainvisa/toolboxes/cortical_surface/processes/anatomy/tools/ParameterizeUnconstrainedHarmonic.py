@@ -25,7 +25,7 @@ def validation():
     import brainvisa.cortical_surface.parameterization.mapping
   except:
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
-  
+
 from brainvisa.processes import *
 from soma import aims
 import numpy as np
@@ -47,7 +47,7 @@ userLevel = 0
 
 # def validation():
 #     anatomist.validation()
-    
+
 signature = Signature(
 
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
@@ -85,9 +85,9 @@ def initialization( self ):
     self.nb_it_local_smoothing_for_unfolding = 100
     self.rectangle_length = 450.0
     self.rectangle_width = 100.0
-    
+
 def execution( self, context ):
-  
+
     re = aims.Reader()
     ws = aims.Writer()
     context.write('Reading textures and mesh')
@@ -138,28 +138,29 @@ def execution( self, context ):
     for b in neoCortex_open_boundary:
         tex_square_sulci[b] = 0
     output_SL_tex[0].assign(tex_square_sulci)
-    
-    
+
+
     labels = np.unique(tex_square_sulci)
     labels = labels[labels!=0]
     context.write('found the following sulci in the texture :')
     context.write([sulc_labels_dict[lab] for lab in labels])
     context.write('associated to the following labels :')
     context.write(labels)
-    full_sulci = slSet.SulcalLinesSet() 
+    full_sulci = slSet.SulcalLinesSet()
     full_sulci.extractFromTexture(tex_square_sulci, neoCortex_square, sulc_labels_dict)
+    vert = np.array(neoCortex_square.vertex())
     try :
-      SC_ind = full_sulci.names.index(('S.C._'+self.side))   
+      SC_ind = full_sulci.names.index(('S.C._'+self.side))
       SC_label = full_sulci.labels[SC_ind]
 #    full_sulci.sulcalLines[SC_ind].printArgs()
       translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
-      vert = np.array(neoCortex_square.vertex())
-      vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
-      neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
     except ValueError:
       context.write('----------------------------------------------------------------')
-      context.write('Central sulcus is missing, no translation applied!')
+      context.write('Central sulcus is missing, translating of the barycenter of the mesh at 0')
       context.write('----------------------------------------------------------------')
+      translation = - np.mean(vert[:, 0])
+    vert[:, 0] = vert[:, 0] + translation # * np.ones(vert.shape[0])
+    neoCortex_square.vertex().assign([aims.Point3df(x) for x in vert])
 
     context.write('Writing meshes and textures')
     if self.side == 'right':
@@ -193,7 +194,7 @@ def execution( self, context ):
     mesh_parts.polygon( 2 ).assign( cingular_mesh.polygon() )
     ws.write(mesh_parts, self.white_mesh_parts.fullPath())
 
-    '''boundaries (see mapping.path2Boundary for details:"
+    '''boundaries (see mapping.path2Boundary for details):"
     boundary[0] == insula_boundary
     boundary[1] == neocortex_poles_path always from insula to cingular pole
     boundary[2] == cingular_boundary
@@ -202,7 +203,7 @@ def execution( self, context ):
     tex_boundary = aims.TimeTexture_S16()
     for ind,bound in enumerate(neoCortex_open_boundary):
         tmp_tex = np.zeros(len(neoCortex_square.vertex()))
-        tmp_tex[bound] = 1
+        tmp_tex[bound] = range(1, len(bound)+1)
         tex_boundary[ind].assign(tmp_tex)
     ws.write(tex_boundary, self.boundary_texture.fullPath())
     '''
@@ -248,7 +249,7 @@ def execution( self, context ):
 #     ws.write(tex_lat, self.latitude.fullPath())
 
 #    spherical_verts = sphericalMeshFromCoords(lat, lon, 50):
-    
+
     context.write('Done')
-            
-      
+
+

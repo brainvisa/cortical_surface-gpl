@@ -34,6 +34,11 @@ include( 'builtin' )
 include( 'registration' )
 include( 'anatomy' )
 
+## Laplacian Eigen Vectors
+FileType( 'Eigen vectors texture', 'Texture' )
+FileType( 'Left eigen vectors texture', 'Eigen vectors texture' )
+FileType( 'Right eigen vectors texture', 'Eigen vectors texture' )
+
 ## sulcal pits
 FileType( 'pits texture', 'Texture' )
 FileType( 'Left pits texture', 'pits texture' )
@@ -147,7 +152,7 @@ FileType( 'Right Cingular Pole Template Subject', 'Cingular Pole Template Subjec
 FileType( 'Latitude Constraint Gyri Model', 'Gyri Model' )
 FileType( 'Longitude Constraint Gyri Model', 'Gyri Model' )
 
-## HIipHop model files
+## HipHop model files
 FileType( 'HipHop Model', 'Text File' )
 
 ## Transformation matrices for cingular pole template registration

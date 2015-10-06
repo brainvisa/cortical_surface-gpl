@@ -6,6 +6,8 @@ Created on 2 august 2012
 import numpy as np
 from soma import aims
 from scipy import sparse
+from brainvisa.cortical_surface.surface_tools.basic_tools import vertsIndicesToEdges
+
 np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
 
 
@@ -134,25 +136,26 @@ class SulcalLine(object):
         if Nv is 0:
             print 'no value ' + str(label) + ' in the input texture, return empty sulcalLine!!'
         else:
-            if neigh is None:
-                neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
-            "build the segments that link the vertices"
-            segm = []
-            C = sparse.lil_matrix((Nv, Nv))
-            for v in tex_val_indices:
-                ne_i = np.array(neigh[v].list())
-                if np_ver < [ 1, 6 ]:
-                    intersect = np.intersect1d_nu(ne_i, tex_val_indices)
-                else:
-                    intersect = np.intersect1d(ne_i, tex_val_indices)
-                if intersect is not None:
-                    v_index = tex_val_indices.index(v)
-                    for inter in intersect:
-                        inter_index = tex_val_indices.index(inter)
-                        if C[v_index, inter_index] == 0:
-                            segm.append([v_index, inter_index])
-                            C[v_index, inter_index] = 1
-                            C[inter_index, v_index] = 1
+            segm = vertsIndicesToEdges(mesh, tex_val_indices, neigh)
+            # if neigh is None:
+            #     neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+            # "build the segments that link the vertices"
+            # segm = []
+            # C = sparse.lil_matrix((Nv, Nv))
+            # for v in tex_val_indices:
+            #     ne_i = np.array(neigh[v].list())
+            #     if np_ver < [ 1, 6 ]:
+            #         intersect = np.intersect1d_nu(ne_i, tex_val_indices)
+            #     else:
+            #         intersect = np.intersect1d(ne_i, tex_val_indices)
+            #     if intersect is not None:
+            #         v_index = tex_val_indices.index(v)
+            #         for inter in intersect:
+            #             inter_index = tex_val_indices.index(inter)
+            #             if C[v_index, inter_index] == 0:
+            #                 segm.append([v_index, inter_index])
+            #                 C[v_index, inter_index] = 1
+            #                 C[inter_index, v_index] = 1
             verts = np.array(mesh.vertex())
             return self.__init__(label, np.array(tex_val_indices, np.uint32), verts[tex_val_indices, :], np.array(segm, np.uint32), sulc_labels_dict)
             

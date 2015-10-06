@@ -76,7 +76,11 @@ def execution( self, context ):
     '''
     boundary = []
     for t in  range( boundary_tex.size() ):
-        boundary.append(np.where(boundary_tex[t].arraydata()>0)[0])
+        inds = np.where(boundary_tex[t].arraydata()>0)[0]
+        order = boundary_tex[t].arraydata()[inds] - 1
+        ordered_bound = inds.copy()
+        ordered_bound[order]=inds
+        boundary.append(ordered_bound)
     '''
     tex_corresp_indices contains the indices of the vertices in white_mesh for:
         neoCortex_square in time 0
@@ -90,12 +94,9 @@ def execution( self, context ):
         output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
         tmp_tex = np.zeros(nb_vert_square, input_tex[t].arraydata().dtype )
         tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
-        for b in boundary:
-            tmp_tex[b] = 0
+        #for b in boundary:
+        tmp_tex[boundary[3]] = tmp_tex[boundary[1]]
         output_tex[t].assign(tmp_tex)
 
     ws.write(output_tex, self.output_texture.fullPath())
-    context.write('Texture set to 0 on the boundary')
     context.write('Done')
-            
-      

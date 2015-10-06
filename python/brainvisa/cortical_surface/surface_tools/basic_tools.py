@@ -681,6 +681,37 @@ def subCutMesh(mesh, atex, val):
 #    boundary_comp=compute_boundary(FV_comp.faces');
 
 ####################################################################
+#
+# compute the edges  between a list of vertices
+# the indices in the resulting edges are within [0 length of the list]
+#
+####################################################################
+
+def vertsIndicesToEdges(mesh, indices, neigh=None):
+    if neigh is None:
+        neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+    "build the segments that link the vertices"
+    Nv = len(indices)
+    segm = []
+    C = sparse.lil_matrix((Nv, Nv))
+    for v in indices:
+        ne_i = np.array(neigh[v].list())
+        if np_ver < [ 1, 6 ]:
+            intersect = np.intersect1d_nu(ne_i, indices)
+        else:
+            intersect = np.intersect1d(ne_i, indices)
+        if intersect is not None:
+            v_index = indices.index(v)
+            for inter in intersect:
+                inter_index = indices.index(inter)
+                if C[v_index, inter_index] == 0:
+                    segm.append([v_index, inter_index])
+                    C[v_index, inter_index] = 1
+                    C[inter_index, v_index] = 1
+    return segm
+
+
+####################################################################
 # 
 # compute iso-parameter lines on the mesh
 #

@@ -31,14 +31,20 @@ from soma import aims
 # distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
 #
 ####################################################################
-def meshFiedlerLength(mesh, dist_type='geodesic'):
+def meshLaplacianEigenVectors(mesh, nbVectors=1):
     from scipy.sparse.linalg import eigsh
     L = computeMeshLaplacian(mesh)
     Lap = 0.5*(L+L.transpose())
-    print 'Computing fiedler vector'
-    w,v = eigsh(Lap, 2, which='LM', sigma = 0)
- 
-    fiedler = v[:,1]
+    w,v = eigsh(Lap, nbVectors+1, which='LM', sigma = 0)
+    return v[:,1:]
+
+####################################################################
+#
+# distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
+#
+####################################################################
+def meshFiedlerLength(mesh, dist_type='geodesic'):
+    fiedler = meshLaplacianEigenVectors(mesh, 1)
     imin = fiedler.argmin()
     imax = fiedler.argmax()
     vert = np.array(mesh.vertex())
