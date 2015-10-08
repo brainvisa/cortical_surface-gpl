@@ -9,13 +9,13 @@
   <p>
   The Cortical Surface toolbox provides surface-based generation and processing methods for MR brain data. It is mostly developed by the <a href="http://www.meca-brain.org/">Methods and Computational Anatomy (MeCA) research group</a> in Marseille, with some help from the LNAO at the Neurospin center. 
   </p>
+  <div class="warning">
+      <h5>IMPORTANT:</h5> documentation/help is available at the following URL: <a href="http://www.meca-brain.org/softwares/">http://www.meca-brain.org/softwares</a>. It will be updated and improved in the future.
+  </div>
   <p>
-      <span style="color: rgb(255, 51, 51);">IMPORTANT:</span> documentation/help is available at the following URL: <a href="http://www.meca-brain.org/softwares/">http://www.meca-brain.org/softwares</a>. It will be updated and improved in the future. 
-  </p>
-  <p>
-      <span style="color: rgb(255, 51, 51);"><b>NEW IN 4.5:</b></span>
+      <b class="warning-title">NEW IN 4.5:</b>
       <ul>
-      <li> A <b>surface template for group studies</b> is now available: <span style="color: rgb(255, 51, 51);">HipHop138</span>. <a href="http://www.meca-brain.org/softwares/hiphop138-cortical-surface-group-template/">Follow this link for more information</a>.</li>
+      <li> A <b>surface template for group studies</b> is now available: <span class="warning-title">HipHop138</span>. <a href="http://www.meca-brain.org/softwares/hiphop138-cortical-surface-group-template/">Follow this link for more information</a>.</li>
       <li> <b>New sulcus parameterization</b>, faster, more robust, better properties.</li>
       <li> Improved version of the <b>Hip-Hop cortical parameterization</b> process: it is now a lot more robust</li>
       <li> The <b>MarsAtlas cortical parcellation model</b> has arrived ! Have a look at <a href="http://www.meca-brain.org/softwares/cortical-parcellation-marsatlas/">the following page</a>.</li>
