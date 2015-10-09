@@ -29,13 +29,24 @@ signature = Signature(
         "Longitude coordinate texture", "aims Texture formats"),
     "resampled_mesh", WriteDiskItem(
         "Remeshed mesh", "Aims mesh formats"),
+    #"invert_longitude", Boolean(),
 )
 
 
+#def linkInversion(self, proc, dummy):
+    #if self.mesh is not None:
+        #side = self.mesh.get("side")
+        #if side == "right":
+            #return True
+    #return False
+
 def initialization(self):
+    #self.invert_longitude = False
     self.linkParameters("latitude", "mesh")
     self.linkParameters("longitude", "mesh")
     self.linkParameters("resampled_mesh", "mesh")
+    #self.linkParameters("invert_longitude", "mesh", self.linkInversion)
+    self.sphere = self.signature['sphere'].findValue({})
 
 def execution(self, context):
     sphere = aims.read(self.sphere.fullPath())
@@ -44,5 +55,5 @@ def execution(self, context):
     lat = aims.read(self.latitude.fullPath())
     resampled_mesh \
         = mesh_coordinates_sphere_resampling.resample_mesh_to_sphere(
-            mesh,sphere,lon,lat)
+            mesh, sphere, lon, lat) #, inversion=self.invert_longitude)
     aims.write(resampled_mesh, self.resampled_mesh.fullPath())
