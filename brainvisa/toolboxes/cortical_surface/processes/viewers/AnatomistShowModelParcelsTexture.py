@@ -42,8 +42,8 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'texture_model_parcels', ReadDiskItem('hemisphere model parcellation texture', 'aims Texture formats', requiredAttributes={'parcellation_type':'model', 'regularized': 'false' }),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
+    'texture_model_parcels', ReadDiskItem('hemisphere model parcellation texture', 'aims Texture formats'),
+    'white_mesh',ReadDiskItem( 'White Mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):

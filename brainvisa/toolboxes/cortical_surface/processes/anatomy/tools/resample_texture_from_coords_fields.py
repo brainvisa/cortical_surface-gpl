@@ -15,34 +15,42 @@ from brainvisa.processes import *
 from soma import aims
 from soma.aimsalgo import mesh_coordinates_sphere_resampling
 
-name = "Resampled Mesh"
+name = "Resample Texture From Coordinates Fields"
 userLevel = 2
 
 
 # Argument declaration
 signature = Signature(
+    "texture", ReadDiskItem("Texture", "aims texture formats"),
     "sphere", ReadDiskItem("Ico Mesh", "aims Texture formats"),
     "mesh", ReadDiskItem("Hemisphere White Mesh", "Aims mesh formats"),
     "latitude", ReadDiskItem(
         "Latitude coordinate texture", "aims Texture formats"),
     "longitude", ReadDiskItem(
         "Longitude coordinate texture", "aims Texture formats"),
-    "resampled_mesh", WriteDiskItem(
-        "Remeshed mesh", "Aims mesh formats"),
+    "interpolation", Choice("linear", "nearest_neighbour"),
+    "resampled_texture", WriteDiskItem(
+        "Texture", "Aims texture formats",
+        requiredAttributes={"vertex_corr": "Yes",
+                            "vertex_corr_method": "hiphop"}),
 )
 
 
 def initialization(self):
+    self.linkParameters("mesh", "texture")
     self.linkParameters("latitude", "mesh")
     self.linkParameters("longitude", "mesh")
-    self.linkParameters("resampled_mesh", "mesh")
+    self.linkParameters("resampled_texture", "texture")
+    self.interpolation = "nearest_neighbour"
+    self.sphere = self.signature['sphere'].findValue({})
 
 def execution(self, context):
     sphere = aims.read(self.sphere.fullPath())
     mesh = aims.read(self.mesh.fullPath())
     lon = aims.read(self.longitude.fullPath())
     lat = aims.read(self.latitude.fullPath())
-    resampled_mesh = mesh_coordinates_sphere_resampling.resample_mesh_to_sphere(
-        mesh,sphere,lon,lat)
-    aims.write(resampled_mesh, self.resampled_mesh.fullPath())
-        
+    texture = aims.read(self.texture.fullPath())
+    resampled_texture \
+        = mesh_coordinates_sphere_resampling.resample_texture_to_sphere(
+            mesh, sphere, lon, lat, texture, self.interpolation)
+    aims.write(resampled_texture, self.resampled_texture.fullPath())
