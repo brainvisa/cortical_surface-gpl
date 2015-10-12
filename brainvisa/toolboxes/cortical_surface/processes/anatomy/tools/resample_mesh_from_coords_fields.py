@@ -14,6 +14,8 @@
 from brainvisa.processes import *
 from soma import aims
 from soma.aimsalgo import mesh_coordinates_sphere_resampling
+import numpy as np
+from brainvisa import registration
 
 name = "Resample Mesh From Coordinates Fields"
 userLevel = 2
@@ -29,20 +31,40 @@ signature = Signature(
         "Longitude coordinate texture", "aims Texture formats"),
     "resampled_mesh", WriteDiskItem(
         "Remeshed mesh", "Aims mesh formats"),
+    "invert_sphere", Boolean(),
 )
 
 
+def linkInversion(self, proc, dummy):
+    if self.mesh is not None:
+        side = self.mesh.get("side")
+        if side == "right":
+            return True
+    return False
+
+
 def initialization(self):
+    self.invert_sphere = False
     self.linkParameters("latitude", "mesh")
     self.linkParameters("longitude", "mesh")
     self.linkParameters("resampled_mesh", "mesh")
+    self.linkParameters("invert_sphere", "mesh", self.linkInversion)
+    self.sphere = self.signature['sphere'].findValue({})
+
 
 def execution(self, context):
     sphere = aims.read(self.sphere.fullPath())
     mesh = aims.read(self.mesh.fullPath())
     lon = aims.read(self.longitude.fullPath())
     lat = aims.read(self.latitude.fullPath())
+    if self.invert_sphere:
+        sphere.vertex().assign(
+            [aims.Point3df(x)
+             for x in np.asarray(sphere.vertex()) * [-1, 1, 1]])
     resampled_mesh \
         = mesh_coordinates_sphere_resampling.resample_mesh_to_sphere(
-            mesh,sphere,lon,lat)
+            mesh, sphere, lon, lat) #, inversion=self.invert_longitude)
     aims.write(resampled_mesh, self.resampled_mesh.fullPath())
+    tm = registration.getTransformationManager()
+    tm.copyReferential(self.mesh, self.resampled_mesh)
+
