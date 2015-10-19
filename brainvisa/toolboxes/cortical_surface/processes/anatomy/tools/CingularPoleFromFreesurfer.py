@@ -75,7 +75,7 @@ def execution(self, context):
     nbv = len(mesh.vertex())
     data = np.ones(nbv)
 
-    fs_cortex_label = self.database.fullPath()+'/'+self.subject+'/label/'+side+'.cortex.label'
+    fs_cortex_label = self.freesurfer_database.fullPath()+'/'+self.subject+'/label/'+side+'.cortex.label'
     f = open(fs_cortex_label,'r')
     lines = f.readlines()
     for a in lines[2:]:

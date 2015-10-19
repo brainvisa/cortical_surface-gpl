@@ -125,27 +125,27 @@ def execution( self, context ):
 
     # Saving
     # texture of basins
-    labelsTexture = aims.TimeTexture_FLOAT(1, len(labels))
+    labelsTexture = aims.TimeTexture_S16(1, len(labels))
     labelsTexture[0].assign(labels)
     ws.write( labelsTexture, self.basins_texture.fullPath() )
     # texture of pits
     atex_pits = np.zeros((len(labels), 1))
     for pit in pitsKept:
         atex_pits[pit[0]] = 1
-    pitsTexture = aims.TimeTexture_FLOAT(1,len(labels))
+    pitsTexture = aims.TimeTexture_S16(1,len(labels))
     pitsTexture[0].assign(atex_pits)
     ws.write( pitsTexture, self.pits_texture.fullPath() )
     # texture of noisy pits
     atex_noisypits = np.zeros((len(labels),1))
     for pit in pitsRemoved:
         atex_noisypits[pit[0]] = 1
-    noisypitsTexture = aims.TimeTexture_FLOAT(1, len(labels))
+    noisypitsTexture = aims.TimeTexture_S16(1, len(labels))
     noisypitsTexture[0].assign(atex_noisypits)
     ws.write( noisypitsTexture, self.noisypits_texture.fullPath() )
     # texture of ridges
     atex_ridges = np.zeros((len(labels), 1))
     for ridge in ridgePoints:
         atex_ridges[ridge[2]] = 1
-    ridgesTexture = aims.TimeTexture_FLOAT(1, len(labels))
+    ridgesTexture = aims.TimeTexture_S16(1, len(labels))
     ridgesTexture[0].assign(atex_ridges)
     ws.write( ridgesTexture, self.ridges_texture.fullPath() )
