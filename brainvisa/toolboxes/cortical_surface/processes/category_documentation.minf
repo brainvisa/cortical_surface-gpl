@@ -12,6 +12,9 @@
   <div class="warning">
       <h5>IMPORTANT:</h5> documentation/help is available at the following URL: <a href="http://www.meca-brain.org/softwares/">http://www.meca-brain.org/softwares</a>. It will be updated and improved in the future.
   </div>
+  <div class="warning">
+       <h5>IMPORTANT:</h5> In order to use all new functionnality, your must make sure that all your databases follow the 3.2 ontology. Got to the BrainVisa preferences, select 'Databases', select a database then 'edit'. In the 'expert_settings' part, make sure that the field 'ontology' is set to 'brainvisa-3.2.0'.
+  </div>
   <p>
       <b class="warning-title">NEW IN 4.5:</b>
       <ul>
