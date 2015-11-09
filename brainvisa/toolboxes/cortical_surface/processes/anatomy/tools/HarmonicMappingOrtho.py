@@ -34,6 +34,7 @@ try:
   from brainvisa.cortical_surface.parameterization import mapping as map
   from brainvisa.cortical_surface.surface_tools import readSulcusLabelTranslationFile as rSLT
   from brainvisa.cortical_surface.parameterization import model as md
+  from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
 except:
   pass
     
@@ -129,7 +130,10 @@ def execution( self, context ):
     open_mesh.normal().assign( mesh_parts.normal(0) )
     open_mesh.polygon().assign( mesh_parts.polygon(0) )
 
-    (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary,open_mesh, square_sulci, sulc_labels_dict, self.side, model)
+    full_sulci = slSet.SulcalLinesSet()
+    full_sulci.extractFromTexture(square_sulci, mesh, sulc_labels_dict)
+
+    (cstr_mesh) = map.hop(self.cstrBalance, mesh, boundary,open_mesh, full_sulci, self.side, model)
     (nb_inward, inward) = map.invertedPolygon(cstr_mesh)
     #vert = np.array(cstr_mesh.vertex())
     context.write('------------------number of vertices on folded triangles : '+str(nb_inward)+' => '+str(100.0 * nb_inward / len(cstr_mesh.polygon()))+' %')

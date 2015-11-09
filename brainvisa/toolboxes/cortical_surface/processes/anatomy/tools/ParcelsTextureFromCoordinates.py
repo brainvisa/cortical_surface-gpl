@@ -35,7 +35,7 @@ try :
 except:
   pass
 
-name = 'ParcelsTextureFromCoordinates'
+name = 'Parcels Texture From Coordinates'
 
 userLevel = 0
 

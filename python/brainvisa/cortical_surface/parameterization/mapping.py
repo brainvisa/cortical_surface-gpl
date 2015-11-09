@@ -1375,19 +1375,9 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 # HOP
 #
 ####################################################################
-def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, neoCortex_open_mesh,texture_sulci, sulci_dict, side, model=None):
+def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, neoCortex_open_mesh,full_sulci, side, model=None):
     vert = np.array(neoCortex_square.vertex())
-    if vert.shape[0] != len(texture_sulci):
-        raise Exception('sulcal lines texture and rectangular mesh are not compatible, run the process --texture to Flat Mesh--')
-        return
 
-    full_sulci = slSet.SulcalLinesSet()
-#     tex_cstr_square = texture2ROI(texture_sulci, neocortex_indices)
-#     full_sulci.extractFromTexture(texture_sulci, mesh)
-#     full_sulci.updateIndices(neocortex_indices)
-#     vert = np.array(neoCortex_square.vertex())
-#     full_sulci.updateVertices(vert)    
-    full_sulci.extractFromTexture(texture_sulci, neoCortex_square, sulci_dict)
 
     
     '''

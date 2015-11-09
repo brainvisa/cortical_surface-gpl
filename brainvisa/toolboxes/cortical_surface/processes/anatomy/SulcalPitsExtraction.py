@@ -43,6 +43,7 @@ userLevel = 0
 # Argument declaration
 signature = Signature(
     'input_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'Aims mesh formats' ),
+    'side', Choice('left', 'right'),
     'mask_texture',ReadDiskItem( 'Cingular pole texture','Aims Texture formats' ),
     'DPF_alpha', Float(),
     'thresh_ridge', Float(),
@@ -61,6 +62,10 @@ signature = Signature(
 
 # Default values
 def initialization( self ):
+    def linkSide( proc, dummy ):
+        if proc.input_mesh is not None:
+            return proc.input_mesh.get( 'side' )
+    self.linkParameters( 'side', 'input_mesh', linkSide )
     self.linkParameters( 'DPF_texture', 'input_mesh' )
     self.linkParameters( 'mask_texture', 'input_mesh' )
     self.linkParameters( 'pits_texture', 'input_mesh' )
@@ -68,11 +73,37 @@ def initialization( self ):
     self.linkParameters( 'ridges_texture', 'input_mesh' )
     self.linkParameters( 'basins_texture', 'input_mesh' )
     self.DPF_alpha = 0.03
-    self.thresh_dist=20
-    self.thresh_ridge=1.5
-    self.thresh_area=50
-    self.group_average_surface_area = 88150.64
-    self.group_average_Fiedler_length = 233.68
+    self.thresh_dist = 20
+    self.thresh_ridge = 1.5
+    self.thresh_area = 50
+    # default values were computed across 137 subjects from the OASIS database, for details, see:
+    #  Auzias, G., Brun, L., Deruelle, C., & Coulon, O. (2015). Deep sulcal landmarks: Algorithmic and conceptual improvements in
+    #  the definition and extraction of sulcal pits. NeuroImage, 111, 12–25. doi:10.1016/j.neuroimage.2015.02.008
+    # values from this paper:
+    # all 137 subjects :  area_L 91369, fiedler_L 236, area_R 91434, fiedler_R 238
+    # group1 area_L 91665, fiedler_L 237, area_R 91742, fiedler_R 238
+    # group2 area_L 91078, fiedler_L 235, area_R 91130, fiedler_R 239
+
+    # the default values given in the current process were recomputed from the 137 subjects
+    # slightly different values are due to implementations details.
+
+    def linkSurfaceSide( proc, dummy  ):
+        if proc.input_mesh is not None:
+            side = proc.input_mesh.get( 'side' )
+            if side == 'left':
+                return 91369.33
+            else:
+                return 91433.68
+    self.linkParameters( 'group_average_surface_area', 'input_mesh', linkSurfaceSide)
+    def linkFiedlerSide( proc, dummy ):
+        if proc.input_mesh is not None:
+            side = proc.input_mesh.get( 'side' )
+            if side == 'left':
+                return 235.95
+            else:
+                return 238.25
+
+    self.linkParameters( 'group_average_Fiedler_length', 'input_mesh', linkFiedlerSide)
     self.setOptional('mask_texture')
 
 
