@@ -31,7 +31,6 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
-import shfjGlobals
 from numpy import *
 
 name = 'Sulcus Parameterization'
@@ -127,10 +126,10 @@ def execution( self, context ):
                          label_values = self.label_values,
                          node_edge_types='All' )
 
-     dilating = [ 'AimsDilation',
+     dilating = ['AimsMorphoMath', '-m', 'dil',
                  '-i', sulcusIm.fullPath(),
                  '-o', dilatedIm.fullPath(),
-                 '-e', self.dilation ]
+                 '-r', self.dilation ]
 
      apply( context.system, dilating )
 
@@ -150,7 +149,7 @@ def execution( self, context ):
 #
 #     apply( context.system, dilatingB )
 
-     closing = [ 'AimsClosing',
+     closing = [ 'AimsMorphoMath', '-m', 'clo',
                  '-i', dilatedIm.fullPath(),
                  '-o', closedIm.fullPath(),
                  '-r', 2 ]
