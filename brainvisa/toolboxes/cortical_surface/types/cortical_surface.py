@@ -34,12 +34,24 @@ include( 'builtin' )
 include( 'registration' )
 include( 'anatomy' )
 
+## sulci voronoi
+FileType( 'sulci voronoi texture', 'Texture' )
+FileType( 'Left sulci voronoi texture', 'sulci voronoi texture' )
+FileType( 'Right sulci voronoi texture', 'sulci voronoi texture' )
+
 ## Laplacian Eigen Vectors
 FileType( 'Eigen vectors texture', 'Texture' )
 FileType( 'Left eigen vectors texture', 'Eigen vectors texture' )
 FileType( 'Right eigen vectors texture', 'Eigen vectors texture' )
 
 ## sulcal pits
+FileType( 'labeled pits texture', 'Texture' )
+FileType( 'Left labeled pits texture', 'labeled pits texture' )
+FileType( 'Right labeled pits texture', 'labeled pits texture' )
+FileType( 'labeled basins texture', 'Texture' )
+FileType( 'Left labeled basins texture', 'labeled basins texture' )
+FileType( 'Right labeled basins texture', 'labeled basins texture' )
+
 FileType( 'pits texture', 'Texture' )
 FileType( 'Left pits texture', 'pits texture' )
 FileType( 'Right pits texture', 'pits texture' )
