@@ -43,7 +43,7 @@ def validation():
 
 signature = Signature(
     'texture_labeled_pits', ReadDiskItem('labeled pits texture', 'aims Texture formats'),
-    'white_mesh',ReadDiskItem( 'White Mesh', 'aims mesh formats' ),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):
