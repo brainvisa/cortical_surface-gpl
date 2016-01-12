@@ -921,7 +921,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
     
-    if parcellation_type == 'marsAtlas':
+    if parcellation_type == 'marsAtlas' or parcellation_type == 'model' :
         # add suplementary axes to the model <=> subdivise parcels
         # antero-posterior subdivision of the prefrontal lobe
         sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
@@ -946,24 +946,45 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     if parcellation_type == 'model':
         # parcels merging
         # INSULA
-        tex_parcels[tex_parcels == 9] = 2
-        tex_parcels[tex_parcels == 16] = 2
-        tex_parcels[tex_parcels == 23] = 2
-        tex_parcels[tex_parcels == 37] = 2
-        tex_parcels[tex_parcels == 44] = 2
-        tex_parcels[tex_parcels == 51] = 2
-        tex_parcels[tex_parcels == 58] = 2
+        tex_parcels[tex_parcels == 9] = 44
+        tex_parcels[tex_parcels == 2] = 44
+        tex_parcels[tex_parcels == 16] = 44
+        tex_parcels[tex_parcels == 23] = 44
+        tex_parcels[tex_parcels == 30] = 44
+        tex_parcels[tex_parcels == 65] = 44
+        tex_parcels[tex_parcels == 72] = 44
+        tex_parcels[tex_parcels == 51] = 44
+        tex_parcels[tex_parcels == 58] = 44
         # arround the path between the poles
-        tex_parcels[tex_parcels == 31] = 30
-        tex_parcels[tex_parcels == 32] = 30
-        tex_parcels[tex_parcels == 33] = 30
-        tex_parcels[tex_parcels == 34] = 30
-        tex_parcels[tex_parcels == 35] = 30
-        tex_parcels[tex_parcels == 36] = 30
+        tex_parcels[tex_parcels == 38] = 37
+        tex_parcels[tex_parcels == 39] = 37
+        tex_parcels[tex_parcels == 40] = 37
+        tex_parcels[tex_parcels == 41] = 37
+        tex_parcels[tex_parcels == 42] = 37
+        tex_parcels[tex_parcels == 43] = 37
         # cingular pole
         tex_parcels[tex_parcels == 0] = 1
-
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+
+        ## old: original model, without additional axes
+        # # INSULA
+        # tex_parcels[tex_parcels == 9] = 2
+        # tex_parcels[tex_parcels == 16] = 2
+        # tex_parcels[tex_parcels == 23] = 2
+        # tex_parcels[tex_parcels == 37] = 2
+        # tex_parcels[tex_parcels == 44] = 2
+        # tex_parcels[tex_parcels == 51] = 2
+        # tex_parcels[tex_parcels == 58] = 2
+        # # arround the path between the poles
+        # tex_parcels[tex_parcels == 31] = 30
+        # tex_parcels[tex_parcels == 32] = 30
+        # tex_parcels[tex_parcels == 33] = 30
+        # tex_parcels[tex_parcels == 34] = 30
+        # tex_parcels[tex_parcels == 35] = 30
+        # tex_parcels[tex_parcels == 36] = 30
+        # # cingular pole
+        # tex_parcels[tex_parcels == 0] = 1
+        #  (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
 
     elif parcellation_type == 'marsAtlas':
         # parcels merging, parcel names correspond to the nomenclature given in the paper
