@@ -139,3 +139,15 @@ def dilateTexture(tex, neigh, inds):
         tex[np.array(neigh[i].list())] = tex[i]
     return tex
 
+def TextureExtrema(mesh, atex, neigh=None):
+    if neigh is None:
+        neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+    extrema = np.zeros_like(atex)
+    for v,ne_v in enumerate(neigh):
+        mi = np.min(atex[ne_v.list()])
+        ma = np.max(atex[ne_v.list()])
+        if atex[v] < mi:
+            extrema[v] = -1
+        elif atex[v] > ma:
+            extrema[v] = 1
+    return extrema
