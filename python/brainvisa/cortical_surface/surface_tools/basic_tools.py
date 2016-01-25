@@ -42,7 +42,8 @@ def meshPolygonArea(vert,poly):
     
     pp = vert[poly[:, 1], :] - vert[poly[:, 0], :]
     qq = vert[poly[:, 2], :] - vert[poly[:, 0], :]
-    area = np.sqrt(np.sum(np.power(pp*qq,2),1))/2
+    cr  = np.cross(pp,qq)
+    area = np.sqrt(np.sum(np.power(cr,2),1))/2
 
     return area
 

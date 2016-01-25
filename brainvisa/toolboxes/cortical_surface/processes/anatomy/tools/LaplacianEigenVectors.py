@@ -57,8 +57,12 @@ def execution( self, context ):
     
     mesh = re.read(self.input_mesh.fullPath())
     context.write('computing the '+str(self.number_of_vectors)+' first Laplacian Eigen vector(s) of the mesh')
-    vectors = pdeTls.meshLaplacianEigenVectors(mesh, self.number_of_vectors)
 
+    # tex_vectors = aims.TimeTexture_FLOAT()
+    # for i in range(20):
+    #     vectors = pdeTls.meshLaplacianEigenVectors(mesh, self.number_of_vectors)
+    #     tex_vectors[i].assign(vectors[:,0])
+    vectors = pdeTls.meshLaplacianEigenVectors(mesh, self.number_of_vectors)
     tex_vectors = aims.TimeTexture_FLOAT()
     for ind in range(self.number_of_vectors):
         tex_vectors[ind].assign(vectors[:,ind])

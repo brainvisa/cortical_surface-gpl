@@ -51,7 +51,18 @@ def initialization( self ):
 
 def execution( self, context ):
   a = anatomist.Anatomist()
-  return a.viewTextureOnMesh( self.rectangular_mesh,
-                                           self.rectangular_white_sulcalines,
-                                           a.getPalette('Talairach'),
-                                           interpolation = 'rgb' )
+  win = a.createWindow( 'Axial' )
+  anamesh = a.loadObject( self.rectangular_mesh.fullPath() )
+  anatex = a.loadObject( self.rectangular_white_sulcalines.fullPath(), duplicate=True)
+  anapalette = a.getPalette('Graph-Label')
+  anatex.setPalette( anapalette, minVal = 0, maxVal= 2.04)
+  anatex.glSetTexRGBInterpolation(True)
+  fusionTexSurf = a.fusionObjects( [anamesh, anatex], method='FusionTexSurfMethod' )
+  win.addObjects(fusionTexSurf )
+
+  return [a,win, anamesh,anatex,fusionTexSurf]
+
+  # return a.viewTextureOnMesh( self.rectangular_mesh,
+  #                                          self.rectangular_white_sulcalines,
+  #                                          a.getPalette('Talairach'),
+  #                                          interpolation = 'rgb' )

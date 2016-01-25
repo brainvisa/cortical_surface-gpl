@@ -22,9 +22,11 @@
 
 import numpy as np
 from scipy import sparse
+import scipy.stats.stats as sss
 from scipy.sparse.linalg import lgmres
 from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 from soma import aims
+
 
 ####################################################################
 #
@@ -33,9 +35,8 @@ from soma import aims
 ####################################################################
 def meshLaplacianEigenVectors(mesh, nbVectors=1):
     from scipy.sparse.linalg import eigsh
-    L = computeMeshLaplacian(mesh)
-    Lap = 0.5*(L+L.transpose())
-    w,v = eigsh(Lap, nbVectors+1, which='LM', sigma = 0)
+    L, LB = computeMeshLaplacian(mesh, lap_type='fem')
+    w,v = eigsh(L.tocsr(), nbVectors+1, M=LB.tocsr(), sigma = 0)
     return v[:,1:]
 
 ####################################################################
@@ -43,8 +44,9 @@ def meshLaplacianEigenVectors(mesh, nbVectors=1):
 # distance between the two vertices corresponding to the min and max of the 2d laplacien eigen vector
 #
 ####################################################################
-def meshFiedlerLength(mesh, dist_type='geodesic'):
-    fiedler = meshLaplacianEigenVectors(mesh, 1)
+def meshFiedlerLength(mesh, dist_type='geodesic', fiedler=None):
+    if fiedler is None:
+        fiedler = meshLaplacianEigenVectors(mesh, 1)
     imin = fiedler.argmin()
     imax = fiedler.argmax()
     vert = np.array(mesh.vertex())
@@ -78,13 +80,8 @@ def meshPitsSmoothing(mesh, tex,Niter, dt):
     print 'using conformal weights with angular threshold at 0.0001'
     weights = computeMeshWeights(mesh,'conformal',0.0001)
     N = weights.shape[0]
-#    s = weights.sum(axis = 1)
     s = weights.sum(axis=0)
-#    dia = sparse.lil_matrix((N,N))
-#    dia.setdiag(s)
     dia = sparse.dia_matrix((1 / s, 0), shape=(N, N))
-#    b = ones(N)
-#    W = sparse.linalg.spsolve(dia.tocsr(),b)*weights
     W = dia * weights
     I = sparse.lil_matrix((N, N))
     I.setdiag(np.ones(N))
@@ -183,11 +180,9 @@ def meshSmoothing(mesh, Niter, dt):
 #   If options.normalize = 1, the the rows of W are normalize to sum to 1.
 #
 ####################################################################
-def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
-#    angle_threshold=0.00001
+def computeMeshWeights(mesh, weight_type='conformal', cot_threshold=None, z_threshold=None):
+#    cot_threshold=0.00001
  #   print 'angle threshold'
-    if weight_type is None:
-        weight_type = 'conformal'
     print '    Computing mesh weights'
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
@@ -195,8 +190,8 @@ def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
     Nbv = vert.shape[0]
     Nbp = poly.shape[0]
     W = sparse.lil_matrix((Nbv, Nbv))
-#    W1 = sparse.lil_matrix((Nbv, Nbv))
-    if weight_type == 'conformal':
+    femB = sparse.lil_matrix((Nbv, Nbv))
+    if weight_type == 'conformal' or weight_type == 'fem' :
         threshold = 0.0001 #np.spacing(1)??
         threshold_needed = 0
         for i in range(3):
@@ -205,6 +200,8 @@ def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
             i3 = np.mod(i + 2, 3)
             pp = vert[poly[:, i2], :] - vert[poly[:, i1], :]
             qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]
+            cr  = np.cross(pp,qq)
+            area = np.sqrt(np.sum(np.power(cr,2),1))/2
 #             nopp = np.apply_along_axis(np.linalg.norm, 1, pp)
 #             noqq = np.apply_along_axis(np.linalg.norm, 1, qq)
             noqq = np.sqrt(np.sum(qq * qq, 1))
@@ -227,57 +224,69 @@ def computeMeshWeights(mesh, weight_type=None, angle_threshold=None):
             threshold_needed_angle = len(inds_zeros)
             ################################
             cot = 1 / np.tan(ang)
-            if angle_threshold is not None:
+            if cot_threshold is not None:
                 thresh_inds = cot<0
-                cot[thresh_inds]=angle_threshold
+                cot[thresh_inds]=cot_threshold
                 threshold_needed_angle += np.count_nonzero(thresh_inds)
             W = W + sparse.coo_matrix((cot,(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
             W = W + sparse.coo_matrix((cot,(poly[:, i3],poly[:, i2])),shape=(Nbv, Nbv))
+            femB = femB + sparse.coo_matrix((area/12,(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
+            femB = femB + sparse.coo_matrix((area/12,(poly[:, i3],poly[:, i2])),shape=(Nbv, Nbv))
 
-#             for j in range(Nbp):
-#     #            ind1 = poly[j, i1]
-#                 ind2 = poly[j, i2]
-#                 ind3 = poly[j, i3]
-#                 W[ind2, ind3] = W[ind2, ind3] + 1 / np.tan(ang[j])
-#                 W[ind3, ind2] = W[ind3, ind2] + 1 / np.tan(ang[j])
+        # if weight_type == 'fem' :
+        #     W.data = W.data/2
 
-#            W[poly[:, i2],poly[:, i3]] = W[poly[:, i2],poly[:, i3]] + cot
-#            W[poly[:, i3],poly[:, i2]] = W[poly[:, i3],poly[:, i2]] + cot
-           
-        print '    -angle threshold needed for ',threshold_needed_angle,' values-'
-        print '    -weight threshold needed for ',threshold_needed,' values-'
+        nnz = W.nnz
+        if z_threshold is not None:
+            z_weights = sss.zscore(W.data)
+            inds_out = np.where(np.abs(z_weights) > z_thresh)[0]
+            W.data[inds_out] = np.mean(W.data)
+            print '    -Zscore threshold needed for ',len(inds_out),' values = ', 100*len(inds_out)/nnz,' %'
+        #inds_out_inf = np.where(z_weights < -z_thresh)[0]
+        #inds_out_sup = np.where(z_weights > z_thresh)[0]
+        #val_inf = np.max(W.data[inds_out_inf])
+        #W.data[inds_out_inf] = val_inf
+        #val_sup = np.min(W.data[inds_out_sup])
+        #W.data[inds_out_sup] = val_sup
+        #print '    -Zscore threshold needed for ',len(inds_out_inf)+len(inds_out_sup),' values-'
+        print '    -edge length threshold needed for ',threshold_needed,' values = ', 100*threshold_needed/nnz,' %'
+        if cot_threshold is not None:
+            print '    -cot threshold needed for ',threshold_needed_angle,' values = ', 100*threshold_needed_angle/nnz,' %'
+
     li = np.hstack(W.data)
     nb_Nan = len(np.where(np.isnan(li))[0])
     nb_neg = len(np.where(li<0)[0])
-    print '    -number of Nan in weights: ',nb_Nan ,' = ', 100*nb_Nan/len(li),' %'
-    print '    -number of Negative values in weights: ', nb_neg,' = ',100*nb_neg/len(li),' %'
+    print '    -number of Nan in weights: ',nb_Nan ,' = ', 100*nb_Nan/nnz,' %'
+    print '    -number of Negative values in weights: ', nb_neg,' = ',100*nb_neg/nnz,' %'
 
-    return W
-
+    return W.tocsr(),femB.tocsr()
 
 ####################################################################
 #
 # compute laplacian of a mesh
 #
 ####################################################################
-def computeMeshLaplacian(mesh, weights=None):
+def computeMeshLaplacian(mesh, weights=None, femB=None, lap_type='conformal'):
     print '    Computing Laplacian'
     if weights is None:
-        weights = computeMeshWeights(mesh)
-    N = weights.shape[0]
-#    s = weights.sum(axis = 1)
-    s = weights.sum(axis=0)
-#    dia = sparse.lil_matrix((N,N))
-#    dia.setdiag(s)
-    dia = sparse.dia_matrix((s, 0), shape=(N, N))
+        (weights, femB) = computeMeshWeights(mesh, weight_type=lap_type)
 
-#    print dia - weights
+    if lap_type == 'fem':
+        weights.data = weights.data/2
+
+    N = weights.shape[0]
+    sB = femB.sum(axis=0)
+    diaB = sparse.dia_matrix((sB, 0), shape=(N, N))
+    B = sparse.lil_matrix(diaB + femB)
+    s = weights.sum(axis=0)
+    dia = sparse.dia_matrix((s, 0), shape=(N, N))
     L = sparse.lil_matrix(dia - weights)
+
     li = np.hstack(L.data)
     print '    -nb Nan in L : ', len(np.where(np.isnan(li))[0])
     print '    -nb Inf in L : ', len(np.where(np.isinf(li))[0])   
 
-    return L
+    return L,B
 
 ####################################################################
 #
@@ -349,29 +358,30 @@ def vertexVoronoi(mesh, angs=None):
 #    doi:10.1016/j.media.2008.09.001
 #
 ####################################################################
-def depthPotentialFunction(mesh, curvature, alphas, vert_voronoi=None):
-    if vert_voronoi is None:
-        vert_voronoi = vertexVoronoi(mesh)
-    L = computeMeshLaplacian(mesh)
-#     v=np.array(vert_voronoi).squeeze()
-#     print 'min',np.min(v)
-#     print 'max',np.max(v)
-#     print 'sum',np.sum(v)
-#     print len(np.where(v<0)[0])
+def depthPotentialFunction(mesh, curvature, alphas):
+    L, LB = computeMeshLaplacian(mesh, lap_type='fem')
     Nbv = len(np.array(mesh.vertex()))
     solver_tolerance = 1e-6
-#    B = sparse.dia_matrix((2 * np.array(vert_voronoi).squeeze() * (k-( np.sum(k*np.array(vert_voronoi).squeeze()) / vert_voronoi.sum() )), 0), shape=(Nbv, Nbv))
-#    B = B.tocsr()
-    B = -2 * vert_voronoi * (curvature-( np.sum(curvature*vert_voronoi) / vert_voronoi.sum() ))
-    B=B.squeeze()
-#    B = sparse.csr_matrix(B)
+    B = -LB * (curvature-( np.sum(curvature*LB.diagonal()) / np.sum(LB.diagonal()) ))
+
     dpf=[]
-    for ind, alpha in enumerate(alphas): 
-        A = sparse.dia_matrix((alpha*vert_voronoi, 0), shape=(Nbv, Nbv))
-        M = A+L
-        M = M.tocsr()
+    for ind, alpha in enumerate(alphas):
+        M = alpha*LB+L/2
         dpf_t, info = lgmres(M.tocsr(), B, tol=solver_tolerance)
         dpf.append(dpf_t)
+
+    ############################
+    # old, slower and less accurate implementation using conformal laplacian instead of fem
+    ############################
+    # vert_voronoi = vertexVoronoi(mesh)
+    # L, LB = computeMeshLaplacian(mesh, lap_type='conformal')
+    # B = -2 * vert_voronoi * (curvature-( np.sum(curvature*vert_voronoi) / vert_voronoi.sum() ))
+    # B=B.squeeze()
+    # for ind, alpha in enumerate(alphas):
+    #     A = sparse.dia_matrix((alpha*vert_voronoi, 0), shape=(Nbv, Nbv))
+    #     M = A+L
+    #     dpf_t, info = lgmres(M.tocsr(), B, tol=solver_tolerance)
+    #     dpf.append(dpf_t)
     return dpf
 
 ####################################################################
