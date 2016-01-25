@@ -316,7 +316,7 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
 #
 ####################################################################
 def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance):
-    "boundaries (see path2Boundary for details:"
+    "boundaries (see path2Boundary for details):"
     "boundary[0] == insula_boundary"
     "boundary[1] == neocortex_poles_path always from insula to cingular pole"
     "boundary[2] == cingular_boundary"
@@ -719,10 +719,14 @@ def boundaryReordering(neoCortex_boundary, neocortex_poles_path, vert):
         ordered_neoCortex_boundary.append(neocortex_poles_path)
         ordered_neoCortex_boundary.append(rotate(neoCortex_boundary[0], rt_bound0))
 
+    ###########################################
+    # inversion of insula or cingular boundary: not good to use coordinates of the vertices here
+    ###########################################
     "reverse insula and cingular boundary if necessary"
 #    sec_coord_insula = vert[ordered_neoCortex_boundary[0],1]
 #    print sec_coord_insula
 #    print (np.argmin(sec_coord_insula),sec_coord_insula[np.argmin(sec_coord_insula)])
+
     if np.argmin(vert[ordered_neoCortex_boundary[0], 1]) < (len(ordered_neoCortex_boundary[0]) / 2):
         ordered_neoCortex_boundary[0].reverse()
         ordered_neoCortex_boundary[0] = rotate(ordered_neoCortex_boundary[0], -1)
@@ -880,10 +884,6 @@ def recantgleFlip(rect_mesh):
     vert[:, 0] = -vert[:,0] + (M[0] - m[0])
     m2 = vert.min(0)
     M2 = vert.max(0)
-    print 'm',m
-    print 'M',M
-    print 'm2',m2
-    print 'M2',M2
     vv = aims.vector_POINT3DF()
     for x in vert:
          vv.append(x)
@@ -1339,8 +1339,10 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 
     '''poles_path to neocortex'''
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
+    print 'neocortex_poles_path',neocortex_poles_path
     print '------------------path2Boundary'
     (neoCortex_open_mesh, neoCortex_open_boundary) = path2Boundary(neoCortex_mesh,neoCortex_boundary,neocortex_poles_path)
+    print 'neoCortex_open_boundary',neoCortex_open_boundary
     #vert = np.array(neoCortex_open_mesh.vertex())
     print '------------------rectConformalMapping'
     neoCortex_square = rectConformalMapping(neoCortex_open_mesh, neoCortex_open_boundary, length, width, 0)

@@ -42,7 +42,7 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'DPF_texture',WriteDiskItem( 'DPF texture',  'aims texture formats' ),
+    'DPF_texture',ReadDiskItem( 'DPF texture',  'aims texture formats' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
 )
 

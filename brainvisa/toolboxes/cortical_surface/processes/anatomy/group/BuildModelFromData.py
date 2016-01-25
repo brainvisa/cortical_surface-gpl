@@ -121,11 +121,15 @@ def execution( self, context ):
     context.write('------------------- output model -------------------')
     for line in model.printArgs().splitlines():
         context.write(line)
+
     if self.model_file_mesh is not None:
+        context.write('saving model mesh')
         model.saveToMesh(self.model_file_mesh.fullPath())
     if self.union_sulcal_lines_mesh is not None:
+        context.write('saving the union of sulcal lines mesh')
         ws = aims.Writer()
         ws.write(group_full_sulci.toMesh(), self.union_sulcal_lines_mesh.fullPath())
     if self.union_sulcal_lines_texture is not None:
+        context.write('saving the union of sulcal lines texture')
         ws = aims.Writer()
         ws.write(group_full_sulci.toTex(), self.union_sulcal_lines_texture.fullPath())

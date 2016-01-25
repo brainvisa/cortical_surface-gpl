@@ -34,7 +34,7 @@ from neuroProcesses import *
 import shfjGlobals
 from brainvisa import anatomist
 
-name = 'Anatomist Show Ridges Texture'
+name = 'Anatomist Show Laplacian Eigen Vectors Texture'
 roles = ('viewer',)
 userLevel = 0
 
@@ -42,16 +42,15 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'ridges_texture',ReadDiskItem( 'ridges texture',  'Aims texture formats' ),
+    'Eigen_vectors_texture',ReadDiskItem( 'Eigen vectors texture',  'aims texture formats' ),
     'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):
-  self.linkParameters('white_mesh','ridges_texture' )
+  self.linkParameters('white_mesh','Eigen_vectors_texture' )
 
 def execution( self, context ):
   a = anatomist.Anatomist()
   return a.viewTextureOnMesh( self.white_mesh,
-                                           self.ridges_texture,
-                                           a.getPalette('GREEN-ufusion'),
-                                           interpolation = 'rgb' )
+                                           self.Eigen_vectors_texture,
+                                           a.getPalette('Purple-Red + Stripes'))

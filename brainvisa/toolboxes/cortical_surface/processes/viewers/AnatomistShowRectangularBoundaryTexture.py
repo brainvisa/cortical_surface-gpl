@@ -34,7 +34,7 @@ from neuroProcesses import *
 import shfjGlobals
 from brainvisa import anatomist
 
-name = 'Anatomist Show Ridges Texture'
+name = 'Anatomist Show Rectangular Boundary Texture'
 roles = ('viewer',)
 userLevel = 0
 
@@ -42,16 +42,16 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'ridges_texture',ReadDiskItem( 'ridges texture',  'Aims texture formats' ),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
+    'boundary_texture',ReadDiskItem( 'Rectangular boundary texture', 'aims Texture formats' ),
+    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):
-  self.linkParameters('white_mesh','ridges_texture' )
+  self.linkParameters('rectangular_mesh','boundary_texture' )
 
 def execution( self, context ):
   a = anatomist.Anatomist()
-  return a.viewTextureOnMesh( self.white_mesh,
-                                           self.ridges_texture,
-                                           a.getPalette('GREEN-ufusion'),
+  return a.viewTextureOnMesh( self.rectangular_mesh,
+                                           self.boundary_texture,
+                                           a.getPalette('actif_ret'),
                                            interpolation = 'rgb' )

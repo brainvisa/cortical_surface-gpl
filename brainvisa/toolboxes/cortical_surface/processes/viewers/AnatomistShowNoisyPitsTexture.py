@@ -34,7 +34,7 @@ from neuroProcesses import *
 import shfjGlobals
 from brainvisa import anatomist
 
-name = 'Anatomist Show Insula Pole Texture'
+name = 'Anatomist Show Noisy Pits Texture'
 roles = ('viewer',)
 userLevel = 0
 
