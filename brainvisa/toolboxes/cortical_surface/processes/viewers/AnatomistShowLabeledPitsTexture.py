@@ -34,7 +34,7 @@ from neuroProcesses import *
 import shfjGlobals
 from brainvisa import anatomist
 
-name = 'Anatomist Show Sulcal Lines Texture On The Rectangle'
+name = 'Anatomist Show Labeled Pits Texture'
 roles = ('viewer',)
 userLevel = 0
 
@@ -42,27 +42,16 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'rectangular_white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'aims Texture formats' ),
-    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', 'aims mesh formats' ),
+    'texture_labeled_pits', ReadDiskItem('labeled pits texture', 'aims Texture formats'),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):
-  self.linkParameters('rectangular_mesh','rectangular_white_sulcalines' )
+  self.linkParameters('white_mesh','texture_labeled_pits' )
 
 def execution( self, context ):
   a = anatomist.Anatomist()
-  win = a.createWindow( 'Axial' )
-  anamesh = a.loadObject( self.rectangular_mesh.fullPath() )
-  anatex = a.loadObject( self.rectangular_white_sulcalines.fullPath(), duplicate=True)
-  anapalette = a.getPalette('Graph-Label')
-  anatex.setPalette( anapalette, minVal = 0, maxVal= 2.04)
-  anatex.glSetTexRGBInterpolation(True)
-  fusionTexSurf = a.fusionObjects( [anamesh, anatex], method='FusionTexSurfMethod' )
-  win.addObjects(fusionTexSurf )
-
-  return [a,win, anamesh,anatex,fusionTexSurf]
-
-  # return a.viewTextureOnMesh( self.rectangular_mesh,
-  #                                          self.rectangular_white_sulcalines,
-  #                                          a.getPalette('Talairach'),
-  #                                          interpolation = 'rgb' )
+  return a.viewTextureOnMesh( self.white_mesh,
+                                           self.texture_labeled_pits,
+                                           a.getPalette('Talairach'),
+                                           interpolation = 'rgb' )

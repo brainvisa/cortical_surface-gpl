@@ -33,8 +33,10 @@
 from neuroProcesses import *
 import shfjGlobals
 from brainvisa import anatomist
+from soma import aims
+import numpy as np
 
-name = 'Anatomist Show Sulcal Lines Texture On The Rectangle'
+name = 'Anatomist Show Pits As Spheres'
 roles = ('viewer',)
 userLevel = 0
 
@@ -42,27 +44,36 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'rectangular_white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'aims Texture formats' ),
-    'rectangular_mesh',ReadDiskItem( 'Rectangular flat mesh', 'aims mesh formats' ),
+    'texture_pits', ReadDiskItem('pits texture', 'aims Texture formats'),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
+    'sphere_size', Float(),
 )
 
 def initialization( self ):
-  self.linkParameters('rectangular_mesh','rectangular_white_sulcalines' )
+    self.linkParameters('white_mesh','texture_pits' )
+    self.sphere_size = 1.0
 
 def execution( self, context ):
-  a = anatomist.Anatomist()
-  win = a.createWindow( 'Axial' )
-  anamesh = a.loadObject( self.rectangular_mesh.fullPath() )
-  anatex = a.loadObject( self.rectangular_white_sulcalines.fullPath(), duplicate=True)
-  anapalette = a.getPalette('Graph-Label')
-  anatex.setPalette( anapalette, minVal = 0, maxVal= 2.04)
-  anatex.glSetTexRGBInterpolation(True)
-  fusionTexSurf = a.fusionObjects( [anamesh, anatex], method='FusionTexSurfMethod' )
-  win.addObjects(fusionTexSurf )
-
-  return [a,win, anamesh,anatex,fusionTexSurf]
-
-  # return a.viewTextureOnMesh( self.rectangular_mesh,
-  #                                          self.rectangular_white_sulcalines,
-  #                                          a.getPalette('Talairach'),
-  #                                          interpolation = 'rgb' )
+    spheres_mesh_file = context.temporary(  'GIFTI file' )
+    white_mesh = aims.read(self.white_mesh.fullPath())
+    pits_texture = aims.read(self.texture_pits.fullPath())
+    gen = aims.SurfaceGenerator()
+    spheres_mesh = aims.AimsSurfaceTriangle()
+    vert = np.array(white_mesh.vertex())  # vertex coordinates
+    pits = np.where(np.array(pits_texture[0]))[0]
+    for pit in pits:
+        spheres_mesh += gen.sphere(vert[pit], self.sphere_size,10)
+    aims.write(spheres_mesh, spheres_mesh_file.fullPath())
+    a = anatomist.Anatomist()
+    win = a.createWindow( 'Axial' )
+    anamesh = a.loadObject( spheres_mesh_file.fullPath() )
+    win.addObjects(anamesh )
+    anamesh.setMaterial( a.Material(diffuse = [1.0, 0.0, 0.0, 1]) )
+    anamesh2 = a.loadObject( self.white_mesh.fullPath() )
+    win.addObjects(anamesh2 )
+    #r = a.viewTextureOnMesh( self.white_mesh,
+    #                                           self.texture_pits,
+     #                                         a.getPalette('Talairach'),
+      #                                        interpolation = 'rgb' )
+    #context.write(r['window'])
+    return [win, anamesh,anamesh2]

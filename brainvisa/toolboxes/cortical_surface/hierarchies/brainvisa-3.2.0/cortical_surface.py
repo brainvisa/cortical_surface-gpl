@@ -20,11 +20,20 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
   'surface_analysis', SetContent(
     ## que mettre dans les niveaux aquisition et analysis?
 
+    ## sulci voronoi
+    '<subject>_Lwhite_sulci_voronoi', SetType( 'Left sulci voronoi texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_sulci_voronoi', SetType( 'Right sulci voronoi texture' ), SetWeakAttr( 'side', 'right' ),
+
     ## Laplacian Eigen vectors
     '<subject>_Lwhite_eigen_vectors', SetType( 'Left eigen vectors texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_eigen_vectors', SetType( 'Right eigen vectors texture' ), SetWeakAttr( 'side', 'right' ),
 
     ## sulcal pits
+    '<subject>_Lwhite_pits_labeled', SetType( 'Left labeled pits texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_pits_labeled', SetType( 'Right labeled pits texture' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_basins_labeled', SetType( 'Left labeled basins texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_basins_labeled', SetType( 'Right labeled basins texture' ), SetWeakAttr( 'side', 'right' ),
+
     '<subject>_Lwhite_pits', SetType( 'Left pits texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_pits', SetType( 'Right pits texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lwhite_noisy_pits', SetType( 'Left noisy pits texture' ), SetWeakAttr( 'side', 'left' ),
@@ -130,6 +139,12 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
     '<subject>_Rwhite_parcels_marsAtlas', SetType( 'Right hemisphere marsAtlas parcellation texture'),
       SetWeakAttr('side', 'right', 'averaged', 'No', 'vertex_corr', 'No',
                   'parcellation_type', 'marsAtlas', 'regularized', 'false'),
+  ),
+)
+
+insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
+  'surface_analysis', SetContent(
+
     ## same with resampling to sphere coordinates
     '<subject>_Lwhite_parcels_model_remeshed_{vertex_corr_method}',
       SetType('Left hemisphere model parcellation texture'),

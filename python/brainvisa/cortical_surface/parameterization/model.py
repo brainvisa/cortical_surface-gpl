@@ -11,14 +11,15 @@ class Model(object):
     classdocs
     '''
 
-    def __init__(self, modelVersion=None, left=None, right=None, top=None, bottom=None, longitudeAxisID=None, latitudeAxisID=None, longitudeAxisCoord=None, latitudeAxisCoord=None, insularPoleBoundaryCoord=None, cingularPoleBoundaryCoord=None):
+    def __init__(self, modelVersion=None, left=None, right=None, top=None, bottom=None, longitudeAxisID=None, latitudeAxisID=None, longitudeAxisCoord=None, latitudeAxisCoord=None, longitudeAxisSulci=None, latitudeAxisSulci=None, insularPoleBoundaryCoord=None, cingularPoleBoundaryCoord=None):
         '''
         Constructor
         '''
         if modelVersion is None:
-            self.modelVersion = 0.1
+            self.modelVersion = 2
         else:
             self.modelVersion = modelVersion
+        # AxisID
         if longitudeAxisID is None:
             self.longitudeAxisID = [16, 40, 61, 281, 297, 339, 360]
         else:
@@ -27,14 +28,25 @@ class Model(object):
             self.latitudeAxisID = [1, 55, 56, 81, 92, 106]
         else:
             self.latitudeAxisID = latitudeAxisID
+        # AxisCoord
         if longitudeAxisCoord is None:
             self.longitudeAxisCoord = [None, None, None, None, None, None, None]
         else:
             self.longitudeAxisCoord = longitudeAxisCoord
-        if longitudeAxisCoord is None:    
+        if latitudeAxisCoord is None:
             self.latitudeAxisCoord = [None, None, None, None, None, None]
         else:
             self.latitudeAxisCoord = latitudeAxisCoord
+        # AxisSulci
+        if longitudeAxisSulci is None:
+            self.longitudeAxisSulci = {'F.C.L.r.asc.': 40, 'F.Cal.ant.-Sc.Cal.': 281, 'F.P.O.': 297, 'S.C.': 360, 'S.F.orbitaire.': 61, 'S.F.marginal.': 61, 'F.I.P.Po.C.inf.': 339, 'S.Po.C.sup.': 339, 'S.Pe.C.inf.': 16, 'S.Pe.C.median.': 16, 'S.Pe.C.sup.': 16}
+        else:
+            self.longitudeAxisSulci = longitudeAxisSulci
+        if latitudeAxisSulci is None:
+            self.latitudeAxisSulci ={'F.C.M.ant.': 55 , 'F.Coll.': 56, 'S.Call.': 1, 'S.F.inf.': 106, 'S.F.inter.': 92, 'S.F.sup.': 81, 'S.O.T.lat.post.': 81, 'S.Olf.': 81, 'S.T.i.ant.': 92, 'S.T.i.post.': 92, 'S.T.s.': 106, 'S.T.s.ter.asc.ant.': 106, 'S.T.s.ter.asc.post.': 92}
+        else:
+            self.latitudeAxisSulci = latitudeAxisSulci
+        # boundary coordinates
         if left == None:
             self.left = 0.0
         else:
@@ -64,16 +76,46 @@ class Model(object):
 
     def printArgs(self):
         txt = 'modelVersion ' + str(self.modelVersion) + '\n'
-        txt = txt + '    left ' + str(self.left) + '\n'
-        txt = txt + '    right ' + str(self.right) + '\n'
-        txt = txt + '    top ' + str(self.top) + '\n'
-        txt = txt + '    bottom ' + str(self.bottom) + '\n'
-        txt = txt + '    insularPoleBoundaryCoord ' + str(self.insularPoleBoundaryCoord) + '\n'
-        txt = txt + '    cingularPoleBoundaryCoord ' + str(self.cingularPoleBoundaryCoord) + '\n'
-        txt = txt + '    longitudeAxisID '+ str(self.longitudeAxisID) + '\n'
-        txt = txt + '    longitudeAxisCoord ' + str(self.longitudeAxisCoord) + '\n'
-        txt = txt + '    latitudeAxisID ' + str(self.latitudeAxisID) + '\n'
-        txt = txt + '    latitudeAxisCoord ' + str(self.latitudeAxisCoord) + '\n'
+#         for col in data[index,:]:
+#             txt = txt+' '+str(col)
+        txt = txt + 'left ' + str(self.left) + '\n'
+        txt = txt + 'right ' + str(self.right) + '\n'
+        txt = txt + 'top ' + str(self.top) + '\n'
+        txt = txt + 'bottom ' + str(self.bottom) + '\n'
+        txt = txt + 'insularPoleBoundaryCoord ' + str(self.insularPoleBoundaryCoord) + '\n'
+        txt = txt + 'cingularPoleBoundaryCoord ' + str(self.cingularPoleBoundaryCoord) + '\n'
+        txt_tmp = ','.join(str(i) for i in self.longitudeAxisID)
+        txt = txt + 'longitudeAxisID '+ txt_tmp + '\n'
+        txt_tmp = ','.join(str(i) for i in self.longitudeAxisCoord)
+        txt = txt + 'longitudeAxisCoord ' + txt_tmp + '\n'
+        if self.modelVersion == '0.1':
+            pass
+        else:
+            txt_tmp = ','.join(i+':'+str(self.longitudeAxisSulci[i]) for i in self.longitudeAxisSulci)
+            txt = txt + 'longitudeAxisSulci ' + txt_tmp + '\n'
+        txt_tmp = ','.join(str(i) for i in self.latitudeAxisID)
+        txt = txt + 'latitudeAxisID ' + txt_tmp + '\n'
+        txt_tmp = ','.join(str(i) for i in self.latitudeAxisCoord)
+        txt = txt + 'latitudeAxisCoord ' + txt_tmp + '\n'
+        if self.modelVersion == '0.1':
+            pass
+        else:
+            txt_tmp = ','.join(i+':'+str(self.latitudeAxisSulci[i]) for i in self.latitudeAxisSulci)
+            txt = txt + 'latitudeAxisSulci ' + txt_tmp + '\n'
+
+        # txt = 'modelVersion ' + str(self.modelVersion) + '\n'
+        # txt = txt + 'left ' + str(self.left) + '\n'
+        # txt = txt + 'right ' + str(self.right) + '\n'
+        # txt = txt + 'top ' + str(self.top) + '\n'
+        # txt = txt + 'bottom ' + str(self.bottom) + '\n'
+        # txt = txt + 'insularPoleBoundaryCoord ' + str(self.insularPoleBoundaryCoord) + '\n'
+        # txt = txt + 'cingularPoleBoundaryCoord ' + str(self.cingularPoleBoundaryCoord) + '\n'
+        # txt = txt + 'longitudeAxisID '+ str(self.longitudeAxisID) + '\n'
+        # txt = txt + 'longitudeAxisCoord ' + str(self.longitudeAxisCoord) + '\n'
+        # txt = txt + 'longitudeAxisSulci ' + str(self.longitudeAxisSulci) + '\n'
+        # txt = txt + 'latitudeAxisID ' + str(self.latitudeAxisID) + '\n'
+        # txt = txt + 'latitudeAxisCoord ' + str(self.latitudeAxisCoord) + '\n'
+        # txt = txt + 'latitudeAxisSulci ' + str(self.latitudeAxisSulci) + '\n'
 
         return txt
 
@@ -89,24 +131,25 @@ class Model(object):
 
     def saveToFile(self, fileName):
         f = open(fileName, 'w')
-        txt = 'modelVersion ' + str(self.modelVersion) + '\n'
-#         for col in data[index,:]:
-#             txt = txt+' '+str(col)
-        txt = txt + 'left ' + str(self.left) + '\n'
-        txt = txt + 'right ' + str(self.right) + '\n'
-        txt = txt + 'top ' + str(self.top) + '\n'
-        txt = txt + 'bottom ' + str(self.bottom) + '\n'
-        txt = txt + 'insularPoleBoundaryCoord ' + str(self.insularPoleBoundaryCoord) + '\n'
-        txt = txt + 'cingularPoleBoundaryCoord ' + str(self.cingularPoleBoundaryCoord) + '\n'
-        txt_tmp = ','.join(str(i) for i in self.longitudeAxisID)
-        txt = txt + 'longitudeAxisID '+ txt_tmp + '\n'
-        txt_tmp = ','.join(str(i) for i in self.longitudeAxisCoord)
-        txt = txt + 'longitudeAxisCoord ' + txt_tmp + '\n'
-        txt_tmp = ','.join(str(i) for i in self.latitudeAxisID)
-        txt = txt + 'latitudeAxisID ' + txt_tmp + '\n'
-        txt_tmp = ','.join(str(i) for i in self.latitudeAxisCoord)
-        txt = txt + 'latitudeAxisCoord ' + txt_tmp + '\n'
-        f.write(txt)
+#         txt = 'modelVersion ' + str(self.modelVersion) + '\n'
+# #         for col in data[index,:]:
+# #             txt = txt+' '+str(col)
+#         txt = txt + 'left ' + str(self.left) + '\n'
+#         txt = txt + 'right ' + str(self.right) + '\n'
+#         txt = txt + 'top ' + str(self.top) + '\n'
+#         txt = txt + 'bottom ' + str(self.bottom) + '\n'
+#         txt = txt + 'insularPoleBoundaryCoord ' + str(self.insularPoleBoundaryCoord) + '\n'
+#         txt = txt + 'cingularPoleBoundaryCoord ' + str(self.cingularPoleBoundaryCoord) + '\n'
+#         txt_tmp = ','.join(str(i) for i in self.longitudeAxisID)
+#         txt = txt + 'longitudeAxisID '+ txt_tmp + '\n'
+#         txt_tmp = ','.join(str(i) for i in self.longitudeAxisCoord)
+#         txt = txt + 'longitudeAxisCoord ' + txt_tmp + '\n'
+#         txt_tmp = ','.join(str(i) for i in self.latitudeAxisID)
+#         txt = txt + 'latitudeAxisID ' + txt_tmp + '\n'
+#         txt_tmp = ','.join(str(i) for i in self.latitudeAxisCoord)
+#         txt = txt + 'latitudeAxisCoord ' + txt_tmp + '\n'
+#        f.write(txt)
+        f.write(self.printArgs())
         f.close()
 
 ####################################################################
@@ -121,13 +164,14 @@ class Model(object):
                 for line in inf:
                     txt_list.append(line.split())
             txt_dict = dict((key, value) for (key, value) in txt_list)
+
             txt_dict['right'] = float(txt_dict['right'])
             txt_dict['left'] = float(txt_dict['left'])
             txt_dict['top'] = float(txt_dict['top'])
             txt_dict['bottom'] = float(txt_dict['bottom'])
             txt_dict['insularPoleBoundaryCoord'] = float(txt_dict['insularPoleBoundaryCoord'])
             txt_dict['cingularPoleBoundaryCoord'] = float(txt_dict['cingularPoleBoundaryCoord'])
-            
+
             data_txt = txt_dict['longitudeAxisID']
             data_num = []
             for x in data_txt.split(','):
@@ -136,7 +180,7 @@ class Model(object):
                 except:
                     data_num.append(None)
             txt_dict['longitudeAxisID'] = data_num
-    
+
             data_txt = txt_dict['latitudeAxisID']
             data_num = []
             for x in data_txt.split(','):
@@ -145,7 +189,7 @@ class Model(object):
                 except:
                     data_num.append(None)
             txt_dict['latitudeAxisID'] = data_num
-            
+
             data_txt = txt_dict['longitudeAxisCoord']
             data_num = []
             for x in data_txt.split(','):
@@ -154,7 +198,7 @@ class Model(object):
                 except:
                     data_num.append(None)
             txt_dict['longitudeAxisCoord'] = data_num
-    
+
             data_txt = txt_dict['latitudeAxisCoord']
             data_num = []
             for x in data_txt.split(','):
@@ -163,7 +207,23 @@ class Model(object):
                 except:
                     data_num.append(None)
             txt_dict['latitudeAxisCoord'] = data_num
-            output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
+            if txt_dict['modelVersion'] == '0.1':
+                output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], None, None, txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
+            elif txt_dict['modelVersion'] == '2':
+                print('read model version 2')
+                data_txt = txt_dict['longitudeAxisSulci']
+                data_num = []
+                for x in data_txt.split(','):
+                    data_num.append(x.split(':'))
+                longitudeAxisSulci = dict((key, int(value)) for (key, value) in data_num)
+                data_txt = txt_dict['latitudeAxisSulci']
+                data_num = []
+                for x in data_txt.split(','):
+                    data_num.append(x.split(':'))
+                latitudeAxisSulci = dict((key, int(value)) for (key, value) in data_num)
+                output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], longitudeAxisSulci, latitudeAxisSulci, txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
+            else:
+                raise Exception('cannot read the model file :: bad model version')
         except:
             raise Exception('cannot read the model file')
 
@@ -218,87 +278,87 @@ class Model(object):
 ##########################################################################
 # replaced by sulcus2Axis, should not be used anymore
 ##########################################################################
-    def label2Axis(self, label):
-        isLat = False
-        isLon = False
-        axisID = None
-        #  longitude labels
-        if label == 1 or label == 2:  # F.C.L.r.asc.
-            axisID = 40
-            isLon = True
-        elif label == 9 or label == 10:  # F.Cal.ant.-Sc.Cal.
-            axisID = 281
-            isLon = True
-        elif label == 19 or label == 20:  # F.P.O.
-            axisID = 297
-            isLon = True
-        elif label == 25 or label == 26:  # S.C.
-            axisID = 360
-            isLon = True
-        elif label == 41 or label == 42:  # S.F.orbitaire.
-            axisID = 61
-            isLon = True
-        elif label == 43 or label == 44:  # S.F.marginal.
-            axisID = 61
-            isLon = True
-        elif label == 15 or label == 16:  # F.I.P.Po.C.inf.
-            axisID = 339
-            isLon = True
-        elif label == 63 or label == 64:  # S.Po.C.sup.
-            axisID = 339
-            isLon = True
-        elif label == 57 or label == 58:  # S.Pe.C.inf.
-            axisID = 16
-            isLon = True
-        elif label == 59 or label == 60:  # S.Pe.C.median.
-            axisID = 16
-            isLon = True
-        elif label == 61 or label == 62:  # S.Pe.C.sup.
-            axisID = 16
-            isLon = True
-        #  latitude labels
-        elif label == 5 or label == 6:  # F.C.M.ant.
-            axisID = 55
-            isLat = True
-        elif label == 11 or label == 12:  # F.Coll. 55
-            axisID = 56
-            isLat = True
-        elif label == 31 or label == 32:  # S.Call.
-            axisID = 1
-            isLat = True
-        elif label == 33 or label == 34:  # S.F.inf.
-            axisID = 106
-            isLat = True
-        elif label == 39 or label == 40:  # S.F.inter.
-            axisID = 92
-            isLat = True
-        elif label == 45 or label == 46:  # S.F.sup.
-            axisID = 81
-            isLat = True
-        elif label == 53 or label == 54:  # S.O.T.lat.post.
-            axisID = 81
-            isLat = True
-        elif label == 55 or label == 56:  # S.Olf.
-            axisID = 81
-            isLat = True
-        elif label == 65 or label == 66:  # S.T.i.ant.
-            axisID = 92
-            isLat = True
-        elif label == 67 or label == 68:  # S.T.i.post.
-            axisID = 92
-            isLat = True
-        elif label == 71 or label == 72:  # S.T.s.
-            axisID = 106
-            isLat = True
-        elif label == 73 or label == 74:  # S.T.s.ter.asc.ant.
-            axisID = 106
-            isLat = True
-        elif label == 75 or label == 76:  # S.T.s.ter.asc.post.
-            axisID = 92
-            isLat = True
-        else:
-            print 'no axis defined for label ', label
-        return(axisID, isLon, isLat)
+    # def label2Axis(self, label):
+    #     isLat = False
+    #     isLon = False
+    #     axisID = None
+    #     #  longitude labels
+    #     if label == 1 or label == 2:  # F.C.L.r.asc.
+    #         axisID = 40
+    #         isLon = True
+    #     elif label == 9 or label == 10:  # F.Cal.ant.-Sc.Cal.
+    #         axisID = 281
+    #         isLon = True
+    #     elif label == 19 or label == 20:  # F.P.O.
+    #         axisID = 297
+    #         isLon = True
+    #     elif label == 25 or label == 26:  # S.C.
+    #         axisID = 360
+    #         isLon = True
+    #     elif label == 41 or label == 42:  # S.F.orbitaire.
+    #         axisID = 61
+    #         isLon = True
+    #     elif label == 43 or label == 44:  # S.F.marginal.
+    #         axisID = 61
+    #         isLon = True
+    #     elif label == 15 or label == 16:  # F.I.P.Po.C.inf.
+    #         axisID = 339
+    #         isLon = True
+    #     elif label == 63 or label == 64:  # S.Po.C.sup.
+    #         axisID = 339
+    #         isLon = True
+    #     elif label == 57 or label == 58:  # S.Pe.C.inf.
+    #         axisID = 16
+    #         isLon = True
+    #     elif label == 59 or label == 60:  # S.Pe.C.median.
+    #         axisID = 16
+    #         isLon = True
+    #     elif label == 61 or label == 62:  # S.Pe.C.sup.
+    #         axisID = 16
+    #         isLon = True
+    #     #  latitude labels
+    #     elif label == 5 or label == 6:  # F.C.M.ant.
+    #         axisID = 55
+    #         isLat = True
+    #     elif label == 11 or label == 12:  # F.Coll. 55
+    #         axisID = 56
+    #         isLat = True
+    #     elif label == 31 or label == 32:  # S.Call.
+    #         axisID = 1
+    #         isLat = True
+    #     elif label == 33 or label == 34:  # S.F.inf.
+    #         axisID = 106
+    #         isLat = True
+    #     elif label == 39 or label == 40:  # S.F.inter.
+    #         axisID = 92
+    #         isLat = True
+    #     elif label == 45 or label == 46:  # S.F.sup.
+    #         axisID = 81
+    #         isLat = True
+    #     elif label == 53 or label == 54:  # S.O.T.lat.post.
+    #         axisID = 81
+    #         isLat = True
+    #     elif label == 55 or label == 56:  # S.Olf.
+    #         axisID = 81
+    #         isLat = True
+    #     elif label == 65 or label == 66:  # S.T.i.ant.
+    #         axisID = 92
+    #         isLat = True
+    #     elif label == 67 or label == 68:  # S.T.i.post.
+    #         axisID = 92
+    #         isLat = True
+    #     elif label == 71 or label == 72:  # S.T.s.
+    #         axisID = 106
+    #         isLat = True
+    #     elif label == 73 or label == 74:  # S.T.s.ter.asc.ant.
+    #         axisID = 106
+    #         isLat = True
+    #     elif label == 75 or label == 76:  # S.T.s.ter.asc.post.
+    #         axisID = 92
+    #         isLat = True
+    #     else:
+    #         print 'no axis defined for label ', label
+    #     return(axisID, isLon, isLat)
     
 ####################################################################
 #
@@ -315,80 +375,13 @@ class Model(object):
             sulc_name = sulc_name_in[:-6]
         else:
             sulc_name = sulc_name_in
-        #  longitude labels
-        if sulc_name == 'F.C.L.r.asc.':
-            axisID = 40
+
+        if self.latitudeAxisSulci.has_key(sulc_name):
+            isLat = True
+            axisID = self.latitudeAxisSulci[sulc_name]
+        elif self.longitudeAxisSulci.has_key(sulc_name):
             isLon = True
-        elif sulc_name == 'F.Cal.ant.-Sc.Cal.':
-            axisID = 281
-            isLon = True
-        elif sulc_name == 'F.P.O.':
-            axisID = 297
-            isLon = True
-        elif sulc_name == 'S.C.':
-            axisID = 360
-            isLon = True
-        elif sulc_name == 'S.F.orbitaire.':
-            axisID = 61
-            isLon = True
-        elif sulc_name == 'S.F.marginal.':
-            axisID = 61
-            isLon = True
-        elif sulc_name == 'F.I.P.Po.C.inf.':
-            axisID = 339
-            isLon = True
-        elif sulc_name == 'S.Po.C.sup.':
-            axisID = 339
-            isLon = True
-        elif sulc_name == 'S.Pe.C.inf.':
-            axisID = 16
-            isLon = True
-        elif sulc_name == 'S.Pe.C.median.':
-            axisID = 16
-            isLon = True
-        elif sulc_name == 'S.Pe.C.sup.':
-            axisID = 16
-            isLon = True
-        #  latitude labels
-        elif sulc_name == 'F.C.M.ant.':
-            axisID = 55
-            isLat = True
-        elif sulc_name == 'F.Coll.':
-            axisID = 56  #55
-            isLat = True
-        elif sulc_name == 'S.Call.':
-            axisID = 1
-            isLat = True
-        elif sulc_name == 'S.F.inf.':
-            axisID = 106
-            isLat = True
-        elif sulc_name == 'S.F.inter.':
-            axisID = 92
-            isLat = True
-        elif sulc_name == 'S.F.sup.':
-            axisID = 81
-            isLat = True
-        elif sulc_name == 'S.O.T.lat.post.':
-            axisID = 81
-            isLat = True
-        elif sulc_name == 'S.Olf.':
-            axisID = 81
-            isLat = True
-        elif sulc_name == 'S.T.i.ant.':
-            axisID = 92
-            isLat = True
-        elif sulc_name == 'S.T.i.post.':
-            axisID = 92
-            isLat = True
-        elif sulc_name == 'S.T.s.':
-            axisID = 106
-            isLat = True
-        elif sulc_name == 'S.T.s.ter.asc.ant.':
-            axisID = 106
-            isLat = True
-        elif sulc_name == 'S.T.s.ter.asc.post.':
-            axisID = 92
-            isLat = True
+            axisID = self.longitudeAxisSulci[sulc_name]
         else:
             print 'no axis defined for sulcus ', sulc_name
         return(axisID, isLon, isLat)

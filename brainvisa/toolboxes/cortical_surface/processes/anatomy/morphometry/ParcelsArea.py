@@ -83,6 +83,7 @@ def execution( self, context ):
     parcels_area = list()
     total_area = list()
     subjects = list()
+    parcels_label = list()
     for ind_mesh, r_mesh in enumerate(self.white_meshes):
         context.write('working on mesh nb: ',ind_mesh+1)
         subjects.append(r_mesh.get('subject'))
@@ -92,24 +93,28 @@ def execution( self, context ):
         (subj_parcels_area, subj_parcels_labels, subj_total_area) = compute_parcels_area(mesh, atex_parcels)
         parcels_area.append(subj_parcels_area)
         total_area.append(subj_total_area)
-    nb_parcels = subj_parcels_labels.size
+        parcels_label.append(subj_parcels_labels)
+    union_labels = np.array([], dtype=np.int32)
+    for x in parcels_label:
+        union_labels = np.append(union_labels, x)
+    common_labels = np.unique(union_labels)
     f = open( self.output_csv_file.fullPath(), 'w' )
     f.write( 'subject,side,total_area' )
-    for lab in subj_parcels_labels:
+    for lab in common_labels:
         f.write( ','+str(lab) )
     f.write('\n')
     for ind_s, subj in enumerate(subjects):
         tot_a = total_area[ind_s]
         f.write( subj + ',' + self.side+ ',' + str(tot_a) )
-        if parcels_area[ind_s].size !=  nb_parcels:
-            print 'subject '+subj+' do not have the same number of parcels!'
-            raise Exception('number of parcels not equal across subjects')
-        if self.normalization_by_total_area == 'yes':
-            for pa in parcels_area[ind_s]:
-                f.write( ','+str(pa/tot_a) )
-        else:
-            for pa in parcels_area[ind_s]:
-                f.write( ','+str(pa) )
+        for lab in common_labels:
+            ind_l = np.where(parcels_label[ind_s] == lab)[0]
+            if ind_l.size > 0:
+                if self.normalization_by_total_area == 'yes':
+                    f.write( ','+str(parcels_area[ind_s][ind_l][0]/tot_a) )
+                else:
+                    f.write( ','+str(parcels_area[ind_s][ind_l][0]) )
+            else:
+                f.write( ','+str(0) )
         f.write('\n')
     f.close()
 

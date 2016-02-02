@@ -1,8 +1,24 @@
-'''
-Created on Jan 15, 2013
+# -*- coding: utf-8 -*-
+# As a counterpart to the access to the source code and  rights to copy,
+# modify and redistribute granted by the license, users are provided only
+# with a limited warranty  and the software's author,  the holder of the
+# economic rights,  and the successive licensors  have only  limited
+# liability.
+#
+# In this respect, the user's attention is drawn to the risks associated
+# with loading,  using,  modifying and/or developing or reproducing the
+# software by the user in light of its specific status of free software,
+# that may mean  that it is complicated to manipulate,  and  that  also
+# therefore means  that it is reserved for developers  and  experienced
+# professionals having in-depth computer knowledge. Users are therefore
+# encouraged to load and test the software's suitability as regards their
+# requirements in conditions enabling the security of their systems and/or
+# data to be ensured and,  more generally, to use and operate it in the
+# same conditions as regards security.
+#
+# The fact that you are presently reading this means that you have had
+# knowledge of the CeCILL license version 2 and that you accept its terms.
 
-@author: toz
-'''
 from brainvisa.cortical_surface.parameterization import sulcalLine as sln
 from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
 from brainvisa.cortical_surface.parameterization import model as md
@@ -60,10 +76,8 @@ solver_tolerance = 1e-6                              ####
 def sphereConformalMapping(mesh):
 
     print '    Spherical mapping'
-    L = computeMeshLaplacian(mesh)
+    L, LB = computeMeshLaplacian(mesh, lap_type='conformal')
     #print 'Laplacian : ', L
-
-    L = L.tocsr()
 
     Nv = np.array(mesh.vertex()).shape[0]
 
@@ -74,7 +88,7 @@ def sphereConformalMapping(mesh):
     Rz = sparse.lil_matrix(Nor[:, 2]).tocsr()
 
     print '    Solving linear system'
-
+    L = L.tocsr()
     x = spsolve(L, Rx)
     y = spsolve(L, Ry)
     z = spsolve(L, Rz)
@@ -105,7 +119,7 @@ def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
         p = boundary.size
         t = np.arange(0, 2 * np.math.pi, (2 * np.math.pi / p))
         boundary_coords = np.array([np.cos(t), np.sin(t)])
-    L = pdeTls.computeMeshLaplacian(mesh)
+    L, LB = pdeTls.computeMeshLaplacian(mesh, lap_type='conformal')
     #print 'Laplacian : ', L
     #vert = np.array(mesh.vertex())
     Nv = len(mesh.vertex())  # np.array(mesh.vertex()).shape[0]
@@ -115,7 +129,6 @@ def diskConformalMapping(mesh, boundary=None, boundary_coords=None):
     for i in boundary:
         L[i, :] = 0
         L[i, i] = 1
-    #print 'Modified Laplacian : ', L
     L = L.tocsr()
 
     Rx = np.zeros(Nv)
@@ -169,7 +182,7 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
     Rx = np.zeros(Nbv)
     Ry = np.zeros(Nbv)
 
-    Lx = pdeTls.computeMeshLaplacian(mesh)
+    Lx, LB = pdeTls.computeMeshLaplacian(mesh, lap_type='conformal')
 
     if fixed_boundary:
         for i in boundary[3]:
@@ -213,8 +226,8 @@ def rectConformalMapping(mesh, boundary, length, width, fixed_boundary=0):
 
         print 'solve the linear system'
         Lx = Lx.tocsr()
-        Rx = sparse.lil_matrix(Rx).tocsr()
-        Ry = sparse.lil_matrix(Ry).tocsr()
+        Rx = sparse.csr_matrix(Rx)
+        Ry = sparse.csr_matrix(Ry)
 #        mtx1 = mtx.astype(np.float32)
 #        print 'using gmres'
 #        result, info = gmres(Lx, Rx, tol=1e-3)
@@ -322,14 +335,11 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     "boundary[2] == cingular_boundary"
     "boundary[3] == new vertices always from insula to cingular pole"
     print 'cstr mapping in the rectangle  with cstrBalance = ', cstrBalance
-    #print 'Laplacian : ', L
     vert = np.array(mesh.vertex())
     Nbv = vert.shape[0]
 
     Rx = np.zeros(Nbv)
     Ry = np.zeros(Nbv)
-
-#    Lx = computeMeshLaplacian(mesh)
 
     Ly = Lx.copy()
     for i in boundary[3]:
@@ -612,7 +622,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
         test = nb_tagged > nb_tagged_o
     "identify the anterior bank of the cut :: first vertex of the insula boundary is anterior while last one is posterior"   
     inter_bound0 = set(cluster1).intersection(neoCortex_open_boundary[0])
-    print 'inter_bound0 ',inter_bound0 
+    #print 'inter_bound0 ',inter_bound0
     if len(inter_bound0) > 0:
         if neoCortex_open_boundary[0].index(list(inter_bound0)[0]) < (len(neoCortex_open_boundary[0]) / 2):
             posterior_cluster = other_verts.difference(cluster1)
@@ -921,7 +931,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
     
-    if parcellation_type == 'marsAtlas':
+    if parcellation_type == 'marsAtlas' or parcellation_type == 'model' :
         # add suplementary axes to the model <=> subdivise parcels
         # antero-posterior subdivision of the prefrontal lobe
         sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
@@ -946,24 +956,45 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     if parcellation_type == 'model':
         # parcels merging
         # INSULA
-        tex_parcels[tex_parcels == 9] = 2
-        tex_parcels[tex_parcels == 16] = 2
-        tex_parcels[tex_parcels == 23] = 2
-        tex_parcels[tex_parcels == 37] = 2
-        tex_parcels[tex_parcels == 44] = 2
-        tex_parcels[tex_parcels == 51] = 2
-        tex_parcels[tex_parcels == 58] = 2
+        tex_parcels[tex_parcels == 9] = 44
+        tex_parcels[tex_parcels == 2] = 44
+        tex_parcels[tex_parcels == 16] = 44
+        tex_parcels[tex_parcels == 23] = 44
+        tex_parcels[tex_parcels == 30] = 44
+        tex_parcels[tex_parcels == 65] = 44
+        tex_parcels[tex_parcels == 72] = 44
+        tex_parcels[tex_parcels == 51] = 44
+        tex_parcels[tex_parcels == 58] = 44
         # arround the path between the poles
-        tex_parcels[tex_parcels == 31] = 30
-        tex_parcels[tex_parcels == 32] = 30
-        tex_parcels[tex_parcels == 33] = 30
-        tex_parcels[tex_parcels == 34] = 30
-        tex_parcels[tex_parcels == 35] = 30
-        tex_parcels[tex_parcels == 36] = 30
+        tex_parcels[tex_parcels == 38] = 37
+        tex_parcels[tex_parcels == 39] = 37
+        tex_parcels[tex_parcels == 40] = 37
+        tex_parcels[tex_parcels == 41] = 37
+        tex_parcels[tex_parcels == 42] = 37
+        tex_parcels[tex_parcels == 43] = 37
         # cingular pole
         tex_parcels[tex_parcels == 0] = 1
-
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+
+        ## old: original model, without additional axes
+        # # INSULA
+        # tex_parcels[tex_parcels == 9] = 2
+        # tex_parcels[tex_parcels == 16] = 2
+        # tex_parcels[tex_parcels == 23] = 2
+        # tex_parcels[tex_parcels == 37] = 2
+        # tex_parcels[tex_parcels == 44] = 2
+        # tex_parcels[tex_parcels == 51] = 2
+        # tex_parcels[tex_parcels == 58] = 2
+        # # arround the path between the poles
+        # tex_parcels[tex_parcels == 31] = 30
+        # tex_parcels[tex_parcels == 32] = 30
+        # tex_parcels[tex_parcels == 33] = 30
+        # tex_parcels[tex_parcels == 34] = 30
+        # tex_parcels[tex_parcels == 35] = 30
+        # tex_parcels[tex_parcels == 36] = 30
+        # # cingular pole
+        # tex_parcels[tex_parcels == 0] = 1
+        #  (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
 
     elif parcellation_type == 'marsAtlas':
         # parcels merging, parcel names correspond to the nomenclature given in the paper
@@ -1339,10 +1370,10 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 
     '''poles_path to neocortex'''
     neocortex_poles_path = indsToROI(neocortex_indices, poles_path)
-    print 'neocortex_poles_path',neocortex_poles_path
+    #print 'neocortex_poles_path',neocortex_poles_path
     print '------------------path2Boundary'
     (neoCortex_open_mesh, neoCortex_open_boundary) = path2Boundary(neoCortex_mesh,neoCortex_boundary,neocortex_poles_path)
-    print 'neoCortex_open_boundary',neoCortex_open_boundary
+    #print 'neoCortex_open_boundary',neoCortex_open_boundary
     #vert = np.array(neoCortex_open_mesh.vertex())
     print '------------------rectConformalMapping'
     neoCortex_square = rectConformalMapping(neoCortex_open_mesh, neoCortex_open_boundary, length, width, 0)
@@ -1375,19 +1406,9 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 # HOP
 #
 ####################################################################
-def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, neoCortex_open_mesh,texture_sulci, sulci_dict, side, model=None):
+def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, neoCortex_open_mesh,full_sulci, side, model=None):
     vert = np.array(neoCortex_square.vertex())
-    if vert.shape[0] != len(texture_sulci):
-        raise Exception('sulcal lines texture and rectangular mesh are not compatible, run the process --texture to Flat Mesh--')
-        return
 
-    full_sulci = slSet.SulcalLinesSet()
-#     tex_cstr_square = texture2ROI(texture_sulci, neocortex_indices)
-#     full_sulci.extractFromTexture(texture_sulci, mesh)
-#     full_sulci.updateIndices(neocortex_indices)
-#     vert = np.array(neoCortex_square.vertex())
-#     full_sulci.updateVertices(vert)    
-    full_sulci.extractFromTexture(texture_sulci, neoCortex_square, sulci_dict)
 
     
     '''
@@ -1426,7 +1447,7 @@ def hop(cstrBalance, neoCortex_square, neoCortex_open_boundary, neoCortex_open_m
         model.setAxisCoord(full_sulci)
 
 
-    Lx = pdeTls.computeMeshLaplacian(neoCortex_open_mesh)#neoCortex_square)#
+    Lx, LB = pdeTls.computeMeshLaplacian(neoCortex_open_mesh, lap_type='conformal')#neoCortex_square)#
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
     return neoCortex_square_cstr
@@ -1558,7 +1579,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, side, mode
     model.printArgs()
     model.saveToFile('/home/toz/model_current.txt')
 
-    Lx = pdeTls.computeMeshLaplacian(neoCortex_square)#neoCortex_open_mesh)
+    Lx, LB = pdeTls.computeMeshLaplacian(neoCortex_square, lap_type='conformal')#neoCortex_open_mesh)
 
     neoCortex_square_cstr = cstrRectConformalMapping(Lx, model, neoCortex_square, neoCortex_open_boundary, full_sulci, cstrBalance)
     (neoCortex_square_cstr, nb_inward_cstr_evol) = solveInvertedPolygon(neoCortex_square_cstr, neoCortex_open_boundary, 100)

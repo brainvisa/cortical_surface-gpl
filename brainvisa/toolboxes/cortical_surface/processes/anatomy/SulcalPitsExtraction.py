@@ -114,7 +114,7 @@ def execution( self, context ):
 
     mesh = re.read(self.input_mesh.fullPath())
 
-    #compute the vertex_voronoi of the mesh that will be used in both DPF and watershed hereafter
+    #compute the vertex_voronoi of the mesh that will be used in the  watershed hereafter
     vert_voronoi = pdeTls.vertexVoronoi( mesh )
 
     #compute the DPF
@@ -123,7 +123,7 @@ def execution( self, context ):
     context.system( 'AimsMeshCurvature', '-i', self.input_mesh, '-o', tmp_curv_tex.fullPath() , '-m', 'fem' )
     curv = re.read(tmp_curv_tex.fullPath())
     k = curv[0].arraydata()
-    dpf = pdeTls.depthPotentialFunction(mesh, k, [self.DPF_alpha], vert_voronoi)
+    dpf = pdeTls.depthPotentialFunction(mesh, k, [self.DPF_alpha])
     tex_dpf = aims.TimeTexture_FLOAT()
     tex_dpf[0].assign(dpf[0])
     ws.write(tex_dpf, self.DPF_texture.fullPath())

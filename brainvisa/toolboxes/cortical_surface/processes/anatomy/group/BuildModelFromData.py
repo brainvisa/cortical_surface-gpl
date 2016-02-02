@@ -51,6 +51,7 @@ signature = Signature(
     'flat_white_sulcalines',ListOf( ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ) ),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ListOf( ReadDiskItem( 'Graph Label Translation', 'Text File') ),
+    'model_file_in',ReadDiskItem( 'HipHop Model', 'Text File'),
     'model_file',WriteDiskItem( 'HipHop Model', 'Text File'),
     'model_file_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
     'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),    
@@ -67,14 +68,17 @@ def initialization( self ):
 #    self.linkParameters( 'corresp_indices_texture','rectangular_mesh')
     self.linkParameters( 'flat_white_sulcalines', 'rectangular_mesh')
     self.linkParameters( 'sulcus_labels', 'rectangular_mesh')
-    self.setOptional('model_file_mesh', 'union_sulcal_lines_mesh', 'union_sulcal_lines_texture')
+    self.setOptional('model_file_mesh', 'union_sulcal_lines_mesh', 'union_sulcal_lines_texture', 'model_file_in')
     
 def execution( self, context ):
 
     re = aims.Reader()
     nb_mesh = len(self.rectangular_mesh)
 
+
     model = md.Model()
+    if self.model_file_in is not None:
+        model = model.read(self.model_file_in.fullPath())
     left = 0
     right = 0
     top = 0

@@ -129,7 +129,7 @@ class SulcalLinesSet(object):
             for name in names:
                 place = self.names.index(name)
                 if place is None:
-                    print 'sulcus ' + name + ' not present in this Sulci object!!'
+                    print 'sulcus ' + name + ' not present in this SulcalLinesSet object!!'
                 else:
                     (axisID, isLon, isLat) = modele.sulcus2Axis(name)
                     if isLon:

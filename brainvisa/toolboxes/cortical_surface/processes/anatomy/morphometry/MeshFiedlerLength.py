@@ -34,7 +34,7 @@ try:
 except:
     pass
 
-name = 'Average Mesh Area'
+name = 'Mesh Fiedler length'
 userLevel = 0
 
 # Argument declaration
@@ -55,23 +55,22 @@ def execution( self, context ):
     re = aims.Reader()
     nb_mesh = len( self.input_meshes )
     f = open( self.output_csv_file.fullPath(), 'w' )
-    f.write( 'subject\tside\tarea\n' )
-    context.write('Computing the area')
-    group_areas = []
+    f.write( 'subject\tside\tfidler_length\n' )
+    context.write('Computing the Fiedler geodesic length')
+    group_lengths = []
     for ind_mesh, input_mesh in enumerate(self.input_meshes):
         context.progress( ind_mesh, nb_mesh, process=self )
         subject = input_mesh.get('subject')
         side = input_mesh.get('side')
         mesh = re.read(input_mesh.fullPath())
-        vertex_voronoi = pdeTls.vertexVoronoi(mesh)
-        area = np.sum(vertex_voronoi)
-        f.write( subject + '\t' + side + '\t' + str(area) + '\n' )
-        group_areas.append(area)
+        (d, fiedler) = pdeTls.meshFiedlerLength(mesh, 'geodesic')
+        f.write( subject + '\t' + side + '\t' + str(d) + '\n' )
+        group_lengths.append(d)
     context.progress( nb_mesh, nb_mesh, process=self )
-    avg = np.mean(group_areas)
+    avg = np.mean(group_lengths)
     f.write( 'AVERAGE\tboth\t' + str(avg) + '\n' )
     f.close()
-    context.write('average area:')
+    context.write('average length:')
     context.write(avg)
     # if self.fiedler_texture is not None:
     #     context.write('saving the texture')

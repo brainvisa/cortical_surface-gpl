@@ -43,7 +43,7 @@ signature = Signature(
     'white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines texture', 'aims Texture formats'),
     'basin_min_size', Float(),
     'constraint_weight', Integer(),
-    'constraint_value', Choice('Basins Label','Lat/Lon'),
+    #'constraint_value', Choice('Basins Label','Lat/Lon'),
 )
 
 def initialization( self ):
@@ -66,7 +66,7 @@ def initialization( self ):
     self.sulcus_identification = 'label'
     self.basin_min_size = 50.0
     self.constraint_weight = 15
-    self.constraint_value = 'Basins Label'
+    #self.constraint_value = 'Basins Label'
     
 def execution( self, context ):
         
@@ -130,10 +130,10 @@ def execution( self, context ):
 #      context.runProcess
     context.write('Done')
 
-    if self.constraint_value == 'Basins Label' :
-      constraintValue = 1
-    else :
-      constraintValue = 2
+    # if self.constraint_value == 'Basins Label' :
+    #   constraintValue = 1
+    # else :
+    #   constraintValue = 2
 
     context.write('Sulcal Lines extraction')
 
@@ -150,7 +150,7 @@ def execution( self, context ):
                 '-o', self.white_sulcalines.fullPath(),
                 '-si', self.side,
                 '-sb', self.basin_min_size,
-                '-cv', constraintValue
+                '-cv', 1#constraintValue
                 ]
     apply( context.system, sulcalines )
 

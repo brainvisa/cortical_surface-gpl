@@ -35,14 +35,15 @@ def ismember(ar1, ar2):
 
 ####################################################################
 #
-# compute the 3 angles of each triangle in a mesh
+# compute the area of each triangle in a mesh
 #
 ####################################################################
 def meshPolygonArea(vert,poly):
     
     pp = vert[poly[:, 1], :] - vert[poly[:, 0], :]
     qq = vert[poly[:, 2], :] - vert[poly[:, 0], :]
-    area = np.sqrt(np.sum(np.power(pp*qq,2),1))/2
+    cr  = np.cross(pp,qq)
+    area = np.sqrt(np.sum(np.power(cr,2),1))/2
 
     return area
 
@@ -644,7 +645,7 @@ def subCutMesh(mesh, atex, val):
     if np_ver < [1, 6]:
         (uni, inds) = np.unique1d(poly_set, False, True)
     else:
-        (uni, inds) = np.unique(poly_set, False, True)        
+        (uni, inds) = np.unique(poly_set, False, True)
     submesh = aims.AimsTimeSurface_3_VOID()
     vv = aims.vector_POINT3DF()
     for i in vert[uni, :]:
@@ -712,10 +713,10 @@ def vertsIndicesToEdges(mesh, indices, neigh=None):
 
 
 ####################################################################
-# 
+#
 # compute iso-parameter lines on the mesh
 #
-####################################################################  
+####################################################################
 
 def meshIsoLine(mesh, tex, val):
      #print 'Looking for isoLine'
@@ -729,7 +730,7 @@ def meshIsoLine(mesh, tex, val):
      line=aims.AimsTimeSurface_2_VOID()
      isoV=aims.vector_POINT3DF()
      isoP=aims.vector_AimsVector_U32_2()
-     
+
      triangles=np.array(mesh.polygon())
      for tr in triangles:
           count=sign[tr].sum()
@@ -743,7 +744,7 @@ def meshIsoLine(mesh, tex, val):
                elif (sign[tr[2]]==20):
                     v1=interpolateVertices(tr[2], tr[0], points, values, val)
                     v2=interpolateVertices(tr[2], tr[1], points, values, val)
-               isoV, isoP = addSegment(v1, v2, isoV, isoP)       
+               isoV, isoP = addSegment(v1, v2, isoV, isoP)
           elif (count==50):
                if (sign[tr[0]]==10):
                     v1=interpolateVertices(tr[0], tr[1], points, values, val)

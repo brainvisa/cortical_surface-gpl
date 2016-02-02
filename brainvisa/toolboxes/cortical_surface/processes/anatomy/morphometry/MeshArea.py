@@ -22,58 +22,52 @@
 
 def validation():
     try:
-        from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+        from brainvisa.cortical_surface.surface_tools import basic_tools as bTls
     except:
         raise ValidationError( 'brainvisa.cortical_surface.parameterization.surface_tools module can not be imported.' )
   
 
 from brainvisa.processes import *
 try:
-    from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+    #from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
     import numpy as np
+    from brainvisa.cortical_surface.surface_tools import basic_tools as bTls
 except:
     pass
 
-name = 'Average Mesh Fiedler length'
+name = 'Mesh Area'
 userLevel = 0
 
 # Argument declaration
 signature = Signature(
     'input_meshes', ListOf( ReadDiskItem( 'Hemisphere White Mesh' , 'Aims mesh formats' ) ),
     'output_csv_file', WriteDiskItem( 'CSV file', 'CSV file' )
-    #'fiedler_texture',WriteDiskItem( 'Texture', 'Aims texture formats' )
-    #'distance_type'
 )
 
-
-# Default values
-#def initialization( self ):
-    #self.setOptional( 'fiedler_texture' )
 
 
 def execution( self, context ):
     re = aims.Reader()
     nb_mesh = len( self.input_meshes )
     f = open( self.output_csv_file.fullPath(), 'w' )
-    f.write( 'subject\tside\tfidler_length\n' )
-    context.write('Computing the Fiedler geodesic length')
-    group_lengths = []
+    f.write( 'subject\tside\tarea\n' )
+    context.write('Computing the area')
+    group_areas = []
     for ind_mesh, input_mesh in enumerate(self.input_meshes):
         context.progress( ind_mesh, nb_mesh, process=self )
         subject = input_mesh.get('subject')
         side = input_mesh.get('side')
         mesh = re.read(input_mesh.fullPath())
-        (d, fiedler) = pdeTls.meshFiedlerLength(mesh, 'geodesic')
-        f.write( subject + '\t' + side + '\t' + str(d) + '\n' )
-        group_lengths.append(d)
+        #vertex_voronoi = pdeTls.vertexVoronoi(mesh)
+        p_a = bTls.meshPolygonArea(np.array(mesh.vertex()),np.array(mesh.polygon()))
+        area = np.sum(p_a)
+        f.write( subject + '\t' + side + '\t' + str(area) + '\n' )
+        context.write( subject + '\t' + side + '\t' + str(area) + '\n' )
+        group_areas.append(area)
     context.progress( nb_mesh, nb_mesh, process=self )
-    avg = np.mean(group_lengths)
+    avg = np.mean(group_areas)
     f.write( 'AVERAGE\tboth\t' + str(avg) + '\n' )
     f.close()
-    context.write('average length:')
+    context.write('average area:')
     context.write(avg)
-    # if self.fiedler_texture is not None:
-    #     context.write('saving the texture')
-    #     ws = aims.Writer()
-    #     ws.write(fiedler, self.fiedler_texture.fullPath())
     context.write('Done')
