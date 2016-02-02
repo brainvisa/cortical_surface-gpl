@@ -63,6 +63,7 @@ def execution( self, context ):
     pits = np.where(np.array(pits_texture[0]))[0]
     for pit in pits:
         spheres_mesh += gen.sphere(vert[pit], self.sphere_size,10)
+    #spheres_mesh.header()[ 'referentials' ] = white_mesh.header()[ 'referentials' ]
     aims.write(spheres_mesh, spheres_mesh_file.fullPath())
     a = anatomist.Anatomist()
     win = a.createWindow( 'Axial' )

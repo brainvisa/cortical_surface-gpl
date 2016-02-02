@@ -69,6 +69,7 @@ def execution( self, context ):
     for pit in pits:
         spheres_mesh += gen.sphere(vert[pit], self.sphere_size,10)
         spheres_texture.extend(apits_texture[pit]*np.ones((nb_vert_s,1),np.int16))
+    #spheres_mesh.header()[ 'referentials' ] = white_mesh.header()[ 'referentials' ]
     aims.write(spheres_mesh, spheres_mesh_file.fullPath())
 
     a_tex_out = np.array(spheres_texture)

@@ -48,9 +48,9 @@ signature = Signature(
     'label_attributes', Choice( 'label', 'name' ),
     'label_values', String(),
     'orientation', Choice( 'Top->Bottom', 'Front->Back' ),
-    'sulcus_mesh', WriteDiskItem( 'Sulcus mesh', 'Aims mesh formats' ),
+    'sulcus_mesh', WriteDiskItem( 'Sulcus mesh', 'MESH mesh' ),
     'texture_param1', WriteDiskItem( 'Sulcus y coordinate texture', 'Texture' ),
-    'coordinates_grid', WriteDiskItem( 'Sulcus coordinate grid mesh', 'Aims mesh formats' ),
+    'coordinates_grid', WriteDiskItem( 'Sulcus coordinate grid mesh', 'MESH mesh' ),
     'depth_profile', WriteDiskItem( 'Sulcus depth profile', 'Text file' ),
     'dilation', Float(),
 )
@@ -412,13 +412,13 @@ def execution( self, context ):
      meshing = [ 'AimsMesh',
                  '-i', closedIm.fullPath(),
                  '-o', self.sulcus_mesh.fullPath(),
-                 '-l', '32767',
+                 '-l', '1',
                  '--smooth',
                  '--smoothIt', '20' ]
      apply( context.system, meshing )
 
      test=self.sulcus_mesh.fullName()
-     sulcusMname=test + '_32767_0.mesh'
+     sulcusMname=test + '_1_0.mesh'
 
      shelltools.mv(sulcusMname, self.sulcus_mesh.fullPath())
      shelltools.mv(sulcusMname + '.minf', self.sulcus_mesh.fullPath() + '.minf')
