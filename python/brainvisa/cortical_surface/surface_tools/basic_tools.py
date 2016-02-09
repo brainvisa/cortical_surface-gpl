@@ -718,48 +718,50 @@ def vertsIndicesToEdges(mesh, indices, neigh=None):
 #
 ####################################################################
 
-def meshIsoLine(mesh, tex, val):
-     #print 'Looking for isoLine'
-     points=np.array(mesh.vertex())
-     values=np.array(tex[0])
-     #print('isoLine: points:', points.shape)
-     #print('isoLine: values:', values.shape)
-     sign=np.zeros(values.size)
-     sign[where(values < val)[0]]=10
-     sign[where(values >= val)[0]]=20
-     line=aims.AimsTimeSurface_2_VOID()
-     isoV=aims.vector_POINT3DF()
-     isoP=aims.vector_AimsVector_U32_2()
+def meshIsoLine(mesh, tex, vals):
+    #print 'Looking for isoLine'
+    points=np.array(mesh.vertex())
+    values=np.array(tex[0])
+    #print('isoLine: points:', points.shape)
+    #print('isoLine: values:', values.shape)
+    line=aims.AimsTimeSurface_2_VOID()
+    isoV=aims.vector_POINT3DF()
+    isoP=aims.vector_AimsVector_U32_2()
+    triangles=np.array(mesh.polygon())
 
-     triangles=np.array(mesh.polygon())
-     for tr in triangles:
-          count=sign[tr].sum()
-          if (count==40):
-               if (sign[tr[0]]==20):
-                    v1=interpolateVertices(tr[0], tr[1], points, values, val)
-                    v2=interpolateVertices(tr[0], tr[2], points, values, val)
-               elif (sign[tr[1]]==20):
-                    v1=interpolateVertices(tr[1], tr[0], points, values, val)
-                    v2=interpolateVertices(tr[1], tr[2], points, values, val)
-               elif (sign[tr[2]]==20):
-                    v1=interpolateVertices(tr[2], tr[0], points, values, val)
-                    v2=interpolateVertices(tr[2], tr[1], points, values, val)
-               isoV, isoP = addSegment(v1, v2, isoV, isoP)
-          elif (count==50):
-               if (sign[tr[0]]==10):
-                    v1=interpolateVertices(tr[0], tr[1], points, values, val)
-                    v2=interpolateVertices(tr[0], tr[2], points, values, val)
-               elif (sign[tr[1]]==10):
-                    v1=interpolateVertices(tr[1], tr[0], points, values, val)
-                    v2=interpolateVertices(tr[1], tr[2], points, values, val)
-               elif (sign[tr[2]]==10):
-                    v1=interpolateVertices(tr[2], tr[0], points, values, val)
-                    v2=interpolateVertices(tr[2], tr[1], points, values, val)
-               isoV, isoP=addSegment(v1, v2, isoV, isoP)
+    for val in vals:
+         sign=np.zeros(values.size)
+         sign[values < val]=10
+         sign[values >= val]=20
 
-     line.vertex().assign(isoV)
-     line.polygon().assign(isoP)
-     return line
+         for tr in triangles:
+              count=sign[tr].sum()
+              if (count==40):
+                   if (sign[tr[0]]==20):
+                        v1=interpolateVertices(tr[0], tr[1], points, values, val)
+                        v2=interpolateVertices(tr[0], tr[2], points, values, val)
+                   elif (sign[tr[1]]==20):
+                        v1=interpolateVertices(tr[1], tr[0], points, values, val)
+                        v2=interpolateVertices(tr[1], tr[2], points, values, val)
+                   elif (sign[tr[2]]==20):
+                        v1=interpolateVertices(tr[2], tr[0], points, values, val)
+                        v2=interpolateVertices(tr[2], tr[1], points, values, val)
+                   isoV, isoP = addSegment(v1, v2, isoV, isoP)
+              elif (count==50):
+                   if (sign[tr[0]]==10):
+                        v1=interpolateVertices(tr[0], tr[1], points, values, val)
+                        v2=interpolateVertices(tr[0], tr[2], points, values, val)
+                   elif (sign[tr[1]]==10):
+                        v1=interpolateVertices(tr[1], tr[0], points, values, val)
+                        v2=interpolateVertices(tr[1], tr[2], points, values, val)
+                   elif (sign[tr[2]]==10):
+                        v1=interpolateVertices(tr[2], tr[0], points, values, val)
+                        v2=interpolateVertices(tr[2], tr[1], points, values, val)
+                   isoV, isoP=addSegment(v1, v2, isoV, isoP)
+
+    line.vertex().assign(isoV)
+    line.polygon().assign(isoP)
+    return line
 
 ####################################################################
 # 
@@ -774,8 +776,8 @@ def meshAlmostIsoLine(mesh, tex, val):
      #print('isoLine: points:', points.shape)
      #print('isoLine: values:', values.shape)
      sign=np.zeros(values.size)
-     sign[np.where(values < val)[0]]=10
-     sign[np.where(values >= val)[0]]=20
+     sign[values < val]=10
+     sign[values >= val]=20
      
      si=set()
      
@@ -809,12 +811,12 @@ def meshAlmostIsoLine(mesh, tex, val):
      return np.array(list(si))
                
 def interpolateVertices(v1, v2, points, texture, valeur):
-     t=abs(valeur - texture[v1])/abs(texture[v1] - texture[v2])
+     t=np.abs(valeur - texture[v1])/np.abs(texture[v1] - texture[v2])
      new=(1-t)*points[v1] + t*points[v2]
      return new
      
 def bestVertex(v1, v2, texture, valeur):
-     t=abs(valeur - texture[v1])/abs(texture[v1] - texture[v2])
+     t=np.abs(valeur - texture[v1])/np.abs(texture[v1] - texture[v2])
      if t<0.5:
           return v1
      else:
@@ -829,10 +831,10 @@ def addSegment(v1, v2, vert, seg):
           v=vert[i]
           d1=v-v1
           d2=v-v2
-          if (sqrt(d1[0]*d1[0] + d1[1]*d1[1] + d1[2]*d1[2]))<0.0001:
+          if (np.sqrt(d1[0]*d1[0] + d1[1]*d1[1] + d1[2]*d1[2]))<0.0001:
                i1=i
                a1=1
-          if (sqrt(d2[0]*d2[0] + d2[1]*d2[1] + d2[2]*d2[2]))<0.0001:
+          if (np.sqrt(d2[0]*d2[0] + d2[1]*d2[1] + d2[2]*d2[2]))<0.0001:
                i2=i
                a2=1
  
@@ -844,8 +846,23 @@ def addSegment(v1, v2, vert, seg):
           i2=vert.size()-1
      seg.append([i1, i2])
      return vert, seg 
-     
 
+
+####################################################################
+#
+# create cylindric meshes from a list of vertices
+#
+####################################################################
+
+def linesToTubes(lines, diam=0.25):
+     gen = aims.SurfaceGenerator()
+     tubes = aims.AimsSurfaceTriangle()
+
+     seg = np.array(lines.polygon())
+     vert = np.array(lines.vertex())
+     for s in seg:
+          tubes += gen.cylinder(vert[np.uint32(s[0])], vert[np.uint32(s[1])], diam, diam, 10, 0)
+     return tubes
      
 ####################################################################
 # 
