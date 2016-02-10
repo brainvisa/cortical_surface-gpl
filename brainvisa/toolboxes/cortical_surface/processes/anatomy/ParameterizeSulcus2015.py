@@ -53,6 +53,7 @@ signature = Signature(
     'coordinates_grid', WriteDiskItem( 'Sulcus coordinate grid mesh', 'MESH mesh' ),
     'depth_profile', WriteDiskItem( 'Sulcus depth profile', 'Text file' ),
     'dilation', Float(),
+     'offset', Integer(),
 )
 
 def initialization( self ):
@@ -63,7 +64,7 @@ def initialization( self ):
      self.linkParameters( 'depth_profile', 'sulcus_mesh' )
      self.label_attributes = 'name'
      self.dilation = 1.0
-
+     self.offset = 0
 
 ##################################################################
 # compute_mesh_weight - compute a weight matrix
@@ -413,8 +414,8 @@ def execution( self, context ):
                  '-i', closedIm.fullPath(),
                  '-o', self.sulcus_mesh.fullPath(),
                  '-l', '1',
-                 '--smooth',
-                 '--smoothIt', '20' ]
+                 '--smooth','1',
+                 '--smoothType', 'laplacian' ]
      apply( context.system, meshing )
 
      test=self.sulcus_mesh.fullName()
@@ -566,7 +567,7 @@ def execution( self, context ):
      # inertia plane is computed with a PCA of the vertices.
      # extremities (defined with 'offset') are removed.
      
-     offset=10
+     offset=self.offset
      vert2=vert[where((parameter >= offset) & (parameter <= (100-offset)))].copy()
      bary=mean(vert2, axis=0)
      vert2=vert2-bary
