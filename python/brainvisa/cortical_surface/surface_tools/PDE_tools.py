@@ -78,34 +78,37 @@ def meshPitsSmoothing(mesh, tex,Niter, dt):
         mod = 1000
     #vert = np.array(mesh.vertex())
     print 'using conformal weights with angular threshold at 0.0001'
-    weights = computeMeshWeights(mesh,'conformal',0.0001)
+    weights,B = computeMeshWeights(mesh,'conformal',0.0001)
     N = weights.shape[0]
     s = weights.sum(axis=0)
     dia = sparse.dia_matrix((1 / s, 0), shape=(N, N))
     W = dia * weights
     I = sparse.lil_matrix((N, N))
     I.setdiag(np.ones(N))
-    tL = I.tocsr() - W
-    LI = I.tocsr() - (dt * tL)
+    tL = I - W
+    LI = sparse.lil_matrix( I - (dt * tL) )
+    inds_pits=np.where(tex==1)[0]
+    LI[inds_pits, :] = 0
+    LI[inds_pits, inds_pits] = 1
     #    LI = dt*L
     #    LI = LI.tocsr()
     #    LI = I.tocsr() + LI
     #    print '    LI.shape = ', LI.shape
-    vert=np.array(tex[0]).reshape(N,1)
-    Mtex = vert#sparse.lil_matrix(vert).tocsr()
-    inds_pits=np.where(vert==1)[0]
+    Mtex = tex.reshape(N,1)#sparse.lil_matrix(vert).tocsr()
+
     #print inds_pits[:10]
     #print '    Mtex.shape = ', Mtex.shape
     #print inds_pits.shape
     #print Mtex[inds_pits]
-    o = np.ones((inds_pits.shape[0],1))
+    #o = np.ones((inds_pits.shape[0],1))
 
     #LI2 = I.tocsr() + (dt * tL)
     #Mtex = lgmres(LI2.tocsr(), Mtex, tol=solver_tolerance)
     print 'iterative filtering the texture...'
+    LI = LI.tocsr()
     for i in range(Niter):
         Mtex= LI * Mtex
-        Mtex[inds_pits]=o
+        #Mtex[inds_pits]=o
         if (i % mod == 0):
             print i
     print '    OK'
