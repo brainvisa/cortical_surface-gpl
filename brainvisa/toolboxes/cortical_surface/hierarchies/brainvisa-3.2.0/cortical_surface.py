@@ -36,6 +36,8 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
 
     '<subject>_Lwhite_pits', SetType( 'Left pits texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_pits', SetType( 'Right pits texture' ), SetWeakAttr( 'side', 'right' ),
+    '<subject>_Lwhite_pits_smooth', SetType( 'Left smooth pits texture' ), SetWeakAttr( 'side', 'left' ),
+    '<subject>_Rwhite_pits_smooth', SetType( 'Right smooth pits texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lwhite_noisy_pits', SetType( 'Left noisy pits texture' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_Rwhite_noisy_pits', SetType( 'Right noisy pits texture' ), SetWeakAttr( 'side', 'right' ),
     '<subject>_Lwhite_ridges', SetType( 'Left ridges texture' ), SetWeakAttr( 'side', 'left' ),

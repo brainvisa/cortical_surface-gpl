@@ -31,19 +31,16 @@ try:
 except:
     pass
 
-name = 'Pits Texture Smoothing'
+name = 'Laplacian Mesh Smoothing'
 userLevel = 0
 signature = Signature(
-    'pits_texture',ReadDiskItem( 'pits texture',  'Aims texture formats' ),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
+    'mesh',ReadDiskItem( 'Mesh', 'aims mesh formats' ),
     'dt', Float(),
     'nb_iterations', Integer(),
-    'smoothed_pits_texture', WriteDiskItem('smooth pits texture','Aims texture formats')
+    'smoothed_mesh', WriteDiskItem('Mesh', 'aims mesh formats')
 )
 
 def initialization( self ):
-    self.linkParameters('white_mesh','pits_texture' )
-    self.linkParameters('smoothed_pits_texture','pits_texture' )
     self.dt = 0.7
     self.nb_iterations = 60
     
@@ -52,12 +49,9 @@ def execution( self, context ):
     re = aims.Reader()
     ws = aims.Writer()
     
-    white_mesh = re.read(self.white_mesh.fullPath())
-    pits_tex = re.read(self.pits_texture.fullPath())
-    tex_smooth = pdeTls.laplacianPitsSmoothing(white_mesh, pits_tex[0].arraydata(),self.nb_iterations, self.dt)
-    tex_out = aims.TimeTexture_FLOAT()
-    tex_out[0].assign(tex_smooth)
-    ws.write(tex_out, self.smoothed_pits_texture.fullPath())
+    mesh = re.read(self.mesh.fullPath())
+    mesh_smooth = pdeTls.laplacianMeshSmoothing(mesh ,self.nb_iterations, self.dt)
+    ws.write(mesh_smooth, self.smoothed_mesh.fullPath())
     context.write('Done')
             
       

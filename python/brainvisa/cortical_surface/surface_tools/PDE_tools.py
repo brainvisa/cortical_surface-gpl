@@ -26,7 +26,10 @@ import scipy.stats.stats as sss
 from scipy.sparse.linalg import lgmres
 from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 from soma import aims
-
+########################
+## error tolerance for lgmres solver #
+solver_tolerance = 1e-6                      #
+########################
 
 ####################################################################
 #
@@ -64,106 +67,94 @@ def meshFiedlerLength(mesh, dist_type='geodesic', fiedler=None):
 
 ####################################################################
 #
-# laplacian pits smoothing
+# smoothing the mesh by solving the heat equation using fem Laplacian
 #
 ####################################################################
-def meshPitsSmoothing(mesh, tex,Niter, dt):
+def laplacianMeshSmoothing(mesh, Niter, dt):
     print '    Smoothing mesh'
-    mod = 1
-    if Niter > 10:
-        mod = 10
-    if Niter > 100:
-        mod = 100
-    if Niter > 1000:
-        mod = 1000
-    #vert = np.array(mesh.vertex())
-    print 'using conformal weights with angular threshold at 0.0001'
-    weights,B = computeMeshWeights(mesh,'conformal',0.0001)
-    N = weights.shape[0]
-    s = weights.sum(axis=0)
-    dia = sparse.dia_matrix((1 / s, 0), shape=(N, N))
-    W = dia * weights
-    I = sparse.lil_matrix((N, N))
-    I.setdiag(np.ones(N))
-    tL = I - W
-    LI = sparse.lil_matrix( I - (dt * tL) )
-    inds_pits=np.where(tex==1)[0]
-    LI[inds_pits, :] = 0
-    LI[inds_pits, inds_pits] = 1
-    #    LI = dt*L
-    #    LI = LI.tocsr()
-    #    LI = I.tocsr() + LI
-    #    print '    LI.shape = ', LI.shape
-    Mtex = tex.reshape(N,1)#sparse.lil_matrix(vert).tocsr()
-
-    #print inds_pits[:10]
-    #print '    Mtex.shape = ', Mtex.shape
-    #print inds_pits.shape
-    #print Mtex[inds_pits]
-    #o = np.ones((inds_pits.shape[0],1))
-
-    #LI2 = I.tocsr() + (dt * tL)
-    #Mtex = lgmres(LI2.tocsr(), Mtex, tol=solver_tolerance)
-    print 'iterative filtering the texture...'
-    LI = LI.tocsr()
-    for i in range(Niter):
-        Mtex= LI * Mtex
-        #Mtex[inds_pits]=o
-        if (i % mod == 0):
-            print i
-    print '    OK'
-
-    return(Mtex)
-
-####################################################################
-#
-# laplacian smoothing
-#
-####################################################################
-def meshSmoothing(mesh, Niter, dt):
-    print '    Smoothing mesh'
-    mod = 1
-    if Niter > 10:
-        mod = 10
-    if Niter > 100:
-        mod = 100
-    if Niter > 1000:
-        mod = 1000
-    vert = np.array(mesh.vertex())
-    Mvert = sparse.lil_matrix(vert).tocsr()
-    weights = computeMeshWeights(mesh)
-    N = weights.shape[0]
-#    s = weights.sum(axis = 1)
-    s = weights.sum(axis=0)
-#    dia = sparse.lil_matrix((N,N))
-#    dia.setdiag(s)
-    dia = sparse.dia_matrix((1 / s, 0), shape=(N, N))
-#    b = ones(N)
-#    W = sparse.linalg.spsolve(dia.tocsr(),b)*weights
-    W = dia * weights
-    I = sparse.lil_matrix((N, N))
-    I.setdiag(np.ones(N))
-    tL = I.tocsr() - W
-    LI = I.tocsr() - (dt * tL)
-    #    LI = dt*L
-    #    LI = LI.tocsr()
-    #    LI = I.tocsr() + LI
-    #    print '    LI.shape = ', LI.shape
-    print '    Mvert.shape = ', Mvert.shape
-    for i in range(Niter):
-        Mvert = LI * Mvert
-        if (i % mod == 0):
-            print i
-    print '    OK'
+    L, B = computeMeshLaplacian(mesh, lap_type='fem')
+    avert = np.array(mesh.vertex())
+    Mvert = laplacianSmoothing(avert, L, B, Niter, dt)
     vv = aims.vector_POINT3DF()
-    for i in range(N):
+    for i in range(avert.shape[0]):
         vv.append([Mvert[i, 0], Mvert[i, 1], Mvert[i, 2]])
-
     smooth = aims.AimsTimeSurface_3_VOID()
     smooth.vertex().assign(vv)
     smooth.polygon().assign(mesh.polygon())
     smooth.updateNormals()
-    return(smooth)
+    return smooth
+
+####################################################################
+#
+# smoothing the texture by solving the heat equation using fem Laplacian
+#
+####################################################################
+def laplacianTextureSmoothing(mesh, tex, Niter, dt):
+    print '    Smoothing texture'
+    L, B = computeMeshLaplacian(mesh, lap_type='fem')
+    return laplacianSmoothing(tex, L, B, Niter, dt)
+
+####################################################################
+#
+# smoothing the sulcal pits keeping the max at  1
+# this is done by solving the heat equation under dirichlet condition at the location of pits
+#
+####################################################################
+def laplacianPitsSmoothing(mesh, tex, Niter, dt):
+    print '    Smoothing pits'
+    L, B = computeMeshLaplacian(mesh, lap_type='fem')
+    inds_pits = np.where(tex == 1)[0]
+    #dirichlet condition at the location of pits
+    L[inds_pits, :] = 0
+    B[inds_pits, :] = 0
+    B[inds_pits, inds_pits] = 1
+    s_tex = laplacianSmoothing(tex, L, B, Niter, dt)
+    # threshold negative values due to the inaccuracy of  matrix inversion to 0
+    s_tex[s_tex < 0] = 0
+    return s_tex
+
+####################################################################
+#
+# sub-function for smoothing using fem Laplacian
+#
+####################################################################
+def laplacianSmoothing(Mtex, L, B, Niter, dt):
+    mod = 1
+    if Niter > 10:
+        mod = 10
+    if Niter > 100:
+        mod = 100
+    if Niter > 1000:
+        mod = 1000
+    #print tex.shape[0]
+    #print tex.ndim
+    #if tex.ndim < 2:
+    #   Mtex = tex.reshape(tex.shape[0],1)
+    #else:
+     #   Mtex = tex
+    # using Implicit scheme
+    # B(X^(n+1)-X^n)/dt+L(X^(n+1))=0
+    M = B+dt*L
+    for i in range(Niter):
+        Mtex = B * Mtex
+        if Mtex.ndim>1:
+            for d in range(Mtex.shape[1]):
+                Mtex[:,d], infos = lgmres(M.tocsr(), Mtex[:,d], tol=solver_tolerance)
+        else:
+            Mtex, infos = lgmres(M.tocsr(), Mtex, tol=solver_tolerance)
+        if (i % mod == 0):
+            print i
+
+    # using Explicit scheme, convergence guaranteed only for dt<1 and not faster than implicit when using fem Laplacian
+    # B(X^(n+1)-X^n)/dt+L(X^n)=0
+    # M = B-dt*L
+    # for i in range(Niter):
+    #     Mtex = M * Mtex
+    #     Mtex, infos = lgmres(B.tocsr(), Mtex, tol=solver_tolerance)
+    #     if (i % mod == 0):
+    #         print i
+    print '    OK'
+    return Mtex
 
 ####################################################################
 # compute_mesh_weight - compute a weight matrix
@@ -364,7 +355,6 @@ def vertexVoronoi(mesh, angs=None):
 def depthPotentialFunction(mesh, curvature, alphas):
     L, LB = computeMeshLaplacian(mesh, lap_type='fem')
     Nbv = len(np.array(mesh.vertex()))
-    solver_tolerance = 1e-6
     B = -LB * (curvature-( np.sum(curvature*LB.diagonal()) / np.sum(LB.diagonal()) ))
 
     dpf=[]

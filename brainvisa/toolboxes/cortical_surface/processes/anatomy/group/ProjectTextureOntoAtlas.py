@@ -34,8 +34,8 @@ userLevel = 0
     
 signature = Signature(
     'subject_texture', ReadDiskItem('Texture','Aims Texture formats'),
-    'subject_spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
-    'atlas_spherical_mesh', ReadDiskItem( 'Spherical mesh', 'Aims mesh formats' ),
+    'subject_spherical_mesh', ReadDiskItem( 'Hemisphere spherical mesh', 'Aims mesh formats' ),
+    'atlas_spherical_mesh', ReadDiskItem( 'Hemisphere spherical mesh', 'Aims mesh formats' ),
     'texture_on_atlas', WriteDiskItem('Texture','Aims Texture formats')
 
 )
@@ -43,7 +43,6 @@ signature = Signature(
 def initialization( self ):
     self.linkParameters( 'subject_spherical_mesh','subject_texture' )
 #    self.findValue( 'spherical_template', {'filename_variable' : 'ico100_7'} )
-    self.sphere_ray = 100 
     
 def execution( self, context ):
        
