@@ -26,7 +26,16 @@ def Diffusion(signal, dt, t):
     return diff
 
 # When the curve is a sulcus profile, get L1 L2 
-def GetL1L2(signal, t):
+def GetL1L2(signal, t, species='human'):
+    if species=='human':
+        boundInf=50
+        boundSup=80
+    elif species=='baboon':
+        boundInf=60
+        boundSup=90
+    else:
+        boundInf=50
+        boundSup=80
     dt=0.05
     smooth=Diffusion(signal, dt, t)
     st=signal.std()
@@ -34,11 +43,11 @@ def GetL1L2(signal, t):
     maxP=-100
     l1=0
     l2=0
-    for i in range(20, 50):
+    for i in range(20, boundInf):
         if ((smooth[i]<minP) & (smooth[i]<=smooth[i+1]) & (smooth[i]<=smooth[i-1])):
             l1=i
             minP=smooth[i]
-    for i in range(l1+1, 80):
+    for i in range(l1+1, boundSup):
         if ((smooth[i]>maxP) & (smooth[i]>=smooth[i+1]) & (smooth[i]>=smooth[i-1]) & ((smooth[i]-minP) > 0.5*st)):
             l2=i
             maxP=smooth[i]
