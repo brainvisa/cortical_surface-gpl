@@ -48,11 +48,12 @@ signature = Signature(
     'label_attributes', Choice( 'label', 'name' ),
     'label_values', String(),
     'orientation', Choice( 'Top->Bottom', 'Front->Back' ),
-    'sulcus_mesh', WriteDiskItem( 'Sulcus mesh', 'Aims mesh formats' ),
+    'sulcus_mesh', WriteDiskItem( 'Sulcus mesh', 'MESH mesh' ),
     'texture_param1', WriteDiskItem( 'Sulcus y coordinate texture', 'Texture' ),
-    'coordinates_grid', WriteDiskItem( 'Sulcus coordinate grid mesh', 'Aims mesh formats' ),
+    'coordinates_grid', WriteDiskItem( 'Sulcus coordinate grid mesh', 'MESH mesh' ),
     'depth_profile', WriteDiskItem( 'Sulcus depth profile', 'Text file' ),
     'dilation', Float(),
+    'offset', Integer(),
 )
 
 def initialization( self ):
@@ -63,6 +64,7 @@ def initialization( self ):
      self.linkParameters( 'depth_profile', 'sulcus_mesh' )
      self.label_attributes = 'name'
      self.dilation = 1.0
+     self.offset = 0
 
 
 ##################################################################
@@ -412,13 +414,14 @@ def execution( self, context ):
      meshing = [ 'AimsMesh',
                  '-i', closedIm.fullPath(),
                  '-o', self.sulcus_mesh.fullPath(),
-                 '-l', '32767',
-                 '--smooth',
-                 '--smoothIt', '20' ]
+                 '-l', '1',
+                 '--smooth', '1',
+                 '--smoothType', 'laplacian']
+                # '--smoothIt', '20' ]
      apply( context.system, meshing )
 
      test=self.sulcus_mesh.fullName()
-     sulcusMname=test + '_32767_0.mesh'
+     sulcusMname=test + '_1_0.mesh'
 
      shelltools.mv(sulcusMname, self.sulcus_mesh.fullPath())
      shelltools.mv(sulcusMname + '.minf', self.sulcus_mesh.fullPath() + '.minf')
@@ -442,11 +445,19 @@ def execution( self, context ):
      L=computeMeshLaplacian(mesh)
      Lap=0.5*(L+L.transpose())
      print 'Computing fiedler vector'
-     w,v=alg.eigsh(Lap, 4, which='SM')
+     w,v=alg.eigsh(Lap, 6, which='SM')
  
      texOut=aims.TimeTexture_FLOAT(1,N)
+     texOther1=aims.TimeTexture_FLOAT(1,N)
+     texOther2=aims.TimeTexture_FLOAT(1,N)     
+     texOther3=aims.TimeTexture_FLOAT(1,N)     
+     texOther4=aims.TimeTexture_FLOAT(1,N)     
      isoParam=aims.TimeTexture_FLOAT(1,N)
      fiedler=v[:,1]
+     other1=v[:,2]
+     other2=v[:,3]
+     other3=v[:,4]
+     other4=v[:,5]
      
      # gestion de l'orientation
      
@@ -477,12 +488,18 @@ def execution( self, context ):
      
      for i in range(N):
           texOut[0][i]=(fiedler[i]*a) + b
- 
+          texOther1[0][i]=other1[i]
+          texOther2[0][i]=other2[i] 
+          texOther3[0][i]=other3[i]
+          texOther4[0][i]=other4[i]
      #print 'Writing texture', self.texture_param1.fullName()
      ws=aims.Writer()
  
      ws.write( texOut, tempParam.fullPath() )
-     
+     ws.write( texOther1, '/tmp/other1.tex' )
+     ws.write( texOther2, '/tmp/other2.tex' )
+     ws.write( texOther3, '/tmp/other3.tex' )
+     ws.write( texOther4, '/tmp/other4.tex' )     
      context.write('Recomputing isometric parameterization')
      
      ########################################################
@@ -566,7 +583,7 @@ def execution( self, context ):
      # inertia plane is computed with a PCA of the vertices.
      # extremities (defined with 'offset') are removed.
      
-     offset=10
+     offset=self.offset
      vert2=vert[where((parameter >= offset) & (parameter <= (100-offset)))].copy()
      bary=mean(vert2, axis=0)
      vert2=vert2-bary
