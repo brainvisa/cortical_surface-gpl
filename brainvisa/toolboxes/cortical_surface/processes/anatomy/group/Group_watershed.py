@@ -71,7 +71,7 @@ def execution( self, context ):
     mesh = re.read( self.template_mesh.fullPath() )
     vert_area = pdeTls.vertexVoronoi( mesh )
     densityTex = re.read( self.density_texture.fullPath() )
-    densityArray = np.array( densityTex[0] )
+    densityArray = np.nan_to_num(np.array( densityTex[0] ))
 
     if self.mask_texture is not None:
         maskTex = re.read( self.mask_texture.fullPath() )
