@@ -6,18 +6,18 @@
 For references and a detailed description of the process, a couple of research papers are given below.<br/>
 <br/>
 The Hip-Hop method is described in:<br/>
-<span style="color: rgb(51, 51, 255);">Auzias G, Lefèvre J, Le Troter A, Fischer C, Perrot M, Régis J, Coulon O, <span style="font-style: italic;">Model-driven Harmonic Parameterization of the Cortical Surface : HIP-HOP, </span> <span style="font-weight: bold;">IEEE Trans. on Medical Imaging, </span> 32(5):873-887, 2013.</span><br/>
+<span style="color: rgb(51, 51, 255);">Auzias G, Lefèvre J, Le Troter A, Fischer C, Perrot M, Régis J, Coulon O (2013). <span style="font-style: italic;">Model-driven Harmonic Parameterization of the Cortical Surface : HIP-HOP, </span> <span style="font-weight: bold;">IEEE Trans. on Medical Imaging, </span>32(5):873-887.</span><br/>
 <br/>
-The cortical parcellation method is described in:<br/>
-<span style="color: rgb(51, 51, 255);">Clouchoux C, Coulon O, Anton J-L, Mangin J-F, Régis J,<span style="font-style: italic;">A new cortical surface parcellation model and its automatic implementation, </span> in <span style="font-weight: bold;">MICCAI 06 </span>, Lecture Notes in Computer Science, vol. 4191, pp. 193-200, Springer-Verlag, Copenhagen, Denmark, 2006.</span><br/>
+The MarsAtlas cortical parcellation method is described in:<br/>
+<span style="color: rgb(51, 51, 255);">Auzias G, Coulon O, Brovelli A (2016). <span style="font-style: italic;">MarsAtlas : A cortical parcellation atlas for functional mapping, </span> <span style="font-weight: bold;">Human Brain Mapping</span> 37(4):1573-1592.</span><br/>
 </xhtml>
     <d name="parameters">
       <xhtml name="Rgraph">This is the labelled sulci graph for the left hemisphere.</xhtml>
       <xhtml name="sulcus_identification">In the graphs, sulci can be identified by labels (usually if the labelling has been done automatically) or by names (usually if the labelling has been done or modified manually).</xhtml>
       <xhtml name="Lgraph">This is the labelled sulci graph for the left hemisphere.</xhtml>
     </d>
-    <xhtml name="long">The 'Hip-Hop cortical surface parameterization' process has to be ran AFTER the 'morphologist 2013' pipeline.<br/> 
-In order to produce a parameterization and a parcellation of the ocrical surface of each hemisphere you need to segment the white/grey interface and represent it as a triangulated surface (Morphologist 2013), and you need to extrat the siulci graph and label it. Therefore in the 'morphologist 2013' pipeline you need to make sure that 'Sulci Recognition' is ticked on for each hemisphere (it is of by default). Our recommendation is to use the 'Sulci Recognition with SPAM' option, it is both faster and overall more reliable. <br/>
+    <xhtml name="long">The 'Hip-Hop cortical surface parameterization' process has to be ran AFTER the 'morphologist 2015' pipeline.<br/> 
+In order to produce a parameterization and a parcellation of the cortical surface of each hemisphere you need to segment the white/grey interface and represent it as a triangulated surface (Morphologist 2015), and you need to extrat the sulci graph and label it. Therefore in the 'Morphologist 2015' pipeline you need to make sure that 'Sulci Recognition' is ticked on for each hemisphere (it is of by default). Our recommendation is to use the 'Sulci Recognition with SPAM' option, it is both faster and overall more reliable. <br/>
 <br/>
 The only input you need to provide to the pipeline if the left or right labelled sulci graph and the attribute that identifies sulci. This attribute is set to 'label' by default, which is alright if the sulci recognition has been performed automatically as mentioned above. If you have labelled your sulci by hand you probably need to set it on 'name'.<br/>
 <br/>
@@ -29,15 +29,15 @@ The pipeline produces a number of useful files that are briefly listed below:
 <li> two parcellation textures, 'texture_model_parcels' and 'texture_coarse_parcels'.
 <ul>
 <li>'texture_model_parcels' is the parcellation strictly defined by the model used for the HOP step.</li>
-<li>'texture_marsAtlas_parcels' is a parcellation that has been refined to provide a more regular and useful parcellation scheme. So far, this is the one to use for region of interest analyses or connectivity estimation.</li>
+<li>'texture_marsAtlas_parcels' is the recommended parcellation sheme. It has been optimized for functional data analysis and embed embed hypotheses about the anatomical and functional cortical organization.</li>
 </ul></li>
 </ul>
 <br/>
 It is possible to generate a volume-based parcellation of the cortex from the surface-based one using the process <a href="2dParcellationTo3dParcellation.html">2D Parcellation to 3D Parcellation</a> available in the low-level category of the toolbox.<br/>
 <br/>
-The parcellation provided by the pipeline should look something like this:
-
-
+To know more about the Hip-Hop parameterization process and how to use it <a href="http://www.meca-brain.org/softwares/cortical-parameterization-and-inter-subject-matching-hip-hop/">check out this page</a>. 
+<br/>
+To know more about the MarsAtlas parcellation model <a href="http://www.meca-brain.org/softwares/cortical-parcellation-marsatlas/">check out this page</a>. 
 <br/>
 </xhtml>
   </d>
