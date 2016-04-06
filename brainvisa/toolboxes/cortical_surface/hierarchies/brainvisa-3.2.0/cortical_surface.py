@@ -141,6 +141,12 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
     '<subject>_Rwhite_parcels_marsAtlas', SetType( 'Right hemisphere marsAtlas parcellation texture'),
       SetWeakAttr('side', 'right', 'averaged', 'No', 'vertex_corr', 'No',
                   'parcellation_type', 'marsAtlas', 'regularized', 'false'),
+    '<subject>_Lwhite_parcels_lobes', SetType( 'Left hemisphere lobe parcellation texture'),
+      SetWeakAttr('side', 'left', 'averaged', 'No', 'vertex_corr', 'No',
+                  'parcellation_type', 'lobe', 'regularized', 'false'),
+    '<subject>_Rwhite_parcels_lobes', SetType( 'Right hemisphere lobe parcellation texture'),
+      SetWeakAttr('side', 'right', 'averaged', 'No', 'vertex_corr', 'No',
+                  'parcellation_type', 'lobe', 'regularized', 'false'),
   ),
 )
 

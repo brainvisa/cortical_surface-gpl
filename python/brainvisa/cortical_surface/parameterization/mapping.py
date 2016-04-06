@@ -930,9 +930,9 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     sort_axes_lon.sort()
     sort_axes_lat.sort()
     sort_axes_lat.append(180-model.cingularPoleBoundaryCoord)
-    
+
+    # add suplementary axes to the model <=> subdivise parcels
     if parcellation_type == 'marsAtlas' or parcellation_type == 'model' :
-        # add suplementary axes to the model <=> subdivise parcels
         # antero-posterior subdivision of the prefrontal lobe
         sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
         # antero-posterior subdivision of the temporal lobe
@@ -940,9 +940,31 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
 #        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcel_width)
         sort_axes_lon.sort()
 
-#    sort_axes_lat.append(180)
-#    print sort_axes_lon
-#    print sort_axes_lat
+    elif parcellation_type == 'heschl' :
+        # antero-posterior subdivision of the prefrontal lobe
+        sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
+        sort_axes_lon.sort()
+
+    elif parcellation_type == 'lobe':
+        print(sort_axes_lon)
+        # antero-posterior subdivision of the temporal lobe
+        sort_axes_lon.append(sort_axes_lon[5] + 7 * (sort_axes_lon[6] - sort_axes_lon[5]) / 8)
+#        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcel_width)
+        del sort_axes_lon[8]
+        del sort_axes_lon[6]
+        del sort_axes_lon[3]
+        del sort_axes_lon[2]
+        del sort_axes_lon[1]
+        sort_axes_lon.sort()
+        print(sort_axes_lon)
+
+        print(sort_axes_lat)
+        del sort_axes_lat[5]
+        del sort_axes_lat[4]
+        del sort_axes_lat[3]
+        del sort_axes_lat[2]
+        print(sort_axes_lon)
+
     for t_lon in range(len(sort_axes_lon)-1):
 #        print sort_axes_lon[t_lon]
         inds_lon = np.where((template_lon >= sort_axes_lon[t_lon])&(template_lon<=sort_axes_lon[t_lon+1]))[0]
@@ -953,7 +975,9 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
 #            print 'lab_parcel', lab_parcel
             lab_parcel = lab_parcel+1
 
-    if parcellation_type == 'model':
+
+
+    if parcellation_type == 'model' or parcellation_type == 'heschl' :
         # parcels merging
         # INSULA
         tex_parcels[tex_parcels == 9] = 44
@@ -1161,7 +1185,23 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
 
         nb_parcels = np.unique(tex_parcels).shape[0]
 
+    elif parcellation_type == 'lobe' :
+        # parcels merging
+        # INSULA
+        tex_parcels[tex_parcels == 14] = 2
+        tex_parcels[tex_parcels == 11] = 2
+        tex_parcels[tex_parcels == 8] = 2
+        # arround the path between the poles
+        tex_parcels[tex_parcels == 6] = 5
+        tex_parcels[tex_parcels == 7] = 5
+        # limbic
+        tex_parcels[tex_parcels == 16] = 4
+        tex_parcels[tex_parcels == 13] = 4
+        tex_parcels[tex_parcels == 10] = 4
+        # cingular pole
+        tex_parcels[tex_parcels == 0] = 1
 
+        (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
 
     elif parcellation_type == 'model_foetus':
         # concatenate some parcels
@@ -1203,6 +1243,9 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 0] = 1
 
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+
+    else : # unknown parcellation type
+        nb_parcels = np.unique(tex_parcels).shape[0]
 
     return (tex_parcels, nb_parcels)
 

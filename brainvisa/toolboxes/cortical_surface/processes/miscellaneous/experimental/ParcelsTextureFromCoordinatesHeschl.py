@@ -35,9 +35,9 @@ try :
 except:
   pass
 
-name = 'Parcels Texture From Coordinates'
+name = 'HESCHL Parcels Texture From Coordinates'
 
-userLevel = 0
+userLevel = 2
 
 # def validation():
 #     anatomist.validation()
@@ -50,8 +50,6 @@ signature = Signature(
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
 #=    'parcellation_resolution', Choice('model', 'coarse'),
     'texture_model_parcels', WriteDiskItem('hemisphere model parcellation texture', 'aims Texture formats', requiredAttributes={'regularized': 'false' }),
-     'texture_marsAtlas_parcels', WriteDiskItem('hemisphere marsAtlas parcellation texture', 'aims Texture formats', requiredAttributes={'regularized': 'false' }),
-    'texture_lobes_parcels', WriteDiskItem('hemisphere lobe parcellation texture', 'aims Texture formats', requiredAttributes={'regularized': 'false' }),
 )
 
 def initialization( self ):
@@ -64,10 +62,7 @@ def initialization( self ):
 #=    self.linkParameters( 'texture_parcels','latitude')
     self.linkParameters( 'model_file', 'latitude' )
     self.linkParameters( 'texture_model_parcels', 'latitude')
-    self.linkParameters( 'texture_marsAtlas_parcels', 'latitude')
-    self.linkParameters( 'texture_lobes_parcels', 'latitude')
-
-#=    def linkRes( self, dummy ):
+ #=    def linkRes( self, dummy ):
 #=        if self.latitude is not None:
 #=            return self.signature[ 'texture_parcels' ].findValue( self.latitude, requiredAttributes={ 'parcellation_type' : self.parcellation_resolution } )
 
@@ -87,7 +82,7 @@ def execution( self, context ):
 #=    for line in model.printArgs().splitlines():
 #=        context.write(line)
 
-    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'model')
+    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'heschl')
  #=   context.write('----------------------------------------------------------')
     context.write('number of parcels created for the model-based parcellation (including the cingular pole) :')
     context.write(nb_parcels)
@@ -100,34 +95,6 @@ def execution( self, context ):
     aims_tex_parcels = aims.TimeTexture_S32()
     aims_tex_parcels[0].assign(tex_parcels)
     ws.write(aims_tex_parcels, self.texture_model_parcels.fullPath())
-
-    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'marsAtlas')
- #=   context.write('----------------------------------------------------------')
-    context.write('number of parcels created for the marsAtlas parcellation (including the cingular pole) :')
-    context.write(nb_parcels)
-    if self.side =='right':
-        tex_parcels = tex_parcels + 100
-        tex_parcels[tex_parcels == 100] = 0 #cingular pole
-        tex_parcels[tex_parcels == 355] = 255 # path between poles
-
-    context.write('Writing texture')
-    aims_tex_parcels = aims.TimeTexture_S32()
-    aims_tex_parcels[0].assign(tex_parcels)
-    ws.write(aims_tex_parcels, self.texture_marsAtlas_parcels.fullPath())
-
-    (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'lobe')
- #=   context.write('----------------------------------------------------------')
-    context.write('number of parcels created for the lobe parcellation (including the cingular pole) :')
-    context.write(nb_parcels)
-    if self.side =='right':
-        tex_parcels = tex_parcels + 100
-        tex_parcels[tex_parcels == 100] = 0 #cingular pole
-        tex_parcels[tex_parcels == 355] = 255 # path between poles
-
-    context.write('Writing texture')
-    aims_tex_parcels = aims.TimeTexture_S32()
-    aims_tex_parcels[0].assign(tex_parcels)
-    ws.write(aims_tex_parcels, self.texture_lobes_parcels.fullPath())
 
     context.write('Done')
             
