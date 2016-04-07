@@ -945,8 +945,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         sort_axes_lon.append(sort_axes_lon[1] + (sort_axes_lon[2] - sort_axes_lon[1]) / 2)
         sort_axes_lon.sort()
 
-    elif parcellation_type == 'lobe':
-        print(sort_axes_lon)
+    elif parcellation_type == 'lobes':
         # antero-posterior subdivision of the temporal lobe
         sort_axes_lon.append(sort_axes_lon[5] + 7 * (sort_axes_lon[6] - sort_axes_lon[5]) / 8)
 #        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcel_width)
@@ -956,14 +955,14 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         del sort_axes_lon[2]
         del sort_axes_lon[1]
         sort_axes_lon.sort()
-        print(sort_axes_lon)
 
-        print(sort_axes_lat)
         del sort_axes_lat[5]
         del sort_axes_lat[4]
         del sort_axes_lat[3]
         del sort_axes_lat[2]
-        print(sort_axes_lon)
+
+    elif parcellation_type == 'gyri':
+        del sort_axes_lat[3]
 
     for t_lon in range(len(sort_axes_lon)-1):
 #        print sort_axes_lon[t_lon]
@@ -989,15 +988,16 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 72] = 44
         tex_parcels[tex_parcels == 51] = 44
         tex_parcels[tex_parcels == 58] = 44
+        tex_parcels[tex_parcels == 37] = 44
         # arround the path between the poles
-        tex_parcels[tex_parcels == 38] = 37
-        tex_parcels[tex_parcels == 39] = 37
-        tex_parcels[tex_parcels == 40] = 37
-        tex_parcels[tex_parcels == 41] = 37
-        tex_parcels[tex_parcels == 42] = 37
-        tex_parcels[tex_parcels == 43] = 37
+        tex_parcels[tex_parcels == 39] = 38
+        tex_parcels[tex_parcels == 40] = 38
+        tex_parcels[tex_parcels == 41] = 38
+        tex_parcels[tex_parcels == 42] = 38
+        tex_parcels[tex_parcels == 43] = 38
         # cingular pole
         tex_parcels[tex_parcels == 0] = 1
+
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
 
         ## old: original model, without additional axes
@@ -1047,13 +1047,13 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels_tmp[tex_parcels == 72] = 44
         tex_parcels_tmp[tex_parcels == 51] = 44
         tex_parcels_tmp[tex_parcels == 58] = 44
+        tex_parcels_tmp[tex_parcels == 37] = 44
         # arround the path between the poles
-        tex_parcels_tmp[tex_parcels == 38] = 37
-        tex_parcels_tmp[tex_parcels == 39] = 37
-        tex_parcels_tmp[tex_parcels == 40] = 37
-        tex_parcels_tmp[tex_parcels == 41] = 37
-        tex_parcels_tmp[tex_parcels == 42] = 37
-        tex_parcels_tmp[tex_parcels == 43] = 37
+        tex_parcels_tmp[tex_parcels == 39] = 38
+        tex_parcels_tmp[tex_parcels == 40] = 38
+        tex_parcels_tmp[tex_parcels == 41] = 38
+        tex_parcels_tmp[tex_parcels == 42] = 38
+        tex_parcels_tmp[tex_parcels == 43] = 38
         # ITCm
         tex_parcels_tmp[tex_parcels == 48] = 49  # 77] = 79
         # VCs
@@ -1097,7 +1097,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         # cingular pole = 0
         # tex_parcels_tmp[tex_parcels == 0] = 1
         # path between poles = cingular pole
-        tex_parcels[tex_parcels_tmp == 37] =  255
+        tex_parcels[tex_parcels_tmp == 38] =  255
 
         # reorganization of the labels to match the nomenclature of the paper
         #	VCcm
@@ -1185,15 +1185,15 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
 
         nb_parcels = np.unique(tex_parcels).shape[0]
 
-    elif parcellation_type == 'lobe' :
+    elif parcellation_type == 'lobes' :
         # parcels merging
         # INSULA
         tex_parcels[tex_parcels == 14] = 2
         tex_parcels[tex_parcels == 11] = 2
         tex_parcels[tex_parcels == 8] = 2
+        tex_parcels[tex_parcels == 5] = 2
         # arround the path between the poles
-        tex_parcels[tex_parcels == 6] = 5
-        tex_parcels[tex_parcels == 7] = 5
+        tex_parcels[tex_parcels == 7] = 6
         # limbic
         tex_parcels[tex_parcels == 16] = 4
         tex_parcels[tex_parcels == 13] = 4
@@ -1202,6 +1202,53 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 0] = 1
 
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+
+    elif parcellation_type == 'gyri' :
+        # parcels merging
+        # INSULA
+        tex_parcels[tex_parcels == 14] = 2
+        tex_parcels[tex_parcels == 20] = 2
+        tex_parcels[tex_parcels == 8] = 2
+        tex_parcels[tex_parcels == 50] = 2
+        tex_parcels[tex_parcels == 44] = 2
+        tex_parcels[tex_parcels == 32] = 2
+        tex_parcels[tex_parcels == 26] = 2
+        tex_parcels[tex_parcels == 38] = 2
+        # arround the path between the poles
+        tex_parcels[tex_parcels == 28] = 27
+        tex_parcels[tex_parcels == 29] = 27
+        tex_parcels[tex_parcels == 30] = 27
+        tex_parcels[tex_parcels == 31] = 27
+        # precentral
+        tex_parcels[tex_parcels == 4] = 3
+        tex_parcels[tex_parcels == 5] = 3
+        # postcentral
+        tex_parcels[tex_parcels == 52] = 51
+        tex_parcels[tex_parcels == 53] = 51
+        # superior frontal
+        tex_parcels[tex_parcels == 17] = 11
+        tex_parcels[tex_parcels == 12] = 11
+        tex_parcels[tex_parcels == 18] = 11
+        # medial orbitofrontal
+        tex_parcels[tex_parcels == 24] = 23
+        # paracentral
+        tex_parcels[tex_parcels == 54] = 6
+        # caudal anterior cingulate
+        tex_parcels[tex_parcels == 19] = 13
+        # posterior cingulate
+        tex_parcels[tex_parcels == 55] = 7
+        # isthmus cingulate
+        tex_parcels[tex_parcels == 49] = 43
+        # parahipocampal
+        tex_parcels[tex_parcels == 36] = 37
+        # cuneus
+        tex_parcels[tex_parcels == 42] = 41
+        # supramarginal
+        tex_parcels[tex_parcels == 45] = 39
+        # inferior parietal
+        tex_parcels[tex_parcels == 46] = 40
+
+        nb_parcels = np.unique(tex_parcels).shape[0]
 
     elif parcellation_type == 'model_foetus':
         # concatenate some parcels

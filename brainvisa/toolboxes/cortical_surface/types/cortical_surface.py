@@ -204,9 +204,14 @@ FileType( 'Hemisphere marsAtlas parcellation texture', 'Hemisphere parcellation 
 FileType( 'Left hemisphere marsAtlas parcellation texture', 'Hemisphere marsAtlas parcellation texture')
 FileType( 'Right hemisphere marsAtlas parcellation texture', 'Hemisphere marsAtlas parcellation texture')
 
-FileType( 'Hemisphere lobe parcellation texture', 'Hemisphere parcellation texture' )
-FileType( 'Left hemisphere lobe parcellation texture', 'Hemisphere lobe parcellation texture')
-FileType( 'Right hemisphere lobe parcellation texture', 'Hemisphere lobe parcellation texture')
+FileType( 'Hemisphere lobes parcellation texture', 'Hemisphere parcellation texture' )
+FileType( 'Left hemisphere lobes parcellation texture', 'Hemisphere lobes parcellation texture')
+FileType( 'Right hemisphere lobes parcellation texture', 'Hemisphere lobes parcellation texture')
+
+FileType( 'Hemisphere gyrus parcellation texture', 'Hemisphere parcellation texture' )
+FileType( 'Left hemisphere gyrus parcellation texture', 'Hemisphere gyrus parcellation texture')
+FileType( 'Right hemisphere gyrus parcellation texture', 'Hemisphere gyrus parcellation texture')
+
 
 # may be used to replace hemisphere regularized parcellation texture
 #FileType( 'Left hemisphere regularized model parcellation texture', 'Hemisphere gyri parcellation texture')

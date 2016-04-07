@@ -34,7 +34,7 @@ from neuroProcesses import *
 import shfjGlobals
 from brainvisa import anatomist
 
-name = 'Anatomist Show Lobes Parcels Texture'
+name = 'Anatomist Show Gyrus Parcels Texture'
 roles = ('viewer',)
 userLevel = 0
 
@@ -42,16 +42,16 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'texture_lobes_parcels', ReadDiskItem('hemisphere lobes parcellation texture', 'aims Texture formats'),
+    'texture_gyri_parcels', ReadDiskItem('hemisphere gyrus parcellation texture', 'aims Texture formats'),
     'white_mesh',ReadDiskItem( 'White Mesh', 'aims mesh formats' ),
 )
 
 def initialization( self ):
-  self.linkParameters('white_mesh','texture_lobes_parcels' )
+  self.linkParameters('white_mesh','texture_gyri_parcels' )
 
 def execution( self, context ):
   a = anatomist.Anatomist()
   return a.viewTextureOnMesh( self.white_mesh,
-                                           self.texture_lobes_parcels,
+                                           self.texture_gyri_parcels,
                                            a.getPalette('Talairach'),
                                            interpolation = 'rgb' )
