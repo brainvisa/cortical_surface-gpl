@@ -56,7 +56,7 @@ def execution( self, context ):
     vert = np.array(subject_spherical_mesh.vertex())
     if vert.shape[0] != a.shape[0]:
         context.error('subject_spherical_mesh and subject_texture do not have the same number of elements')
-        
+
     else:
         atlas_spherical_mesh = re.read(self.atlas_spherical_mesh.fullPath())
         mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
