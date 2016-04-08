@@ -50,20 +50,25 @@ def execution( self, context ):
     ws = aims.Writer()
     
     subject_spherical_mesh = re.read(self.subject_spherical_mesh.fullPath())
-    atlas_spherical_mesh = re.read(self.atlas_spherical_mesh.fullPath())
-    mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
-    mi.project() # calcule les correspondances et coord barycentriques
     subject_texture = re.read(self.subject_texture.fullPath())
     a = subject_texture[0].arraydata()
-    isint = a.dtype.type in ( np.int, np.int8, np.int16, np.int32, np.int64 )
-    if isint:
-        context.write('texture type is interger, using nearest neighbour interpolation')
-        texture_on_atlas = mi.resampleTexture(subject_texture, mi.NearestNeighbour)
+    # test whether the mesh and texture have the same number of element to prevent the crash from mi.resampleTexture
+    vert = np.array(subject_spherical_mesh.vertex())
+    if vert.shape[0] != a.shape[0]:
+        context.error('subject_spherical_mesh and subject_texture do not have the same number of elements')
+        
     else:
-        context.write('texture type is float, using linear interpolation')
-        texture_on_atlas = mi.resampleTexture(subject_texture)
-    ws.write( texture_on_atlas, self.texture_on_atlas.fullPath() )
-
-    context.write('Done')
+        atlas_spherical_mesh = re.read(self.atlas_spherical_mesh.fullPath())
+        mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
+        mi.project() # calcule les correspondances et coord barycentriques
+        isint = a.dtype.type in ( np.int, np.int8, np.int16, np.int32, np.int64 )
+        if isint:
+            context.write('texture type is interger, using nearest neighbour interpolation')
+            texture_on_atlas = mi.resampleTexture(subject_texture, mi.NearestNeighbour)
+        else:
+            context.write('texture type is float, using linear interpolation')
+            texture_on_atlas = mi.resampleTexture(subject_texture)
+        ws.write( texture_on_atlas, self.texture_on_atlas.fullPath() )
+        context.write('Done')
             
       
