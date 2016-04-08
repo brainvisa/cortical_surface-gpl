@@ -160,6 +160,7 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
   'surface_analysis', SetContent(
 
     ## same with resampling to sphere coordinates
+    ## model parcellation
     '<subject>_Lwhite_parcels_model_remeshed_{vertex_corr_method}',
       SetType('Left hemisphere model parcellation texture'),
       SetWeakAttr('side', 'left', 'averaged', 'No', 'vertex_corr', 'Yes',
@@ -172,6 +173,7 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
       SetType('Hemisphere model parcellation texture'),
       SetWeakAttr('side', 'both', 'averaged', 'No', 'vertex_corr', 'Yes',
                   'parcellation_type', 'model'),
+    ## marsAtlas parcellation
     '<subject>_Lwhite_parcels_marsAtlas_remeshed_{vertex_corr_method}',
       SetType('Left hemisphere marsAtlas parcellation texture'),
       SetWeakAttr('side', 'left', 'averaged', 'No', 'vertex_corr', 'Yes',
@@ -184,6 +186,32 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
       SetType('Hemisphere marsAtlas parcellation texture'),
       SetWeakAttr('side', 'both', 'averaged', 'No', 'vertex_corr', 'Yes',
                   'parcellation_type', 'marsAtlas'),
+    ## lobes parcellation
+    '<subject>_Lwhite_parcels_lobes_remeshed_{vertex_corr_method}',
+      SetType('Left hemisphere lobes parcellation texture'),
+      SetWeakAttr('side', 'left', 'averaged', 'No', 'vertex_corr', 'Yes',
+                  'parcellation_type', 'lobes'),
+    '<subject>_Rwhite_parcels_lobes_remeshed_{vertex_corr_method}',
+      SetType('Right hemisphere lobes parcellation texture'),
+      SetWeakAttr('side', 'right', 'averaged', 'No', 'vertex_corr', 'Yes',
+                  'parcellation_type', 'lobes'),
+    '<subject>_Bwhite_parcels_lobes_remeshed_{vertex_corr_method}',
+      SetType('Hemisphere lobes parcellation texture'),
+      SetWeakAttr('side', 'both', 'averaged', 'No', 'vertex_corr', 'Yes',
+                  'parcellation_type', 'lobes'),
+    ## gyri parcellation
+    '<subject>_Lwhite_parcels_gyrus_remeshed_{vertex_corr_method}',
+      SetType('Left hemisphere gyrus parcellation texture'),
+      SetWeakAttr('side', 'left', 'averaged', 'No', 'vertex_corr', 'Yes',
+                  'parcellation_type', 'gyrus'),
+    '<subject>_Rwhite_parcels_gyrus_remeshed_{vertex_corr_method}',
+      SetType('Right hemisphere gyrus parcellation texture'),
+      SetWeakAttr('side', 'right', 'averaged', 'No', 'vertex_corr', 'Yes',
+                  'parcellation_type', 'gyrus'),
+    '<subject>_Bwhite_parcels_gyrus_remeshed_{vertex_corr_method}',
+      SetType('Hemisphere gyrus parcellation texture'),
+      SetWeakAttr('side', 'both', 'averaged', 'No', 'vertex_corr', 'Yes',
+                  'parcellation_type', 'gyrus'),
 #
 ## may be used to replace gyri regularized parcellation texture
 ##    '<subject>_Lwhite_model_parcels_regul', SetType( 'Left hemisphere regularized model parcellation texture'), SetWeakAttr( 'side', 'left' ), SetWeakAttr( 'regularized', 'true' ), SetWeakAttr( 'parcels_type', 'model' ),

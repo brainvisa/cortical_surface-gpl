@@ -990,15 +990,19 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 58] = 44
         tex_parcels[tex_parcels == 37] = 44
         # arround the path between the poles
-        tex_parcels[tex_parcels == 39] = 38
-        tex_parcels[tex_parcels == 40] = 38
-        tex_parcels[tex_parcels == 41] = 38
-        tex_parcels[tex_parcels == 42] = 38
-        tex_parcels[tex_parcels == 43] = 38
+        tex_parcels[tex_parcels == 38] = 255
+        tex_parcels[tex_parcels == 39] = 255
+        tex_parcels[tex_parcels == 40] = 255
+        tex_parcels[tex_parcels == 41] = 255
+        tex_parcels[tex_parcels == 42] = 255
+        tex_parcels[tex_parcels == 43] = 255
         # cingular pole
         tex_parcels[tex_parcels == 0] = 1
 
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+        # ensure path between poles parcel has a label of 255
+        m = np.max(tex_parcels)
+        tex_parcels[tex_parcels == m] = 255
 
         ## old: original model, without additional axes
         # # INSULA
@@ -1096,8 +1100,8 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels = np.zeros(tex_parcels_tmp.shape)
         # cingular pole = 0
         # tex_parcels_tmp[tex_parcels == 0] = 1
-        # path between poles = cingular pole
-        tex_parcels[tex_parcels_tmp == 38] =  255
+        # ensure path between poles parcel has a label of 255
+        tex_parcels[tex_parcels_tmp == 38] = 255
 
         # reorganization of the labels to match the nomenclature of the paper
         #	VCcm
@@ -1193,7 +1197,8 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 8] = 2
         tex_parcels[tex_parcels == 5] = 2
         # arround the path between the poles
-        tex_parcels[tex_parcels == 7] = 6
+        tex_parcels[tex_parcels == 6] = 255
+        tex_parcels[tex_parcels == 7] = 255
         # limbic
         tex_parcels[tex_parcels == 16] = 4
         tex_parcels[tex_parcels == 13] = 4
@@ -1202,6 +1207,9 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 0] = 1
 
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+        # ensure path between poles parcel has a label of 255
+        m = np.max(tex_parcels)
+        tex_parcels[tex_parcels == m] = 255
 
     elif parcellation_type == 'gyri' :
         # parcels merging
@@ -1215,10 +1223,11 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         tex_parcels[tex_parcels == 26] = 2
         tex_parcels[tex_parcels == 38] = 2
         # arround the path between the poles
-        tex_parcels[tex_parcels == 28] = 27
-        tex_parcels[tex_parcels == 29] = 27
-        tex_parcels[tex_parcels == 30] = 27
-        tex_parcels[tex_parcels == 31] = 27
+        tex_parcels[tex_parcels == 27] = 255
+        tex_parcels[tex_parcels == 28] = 255
+        tex_parcels[tex_parcels == 29] = 255
+        tex_parcels[tex_parcels == 30] = 255
+        tex_parcels[tex_parcels == 31] = 255
         # precentral
         tex_parcels[tex_parcels == 4] = 3
         tex_parcels[tex_parcels == 5] = 3
@@ -1248,7 +1257,10 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         # inferior parietal
         tex_parcels[tex_parcels == 46] = 40
 
-        nb_parcels = np.unique(tex_parcels).shape[0]
+        (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+        # ensure path between poles parcel has a label of 255
+        m = np.max(tex_parcels)
+        tex_parcels[tex_parcels == m] = 255
 
     elif parcellation_type == 'model_foetus':
         # concatenate some parcels
@@ -1291,7 +1303,7 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
 
         (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
 
-    else : # unknown parcellation type
+    else:  # unknown parcellation type
         nb_parcels = np.unique(tex_parcels).shape[0]
 
     return (tex_parcels, nb_parcels)

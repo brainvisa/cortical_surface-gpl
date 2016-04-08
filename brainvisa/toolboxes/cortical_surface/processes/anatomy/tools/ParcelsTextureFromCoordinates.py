@@ -88,6 +88,7 @@ def execution( self, context ):
 #=    context.write('------------------- model used -------------------')
 #=    for line in model.printArgs().splitlines():
 #=        context.write(line)
+    context.warning('NOTE: in every parcellation textures, CINGULAR POLE = 0 and PATH BETWEEN POLES = 255')
 
     (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'model')
  #=   context.write('----------------------------------------------------------')

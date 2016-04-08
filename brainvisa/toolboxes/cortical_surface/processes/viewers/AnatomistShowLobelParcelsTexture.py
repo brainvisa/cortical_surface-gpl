@@ -53,5 +53,5 @@ def execution( self, context ):
   a = anatomist.Anatomist()
   return a.viewTextureOnMesh( self.white_mesh,
                                            self.texture_lobes_parcels,
-                                           a.getPalette('Talairach'),
+                                           a.getPalette('MarsAtlas'),
                                            interpolation = 'rgb' )
