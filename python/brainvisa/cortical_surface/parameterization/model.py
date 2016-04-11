@@ -223,7 +223,7 @@ class Model(object):
                 latitudeAxisSulci = dict((key, int(value)) for (key, value) in data_num)
                 output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], longitudeAxisSulci, latitudeAxisSulci, txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
             else:
-                raise Exception('cannot read the model file :: bad model version')
+                raise Exception('cannot read the model file :: wrong model version')
         except:
             raise Exception('cannot read the model file')
 
@@ -232,7 +232,7 @@ class Model(object):
     def toMesh(self, z_coord=None):
         if z_coord is None:
             z_coord = 0
-        out_mesh = aims.AimsTimeSurface_2_VOID()
+        out_mesh = aims.AimsTimeSurface_2()
         verts = aims.vector_POINT3DF()
         poly = aims.vector_AimsVector_U32_2()
         #-------- boundaries
