@@ -25,7 +25,7 @@ from soma import aims
 import numpy as np
 
     
-name = 'Make Average Mesh From a Set of Subjects'
+name = 'Compute Average Mesh From a Set of Subjects'
 
 userLevel = 0
 
