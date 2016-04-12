@@ -37,14 +37,14 @@ name = 'Texture Linear Combination'
 userLevel = 0
 
 signature = Signature(
-    'texture1',ReadDiskItem( 'Texture' ,'Texture'  ),
-    'texture2',ReadDiskItem( 'Texture' ,'Texture'  ),
+    'texture1',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
+    'texture2',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
     'num1',Float(),
     'num2',Float(),
     'den1',Float(),
     'den2',Float(),
     'cst',Float(),
-    'output', WriteDiskItem( 'Texture' ,'Texture'),
+    'output', WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
     )
 
 def initialization( self ):     

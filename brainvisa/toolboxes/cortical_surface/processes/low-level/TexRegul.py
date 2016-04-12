@@ -38,8 +38,8 @@ name = 'Texture Regularization'
 userLevel = 0
 
 signature = Signature(
-     'Texture', ReadDiskItem( 'Texture', 'Texture' ), 
-     'output_texture',WriteDiskItem( 'Texture', 'Texture' ),
+     'Texture', ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
+     'output_texture',WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
      'Parameter', Float()
 )
 

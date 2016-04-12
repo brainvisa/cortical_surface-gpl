@@ -38,8 +38,8 @@ name = 'Texture Thresholding'
 userLevel = 0
 
 signature = Signature(
-     'Texture', ReadDiskItem( 'Texture', 'Texture' ), 
-     'Thresholded_texture',WriteDiskItem( 'Texture', 'Texture' ),
+     'Texture', ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
+     'Thresholded_texture',WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
      'Mode', Choice("LOWER_THAN",
                     "LOWER_OR_EQUAL_TO",
                     "GREATER_THAN",

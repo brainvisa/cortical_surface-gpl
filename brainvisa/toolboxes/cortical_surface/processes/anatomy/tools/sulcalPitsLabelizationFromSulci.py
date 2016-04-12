@@ -99,7 +99,7 @@ def execution( self, context ):
     context.write('labelling the pits')
     pits = np.array( pits_tex[0] )
     pits_ind = np.where(pits)[0]
-    pits[pits_ind] = basins_labeled[pits_ind]
+    pits[pits_ind] = np.uint16(basins_labeled[pits_ind])
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(pits)
     aims.write(tex_out, self.labeled_pits_texture.fullPath())
