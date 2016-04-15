@@ -35,6 +35,7 @@ import shfjGlobals
 from brainvisa import anatomist
 from soma import aims
 import numpy as np
+from registration import getTransformationManager
 
 name = 'Anatomist Show Pits As Spheres'
 roles = ('viewer',)
@@ -64,6 +65,8 @@ def execution( self, context ):
     for pit in pits:
         spheres_mesh += gen.sphere(vert[pit], self.sphere_size,10)
     #spheres_mesh.header()[ 'referentials' ] = white_mesh.header()[ 'referentials' ]
+    transformManager = getTransformationManager()
+    transformManager.copyReferential( self.white_mesh, spheres_mesh_file )
     aims.write(spheres_mesh, spheres_mesh_file.fullPath())
     a = anatomist.Anatomist()
     win = a.createWindow( 'Axial' )

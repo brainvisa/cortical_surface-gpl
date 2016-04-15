@@ -42,7 +42,7 @@ signature = Signature(
     'sulcalines_correspondance',ReadDiskItem( 'Graph Label Translation', 'Text File'),
     'white_sulci',ReadDiskItem( 'Sulci White Texture' ,'aims texture formats'),
     'sulci_correspondance',ReadDiskItem( 'Sulci To White Texture Translation', 'Text File'),
-    'sulci_to_copy',Choice('S.Heschl'),
+    'sulci_to_copy',ListOf( String() ),
     'combined_white_sulcalines',WriteDiskItem( 'hemisphere Sulcal Lines texture', 'aims Texture formats'),
 #    'combined_sulcalines_correspondance',WriteDiskItem( 'Constraint coordinates values', 'Text File'),
     #'constraint_value', Choice('Basins Label','Lat/Lon'),
@@ -58,6 +58,7 @@ def initialization( self ):
     self.linkParameters( 'white_sulci','white_sulcalines' )
     self.linkParameters( 'sulci_correspondance','white_sulcalines' )
     self.linkParameters( 'combined_white_sulcalines','white_sulcalines' )
+    self.sulci_to_copy = ['S.Heschl.','F.C.L.r.asc.','F.Cal.ant.-Sc.Cal.']
 #    self.linkParameters( 'combined_sulcalines_correspondance','white_sulcalines' )
 
 def execution( self, context ):
@@ -66,21 +67,21 @@ def execution( self, context ):
     sulcalines_labels_dict = rSLT.readSulcusLabelTranslationFile(self.sulcalines_correspondance.fullPath(), invert=True)
     tex_white_sulci = aims.read(self.white_sulci.fullPath())
     sulci_labels_dict = rSLT.readSulcusLabelTranslationFile(self.sulci_correspondance.fullPath(), invert=True)
-    sulci_to_copy = [sulc+'._'+self.side for sulc in [self.sulci_to_copy]]
+    sulci_to_copy = [sulc+'_'+self.side for sulc in self.sulci_to_copy]
     labels_to_copy = [sulcalines_labels_dict[sulc] for sulc in sulci_to_copy]
-    labels_to_copy_verif = [sulci_labels_dict[sulc] for sulc in sulci_to_copy]
-    context.write('the label of the sulcus to copy is :')
-    context.write(labels_to_copy)
-    context.write(labels_to_copy_verif)
-    if labels_to_copy != labels_to_copy_verif:
+    labels_to_copy_sulci = [sulci_labels_dict[sulc] for sulc in sulci_to_copy]
+    context.write('the labels of the sulci to copy is :')
+    context.write(str(labels_to_copy)+' in the sulcal lines texture')
+    context.write(str(labels_to_copy_sulci)+' in the sulci texture')
+    if len(labels_to_copy) < 1 or len(labels_to_copy) != len(labels_to_copy_sulci):
         context.write('the sulcus cannot be found in both textures, aborting!')
     else:
         context.write('the sulcus was found in both textures, good!')
         atex_white_sulcalines = tex_white_sulcalines[0].arraydata()
         atex_white_sulci = tex_white_sulci[0].arraydata()
-        for lab in labels_to_copy:
+        for ind,lab in enumerate(labels_to_copy):
             inds_sulcalines = np.where(atex_white_sulcalines == lab)
-            inds_sulci = np.where(atex_white_sulci == lab)
+            inds_sulci = np.where(atex_white_sulci == labels_to_copy_sulci[ind])
             "deleting the projection from sulcalines"
             atex_white_sulcalines[inds_sulcalines] = 0
             "copying the projection from sulci"

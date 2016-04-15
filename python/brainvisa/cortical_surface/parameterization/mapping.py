@@ -950,14 +950,14 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
         sort_axes_lon.append(sort_axes_lon[5] + 7 * (sort_axes_lon[6] - sort_axes_lon[5]) / 8)
 #        sort_axes_lon.append(sort_axes_lon[5] + temporal_pole_parcel_width)
         del sort_axes_lon[8]
-        del sort_axes_lon[6]
+        #del sort_axes_lon[6]
         del sort_axes_lon[3]
         del sort_axes_lon[2]
         del sort_axes_lon[1]
         sort_axes_lon.sort()
 
         del sort_axes_lat[5]
-        del sort_axes_lat[4]
+        #del sort_axes_lat[4]
         del sort_axes_lat[3]
         del sort_axes_lat[2]
 
@@ -1192,21 +1192,34 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     elif parcellation_type == 'lobes' :
         # parcels merging
         # INSULA
+        tex_parcels[tex_parcels == 22] = 2
+        tex_parcels[tex_parcels == 18] = 2
         tex_parcels[tex_parcels == 14] = 2
-        tex_parcels[tex_parcels == 11] = 2
-        tex_parcels[tex_parcels == 8] = 2
-        tex_parcels[tex_parcels == 5] = 2
+        tex_parcels[tex_parcels == 10] = 2
+        tex_parcels[tex_parcels == 6] = 2
         # arround the path between the poles
-        tex_parcels[tex_parcels == 6] = 255
         tex_parcels[tex_parcels == 7] = 255
+        tex_parcels[tex_parcels == 8] = 255
+        tex_parcels[tex_parcels == 9] = 255
         # limbic
-        tex_parcels[tex_parcels == 16] = 4
-        tex_parcels[tex_parcels == 13] = 4
-        tex_parcels[tex_parcels == 10] = 4
+        tex_parcels[tex_parcels == 25] = 5
+        tex_parcels[tex_parcels == 21] = 5
+        tex_parcels[tex_parcels == 17] = 5
+        tex_parcels[tex_parcels == 13] = 5
+        # frontal
+        tex_parcels[tex_parcels == 4] = 3
+        # parietal
+        tex_parcels[tex_parcels == 24] = 19
+        tex_parcels[tex_parcels == 23] = 19
+        # temporal
+        tex_parcels[tex_parcels == 15] = 11
+        tex_parcels[tex_parcels == 12] = 11
+        # occipital
+        tex_parcels[tex_parcels == 20] = 16
         # cingular pole
         tex_parcels[tex_parcels == 0] = 1
-
-        (tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
+        nb_parcels = np.unique(tex_parcels).shape[0]
+        #(tex_parcels, nb_parcels) = reorganize_parcels(tex_parcels)
         # ensure path between poles parcel has a label of 255
         m = np.max(tex_parcels)
         tex_parcels[tex_parcels == m] = 255
