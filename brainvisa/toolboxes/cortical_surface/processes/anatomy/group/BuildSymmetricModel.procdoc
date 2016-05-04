@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Computes a symmetric model from the left and right models.
+The resulting symmetric model can be used in the hiphop pipeline to obtain a parameterization in which the left and right hemispheres are in correspondance.
+This is mandatory for the analysis of assymmetries.</xhtml>
+    <d name="parameters">
+      <xhtml name="model_right_in"/>
+      <xhtml name="model_symmetric"/>
+      <xhtml name="model_left_in"/>
+      <xhtml name="model_symmetric_mesh"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Computes the clusters of sulcal pit from the pits density map.
+These clusters can be used to define a labeling of sulcal pits that is common to the subjects involved in the analysis.
+For details, see: <br/>
+<span style="color: rgb(51, 51, 255);">Auzias, G, Brun, L, Deruelle, C, Coulon, O, <span style="font-style: italic;">Deep sulcal landmarks: algorithmic and conceptual improvements in the definition and extraction of sulcal pits, </span> <span style="font-weight: bold;">NeuroImage, </span>  2015.</span><br/></xhtml>
+    <d name="parameters">
+      <xhtml name="template_mesh"/>
+      <xhtml name="mask_texture"/>
+      <xhtml name="thresh_dist"/>
+      <xhtml name="basins_texture"/>
+      <xhtml name="thresh_area"/>
+      <xhtml name="thresh_ridge"/>
+      <xhtml name="density_texture"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>

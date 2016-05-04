@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Computes a density map from the smoothed sulcal pits maps from a set of subjects.
+For details, see: <br/>
+<span style="color: rgb(51, 51, 255);">Auzias, G, Brun, L, Deruelle, C, Coulon, O, <span style="font-style: italic;">Deep sulcal landmarks: algorithmic and conceptual improvements in the definition and extraction of sulcal pits, </span> <span style="font-weight: bold;">NeuroImage, </span>  2015.</span><br/></xhtml>
+    <d name="parameters">
+      <xhtml name="projected_smoothed_pits"/>
+      <xhtml name="pits_density"/>
+    </d>
+    <xhtml name="long"/>
+  </d>
+</d>
+</minf>
