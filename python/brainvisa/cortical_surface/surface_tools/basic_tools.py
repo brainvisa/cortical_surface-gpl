@@ -71,25 +71,19 @@ def meshPolygonAngles(vert, poly):
 
 ####################################################################
 #
-# compute the norm distortions between the two meshes given following
-# the type of distortions is given in parameter
-# the two meshes must have the same number of vertex
+# compute the distortions between the two meshes given
+# the type of distortions is given as parameter
+# the two meshes must have the same number of vertices
 #
 ####################################################################
 def meshDistortions(mesh1,mesh2,type):
-    vert1 = np.array(mesh1.vertex())
-    distortions_out = np.zeros(vert1.shape[0])
-#     
-#     switch type
-#         case 'distance'
-#             VertConn = compute_vertex_ring(FV1.faces');
-#             for v=1:length(FV1.vertices(:,1))
-#                 for n=1:length(VertConn{v})
-#                     tex1(v)=tex1(v)+(euclidian_dist(FV2.vertices(v,:),FV2.vertices(VertConn{v}(n),:))-euclidian_dist(FV1.vertices(v,:),FV1.vertices(VertConn{v}(n),:)))^2;
-#                 end
-#                 tex1(v)=tex1(v)/(2*length(VertConn{v}));%normalisation par rapport au nb de voisins (x2 car chaque arete est parcourue 2 fois)
-#             end
-#         case 'angle'
+
+    if type == 'angle':
+        print('computing angular distortions')
+        angles1 = meshPolygonAngles(np.array(mesh1.vertex()), np.array(mesh1.polygon()))
+        angles2 = meshPolygonAngles(np.array(mesh2.vertex()), np.array(mesh2.polygon()))
+        diff_angles = angles1 - angles2
+        distortions_out = diff_angles#np.sum(np.abs(diff_angles))
 #             tet1=mesh_face_angles(FV1);
 #             tet2=mesh_face_angles(FV2);       
 #             tet_1{1,length(FV1.vertices(:,1))}=[];
@@ -101,6 +95,16 @@ def meshDistortions(mesh1,mesh2,type):
 #             end
 #             for v=1:length(FV1.vertices(:,1))
 #                 tex1(v)=sum(tet_1{v}(:))/length(tet_1{v}(:));
+#             end
+    else:
+        print('available types of distortions :: angle')
+#         case 'distance'
+#             VertConn = compute_vertex_ring(FV1.faces');
+#             for v=1:length(FV1.vertices(:,1))
+#                 for n=1:length(VertConn{v})
+#                     tex1(v)=tex1(v)+(euclidian_dist(FV2.vertices(v,:),FV2.vertices(VertConn{v}(n),:))-euclidian_dist(FV1.vertices(v,:),FV1.vertices(VertConn{v}(n),:)))^2;
+#                 end
+#                 tex1(v)=tex1(v)/(2*length(VertConn{v}));%normalisation par rapport au nb de voisins (x2 car chaque arete est parcourue 2 fois)
 #             end
 #         case 'area'
 #             tet1=mesh_face_area(FV1);
@@ -115,8 +119,7 @@ def meshDistortions(mesh1,mesh2,type):
 #             for v=1:length(FV1.vertices(:,1))
 #                 tex1(v)=sum(tet_1{v}(:))/length(tet_1{v}(:));
 #             end
-#         otherwise
-#             error('type of distortion not valid')
+
     return distortions_out
 
 
