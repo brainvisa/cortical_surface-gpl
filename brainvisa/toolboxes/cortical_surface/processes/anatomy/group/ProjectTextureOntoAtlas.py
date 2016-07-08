@@ -43,12 +43,21 @@ signature = Signature(
 def initialization( self ):
     self.linkParameters( 'subject_spherical_mesh','subject_texture' )
 #    self.findValue( 'spherical_template', {'filename_variable' : 'ico100_7'} )
-    
+
+def nearest_neighbor(vert_template,vert_pits):
+    vertex_number1=vert_template.shape[0]
+    v_number=vert_pits.shape[0]
+    nn=[]
+    for v in vert_pits:
+        nn_tmp = np.argmin(np.sum(np.square(np.tile(v,(vertex_number1,1))-vert_template),1))
+        nn.append(nn_tmp)
+    return nn
+
 def execution( self, context ):
-       
+
     re = aims.Reader()
     ws = aims.Writer()
-    
+
     subject_spherical_mesh = re.read(self.subject_spherical_mesh.fullPath())
     subject_texture = re.read(self.subject_texture.fullPath())
     a = subject_texture[0].arraydata()
@@ -59,16 +68,25 @@ def execution( self, context ):
 
     else:
         atlas_spherical_mesh = re.read(self.atlas_spherical_mesh.fullPath())
-        mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
-        mi.project() # calcule les correspondances et coord barycentriques
         isint = a.dtype.type in ( np.int, np.int8, np.int16, np.int32, np.int64 )
         if isint:
             context.write('texture type is interger, using nearest neighbour interpolation')
-            texture_on_atlas = mi.resampleTexture(subject_texture, mi.NearestNeighbour)
+            #texture_on_atlas = mi.resampleTexture(subject_texture, mi.NearestNeighbour)
+            pits=np.where(a==1)[0]
+            vert_template=np.array(atlas_spherical_mesh.vertex())
+            vert_pits = vert[pits,:]
+            nn=nearest_neighbor(vert_template,vert_pits)
+            context.write(len(nn), 'of', len(pits), 'pits interpolated')
+
+            a_tex_out = np.zeros(vert_template.shape[0])
+            a_tex_out[nn]=1
+            texture_on_atlas =aims.TimeTexture_S16()
+            texture_on_atlas[0].assign(a_tex_out)
+
         else:
             context.write('texture type is float, using linear interpolation')
+            mi = aims.MeshInterpoler(subject_spherical_mesh, atlas_spherical_mesh)
+            mi.project() # calcule les correspondances et coord barycentriques
             texture_on_atlas = mi.resampleTexture(subject_texture)
         ws.write( texture_on_atlas, self.texture_on_atlas.fullPath() )
         context.write('Done')
-            
-      
