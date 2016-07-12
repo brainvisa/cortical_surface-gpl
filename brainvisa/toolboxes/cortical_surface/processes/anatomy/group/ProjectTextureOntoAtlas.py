@@ -46,7 +46,6 @@ def initialization( self ):
 
 def nearest_neighbor(vert_template,vert_pits):
     vertex_number1=vert_template.shape[0]
-    v_number=vert_pits.shape[0]
     nn=[]
     for v in vert_pits:
         nn_tmp = np.argmin(np.sum(np.square(np.tile(v,(vertex_number1,1))-vert_template),1))
