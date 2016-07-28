@@ -53,8 +53,8 @@ signature = Signature(
     'sulcus_labels',ListOf( ReadDiskItem( 'Graph Label Translation', 'Text File') ),
     'model_file_in',ReadDiskItem( 'HipHop Model', 'Text File'),
     'model_file',WriteDiskItem( 'HipHop Model', 'Text File'),
-    'model_file_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
-    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),    
+    'model_file_mesh',WriteDiskItem( 'mesh', 'Mesh mesh'),
+    'union_sulcal_lines_mesh',WriteDiskItem( 'mesh', 'Mesh mesh'),
     'union_sulcal_lines_texture',WriteDiskItem( 'Texture', 'Texture') 
 )
 

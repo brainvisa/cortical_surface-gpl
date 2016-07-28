@@ -75,7 +75,7 @@ def execution( self, context ):
             vert_template=np.array(atlas_spherical_mesh.vertex())
             vert_pits = vert[pits,:]
             nn=nearest_neighbor(vert_template,vert_pits)
-            context.write(len(set(nn)), 'of', len(pits), 'pits interpolated')
+            context.write(len(set(nn)), 'of', len(pits), 'points interpolated')
 
             a_tex_out = np.zeros(vert_template.shape[0])
             a_tex_out[nn]=1

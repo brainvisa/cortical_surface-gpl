@@ -367,6 +367,7 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     for lon_cstr_ind in sulcalCstr.longitudeCstrIndex:
         if sulcalCstr.sulcalLines[lon_cstr_ind].axisID in modele.longitudeAxisID:
             if modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] is not None:
+                print(sulcalCstr.sulcalLines[lon_cstr_ind].name+' weight in HOP energy : '+str(sulcalCstr.sulcalLines[lon_cstr_ind].weight))
                 lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = sulcalCstr.sulcalLines[lon_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lon_cstr_ind].weight
                 C_lon[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = modele.longitudeAxisCoord[modele.longitudeAxisID.index(sulcalCstr.sulcalLines[lon_cstr_ind].axisID)] * lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
                 A_lon_diag[sulcalCstr.sulcalLines[lon_cstr_ind].indices] = -lon_weights[sulcalCstr.sulcalLines[lon_cstr_ind].indices]
@@ -378,6 +379,7 @@ def cstrRectConformalMapping(Lx, modele, mesh, boundary, sulcalCstr, cstrBalance
     for lat_cstr_ind in sulcalCstr.latitudeCstrIndex:
         if sulcalCstr.sulcalLines[lat_cstr_ind].axisID in modele.latitudeAxisID:
             if modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] is not None:
+                print(sulcalCstr.sulcalLines[lat_cstr_ind].name+' weight in HOP energy : '+str(sulcalCstr.sulcalLines[lat_cstr_ind].weight))
                 lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = sulcalCstr.sulcalLines[lat_cstr_ind].vertexWeight * sulcalCstr.sulcalLines[lat_cstr_ind].weight
                 C_lat[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = modele.latitudeAxisCoord[modele.latitudeAxisID.index(sulcalCstr.sulcalLines[lat_cstr_ind].axisID)] * lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
                 A_lat_diag[sulcalCstr.sulcalLines[lat_cstr_ind].indices] = -lat_weights[sulcalCstr.sulcalLines[lat_cstr_ind].indices]
@@ -603,7 +605,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
 #     ws = aims.Writer()
 #     ws.write(tex_out, '/home/toz/ammon_Lwhite_neocortex_other_verts.tex')
 
-    "group other verts into two connected sets, one on each side of the link"
+    "group other verts into two connected sets, one on each side of the poles_path"
     l_other_verts = list(other_verts)
     tag = np.zeros(len(other_verts))
     nb_tagged = 1
@@ -631,6 +633,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     else:
         print 'problem: cluster1.intersection(insula) is empty'
 
+    "add the new vertices and poly to the mesh"
     poly = np.array(neoCortex_mesh.polygon())
 
     posterior_cluster_ind_poly = np.hstack(np.where(poly == i)[0] for i in posterior_cluster)
@@ -679,41 +682,52 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
 
     return (neoCortex_open_mesh, neoCortex_open_boundary)
 
-
+####################################################################
+#
+#    ensures neoCortex_boundary[0] == insula_boundary and boundary[2] == cingular_boundary
+#    neoCortex_boundary[1] == neocortex_poles_path
+#    insula and cingular boundary are always oriented in the same way
+#
+#    neocortex_poles_path given as parameter is assumed to be always oriented from insula to cingular pole
+#    it is the orientation of neocortex_poles_path that drives the orientation of insula and cingular boundary
+####################################################################
 def boundaryReordering(neoCortex_boundary, neocortex_poles_path, vert):
-    "ensures neoCortex_boundary[0] == insula_boundary and boundary[2] == cingular_boundary"
-    "neoCortex_boundary[1] == neocortex_poles_path always from insula to cingular pole"
-    "insula and cingular boundary are always oriented in the same way"
+
     path_bound0 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[0])))
     path_bound1 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[1])))
-    if path_bound0:
-        ind_path_bound0 = neocortex_poles_path.index(path_bound0[0])
-    else:
+    if not path_bound0:
         print "problem: no intersection between boundary 0 and poles_path"
-    if path_bound1:
-        ind_path_bound1 = neocortex_poles_path.index(path_bound1[0])
-    else:
+    if not path_bound1:
         print "problem: no intersection between boundary 1 and poles_path"
 
-    "ensures a single vertex intersection between poles_path and boundaries"
-    if len(path_bound0) > 1:
-        indices = [neocortex_poles_path.index(i) for i in path_bound0].sort()
-        if indices[0] == 0:
-            neocortex_poles_path.pop(indices[0])
-        else:
-            neocortex_poles_path.pop()
-        path_bound0 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[0])))
-        ind_path_bound0 = neocortex_poles_path.index(path_bound0[0])
-    if len(path_bound1) > 1:
-        indices = [neocortex_poles_path.index(i) for i in path_bound1]
-        indices.sort()
-        if indices[0] == 0:
-            neocortex_poles_path.pop(indices[0])
-        else:
-            neocortex_poles_path.pop()
-        path_bound1 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[1])))
-        ind_path_bound1 = neocortex_poles_path.index(path_bound1[0])
 
+    "ensures a single vertex intersection between poles_path and boundaries"
+    "note that neocortex_poles_path is the ordered list of vertices, "
+    "i.e if the intersection consists of more than 1 vertex, the supplementary vertices to suppress are at the begining or at the end but not in the middle"
+    if len(path_bound0) > 1:
+        path_length = len(neocortex_poles_path)
+        inds_path_bound0 = [neocortex_poles_path.index(i) for i in path_bound0]
+        m_ind = min(inds_path_bound0)
+        M_ind = max(inds_path_bound0)
+        if M_ind < (path_length/2.): # delete the first items
+            removeset = set(range(M_ind))
+        else:# delete the last items
+            removeset = set(range(m_ind+1,path_length))
+        neocortex_poles_path = [v for i, v in enumerate(neocortex_poles_path) if i not in removeset]
+        path_bound0 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[0])))
+    if len(path_bound1) > 1:
+        path_length = len(neocortex_poles_path)
+        inds_path_bound1 = [neocortex_poles_path.index(i) for i in path_bound1]
+        m_ind = min(inds_path_bound1)
+        M_ind = max(inds_path_bound1)
+        if M_ind < (path_length/2.): # delete the first items
+            removeset = set(range(M_ind))
+        else:# delete the last items
+            removeset = set(range(m_ind+1,path_length))
+        neocortex_poles_path = [v for i, v in enumerate(neocortex_poles_path) if i not in removeset]
+        path_bound1 = list(set(neocortex_poles_path).intersection(set(neoCortex_boundary[1])))
+    ind_path_bound0 = neocortex_poles_path.index(path_bound0[0])
+    ind_path_bound1 = neocortex_poles_path.index(path_bound1[0])
     "order the boundaries and rotate insula and cingular boundary if necessary"
     rotate = lambda l, n :l[n:] + l[:n]  # list rotation fct
     rt_bound0 = neoCortex_boundary[0].index(path_bound0[0])
@@ -1411,6 +1425,141 @@ def solveInvertedPolygon(mesh, boundary, nb_it_smooth, neigh=None):
         mesh.updateNormals()
     return (mesh, nb_inward_evol, inward_evol)
 
+
+
+
+####################################################################
+#
+# HIP with multiple poles_path
+#
+####################################################################
+def hip_multi_path(mesh, insula_tex_clean, cingular_tex_clean, length, width,Npath,step,path_displacement):
+#    square_ratio = 4.5
+    neocortex_tex_value = 0
+    insula_tex_value = 180
+    cingular_tex_value = 1
+    #write_all_steps_to_disk = 0
+    cingular_inds_in = np.where(cingular_tex_clean == cingular_tex_value)[0]
+    insula_inds_in = np.where(insula_tex_clean == insula_tex_value)[0]
+    # test that there is no intersection between the two poles
+    inter = set(cingular_inds_in).intersection(insula_inds_in)
+    if inter:
+        raise Exception('Cingular and Insular poles are connected ! You should run the poles textures sanity check')
+        return
+
+    tex_poles_clean = np.zeros(mesh.vertex().size())
+    tex_poles_clean[cingular_inds_in] = cingular_tex_value
+    tex_poles_clean[insula_inds_in] = insula_tex_value
+
+    neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+    print '------------------CutMesh'
+    (sub_meshes, labels, sub_indexes) = basicTls.cutMesh(mesh, tex_poles_clean)
+    print 'labels found in the texture ', labels
+    neo_ind = labels.index(neocortex_tex_value)
+    neoCortex_mesh = sub_meshes[neo_ind]
+    neoCortex_boundary = basicTls.meshBoundary(sub_meshes[neo_ind])
+    if len(neoCortex_boundary)>2:
+        print ('problem: more than 2 boundaries in the neoCortex, the pole textures have topological defects')
+        raise Exception('more than 2 boundaries in the neoCortex, the pole textures have topological defects')
+        return
+    neocortex_indices = sub_indexes[neo_ind]
+    ins_ind = labels.index(insula_tex_value)
+    insula_mesh = sub_meshes[ins_ind]
+#    insula_boundary = basicTls.meshBoundary(sub_meshes[ins_ind])
+    insula_indices = sub_indexes[ins_ind]
+    cing_ind = labels.index(cingular_tex_value)
+    cingular_mesh = sub_meshes[cing_ind]
+#    cingular_boundary = basicTls.meshBoundary(sub_meshes[cing_ind])
+    cingular_indices = sub_indexes[cing_ind]
+    "------------------computing the poles path on the original mesh, always from the boundary of insula pole to the boundary of cingular pole"
+    cing_tex_boundary = basicTls.textureBoundary(mesh, cingular_tex_clean, cingular_tex_value, neigh)
+    ins_tex_boundary = basicTls.textureBoundary(mesh, insula_tex_clean, insula_tex_value, neigh)
+    #poles_path = getShortestPath(mesh, ins_tex_boundary[-1], cing_tex_boundary[-1])
+
+    #------------------- compute Npath other possible poles_path using neighbors of the extremities -------------------------
+    #----- reorganize the poles_path and boundaries to distinguish anterior and posterior parts of the boundaries arround the poles_path
+#    neoCortex_boundary_on_mesh =  [ins_tex_boundary[-1], cing_tex_boundary[-1]]
+#    neoCortex_boundary_on_mesh = boundaryReordering(neoCortex_boundary_on_mesh, poles_path.tolist(), np.array(mesh.vertex()))
+    "neoCortex_boundary_on_mesh[0] == insula_boundary"
+    " boundary[2] == cingular_boundary"
+    "neoCortex_boundary[1] == neocortex_poles_path always from insula to cingular pole"
+    "the Npath neighbors of poles_path extremities in ins_tex_boundary and cing_tex_boundary are then :"
+    "neoCortex_boundary_on_mesh[0][0:Npath-1]"
+    "neoCortex_boundary_on_mesh[2][-1:-Npath]"
+    ins_tex_boundary_o =  indsToROI(neocortex_indices, ins_tex_boundary[-1])
+    cing_tex_boundary_o = indsToROI(neocortex_indices, cing_tex_boundary[-1])
+    poles_path = getShortestPath(neoCortex_mesh, ins_tex_boundary_o, cing_tex_boundary_o)
+    neoCortex_boundary_o =  [ins_tex_boundary_o, cing_tex_boundary_o]
+    neoCortex_boundary_o = boundaryReordering(neoCortex_boundary_o, poles_path.tolist(), np.array(neoCortex_mesh.vertex()))
+    # compute other possible poles_path
+    all_poles_path = []
+    gp = aims.GeodesicPath(neoCortex_mesh, 3, 0)
+    if path_displacement == 'backward' or path_displacement == 'both':
+        for p in range(1, Npath+1):
+            ind_vert_insula = int(neoCortex_boundary_o[0][-p*step])
+            ind_vert_cingular = int(neoCortex_boundary_o[2][p*step])#(neoCortex_boundary_o[2][-p*step-1])
+            all_poles_path.append( gp.shortestPath_1_1_ind( ind_vert_insula, ind_vert_cingular).arraydata() )
+    all_poles_path.append(poles_path)
+    if path_displacement == 'forward' or path_displacement == 'both':
+        for p in range(1, Npath+1):
+            ind_vert_insula = int(neoCortex_boundary_o[0][p*step])
+            ind_vert_cingular = int(neoCortex_boundary_o[2][-p*step])#(neoCortex_boundary_o[2][-p*step-1])
+            all_poles_path.append( gp.shortestPath_1_1_ind( ind_vert_insula, ind_vert_cingular).arraydata() )
+#    path_meshes = basicTls.meshBoundaryMesh(neoCortex_mesh, all_poles_path)
+#    aims.write( path_meshes, '/home/toz/paths_all_sav.gii')
+
+#     ws = aims.Writer()
+#     tex_out = aims.TimeTexture_S16()
+#     tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in poles_path:
+#              tex_out[0].append(1)
+#         else:
+#              tex_out[0].append(0)
+#     tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in cing_tex_boundary[-1]:
+#              tex_out[1].append(1)
+#         else:
+#              tex_out[1].append(0)
+#     tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
+#     for i in xrange(mesh.vertex().size()):
+#         if i in ins_tex_boundary[-1]:
+#              tex_out[2].append(1)
+#         else:
+#              tex_out[2].append(0)
+#     ws.write(tex_out, '/home/toz/poles_link.tex')
+    neoCortex_open_mesh = []
+    neoCortex_open_boundary = []
+    neoCortex_square = []
+    tested_poles_path = []
+    for path in all_poles_path:
+        '''poles_path to neocortex'''
+        #neocortex_poles_path = indsToROI(neocortex_indices, path)
+        #print 'neocortex_poles_path',neocortex_poles_path
+        print '------------------path2Boundary'
+        #(neoCortex_open_mesh_p, neoCortex_open_boundary_p) = path2Boundary(neoCortex_mesh,neoCortex_boundary,neocortex_poles_path)
+        (neoCortex_open_mesh_p, neoCortex_open_boundary_p) = path2Boundary(neoCortex_mesh,neoCortex_boundary, path.tolist())
+        l = len(neoCortex_open_boundary_p[1])
+        done = False
+        for p in tested_poles_path:
+            if len(set(neoCortex_open_boundary_p[1]).intersection(set(p))) == l:
+                print('pole_path already processed')
+                done = True
+        if not done:
+            tested_poles_path.append(neoCortex_open_boundary_p[1])
+            #print 'neoCortex_open_boundary',neoCortex_open_boundary
+            #vert = np.array(neoCortex_open_mesh.vertex())
+            print '------------------rectConformalMapping'
+            neoCortex_square_p = rectConformalMapping(neoCortex_open_mesh_p, neoCortex_open_boundary_p, length, width, 0)
+
+            neoCortex_open_mesh.append(neoCortex_open_mesh_p)
+            neoCortex_open_boundary.append(neoCortex_open_boundary_p)
+            neoCortex_square .append(neoCortex_square_p)
+
+    path_meshes = basicTls.meshBoundaryMesh(neoCortex_mesh, tested_poles_path)
+
+    return (neoCortex_square, neoCortex_open_boundary, neocortex_indices, insula_indices, cingular_indices, insula_mesh, cingular_mesh, neoCortex_open_mesh, path_meshes)
 
 
 

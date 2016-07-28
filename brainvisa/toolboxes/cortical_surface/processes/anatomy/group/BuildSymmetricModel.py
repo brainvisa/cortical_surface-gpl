@@ -47,7 +47,7 @@ signature = Signature(
     'model_left_in',ReadDiskItem( 'HipHop Model', 'Text File'),
     'model_right_in',ReadDiskItem( 'HipHop Model', 'Text File'),
     'model_symmetric',WriteDiskItem( 'HipHop Model', 'Text File'),
-    'model_symmetric_mesh',WriteDiskItem( 'Mesh',shfjGlobals.aimsMeshFormats),
+    'model_symmetric_mesh',WriteDiskItem( 'Mesh','Mesh mesh'),
 #    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
 #    'union_sulcal_lines_texture',WriteDiskItem( 'Texture', 'Texture')
 )

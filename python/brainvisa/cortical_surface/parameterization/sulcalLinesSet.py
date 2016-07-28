@@ -132,17 +132,17 @@ class SulcalLinesSet(object):
                 if place is None:
                     print 'sulcus ' + name + ' not present in this SulcalLinesSet object!!'
                 else:
-                    (axisID, isLon, isLat) = modele.sulcus2Axis(name)
+                    (axisID, isLon, isLat, slWeight) = modele.sulcus2Axis(name)
                     if isLon:
-                        self.sulcalLines[place] = sln.SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat)
+                        self.sulcalLines[place] = sln.SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat, slWeight)
                         self.longitudeCstrIndex.append(place)
                         self.longitudeCstrAxis.append(axisID)
                     elif isLat:
-                        self.sulcalLines[place] = sln.SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat)
+                        self.sulcalLines[place] = sln.SulcalConstraint(self.sulcalLines[place], axisID, isLon, isLat, slWeight)
                         self.latitudeCstrIndex.append(place)
                         self.latitudeCstrAxis.append(axisID)
                     else:
-                        print 'sulcalLine with name ', name, 'is not a constraint'
+                        print 'sulcalLine with name ', name, 'is not a constraint in the model given'
 
     def toMesh(self):
 
