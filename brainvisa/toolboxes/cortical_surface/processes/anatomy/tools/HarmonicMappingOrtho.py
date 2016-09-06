@@ -79,6 +79,7 @@ def initialization( self ):
 def execution( self, context ):
     context.write('Reading model')
     model = md.Model().read(self.model_file.fullPath())
+
     for line in model.printArgs().splitlines():
         context.write(line)
     re = aims.Reader()

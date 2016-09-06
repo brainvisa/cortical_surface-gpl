@@ -33,34 +33,33 @@
 from neuroProcesses import *
 import shfjGlobals     
 
-name = 'Texture Linear Combination'
+name = '2D to 3D'
+
 userLevel = 0
 
 signature = Signature(
-    'texture1',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
-    'texture2',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
-    'num1',Float(),
-    'num2',Float(),
-    'den1',Float(),
-    'den2',Float(),
-    'cst',Float(),
-    'output', WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-    )
+    'texture_in',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'texture_time', Integer(),
+    'object_label', Integer(),
+    'input_volume', ReadDiskItem( 'Grey White Mask', shfjGlobals.anatomistVolumeFormats ),
+    'output_volume', WriteDiskItem( 'Left Gyri Volume', shfjGlobals.anatomistVolumeFormats ), 
 
-def initialization( self ):     
-   self.num1 = 1
-   self.num2 = 1
-   self.den1 = 1
-   self.den2 = 1
-   self.cst = 0
-     
-def execution( self, context ):
+)
 
-   context.system('AimsLinearComb','-i',self.texture1.fullPath(),'-j',self.texture2.fullPath(),
-                  '-o',self.output.fullPath(),
-                  '-a',self.num1, '-b',self.den1,
-                  '-c',self.num2, '-d',self.den2,
-                  '-e',self.cst)
-  
-   
-                      
+def initialization( self ):
+    self.linkParameters( 'white_mesh', 'texture_in' )
+    self.linkParameters( 'input_volume', 'texture_in' )
+    self.texture_time = 0
+    self.object_label = 100
+
+def execution( self, context ):  
+    context.write('3D parcellation.')
+    context.system('AimsMeshParcellation2VolumeParcellation',
+                    '-m', self.white_mesh.fullPath(),
+                    '-t', self.texture_in.fullPath(),
+                    '-o', self.output_volume.fullPath(),
+                    '-v', self.input_volume.fullPath(),
+                    '-T', self.texture_time,
+                    '-l', self.object_label )
+

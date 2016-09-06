@@ -31,36 +31,27 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from neuroProcesses import *
-import shfjGlobals     
+import shfjGlobals
+from brainvisa import anatomist
 
-name = 'Texture Linear Combination'
+name = 'Anatomist Show Lobes Parcels Texture'
+roles = ('viewer',)
 userLevel = 0
 
+def validation():
+  anatomist.validation()
+
 signature = Signature(
-    'texture1',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
-    'texture2',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
-    'num1',Float(),
-    'num2',Float(),
-    'den1',Float(),
-    'den2',Float(),
-    'cst',Float(),
-    'output', WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-    )
+    'texture_lobes_parcels', ReadDiskItem('hemisphere lobes parcellation texture', 'aims Texture formats'),
+    'white_mesh',ReadDiskItem( 'White Mesh', 'aims mesh formats' ),
+)
 
-def initialization( self ):     
-   self.num1 = 1
-   self.num2 = 1
-   self.den1 = 1
-   self.den2 = 1
-   self.cst = 0
-     
+def initialization( self ):
+  self.linkParameters('white_mesh','texture_lobes_parcels' )
+
 def execution( self, context ):
-
-   context.system('AimsLinearComb','-i',self.texture1.fullPath(),'-j',self.texture2.fullPath(),
-                  '-o',self.output.fullPath(),
-                  '-a',self.num1, '-b',self.den1,
-                  '-c',self.num2, '-d',self.den2,
-                  '-e',self.cst)
-  
-   
-                      
+  a = anatomist.Anatomist()
+  return a.viewTextureOnMesh( self.white_mesh,
+                                           self.texture_lobes_parcels,
+                                           a.getPalette('MarsAtlas'),
+                                           interpolation = 'rgb' )

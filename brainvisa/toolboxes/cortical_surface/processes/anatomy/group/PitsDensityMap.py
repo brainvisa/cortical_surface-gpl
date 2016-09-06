@@ -1,15 +1,3 @@
-#  This software and supporting documentation are distributed by
-#      Institut Federatif de Recherche 49
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-#
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the 
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info". 
-#
 # As a counterpart to the access to the source code and  rights to copy,
 # modify and redistribute granted by the license, users are provided only
 # with a limited warranty  and the software's author,  the holder of the
@@ -30,21 +18,44 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
 
-name = 'Texture Regularization'
+from brainvisa.processes import *
+import shfjGlobals  
+from soma import aims
+import numpy as np
+
+    
+name = 'Compute Pits Density From a Set of Subjects'
 
 userLevel = 0
 
 signature = Signature(
-     'Texture', ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-     'output_texture',WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-     'Parameter', Float()
+                      
+    'projected_smoothed_pits',ListOf( ReadDiskItem( 'Texture', shfjGlobals.aimsTextureFormats) ),
+    'pits_density',WriteDiskItem( 'Texture', shfjGlobals.aimsTextureFormats),
 )
 
-def initialization( self ):
-     self.Parameter = 0.95
+#def initialization( self ):
+
+    
 def execution( self, context ):
-    context.system('AimsTextureRegularization','-t',self.Texture.fullPath(),'-o',self.output_texture.fullPath(),
-                   '-r',self.parameter)
+
+    tex1 = aims.read(self.projected_smoothed_pits[0].fullPath())
+    atex1 = tex1[0].arraydata()
+    good_shape = atex1.shape
+    a_tex_out = np.zeros(good_shape)
+    nb_subj = 0
+    for proj_pits in self.projected_smoothed_pits:
+        tex_pits = aims.read(proj_pits.fullPath())
+        atex_pits = np.array(tex_pits[0])
+        if atex_pits.shape == good_shape:
+            a_tex_out += np.nan_to_num(atex_pits)
+            nb_subj += 1
+        else:
+            pb_subj = proj_pits.get( 'subject' )
+            context.error('problem, subject '+pb_subj+' not processed')
+    a_tex_out = a_tex_out / nb_subj
+    tex_out = aims.TimeTexture_FLOAT()
+    tex_out[0].assign(a_tex_out)
+    aims.write(tex_out, self.pits_density.fullPath())
+    context.write('done')

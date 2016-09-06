@@ -38,9 +38,9 @@ name = 'Texture Mathematic Morphology'
 userLevel = 0
 
 signature = Signature(
-     'Texture', ReadDiskItem( 'Texture', 'Texture' ), 
-     'Mesh', ReadDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats ), 
-     'output_texture',WriteDiskItem( 'Texture', 'Texture' ),
+     'Texture', ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
+     'Mesh', ReadDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats ),
+     'output_texture',WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
      'Mode', Choice("Dilation",
                     "Erosion",
                     "Opening",
@@ -57,6 +57,7 @@ def initialization( self ):
      self.background_label = 0
      self.forbidden_label = -1
      self.setOptional('Radius')
+
 def execution( self, context ):
     if (self.Metric == 'Euclidean'): 
          if (self.Mode == 'Dilation'):

@@ -81,6 +81,20 @@ def execution( self, context ):
     cingular_tex_value = acingular_tex_clean_in.max()
     insula_tex_value = ainsula_tex_clean_in.max()
     neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
+
+    save_cingular = False
+    cingular_boundary = basicTls.textureBoundary(mesh, acingular_tex_clean_in, cingular_tex_value, neigh)
+    if len(cingular_boundary) > 1:
+        save_cingular = True
+        context.write('Topological correction needed for cingular pole...')
+        acingular_tex_clean_in, cingular_tex_boundary = texTls.textureTopologicalCorrection(mesh, acingular_tex_clean_in, cingular_tex_value, 0, neigh)
+    save_insula = False
+    insula_boundary = basicTls.textureBoundary(mesh, ainsula_tex_clean_in, insula_tex_value, neigh)
+    if len(insula_boundary) > 1:
+        save_insula = True
+        context.write('Topological correction needed for insular pole...')
+        ainsula_tex_clean_in, insula_tex_boundary = texTls.textureTopologicalCorrection(mesh, ainsula_tex_clean_in, insula_tex_value, 0, neigh)
+
     ## dilation of the two poles will ensure that the gap between them is least of 2*dilation_size vertices
     for it in range(self.dilation_size):
         simple_boundary = basicTls.textureSimpleBoundary(mesh, acingular_tex_clean_in, cingular_tex_value, neigh)
@@ -120,5 +134,15 @@ def execution( self, context ):
 
     else:
         context.write('Cingular and Insular poles are separated by more than '+str(2*self.dilation_size)+' vertices, OK')
+        if save_cingular:
+            acingular_tex_clean_in[acingular_tex_clean_in > 0] = 1
+            tex_out = aims.TimeTexture_S16()
+            tex_out[0].assign(acingular_tex_clean_in)
+            ws.write(tex_out, self.cingular_pole_texture_out.fullPath())
+        if save_insula:
+            ainsula_tex_clean_in[ainsula_tex_clean_in > 0] = 180
+            tex_out = aims.TimeTexture_S16()
+            tex_out[0].assign(ainsula_tex_clean_in)
+            ws.write(tex_out, self.insula_pole_texture_out.fullPath())
     context.write('Done')
 

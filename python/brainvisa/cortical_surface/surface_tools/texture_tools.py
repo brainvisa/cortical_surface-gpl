@@ -152,31 +152,3 @@ def TextureExtrema(mesh, atex, neigh=None):
         elif atex[v] > ma:
             extrema[v] = 1
     return extrema
-
-def TextureSmoothing(mesh, tex,Niter, dt):
-    mod = 1
-    if Niter > 10:
-        mod = 10
-    if Niter > 100:
-        mod = 100
-    if Niter > 1000:
-        mod = 1000
-    print 'using conformal weights'
-    weights = pdeTls.computeMeshWeights(mesh)
-    N = weights.shape[0]
-    s = weights.sum(axis=0)
-    dia = sparse.dia_matrix((1 / s, 0), shape=(N, N))
-    W = dia * weights
-    I = sparse.lil_matrix((N, N))
-    I.setdiag(np.ones(N))
-    tL = I.tocsr() - W
-    LI = I.tocsr() - (dt * tL)
-    Mtex = tex#np.array(tex[0]).reshape(N,1)
-    print 'iterative filtering the texture...'
-    for i in range(Niter):
-        Mtex = LI * Mtex
-        if (i % mod == 0):
-            print i
-    print '    OK'
-
-    return(Mtex)

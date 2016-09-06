@@ -16,7 +16,7 @@ class Model(object):
         Constructor
         '''
         if modelVersion is None:
-            self.modelVersion = 2
+            self.modelVersion = 3
         else:
             self.modelVersion = modelVersion
         # AxisID
@@ -39,11 +39,11 @@ class Model(object):
             self.latitudeAxisCoord = latitudeAxisCoord
         # AxisSulci
         if longitudeAxisSulci is None:
-            self.longitudeAxisSulci = {'F.C.L.r.asc.': 40, 'F.Cal.ant.-Sc.Cal.': 281, 'F.P.O.': 297, 'S.C.': 360, 'S.F.orbitaire.': 61, 'S.F.marginal.': 61, 'F.I.P.Po.C.inf.': 339, 'S.Po.C.sup.': 339, 'S.Pe.C.inf.': 16, 'S.Pe.C.median.': 16, 'S.Pe.C.sup.': 16}
+            self.longitudeAxisSulci = {'F.C.L.r.asc.': (40,1.0), 'F.Cal.ant.-Sc.Cal.': (281,1.0), 'F.P.O.': (297,1.0), 'S.C.': (360,1.0), 'S.F.orbitaire.': (61,1.0), 'S.F.marginal.': (61,1.0), 'F.I.P.Po.C.inf.': (339,1.0), 'S.Po.C.sup.': (339,1.0), 'S.Pe.C.inf.': (16,1.0), 'S.Pe.C.median.': (16,1.0), 'S.Pe.C.sup.': (16,1.0)}
         else:
             self.longitudeAxisSulci = longitudeAxisSulci
         if latitudeAxisSulci is None:
-            self.latitudeAxisSulci ={'F.C.M.ant.': 55 , 'F.Coll.': 56, 'S.Call.': 1, 'S.F.inf.': 106, 'S.F.inter.': 92, 'S.F.sup.': 81, 'S.O.T.lat.post.': 81, 'S.Olf.': 81, 'S.T.i.ant.': 92, 'S.T.i.post.': 92, 'S.T.s.': 106, 'S.T.s.ter.asc.ant.': 106, 'S.T.s.ter.asc.post.': 92}
+            self.latitudeAxisSulci ={'F.C.M.ant.': (55,1.0) , 'F.Coll.': (56,1.0), 'S.Call.': (1,1.0), 'S.F.inf.': (106,1.0), 'S.F.inter.': (92,1.0), 'S.F.sup.': (81,1.0), 'S.O.T.lat.post.': (81,1.0), 'S.Olf.': (81,1.0), 'S.T.i.ant.': (92,1.0), 'S.T.i.post.': (92,1.0), 'S.T.s.': (106,1.0), 'S.T.s.ter.asc.ant.': (106,1.0), 'S.T.s.ter.asc.post.': (92,1.0)}
         else:
             self.latitudeAxisSulci = latitudeAxisSulci
         # boundary coordinates
@@ -91,7 +91,7 @@ class Model(object):
         if self.modelVersion == '0.1':
             pass
         else:
-            txt_tmp = ','.join(i+':'+str(self.longitudeAxisSulci[i]) for i in self.longitudeAxisSulci)
+            txt_tmp = ','.join(i+':('+str(self.longitudeAxisSulci[i][0])+';'+str(self.longitudeAxisSulci[i][1])+')' for i in self.longitudeAxisSulci)
             txt = txt + 'longitudeAxisSulci ' + txt_tmp + '\n'
         txt_tmp = ','.join(str(i) for i in self.latitudeAxisID)
         txt = txt + 'latitudeAxisID ' + txt_tmp + '\n'
@@ -100,7 +100,7 @@ class Model(object):
         if self.modelVersion == '0.1':
             pass
         else:
-            txt_tmp = ','.join(i+':'+str(self.latitudeAxisSulci[i]) for i in self.latitudeAxisSulci)
+            txt_tmp = ','.join(i+':('+str(self.latitudeAxisSulci[i][0])+';'+str(self.latitudeAxisSulci[i][1])+')' for i in self.latitudeAxisSulci)
             txt = txt + 'latitudeAxisSulci ' + txt_tmp + '\n'
 
         # txt = 'modelVersion ' + str(self.modelVersion) + '\n'
@@ -222,8 +222,25 @@ class Model(object):
                     data_num.append(x.split(':'))
                 latitudeAxisSulci = dict((key, int(value)) for (key, value) in data_num)
                 output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], longitudeAxisSulci, latitudeAxisSulci, txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
+            elif txt_dict['modelVersion'] == '3':
+                print('read model version 3')
+                data_txt = txt_dict['longitudeAxisSulci']
+                data_num = []
+                for x in data_txt.split(','):
+                    y = x.split(':')
+                    z = y[1].split(';')
+                    data_num.append([y[0],z[0][1:],z[1][:-1]])
+                longitudeAxisSulci = dict((key, (int(value),float(weight))) for (key, value, weight) in data_num)
+                data_txt = txt_dict['latitudeAxisSulci']
+                data_num = []
+                for x in data_txt.split(','):
+                    y = x.split(':')
+                    z = y[1].split(';')
+                    data_num.append([y[0],z[0][1:],z[1][:-1]])
+                latitudeAxisSulci = dict((key, (int(value),float(weight))) for (key, value, weight) in data_num)
+                output_model = Model(txt_dict['modelVersion'], txt_dict['left'], txt_dict['right'], txt_dict['top'], txt_dict['bottom'], txt_dict['longitudeAxisID'], txt_dict['latitudeAxisID'], txt_dict['longitudeAxisCoord'], txt_dict['latitudeAxisCoord'], longitudeAxisSulci, latitudeAxisSulci, txt_dict['insularPoleBoundaryCoord'], txt_dict['cingularPoleBoundaryCoord'])
             else:
-                raise Exception('cannot read the model file :: bad model version')
+                raise Exception('cannot read the model file :: wrong model version')
         except:
             raise Exception('cannot read the model file')
 
@@ -232,7 +249,7 @@ class Model(object):
     def toMesh(self, z_coord=None):
         if z_coord is None:
             z_coord = 0
-        out_mesh = aims.AimsTimeSurface_2_VOID()
+        out_mesh = aims.AimsTimeSurface_2()
         verts = aims.vector_POINT3DF()
         poly = aims.vector_AimsVector_U32_2()
         #-------- boundaries
@@ -369,6 +386,7 @@ class Model(object):
         isLat = False
         isLon = False
         axisID = None
+        slWeight = 1.0
         if sulc_name_in.find('left')>0:
             sulc_name = sulc_name_in[:-5]
         elif sulc_name_in.find('right')>0:
@@ -378,13 +396,15 @@ class Model(object):
 
         if self.latitudeAxisSulci.has_key(sulc_name):
             isLat = True
-            axisID = self.latitudeAxisSulci[sulc_name]
+            axisID = self.latitudeAxisSulci[sulc_name][0]
+            slWeight = self.latitudeAxisSulci[sulc_name][1]
         elif self.longitudeAxisSulci.has_key(sulc_name):
             isLon = True
-            axisID = self.longitudeAxisSulci[sulc_name]
+            axisID = self.longitudeAxisSulci[sulc_name][0]
+            slWeight = self.longitudeAxisSulci[sulc_name][1]
         else:
             print 'no axis defined for sulcus ', sulc_name
-        return(axisID, isLon, isLat)
+        return(axisID, isLon, isLat, slWeight)
 
 ####################################################################
 #

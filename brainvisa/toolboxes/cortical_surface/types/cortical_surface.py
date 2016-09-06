@@ -55,6 +55,9 @@ FileType( 'Right labeled basins texture', 'labeled basins texture' )
 FileType( 'pits texture', 'Texture' )
 FileType( 'Left pits texture', 'pits texture' )
 FileType( 'Right pits texture', 'pits texture' )
+FileType( 'smooth pits texture', 'Texture' )
+FileType( 'Left smooth pits texture', 'smooth pits texture' )
+FileType( 'Right smooth pits texture', 'smooth pits texture' )
 FileType( 'noisy pits texture', 'Texture' )
 FileType( 'Left noisy pits texture', 'noisy pits texture' )
 FileType( 'Right noisy pits texture', 'noisy pits texture' )
@@ -200,6 +203,15 @@ FileType( 'Right hemisphere model parcellation texture', 'Hemisphere model parce
 FileType( 'Hemisphere marsAtlas parcellation texture', 'Hemisphere parcellation texture' )
 FileType( 'Left hemisphere marsAtlas parcellation texture', 'Hemisphere marsAtlas parcellation texture')
 FileType( 'Right hemisphere marsAtlas parcellation texture', 'Hemisphere marsAtlas parcellation texture')
+
+FileType( 'Hemisphere lobes parcellation texture', 'Hemisphere parcellation texture' )
+FileType( 'Left hemisphere lobes parcellation texture', 'Hemisphere lobes parcellation texture')
+FileType( 'Right hemisphere lobes parcellation texture', 'Hemisphere lobes parcellation texture')
+
+FileType( 'Hemisphere gyrus parcellation texture', 'Hemisphere parcellation texture' )
+FileType( 'Left hemisphere gyrus parcellation texture', 'Hemisphere gyrus parcellation texture')
+FileType( 'Right hemisphere gyrus parcellation texture', 'Hemisphere gyrus parcellation texture')
+
 
 # may be used to replace hemisphere regularized parcellation texture
 #FileType( 'Left hemisphere regularized model parcellation texture', 'Hemisphere gyri parcellation texture')

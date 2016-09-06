@@ -45,19 +45,19 @@ userLevel = 0
 signature = Signature(
     'side', Choice('left', 'right'),
     'textures_parcels', ListOf(
-        ReadDiskItem('hemisphere marsAtlas parcellation texture',
+        ReadDiskItem('hemisphere parcellation texture',
                      'aims Texture formats',
-                     requiredAttributes={'regularized': 'false',
-                                         'side': 'left'}) ),
+                     requiredAttributes={'regularized': 'false'}) ),
     'white_meshes',ListOf(ReadDiskItem( 'Hemisphere White Mesh',
                                        'aims mesh formats')),
+    'parcels_to_ignore', ListOf( Integer() ),
     'normalization_by_total_area', Choice('no', 'yes'),
     'output_csv_file', WriteDiskItem( 'CSV file', 'CSV file' )
 )
 
 def linkParcels(proc, dummy):
     proc.signature['textures_parcels'] = ListOf(
-        ReadDiskItem('hemisphere marsAtlas parcellation texture',
+        ReadDiskItem('hemisphere parcellation texture',
                      'aims Texture formats',
                      requiredAttributes={'regularized': 'false',
                                          'side': proc.side}))
@@ -66,17 +66,19 @@ def linkParcels(proc, dummy):
 def initialization( self ):
     self.linkParameters(None, 'side', linkParcels)
     self.linkParameters('white_meshes','textures_parcels' )
-
+    self.parcels_to_ignore = [0,255]
 
 def execution( self, context ):
-    def compute_parcels_area(mesh, atex_parcels):
+    def compute_parcels_area(mesh, atex_parcels, bad_labels):
         vert_voronoi = pdeTls.vertexVoronoi(mesh)
-        total_area = np.sum(vert_voronoi)
-        parcels_labels = np.unique(atex_parcels)
-        parcels_area = np.zeros(parcels_labels.shape)
+        parcels_labels = list(np.unique(atex_parcels))
+        for l in bad_labels:
+            parcels_labels.remove(l)
+        parcels_area = np.zeros(len(parcels_labels))
         for ind_lab, lab in enumerate(parcels_labels):
             vert_inds = np.where(atex_parcels == lab)[0]
             parcels_area[ind_lab] = np.sum(vert_voronoi[vert_inds])
+        total_area = np.sum(parcels_area)
         return parcels_area,  parcels_labels, total_area
 
 
@@ -90,7 +92,7 @@ def execution( self, context ):
         mesh = aims.read(r_mesh.fullPath())
         tex_parcels = aims.read(self.textures_parcels[ind_mesh].fullPath())
         atex_parcels = tex_parcels[0].arraydata()
-        (subj_parcels_area, subj_parcels_labels, subj_total_area) = compute_parcels_area(mesh, atex_parcels)
+        (subj_parcels_area, subj_parcels_labels, subj_total_area) = compute_parcels_area(mesh, atex_parcels, self.parcels_to_ignore)
         parcels_area.append(subj_parcels_area)
         total_area.append(subj_total_area)
         parcels_label.append(subj_parcels_labels)

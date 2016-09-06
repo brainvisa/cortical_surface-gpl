@@ -25,10 +25,12 @@
 # read sulcus label translation file and return a dictionnary
 #
 ####################################################################
-def readSulcusLabelTranslationFile(sulcus_label_file):
+def readSulcusLabelTranslationFile(sulcus_label_file, invert=False):
     sulc_labels = []
     with open(sulcus_label_file,'r') as inf:
         for line in inf:
-            sulc_labels.append(line.split())    
+            sulc_labels.append(line.split())
     sulc_labels_dict = dict((int(value), key) for (key, value) in sulc_labels)
+    if invert:
+        sulc_labels_dict = dict((v, k) for k, v in sulc_labels_dict.items())
     return sulc_labels_dict

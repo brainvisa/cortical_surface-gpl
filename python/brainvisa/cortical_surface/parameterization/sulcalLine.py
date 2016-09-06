@@ -16,7 +16,7 @@ class SulcalLine(object):
     classdocs
     '''
 
-    def __init__(self, label=None, indices=None, vertices=None, segm=None, sulc_labels_dict=None):
+    def __init__(self, label=None, indices=None, vertices=None, segm=None, sulc_labels_dict=None, name=None):
         '''
         Constructor
         '''
@@ -42,6 +42,8 @@ class SulcalLine(object):
             self.name = 'unknown'
         else:
             self.name = sulc_labels_dict[self.label]
+        if name is not None:
+            self.name = name
         self.computeAttributes()
 
     def printArgs(self):
@@ -70,7 +72,7 @@ class SulcalLine(object):
             self.vertices = np.array([])
         else:
             self.vertices = vertices
-#        self.computeAttributes()
+            self.computeAttributes()
 
     def updateSegm(self, segm=None):
         if segm is None:
@@ -122,6 +124,18 @@ class SulcalLine(object):
         else:
             self.barycenter = np.array([])
             self.length = np.array([])
+
+    def computePCA(self):
+        if self.vertices.shape[0] > 0:
+            #compute the PCA
+            #----center the data
+            data = self.vertices - self.vertices.mean(axis=0)
+            #----compute the SVD
+            U, s, Vt = np.linalg.svd(data[:,0:2], full_matrices=False)
+            self.PCA = Vt
+        else:
+            self.PCA = np.array([])
+
 
     def __iter__(self):
         return self
@@ -186,11 +200,11 @@ class SulcalLine(object):
         return self
 
     def plot(self, plt, color=None, modele=None):
-        if modele == None:
+        if modele is None:
             plot_target = False
         else:
             plot_target = True
-        if color == None:
+        if color is None:
             color = ['b']
         for s in self.segm:
             plt.plot(self.vertices[s, 0], self.vertices[s, 1], color, linewidth=3.0)
@@ -199,29 +213,36 @@ class SulcalLine(object):
 
 
 class SulcalConstraint(SulcalLine):
-    def __init__(self, sl=None, axisID=None, isLon=None, isLat=None):
+    def __init__(self, sl=None, axisID=None, isLon=None, isLat=None, weight=None, vertexWeight=None):
         '''
         Constructor
         '''
         if sl is None:
             super(SulcalConstraint, self).__init__()
         else:
-            super(SulcalConstraint, self).__init__(sl.label, sl.indices, sl.vertices, sl.segm)
-        if isLat == None:
+            super(SulcalConstraint, self).__init__(label=sl.label, indices=sl.indices, vertices=sl.vertices, segm=sl.segm,name=sl.name)
+        if isLat is None:
             self.isLat = False
         else:
             self.isLat = isLat
-        if isLon == None:
+        if isLon is None:
             self.isLon = False
         else:
             self.isLon = isLon
-        if axisID == None:
+        if axisID is None:
             self.axisID = None
         else:
             self.axisID = axisID
-        self.setVertexWeight()  # should be used for weighting between vertices inside a sulcaConstraint
+
         ######################################################################
-        self.weight = 1#self.nbVertices #self.length  # sum(self.vertexWeight)
+        if weight is None:
+            self.weight = 1#self.nbVertices #self.length  # sum(self.vertexWeight)
+        else:
+            self.weight = weight
+        if vertexWeight is None:
+            self.vertexWeight = np.ones(self.nbVertices)# should be used for weighting between vertices inside a sulcalConstraint
+        else:
+            self.vertexWeight = vertexWeight
         ######################################################################
 
     def plotTarget(self, plt, modele):
@@ -244,13 +265,13 @@ class SulcalConstraint(SulcalLine):
 
     def cat(self, sc):
         super(SulcalConstraint, self).cat(sc)
-        self.setVertexWeight()  # should be used for weighting between vertices inside a sulcaConstraint
-        ######################################################################
-        self.weight = 1#self.nbVertices#self.length  # sum(self.verticesWeight)
-        ######################################################################
-
-    def setVertexWeight(self, input_weights=None):
-        if input_weights is None:
-            self.vertexWeight = np.ones(self.nbVertices)
-        else:
-            self.vertexWeight = input_weights
+    #     self.setVertexWeight()  # should be used for weighting between vertices inside a sulcaConstraint
+    #     ######################################################################
+    #     self.weight = 1#self.nbVertices#self.length  # sum(self.verticesWeight)
+    #     ######################################################################
+    #
+    # def setVertexWeight(self, input_weights=None):
+    #     if input_weights is None:
+    #         self.vertexWeight = np.ones(self.nbVertices)
+    #     else:
+    #         self.vertexWeight = input_weights

@@ -1,4 +1,4 @@
-modelVersion 0.1
+modelVersion 3
 left -242.926999774
 right 207.07300168
 top 100.0
@@ -7,5 +7,7 @@ insularPoleBoundaryCoord 30.0
 cingularPoleBoundaryCoord 30.0
 longitudeAxisID 16,40,61,281,297,339,360
 longitudeAxisCoord 11.3520704418,29.9030027811,49.4981417246,-40.5930002416,-34.3914656973,-12.6077749619,3.32446671061e-17
+longitudeAxisSulci F.C.L.r.asc.:(40;1.0),S.Po.C.sup.:(339;1.0),S.Pe.C.inf.:(16;1.0),F.Cal.ant.-Sc.Cal.:(281;1.0),S.Pe.C.median.:(16;1.0),S.F.orbitaire.:(61;1.0),F.P.O.:(297;1.0),S.F.marginal.:(61;1.0),S.C.:(360;1.0),S.Pe.C.sup.:(16;1.0),F.I.P.Po.C.inf.:(339;1.0)
 latitudeAxisID 1,55,56,81,92,106
 latitudeAxisCoord None,84.73323423,69.6368139884,58.9850785074,49.126326817,38.323223391
+latitudeAxisSulci S.O.T.lat.post.:(81;1.0),S.T.s.:(106;1.0),F.Coll.:(56;1.0),S.T.i.post.:(92;1.0),F.C.M.ant.:(55;1.0),S.F.sup.:(81;1.0),S.Call.:(1;1.0),S.T.s.ter.asc.post.:(92;1.0),S.T.s.ter.asc.ant.:(106;1.0),S.Olf.:(81;1.0),S.T.i.ant.:(92;1.0),S.F.inter.:(92;1.0),S.F.inf.:(106;1.0)

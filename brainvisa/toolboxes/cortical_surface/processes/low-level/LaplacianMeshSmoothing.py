@@ -1,15 +1,3 @@
-#  This software and supporting documentation are distributed by
-#      Institut Federatif de Recherche 49
-#      CEA/NeuroSpin, Batiment 145,
-#      91191 Gif-sur-Yvette cedex
-#      France
-#
-# This software is governed by the CeCILL license version 2 under
-# French law and abiding by the rules of distribution of free software.
-# You can  use, modify and/or redistribute the software under the 
-# terms of the CeCILL license version 2 as circulated by CEA, CNRS
-# and INRIA at the following URL "http://www.cecill.info". 
-#
 # As a counterpart to the access to the source code and  rights to copy,
 # modify and redistribute granted by the license, users are provided only
 # with a limited warranty  and the software's author,  the holder of the
@@ -30,21 +18,40 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
 
-name = 'Texture Regularization'
+def validation():
+  try:
+    from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+  except:
+    raise ValidationError( 'brainvisa.cortical_surface.surface_tools.PDE_tools can not be imported.' )
 
+from brainvisa.processes import *
+try:
+    from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+except:
+    pass
+
+name = 'Laplacian Mesh Smoothing'
 userLevel = 0
-
 signature = Signature(
-     'Texture', ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-     'output_texture',WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-     'Parameter', Float()
+    'mesh',ReadDiskItem( 'Mesh', 'aims mesh formats' ),
+    'dt', Float(),
+    'nb_iterations', Integer(),
+    'smoothed_mesh', WriteDiskItem('Mesh', 'aims mesh formats')
 )
 
 def initialization( self ):
-     self.Parameter = 0.95
+    self.dt = 0.7
+    self.nb_iterations = 60
+    
 def execution( self, context ):
-    context.system('AimsTextureRegularization','-t',self.Texture.fullPath(),'-o',self.output_texture.fullPath(),
-                   '-r',self.parameter)
+       
+    re = aims.Reader()
+    ws = aims.Writer()
+    
+    mesh = re.read(self.mesh.fullPath())
+    mesh_smooth = pdeTls.laplacianMeshSmoothing(mesh ,self.nb_iterations, self.dt)
+    ws.write(mesh_smooth, self.smoothed_mesh.fullPath())
+    context.write('Done')
+            
+      

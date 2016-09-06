@@ -53,8 +53,8 @@ signature = Signature(
     'sulcus_labels',ListOf( ReadDiskItem( 'Graph Label Translation', 'Text File') ),
     'model_file_in',ReadDiskItem( 'HipHop Model', 'Text File'),
     'model_file',WriteDiskItem( 'HipHop Model', 'Text File'),
-    'model_file_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
-    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),    
+    'model_file_mesh',WriteDiskItem( 'mesh', 'Mesh mesh'),
+    'union_sulcal_lines_mesh',WriteDiskItem( 'mesh', 'Mesh mesh'),
     'union_sulcal_lines_texture',WriteDiskItem( 'Texture', 'Texture') 
 )
 
@@ -79,6 +79,7 @@ def execution( self, context ):
     model = md.Model()
     if self.model_file_in is not None:
         model = model.read(self.model_file_in.fullPath())
+
     left = 0
     right = 0
     top = 0
@@ -87,9 +88,19 @@ def execution( self, context ):
         context.write('working on mesh nb: ',ind_mesh+1)
         mesh = re.read(r_mesh.fullPath())
         tex_square_sulci = re.read(self.flat_white_sulcalines[ind_mesh].fullPath())
-        sulci_dict = rSLT.readSulcusLabelTranslationFile(self.sulcus_labels[ind_mesh].fullPath())
+        sulci_dict = rSLT.readSulcusLabelTranslationFile(self.sulcus_labels[ind_mesh].fullPath(), invert=True)
+        # extract only the sulci that are used in the model
+        model_sulci_dict = {}
+        for s in model.longitudeAxisSulci.keys():
+            sulci_dict_key = s+'_'+self.side
+            if sulci_dict.has_key(sulci_dict_key):
+                model_sulci_dict[sulci_dict[sulci_dict_key]] = sulci_dict_key
+        for s in model.latitudeAxisSulci.keys():
+            sulci_dict_key = s+'_'+self.side
+            if sulci_dict.has_key(sulci_dict_key):
+                model_sulci_dict[sulci_dict[sulci_dict_key]] = sulci_dict_key
         full_sulci = slSet.SulcalLinesSet()
-        full_sulci.extractFromTexture(tex_square_sulci[0].arraydata(), mesh, sulci_dict)
+        full_sulci.extractFromTexture(tex_square_sulci[0].arraydata(), mesh, model_sulci_dict)
         context.write('Translating the barycenter of S.C. to 0')
         SC_ind = full_sulci.names.index(('S.C._'+self.side))   
         SC_label = full_sulci.labels[SC_ind]

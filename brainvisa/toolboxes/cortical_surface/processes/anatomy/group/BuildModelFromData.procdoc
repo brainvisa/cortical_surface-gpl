@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">This process computes the coordinates of the axes of the model from a set of individuals, i.e. from a set of flat mesh and corresponding flat sulcal lines as produced by the Harmonic Intrinsic Parameterization (HIP) process.</xhtml>
+    <d name="parameters">
+      <xhtml name="model_file_mesh"/>
+      <xhtml name="model_file"/>
+      <xhtml name="flat_white_sulcalines"/>
+      <xhtml name="rectangular_mesh"/>
+      <xhtml name="sulcus_labels"/>
+      <xhtml name="boundary_texture"/>
+      <xhtml name="union_sulcal_lines_texture"/>
+      <xhtml name="union_sulcal_lines_mesh"/>
+      <xhtml name="side"/>
+      <xhtml name="model_file_in">if a model is given as input, the process will compute the corrdinates of the corresponding axes. If no model is given, then the default model will be used.</xhtml>
+    </d>
+    <xhtml name="long">The coordinate values of the axes of the model are defined for a group of subjects after the unconstrained mapping (HIP) in the rectangular domain. For each axis, the computation of the coordinate value is based on the weighted barycenter of the points associated to the sulcal fundi corresponding to this axis across the subjects of the group. For more details, see:
+<br/>
+<span style="color: rgb(51, 51, 255);">Auzias G, Lefèvre J, Le Troter A, Fischer C, Perrot M, Régis J, Coulon O (2013). <span style="font-style: italic;">Model-driven Harmonic Parameterization of the Cortical Surface : HIP-HOP, </span> <span style="font-weight: bold;">IEEE Trans. on Medical Imaging, </span>32(5):873-887.</span><br/>
+<br/></xhtml>
+  </d>
+</d>
+</minf>
