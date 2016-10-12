@@ -17,8 +17,7 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
-from neuroProcesses import *
-import shfjGlobals
+from brainvisa.processes import *
 from brainvisa import anatomist
 from soma import aims
 import numpy as np
@@ -34,15 +33,15 @@ def validation():
   anatomist.validation()
 
 signature = Signature(
-    'rectangular_mesh',ListOf( ReadDiskItem( 'Rectangular flat cstr mesh', shfjGlobals.aimsMeshFormats) ),
+    'rectangular_mesh',ListOf( ReadDiskItem( 'Rectangular flat cstr mesh', 'aims Mesh Formats') ),
     'side', Choice('left', 'right'),
 #    'corresp_indices_texture',ReadDiskItem( 'Rectangular flat indices texture', 'Texture'),
     'flat_white_sulcalines',ListOf( ReadDiskItem( 'hemisphere Sulcal Lines Rectangular Flat texture', 'Texture' ) ),
 #    'white_sulcalines',ReadDiskItem( 'hemisphere Sulcal Lines texture', 'Texture' ),
     'sulcus_labels',ListOf( ReadDiskItem( 'Graph Label Translation', 'Text File') ),
     'model_file',ReadDiskItem( 'HipHop Model', 'Text File'),
-#    'model_file_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
-#    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
+#    'model_file_mesh',WriteDiskItem( 'Mesh', 'aims Mesh Formats'),
+#    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', 'aims Mesh Formats'),
 #    'union_sulcal_lines_texture',WriteDiskItem( 'Texture', 'Texture')
 )
 

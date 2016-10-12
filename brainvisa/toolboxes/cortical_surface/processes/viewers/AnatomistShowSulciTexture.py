@@ -30,8 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals
+from brainvisa.processes import *
 from brainvisa import anatomist
 
 name = 'Anatomist Show Sulci Texture'
@@ -43,7 +42,7 @@ def validation():
 
 signature = Signature(
   'sulci_texture', ReadDiskItem( 'Sulci White Texture', 'Texture' ),
-  'Triangulation', ReadDiskItem( 'Hemisphere White Mesh',shfjGlobals.aimsMeshFormats ),
+  'Triangulation', ReadDiskItem( 'Hemisphere White Mesh', 'aims Mesh Formats' ),
 )
 
 def initialization( self ):

@@ -30,8 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
+from brainvisa.processes import *
 
 name = 'Sulcal Parcellation'
 
@@ -50,9 +49,9 @@ signature = Signature(
     'left_sulci_label_to_sulci_name',WriteDiskItem( 'Sulci To White Texture Translation', 'Text File',requiredAttributes={ 'side': 'left' }),
     'right_sulci_label_to_sulci_name',WriteDiskItem( 'Sulci To White Texture Translation', 'Text File',requiredAttributes={ 'side': 'right' }),
     'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' ,
-                                    shfjGlobals.aimsMeshFormats),
+                                    'aims Mesh Formats'),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' ,
-                                     shfjGlobals.aimsMeshFormats),
+                                     'aims Mesh Formats'),
     'left_hemi_mesh', WriteDiskItem( 'Left Hemisphere Mesh', 'MESH mesh' ),
     'right_hemi_mesh', WriteDiskItem( 'Right Hemisphere Mesh', 'MESH mesh' ),
     'left_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'Texture',

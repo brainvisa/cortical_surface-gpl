@@ -30,8 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals
+from brainvisa.processes import *
 from brainvisa import anatomist
 
 def validation():
@@ -43,7 +42,7 @@ userLevel = 0
 
 signature = Signature(
   'blob_texture', ReadDiskItem( 'Blob White Curvature Texture', 'Texture' ),
-  'Triangulation', ReadDiskItem( 'Inflated Hemisphere White Mesh',shfjGlobals.aimsMeshFormats ),
+  'Triangulation', ReadDiskItem( 'Inflated Hemisphere White Mesh', 'aims Mesh Formats' ),
 )
 
 def initialization( self ):

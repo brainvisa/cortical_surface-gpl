@@ -30,16 +30,15 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
+from brainvisa.processes import *
 
 name = 'Texture Regularization'
 
 userLevel = 0
 
 signature = Signature(
-     'Texture', ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-     'output_texture',WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
+     'Texture', ReadDiskItem( 'Texture', 'aims Mesh Formats' ),
+     'output_texture',WriteDiskItem( 'Texture', 'aims Mesh Formats' ),
      'Parameter', Float()
 )
 

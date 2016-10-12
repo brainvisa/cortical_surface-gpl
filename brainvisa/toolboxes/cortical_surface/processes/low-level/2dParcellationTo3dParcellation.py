@@ -30,8 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
+from brainvisa.processes import *
 
 name = '2D Parcellation to 3D parcellation'
 
@@ -41,14 +40,14 @@ signature = Signature(
     'Side', Choice("Both","Left","Right"),
     'left_gyri',ReadDiskItem( 'hemisphere parcellation texture','Aims texture formats',requiredAttributes={ 'side': 'left' } ),
     'right_gyri',ReadDiskItem( 'hemisphere parcellation texture','Aims texture formats',requiredAttributes={ 'side': 'right' } ),
-    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , 'aims Mesh Formats'),
+    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
     'texture_time', Integer(),
     'object_label', Integer(),
 #    'translation',ReadDiskItem('Label Translation','Label Translation' ),
 #    'translation_type', Choice("int_to_string","string_to_int"),
-    'left_input_volume', ReadDiskItem( 'Left Grey White Mask', shfjGlobals.anatomistVolumeFormats ),
-    'right_input_volume', ReadDiskItem( 'Right Grey White Mask', shfjGlobals.anatomistVolumeFormats ),
+    'left_input_volume', ReadDiskItem( 'Left Grey White Mask', 'anatomist Volume Formats' ),
+    'right_input_volume', ReadDiskItem( 'Right Grey White Mask', 'anatomist Volume Formats' ),
     'left_output_volume', WriteDiskItem( 'Left Gyri Volume', 'Aims writable volume formats' ), #parcellation volume', 'Aims writable volume formats' ),
     'right_output_volume', WriteDiskItem( 'Right Gyri Volume', 'Aims writable volume formats' ), #parcellation volume', 'Aims writable volume formats' ),
 #    'left_output_graph', WriteDiskItem( 'Left Gyri Graph', 'Graph' ),#Parcels Graph', 'Graph' ),
