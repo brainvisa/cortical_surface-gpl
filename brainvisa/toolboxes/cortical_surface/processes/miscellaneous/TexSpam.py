@@ -30,8 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
+from brainvisa.processes import *
 
 name = 'Surfacic SPAM'
 userLevel = 1

@@ -30,16 +30,15 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
+from brainvisa.processes import *
 
 name = 'Texture Thresholding'
 
 userLevel = 0
 
 signature = Signature(
-     'Texture', ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-     'Thresholded_texture',WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
+     'Texture', ReadDiskItem( 'Texture', 'aims Mesh Formats' ),
+     'Thresholded_texture',WriteDiskItem( 'Texture', 'aims Mesh Formats' ),
      'Mode', Choice("LOWER_THAN",
                     "LOWER_OR_EQUAL_TO",
                     "GREATER_THAN",

@@ -30,20 +30,19 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
+from brainvisa.processes import *
 
 name = '2D to 3D'
 
 userLevel = 0
 
 signature = Signature(
-    'texture_in',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'texture_in',ReadDiskItem( 'Texture', 'aims Mesh Formats' ),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'aims Mesh Formats'),
     'texture_time', Integer(),
     'object_label', Integer(),
-    'input_volume', ReadDiskItem( 'Grey White Mask', shfjGlobals.anatomistVolumeFormats ),
-    'output_volume', WriteDiskItem( 'Left Gyri Volume', shfjGlobals.anatomistVolumeFormats ), 
+    'input_volume', ReadDiskItem( 'Grey White Mask', 'aims readable Volume Formats' ),
+    'output_volume', WriteDiskItem( 'Left Gyri Volume', 'aims writable Volume Formats' ),
 
 )
 

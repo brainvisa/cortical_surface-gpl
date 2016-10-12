@@ -30,30 +30,29 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from neuroProcesses import *
-import shfjGlobals     
+from brainvisa.processes import *
 
 name = 'Texture Linear Combination'
 userLevel = 0
 
 signature = Signature(
-    'texture1',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
-    'texture2',ReadDiskItem( 'Texture', shfjGlobals.aimsMeshFormats  ),
+    'texture1',ReadDiskItem( 'Texture', 'aims Mesh Formats' ),
+    'texture2',ReadDiskItem( 'Texture', 'aims Mesh Formats' ),
     'num1',Float(),
     'num2',Float(),
     'den1',Float(),
     'den2',Float(),
     'cst',Float(),
-    'output', WriteDiskItem( 'Texture', shfjGlobals.aimsMeshFormats ),
+    'output', WriteDiskItem( 'Texture', 'aims Mesh Formats' ),
     )
 
-def initialization( self ):     
+def initialization( self ):
    self.num1 = 1
    self.num2 = 1
    self.den1 = 1
    self.den2 = 1
    self.cst = 0
-     
+
 def execution( self, context ):
 
    context.system('AimsLinearComb','-i',self.texture1.fullPath(),'-j',self.texture2.fullPath(),
@@ -61,6 +60,5 @@ def execution( self, context ):
                   '-a',self.num1, '-b',self.den1,
                   '-c',self.num2, '-d',self.den2,
                   '-e',self.cst)
-  
-   
-                      
+
+
