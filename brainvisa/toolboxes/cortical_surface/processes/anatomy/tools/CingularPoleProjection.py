@@ -31,7 +31,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals
 # from brainvisa import anatomist
 from soma import aims
 from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
@@ -45,7 +44,7 @@ userLevel = 0
 #     anatomist.validation()
 
 signature = Signature(
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'aims Mesh Formats'),
     'side', Choice('left', 'right'),
 #    'pole_template',ReadDiskItem( 'Cingular Pole Template Subject' , 'Aims readable volume formats' ),
     'subject_transformation',ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist',
