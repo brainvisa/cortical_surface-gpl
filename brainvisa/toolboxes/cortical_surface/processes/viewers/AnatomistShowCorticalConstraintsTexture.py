@@ -31,7 +31,6 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
-import shfjGlobals
 from brainvisa import anatomist
 
 def validation():
@@ -43,7 +42,7 @@ userLevel = 0
 
 signature = Signature(
     'constaints_texture', ReadDiskItem( 'Constraints Texture', 'Texture' ),
-    'mesh', ReadDiskItem( 'Hemisphere White Mesh',shfjGlobals.aimsMeshFormats ),
+    'mesh', ReadDiskItem( 'Hemisphere White Mesh', 'aims Mesh Formats' ),
 )
 
 def initialization( self ):

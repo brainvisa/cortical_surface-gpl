@@ -26,7 +26,6 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
   
 from brainvisa.processes import *
-import shfjGlobals 
 from soma import aims
 import numpy as np
 
@@ -44,7 +43,7 @@ userLevel = 0
     
 signature = Signature(
                       
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats ),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'aims Mesh Formats' ),
     'side', Choice('left', 'right'),
     'latitude',ReadDiskItem( 'Latitude coordinate texture','Aims Texture formats' ),
     'longitude',ReadDiskItem( 'Longitude coordinate texture','Aims Texture formats' ),

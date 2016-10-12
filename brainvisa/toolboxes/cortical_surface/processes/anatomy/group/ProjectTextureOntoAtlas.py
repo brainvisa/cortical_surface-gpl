@@ -18,9 +18,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
-#from brainvisa import anatomist
-import sigraph
 import sys
 from soma import aims, aimsalgo
 import numpy as np
@@ -29,9 +26,7 @@ name = 'Project Texture Onto Atlas From Sphere'
 
 userLevel = 0
 
-# def validation():
-#     anatomist.validation()
-    
+
 signature = Signature(
     'subject_texture', ReadDiskItem('Texture','Aims Texture formats'),
     'subject_spherical_mesh', ReadDiskItem( 'Hemisphere spherical mesh', 'Aims mesh formats' ),

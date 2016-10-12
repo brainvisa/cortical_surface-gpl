@@ -31,7 +31,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals
 from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
 import numpy as np
 #from brainvisa import anatomist
@@ -52,7 +51,7 @@ signature = Signature(
 #    'trl',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
     'transformation', ReadDiskItem('Transformation matrix', 'Transformation matrix'),
-    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
     'right_pole',WriteDiskItem( 'Right insula pole texture','Texture',requiredAttributes={ 'side': 'right' } )
 )
 

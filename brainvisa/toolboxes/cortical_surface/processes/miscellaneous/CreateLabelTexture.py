@@ -32,7 +32,6 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
-import shfjGlobals
 from brainvisa.data.neuroHierarchy import databases
 
 name = 'Create Label Texture'
@@ -45,8 +44,8 @@ signature = Signature(
     'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
     'sulcus_identification',Choice('name','label'),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims readable volume formats' ),
-    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , 'aims Mesh Formats'),
+    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
     'MNI', Choice("No","Yes"),
     'mni_mesh', ReadDiskItem('MNI Cortex Mesh', 'Aims mesh formats'),
     'left_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'aims texture formats',requiredAttributes={ 'side': 'left' } ),

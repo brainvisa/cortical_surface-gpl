@@ -30,7 +30,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals
 import numpy as np
 from soma import aims
 import sys, os

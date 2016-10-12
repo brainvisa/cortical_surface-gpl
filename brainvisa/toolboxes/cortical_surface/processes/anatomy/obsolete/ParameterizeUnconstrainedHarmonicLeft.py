@@ -18,20 +18,16 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
-from brainvisa import anatomist
 
 name = 'Unconstrained harmonic parameterization left hemisphere'
 
 userLevel = 3
 
-def validation():
-    anatomist.validation()
-    
+
 signature = Signature(
-                      
+
     'Side', Choice('left'),
-    'Lwhite_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'Lwhite_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'aims Mesh Formats'),
     
 )
 

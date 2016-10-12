@@ -20,7 +20,6 @@
 
 
 from brainvisa.processes import *
-import shfjGlobals  
 from soma import aims
 import numpy as np
 
@@ -31,8 +30,8 @@ userLevel = 0
 
 signature = Signature(
                       
-    'projected_smoothed_pits',ListOf( ReadDiskItem( 'Texture', shfjGlobals.aimsTextureFormats) ),
-    'pits_density',WriteDiskItem( 'Texture', shfjGlobals.aimsTextureFormats),
+    'projected_smoothed_pits',ListOf( ReadDiskItem( 'Texture', 'aims Texture Formats') ),
+    'pits_density',WriteDiskItem( 'Texture', 'aims Texture Formats'),
 )
 
 #def initialization( self ):

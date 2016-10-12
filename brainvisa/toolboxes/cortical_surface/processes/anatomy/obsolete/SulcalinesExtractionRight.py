@@ -19,26 +19,22 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
-from brainvisa import anatomist
 
 name = 'Sulcal Lines Extraction Right'
 
 userLevel = 2
 
-def validation():
-    anatomist.validation()
-    
+
 signature = Signature(
-                      
-    'Rwhite_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+
+    'Rwhite_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'aims Mesh Formats'),
     'Rgraph', ReadDiskItem( 'Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'right' } ),
-    'Rgrey_white_input', ReadDiskItem( 'Right Grey White Mask', shfjGlobals.anatomistVolumeFormats,requiredAttributes={ 'side': 'right' } ),
+    'Rgrey_white_input', ReadDiskItem( 'Right Grey White Mask', 'aims readable Volume Formats',requiredAttributes={ 'side': 'right' } ),
     'sulcus_identification',Choice('name','label'),
     'labels_translation_map',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'Rgraph_label_basins',WriteDiskItem( 'Right Graph Label Translation', 'Text File',requiredAttributes={ 'side': 'right' }),
     'file_correspondance_constraint',ReadDiskItem( 'Constraint coordinates values', 'Text File'),
-    'mri', ReadDiskItem( "Raw T1 MRI", shfjGlobals.vipVolumeFormats ),
+    'mri', ReadDiskItem( "Raw T1 MRI", 'aims readable Volume Formats' ),
     'bucket_label_type', Choice('All', 'aims_junction', 'aims_bottom', 'aims_ss', 'aims_other'),  
     'Rwhite_sulcalines',WriteDiskItem( 'Right hemisphere Sulcal Lines texture', 'Texture' ,requiredAttributes={ 'side': 'right' } ),
     'basin_min_size', Float(),

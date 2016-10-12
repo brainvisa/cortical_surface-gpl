@@ -34,8 +34,7 @@
 
 
 from brainvisa.processes import *
-import shfjGlobals
-import string
+from brainvisa.tools import aimsGlobals
 
 name = 'Surfacic Sulci To Labels Volume'
 userLevel = 2
@@ -49,9 +48,9 @@ def validation():
 
 signature = Signature(
   'patches_sulci_graph', ReadDiskItem( 'Graph', 'Graph' ),
-  'mri_volume', ReadDiskItem( '3D Volume', shfjGlobals.aimsVolumeFormats ),
+  'mri_volume', ReadDiskItem( '3D Volume', 'aims readable Volume Formats' ),
   'labels_volume', WriteDiskItem( 'Label Volume',
-    shfjGlobals.aimsWriteVolumeFormats ),
+    'aims Writable Volume Formats' ),
   'input_translation', ReadDiskItem( 'log file', 'text file' ),
   'output_translation', WriteDiskItem( 'log file', 'text file' ),
   'background_labels', ListOf( String() ),
@@ -82,7 +81,7 @@ def execution( self, context ):
       for line in f.xreadlines():
         el = line.split()
         if len( el ) >= 2:
-          labelsmap[ string.join( el[:-1] ) ] = int( el[-1] )
+          labelsmap[ ' '.join( el[:-1] ) ] = int( el[-1] )
           usedindex.append( int( el[-1] ) )
       f.close()
       del f
@@ -94,7 +93,7 @@ def execution( self, context ):
   graph = r.read( self.patches_sulci_graph.fullPath() )
   meshatt = 'aims_patch'
   if self.mri_volume:
-    atts = shfjGlobals.aimsVolumeAttributes( self.mri_volume )
+    atts = aimsGlobals.aimsVolumeAttributes( self.mri_volume )
     dims = atts[ 'volume_dimension' ]
     vs = atts[ 'voxel_size' ]
   else:

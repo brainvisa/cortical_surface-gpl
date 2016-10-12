@@ -28,7 +28,6 @@ def validation():
   
 from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
 from brainvisa.processes import *
-import shfjGlobals  
 from soma import aims
 import numpy as np
 
@@ -44,7 +43,7 @@ userLevel = 0
     
 signature = Signature(
     'input_texture',ReadDiskItem( 'Texture', 'aims Texture formats' ),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'aims Mesh Formats'),
     'pole',WriteDiskItem( 'Cingular pole texture','aims Texture formats' )
 )
 

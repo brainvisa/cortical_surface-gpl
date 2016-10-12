@@ -32,7 +32,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals     
 
 name = 'Create Left Hemisphere Cortical Constraints Texture'
 
@@ -42,7 +41,7 @@ signature = Signature(
     'Lgraph', ReadDiskItem( 'Labelled Cortical folds graph', 'Graph',requiredAttributes={ 'side': 'left' } ),
     'sulcus_identification',Choice('name','label'),
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims readable volume formats' ),
-    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , 'aims Mesh Formats'),
     'left_white_sulci_mer',WriteDiskItem( 'Left hemisphere longitude constraints texture' ,'Texture',requiredAttributes={ 'side': 'left' } ),
     'left_white_sulci_par',WriteDiskItem( 'Left hemisphere latitude constraints texture' ,'Texture',requiredAttributes={ 'side': 'left' } ),
     'translation',ReadDiskItem('Label Translation','Label Translation' ),
