@@ -31,7 +31,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
 
 name = 'Right Cortical Surface Gyri Regularization'
 
@@ -41,7 +40,7 @@ userLevel = 0
 signature = Signature(
     'Side', Choice("Right"),
     'right_gyri',ReadDiskItem( 'Right hemisphere gyri parcellation texture','Texture',requiredAttributes={ 'side': 'right' } ),
-    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
     'data_driven', Float(),
     'smooth', Integer(),
 	'right_regul_gyri',WriteDiskItem( 'Right hemisphere regularized parcellation texture', 'Texture', requiredAttributes={ 'side': 'right' } ),

@@ -32,7 +32,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals   
 
 name = 'Constraint Cleaner Left hemisphere'
 
@@ -40,7 +39,7 @@ userLevel = 2
 
 
 signature = Signature(
-    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , 'aims Mesh Formats'),
     'left_cingular_pole',ReadDiskItem( 'Left cingular pole texture'  , 'Texture',requiredAttributes={ 'side': 'left' } ),
     'left_white_sulci_mer',ReadDiskItem( 'Left hemisphere longitude constraints texture', 'Texture',requiredAttributes={ 'side': 'left' }  ),
     'left_white_sulci_par',ReadDiskItem( 'Left hemisphere latitude constraints texture', 'Texture',requiredAttributes={ 'side': 'left' }  ),

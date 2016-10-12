@@ -31,7 +31,6 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
-import shfjGlobals     
 
 name = '2D Geodesic Primal Sketch'
 
@@ -41,10 +40,10 @@ signature = Signature(
      'Side', Choice("Both","Left","Right"),
      'Graph', Choice("No","Yes"),
      'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'GIS image' ),
-     'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
-     'left_white_mesh_inflated',ReadDiskItem( 'Inflated Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats, requiredAttributes={ 'side': 'left' }),
-     'right_white_mesh_inflated',ReadDiskItem( 'Inflated Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats, requiredAttributes={ 'side': 'right' }),
+     'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , 'aims Mesh Formats'),
+     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
+     'left_white_mesh_inflated',ReadDiskItem( 'Inflated Hemisphere White Mesh' , 'aims Mesh Formats', requiredAttributes={ 'side': 'left' }),
+     'right_white_mesh_inflated',ReadDiskItem( 'Inflated Hemisphere White Mesh' , 'aims Mesh Formats', requiredAttributes={ 'side': 'right' }),
      'left_white_curvature', ReadDiskItem( 'White Curvature Texture', 'Texture', requiredAttributes={ 'side': 'left' } ), 
      'right_white_curvature', ReadDiskItem( 'White Curvature Texture', 'Texture', requiredAttributes={ 'side': 'right' } ),
      'left_white_curvature_blobs', WriteDiskItem( 'Blob White Curvature Texture', 'Texture', requiredAttributes={ 'side': 'left' } ), 

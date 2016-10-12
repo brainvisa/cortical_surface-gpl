@@ -31,7 +31,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals
 from brainvisa import anatomist
 
 name = 'Right Cingular Pole Projection'
@@ -43,7 +42,7 @@ def validation():
 
 signature = Signature(
     'Side', Choice("Right"),
-    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats),
+    'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
     'right_pole_template',ReadDiskItem( 'Right Cingular Pole Template Subject' , 'Aims readable volume formats' ),
     'right_pole',WriteDiskItem( 'Right cingular pole texture','Texture',requiredAttributes={ 'side': 'right' } )
 )

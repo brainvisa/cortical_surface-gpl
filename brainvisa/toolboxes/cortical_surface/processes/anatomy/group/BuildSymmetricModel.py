@@ -26,7 +26,6 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.model module can not be imported.' )
   
 from brainvisa.processes import *
-import shfjGlobals
 from soma import aims
 import numpy as np
 
@@ -48,7 +47,7 @@ signature = Signature(
     'model_right_in',ReadDiskItem( 'HipHop Model', 'Text File'),
     'model_symmetric',WriteDiskItem( 'HipHop Model', 'Text File'),
     'model_symmetric_mesh',WriteDiskItem( 'Mesh','Mesh mesh'),
-#    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
+#    'union_sulcal_lines_mesh',WriteDiskItem( 'Mesh', 'aims Mesh Formats'),
 #    'union_sulcal_lines_texture',WriteDiskItem( 'Texture', 'Texture')
 )
 

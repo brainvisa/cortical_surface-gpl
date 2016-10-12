@@ -20,7 +20,6 @@
 
 
 from brainvisa.processes import *
-import shfjGlobals  
 from soma import aims
 import numpy as np
 
@@ -31,10 +30,10 @@ userLevel = 0
 
 signature = Signature(
                       
-    'remeshed_meshes',ListOf( ReadDiskItem( 'Remeshed mesh', shfjGlobals.aimsMeshFormats) ),
+    'remeshed_meshes',ListOf( ReadDiskItem( 'Remeshed mesh', 'aims Mesh Formats') ),
     'side', Choice('left', 'right'),
     'CACP_tranfos',ListOf( ReadDiskItem( 'Transform Raw T1 MRI to Talairach-AC/PC-Anatomist','Transformation matrix' ) ), 
-    'average_mesh',WriteDiskItem( 'Mesh', shfjGlobals.aimsMeshFormats),
+    'average_mesh',WriteDiskItem( 'Mesh', 'aims Mesh Formats'),
 )
 
 def initialization( self ):

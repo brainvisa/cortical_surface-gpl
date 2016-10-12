@@ -18,7 +18,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 from brainvisa.processes import *
-import shfjGlobals  
 from soma import aims
 import numpy as np
  
@@ -34,7 +33,7 @@ userLevel = 3
 signature = Signature(
                       
     'Side', Choice('right'),    
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , shfjGlobals.aimsMeshFormats,requiredAttributes={ 'side': 'right' } ),    
+    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh' , 'aims Mesh Formats',requiredAttributes={ 'side': 'right' } ),
     'cingular_pole_texture',ReadDiskItem( 'Right cingular pole texture','Texture',requiredAttributes={ 'side': 'right' } ),
     'insular_pole_texture',ReadDiskItem( 'Right insula pole texture','Texture',requiredAttributes={ 'side': 'right' } ),
     'white_sulcalines',ReadDiskItem( 'Right hemisphere Sulcal Lines texture', 'Texture' ,requiredAttributes={ 'side': 'right' } ),

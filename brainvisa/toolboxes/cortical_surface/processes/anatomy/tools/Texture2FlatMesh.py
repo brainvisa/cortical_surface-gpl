@@ -27,7 +27,6 @@ def validation():
     raise ValidationError( 'brainvisa.cortical_surface.parameterization.mapping module can not be imported.' )
   
 from brainvisa.processes import *
-import shfjGlobals  
 from soma import aims
 import numpy as np
 

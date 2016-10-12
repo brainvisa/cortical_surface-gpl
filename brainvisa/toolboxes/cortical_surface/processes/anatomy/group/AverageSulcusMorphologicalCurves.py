@@ -31,8 +31,6 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
-import shfjGlobals
-import math
 from numpy import *
 from soma import aims
 
