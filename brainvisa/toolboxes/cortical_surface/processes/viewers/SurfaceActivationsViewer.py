@@ -87,7 +87,7 @@ def execution( self, context ):
 
   if os.path.exists(self.inflated_mesh.fullName() + '.loc'):
     context.write( "Inflated cortical surface locked")
-  elif self.compute_inflated_mesh: # or not os.path.exists(self.inflated_mesh.fullPath()):
+  elif self.compute_inflated_mesh and self.inflated_mesh is not None and self.curvature_texture is not None:
   ##############################################################################
   # If the user asks to compute the mesh or if it does not exist ###############
   ##############################################################################
