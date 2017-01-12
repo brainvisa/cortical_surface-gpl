@@ -71,7 +71,8 @@ def initialization( self ):
   self.compute_inflated_mesh = 1
   self.iterations = 500
   self.save_inflate_sequence = 0
-  self.setOptional( 'activations_texture_2_green','activations_texture_3_blue' )
+  self.setOptional( 'activations_texture_2_green','activations_texture_3_blue',
+                    'inflated_mesh', 'curvature_texture' )
 
 
 # Surface activations viewer process
@@ -86,7 +87,7 @@ def execution( self, context ):
 
   if os.path.exists(self.inflated_mesh.fullName() + '.loc'):
     context.write( "Inflated cortical surface locked")
-  elif self.compute_inflated_mesh or not os.path.exists(self.inflated_mesh.fullName() + '.mesh'): 
+  elif self.compute_inflated_mesh: # or not os.path.exists(self.inflated_mesh.fullPath()):
   ##############################################################################
   # If the user asks to compute the mesh or if it does not exist ###############
   ##############################################################################
@@ -108,6 +109,11 @@ def execution( self, context ):
                                      '-Ksm', smoothing_force,
                                      '-c', self.curvature_texture.fullPath())
 
+  if self.inflated_mesh is not None:
+      mesh = self.inflated_mesh
+  else:
+      mesh = self.input_mesh
+
   # Final visualization
   #
   
@@ -120,7 +126,7 @@ def execution( self, context ):
     palette_activations_2 = a.getPalette("Green-White-linear") # or "Green-White-linear-fusion"
     palette_activations_3 = a.getPalette("Blue-White") # or "Blue-White-fusion"
 
-    mymesh = a.loadObject( self.inflated_mesh ) 
+    mymesh = a.loadObject( mesh )
 
     if palette_curvature is not None:
       duplicate = True
@@ -197,12 +203,12 @@ def execution( self, context ):
     mywindow.addObjects([fusionTexSurfFinal])
 
     # Display palette control window
-    a.execute("PopupPalette", objects=tex_curvature )
-    a.execute("PopupPalette", objects=tex_activations_1 )
+    a.execute("PopupPalette", objects=[tex_curvature] )
+    a.execute("PopupPalette", objects=[tex_activations_1] )
     if self.activations_texture_2_green is not None:
-        a.execute("PopupPalette", objects=tex_activations_2 )
+        a.execute("PopupPalette", objects=[tex_activations_2] )
     if self.activations_texture_3_blue is not None:
-        a.execute("PopupPalette", objects=tex_activations_3 )
+        a.execute("PopupPalette", objects=[tex_activations_3] )
 
     if (self.activations_texture_2_green is not None) and (self.activations_texture_3_blue is not None):
         self._dontdestroy = [ mymesh, tex_curvature, tex_activations_1, tex_activations_2, tex_activations_3, fusionMultiTextureActivations, fusionTexSurfFinal, mywindow ]
@@ -215,12 +221,12 @@ def execution( self, context ):
 
   else:
     if self.curvature_texture is not None:
-      return a.viewTextureOnMesh( self.inflated_mesh, self.curvature_texture, 
+      return a.viewTextureOnMesh( mesh, self.curvature_texture,
                                   a.getPalette('B-W LINEAR'))
     elif self.activations_texture_1_red is not None:
-      return a.viewTextureOnMesh( self.inflated_mesh, self.activations_texture_1_red, 
+      return a.viewTextureOnMesh( mesh, self.activations_texture_1_red,
                                   a.getPalette('Rainbow1-fusion'))
     else:
-      return a.viewMesh( self.inflated_mesh )
+      return a.viewMesh( mesh )
 
 ################################################################################
