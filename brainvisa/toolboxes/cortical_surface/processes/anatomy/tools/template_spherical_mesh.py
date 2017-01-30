@@ -52,5 +52,4 @@ def execution(self, context):
         cmd_args += ["-g", lon]
     cmd_args += ["-s", self.sphere, "-d", str(self.distance),
                  "-o", self.refined_mesh]
-    context.system(
-        "python2", find_in_path("make_spherical_mesh.py"), *cmd_args)
+    context.pythonSystem( find_in_path("make_spherical_mesh.py"), *cmd_args)
