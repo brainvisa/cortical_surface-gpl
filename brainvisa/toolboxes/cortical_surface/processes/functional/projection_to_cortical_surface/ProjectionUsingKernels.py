@@ -41,7 +41,8 @@ signature = Signature(
       'white_mesh', ReadDiskItem( 'Hemisphere White Mesh', 'BrainVISA mesh formats' ),
       'kernels', ReadDiskItem('Projection convolution kernels', 'BrainVISA volume formats'),
       'fMRI_4D_data', ReadDiskItem('4D Volume', 'BrainVISA volume formats'),
-      'fMRI_surface_data', WriteDiskItem( 'Functional Time Texture', 'Texture')
+      'fMRI_surface_data', WriteDiskItem( 'Functional Time Texture',
+                                          'Aims Texture formats')
 )
 
 
