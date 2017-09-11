@@ -541,7 +541,7 @@ def execution( self, context ):
           a[i]=(newCoord[i+1]-newCoord[i])
           b[i]=(newCoord[i]*(i+1)-newCoord[i+1]*i)
      for i in range(N):
-          ind=math.floor(texOut[0][i])
+          ind=int(math.floor(texOut[0][i]))
           isoParam[0][i]=(texOut[0][i]*a[ind]) + b[ind]
           parameter[i]=(texOut[0][i]*a[ind]) + b[ind]
      ws.write( isoParam, self.texture_param1.fullPath() )
