@@ -93,7 +93,7 @@ def execution( self, context ):
     atex = np.zeros(texture_poles[0].arraydata().shape)
     atex[texture_poles[0].arraydata() > 0] = cingular_tex_value
     tex_S16 = aims.TimeTexture_S16()
-    tex_S16[0].assign(atex)
+    tex_S16[0].assign(atex.astype(np.int16))
     ws.write(tex_S16, self.pole.fullPath())
     if self.dilation_1>0:
         context.system('AimsTextureDilation', '-i',self.white_mesh.fullPath(), '-t',self.pole.fullPath(),'-o',self.pole.fullPath(),'-s',self.dilation_1,'--connexity')#10
