@@ -19,12 +19,15 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-
+import os, sys
 from brainvisa.processes import *
 #from freesurfer.brainvisaFreesurfer import launchFreesurferCommand
 #from glob import glob
 from brainvisa.cortical_surface.surface_tools import texture_tools as textureTls
 import numpy as np
+from freesurfer.brainvisaFreesurfer import launchFreesurferCommand
+from freesurfer.brainvisaFreesurfer import testFreesurferCommand
+
 
 name = 'Subcortical From Freesurfer To MarsAtlas Parcellation'
 userlevel = 2
@@ -57,9 +60,13 @@ def initialization(self):
 
 def FS_convert(vol_in, vol_out, context):
     try:
-        context.system('mri_convert',
-                    '-i', vol_in,
-                    '-o', vol_out )
+        launchFreesurferCommand( context, '',
+                           'mri_convert',
+                           vol_in,
+                           vol_out )
+        #context.system('mri_convert',
+        #            '-i', vol_in,
+        #            '-o', vol_out )
         #os.system('mri_convert -i '+vol_in+' -o '+vol_out)
     except IOError:
         context.write('problem with mri_convert, file format conversion failed')

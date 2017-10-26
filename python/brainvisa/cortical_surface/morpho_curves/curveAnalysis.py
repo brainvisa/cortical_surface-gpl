@@ -29,27 +29,45 @@ def Diffusion(signal, dt, t):
 def GetL1L2(signal, t, species='human'):
     if species=='human':
         boundInf=50
-        boundSup=80
+        boundSup=90
     elif species=='baboon':
         boundInf=60
         boundSup=90
     else:
         boundInf=50
-        boundSup=80
+        boundSup=90
     dt=0.05
     smooth=Diffusion(signal, dt, t)
     st=signal.std()
+
+    print 'signalSTD=', st
+    print 'signal range=', signal.max() - signal.min()
     minP=100
     maxP=-100
     l1=0
     l2=0
     for i in range(20, boundInf):
-        if ((smooth[i]<minP) & (smooth[i]<=smooth[i+1]) & (smooth[i]<=smooth[i-1])):
+        if ((signal[i]<minP) & (smooth[i]<=smooth[i+1]) & (smooth[i]<=smooth[i-1])):
             l1=i
-            minP=smooth[i]
+            minP=signal[i]
     for i in range(l1+1, boundSup):
-        if ((smooth[i]>maxP) & (smooth[i]>=smooth[i+1]) & (smooth[i]>=smooth[i-1]) & ((smooth[i]-minP) > 0.5*st)):
+#        if ((signal[i]>maxP) & (smooth[i]>=smooth[i+1]) & (smooth[i]>=smooth[i-1]) & ((signal[i]-minP) > 0.1*st)):
+        if ( (smooth[i]>=smooth[i+1]) & (smooth[i]>=smooth[i-1])) :# & ((signal[i]-minP) > 0.1*st)):
+
+#
+            # nextmin=99
+            # for j in range(i+1, boundSup):
+            #      if ((smooth[j]<=smooth[j+1]) & (smooth[j]<=smooth[j-1])):
+            #         nextmin=signal[j]
+            #         j=boundSup
+#            if ((signal[i]-nextmin) > 0.1*st):
+#
             l2=i
+            print 'l2=', l2
             maxP=smooth[i]
-            break
+            i=boundSup
+
+    print 'l2=', l2
+
     return l1, l2, smooth
+ 

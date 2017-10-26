@@ -65,7 +65,9 @@ def execution( self, context ):
     cingular_tex_clean, cingular_tex_boundary = textureTls.textureTopologicalCorrection(mesh, atex, 1)
 
     tex_out = aims.TimeTexture_S16()
-    tex_out[0].assign(cingular_tex_clean)
+    #tex_out[0].assign(cingular_tex_clean)
+    for i in cingular_tex_clean:
+         tex_out[0].push_back(int(i))
     ws.write(tex_out, self.pole.fullPath())
     context.write('... Done')
 

@@ -204,7 +204,7 @@ def execution( self, context ):
     for ind,bound in enumerate(neoCortex_open_boundary):
         tmp_tex = np.zeros(len(neoCortex_square.vertex()))
         tmp_tex[bound] = range(1, len(bound)+1)
-        tex_boundary[ind].assign(tmp_tex)
+        tex_boundary[ind].assign(tmp_tex.astype(np.int16))
     ws.write(tex_boundary, self.boundary_texture.fullPath())
     '''
     tex_corresp_indices contains the indices of the vertices in white_mesh for:
@@ -215,13 +215,13 @@ def execution( self, context ):
     tex_corresp_indices = aims.TimeTexture_S16()
     tmp_tex = np.zeros(len(mesh.vertex()))
     tmp_tex[neocortex_indices] = 1
-    tex_corresp_indices[0].assign(tmp_tex)
+    tex_corresp_indices[0].assign(tmp_tex.astype(np.int16))
     tmp_tex = np.zeros(len(mesh.vertex()))
     tmp_tex[insula_indices] = 1
-    tex_corresp_indices[1].assign(tmp_tex)
+    tex_corresp_indices[1].assign(tmp_tex.astype(np.int16))
     tmp_tex = np.zeros(len(mesh.vertex()))
     tmp_tex[cingular_indices] = 1
-    tex_corresp_indices[2].assign(tmp_tex)
+    tex_corresp_indices[2].assign(tmp_tex.astype(np.int16))
     ws.write(tex_corresp_indices, self.corresp_indices_texture.fullPath())
 
 #     re = aims.Reader()

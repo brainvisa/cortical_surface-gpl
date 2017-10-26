@@ -136,6 +136,6 @@ def execution( self, context ):
     cingular_tex_clean, cing_tex_boundary = textureTls.textureTopologicalCorrection(mesh, tex[0].arraydata(), tmp_tex_value)
     cingular_tex_clean[np.where(cingular_tex_clean == tmp_tex_value)[0]] = 180
     tex_out = aims.TimeTexture_S16()
-    tex_out[0].assign(cingular_tex_clean)
+    tex_out[0].assign(cingular_tex_clean.astype(np.int16))
     ws.write(tex_out, self.pole.fullPath())
     context.write('... Done')
