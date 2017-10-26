@@ -126,10 +126,10 @@ def execution( self, context ):
         context.write('topological correction of the new insula pole texture')
         ainsula_tex_clean_out, boundary = texTls.textureTopologicalCorrection(mesh, ainsula_tex_clean_out,  insula_tex_value)
         tex_out = aims.TimeTexture_S16()
-        tex_out[0].assign(acingular_tex_clean_out)
+        tex_out[0].assign(acingular_tex_clean_out.astype(np.int16))
         ws.write(tex_out, self.cingular_pole_texture_out.fullPath())
         tex_out = aims.TimeTexture_S16()
-        tex_out[0].assign(ainsula_tex_clean_out)
+        tex_out[0].assign(ainsula_tex_clean_out.astype(np.int16))
         ws.write(tex_out, self.insula_pole_texture_out.fullPath())
 
     else:
@@ -137,12 +137,12 @@ def execution( self, context ):
         if save_cingular:
             acingular_tex_clean_in[acingular_tex_clean_in > 0] = 1
             tex_out = aims.TimeTexture_S16()
-            tex_out[0].assign(acingular_tex_clean_in)
+            tex_out[0].assign(acingular_tex_clean_in.astype(np.int16))
             ws.write(tex_out, self.cingular_pole_texture_out.fullPath())
         if save_insula:
             ainsula_tex_clean_in[ainsula_tex_clean_in > 0] = 180
             tex_out = aims.TimeTexture_S16()
-            tex_out[0].assign(ainsula_tex_clean_in)
+            tex_out[0].assign(ainsula_tex_clean_in.astype(np.int16))
             ws.write(tex_out, self.insula_pole_texture_out.fullPath())
     context.write('Done')
 

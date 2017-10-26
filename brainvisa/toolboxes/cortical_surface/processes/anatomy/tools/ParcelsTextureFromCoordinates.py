@@ -29,6 +29,8 @@ from brainvisa.processes import *
 import sigraph
 from soma import aims
 from brainvisa.cortical_surface.parameterization import model as md
+import numpy as np
+
 
 try :
   from brainvisa.cortical_surface.parameterization.mapping import parcelsFromCoordinates
@@ -101,7 +103,7 @@ def execution( self, context ):
 
     context.write('Writing texture')
     aims_tex_parcels = aims.TimeTexture_S32()
-    aims_tex_parcels[0].assign(tex_parcels)
+    aims_tex_parcels[0].assign(tex_parcels.astype(np.int32))
     ws.write(aims_tex_parcels, self.texture_model_parcels.fullPath())
 
     (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'marsAtlas')
@@ -115,7 +117,7 @@ def execution( self, context ):
 
     context.write('Writing texture')
     aims_tex_parcels = aims.TimeTexture_S32()
-    aims_tex_parcels[0].assign(tex_parcels)
+    aims_tex_parcels[0].assign(tex_parcels.astype(np.int32))
     ws.write(aims_tex_parcels, self.texture_marsAtlas_parcels.fullPath())
 
     (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'lobes')
@@ -129,7 +131,7 @@ def execution( self, context ):
 
     context.write('Writing texture')
     aims_tex_parcels = aims.TimeTexture_S32()
-    aims_tex_parcels[0].assign(tex_parcels)
+    aims_tex_parcels[0].assign(tex_parcels.astype(np.int32))
     ws.write(aims_tex_parcels, self.texture_lobes_parcels.fullPath())
 
     (tex_parcels, nb_parcels) = parcelsFromCoordinates(latitude_texture[0].arraydata(), longitude_texture[0].arraydata(), model, 'gyri')
@@ -143,7 +145,7 @@ def execution( self, context ):
 
     context.write('Writing texture')
     aims_tex_parcels = aims.TimeTexture_S32()
-    aims_tex_parcels[0].assign(tex_parcels)
+    aims_tex_parcels[0].assign(tex_parcels.astype(np.int32))
     ws.write(aims_tex_parcels, self.texture_gyri_parcels.fullPath())
 
     context.write('Done')
