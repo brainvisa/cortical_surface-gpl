@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 from soma import aims
 from brainvisa.cortical_surface.shell import db
@@ -83,7 +85,7 @@ def spotOutliers ( db, hemis_side = 'L' , data_type = 'curv' ) :
         for v in graph.vertices():
             if v.getSyntax() == 'glb':
                 if float(v['t']) > 50.0:
-                    print v['t'], v['subject']
+                    print(v['t'], v['subject'])
 
 def JointDistrib ( db_path, hemis_side = 'L' ) :
     """ Get a joint distribution between curv and depth data. Are the deep max 

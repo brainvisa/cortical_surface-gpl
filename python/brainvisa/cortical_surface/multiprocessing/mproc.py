@@ -1,5 +1,7 @@
-import Queue, multiprocessing, os
-from exceptions import IOError
+from __future__ import print_function
+
+import multiprocessing, os
+import six.moves.queue as queue
 
 def os_system ( primal_command, sujet, keyword ) :
     os.system ( primal_command )
@@ -18,9 +20,9 @@ class Worker(multiprocessing.Process):
         while not self.kill_received:
             try:
                 job = self.work_queue.get_nowait()
-            except Queue.Empty:
+            except queue.Empty:
                 break
-            print 'jobs:', len(job)
+            print('jobs:', len(job))
             result = self.function ( *job )
             self.result_queue.put ( (job[-1], job[-2], result) )
 
@@ -48,7 +50,7 @@ def MultiProcExecute ( function, jobs, num_processes = 8 ) :
                 result = result_queue.get()
                 results.append(result)
                 stillRunning = False
-            except IOError, e:
+            except IOError:
                 pass
 
     return results

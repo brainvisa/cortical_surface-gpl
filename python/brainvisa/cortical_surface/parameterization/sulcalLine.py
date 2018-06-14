@@ -3,6 +3,8 @@ Created on 2 august 2012
 
 @author: toz
 '''
+from __future__ import print_function
+
 import numpy as np
 from soma import aims
 from scipy import sparse
@@ -47,15 +49,15 @@ class SulcalLine(object):
         self.computeAttributes()
 
     def printArgs(self):
-        print 'label = ', self.label
-        print 'name = ', self.name
-        print 'indices = ', self.indices
-        print 'vertices = ', self.vertices
-        print 'nbVertices = ', self.nbVertices
-        print 'segm = ', self.segm
-        print 'barycenter = ', self.barycenter
-        print 'length = ', self.length
-        print 'color = ', self.color
+        print('label = ', self.label)
+        print('name = ', self.name)
+        print('indices = ', self.indices)
+        print('vertices = ', self.vertices)
+        print('nbVertices = ', self.nbVertices)
+        print('segm = ', self.segm)
+        print('barycenter = ', self.barycenter)
+        print('length = ', self.length)
+        print('color = ', self.color)
 
     def cat(self, sl):
         self.segm = np.vstack((self.segm, sl.segm+len(self.vertices)))
@@ -90,33 +92,33 @@ class SulcalLine(object):
 #             if nb_deleted_inds == 0:
 #                 self.indices = np.array(indices, np.uint32)
 #             else:
-# #                print 'sulcalLine indices : ',indices
+# #                print('sulcalLine indices : ',indices)
 #                 # remove the indices that are = -1...
-# #                print 'deleted_inds : ', deleted_inds
+# #                print('deleted_inds : ', deleted_inds)
 #                 indices = np.delete(indices, deleted_inds)
 #                 self.indices = np.array(indices, np.uint32)
-#                 print indices
+#                 print(indices)
 #                 # ...and the corresponding segment in self.segm
 #                 m_segm = np.max(self.segm)+1
-#                 print 'm_segm : ', m_segm
+#                 print('m_segm : ', m_segm)
 #                 deleted_segm_tmp = np.array([np.where(self.segm == ind)[0] for ind in deleted_inds])
 #                 deleted_segm = np.unique(deleted_segm_tmp.flatten())
-# #                print 'deleted_segm :', deleted_segm
-# #                print 'segm :', self.segm
+# #                print('deleted_segm :', deleted_segm)
+# #                print('segm :', self.segm)
 #                 self.segm = np.delete(self.segm, deleted_segm, 0)
-#                 print 'segm :', self.segm
+#                 print('segm :', self.segm)
 #                 for el in range(m_segm - nb_deleted_inds, m_segm):
 #                     self.segm[np.where(self.segm == el)] = el - nb_deleted_inds
-#                 print 'segm :', self.segm
+#                 print('segm :', self.segm)
 
     def computeAttributes(self):
         if self.vertices.shape[0] > 0:
             self.barycenter = np.mean(self.vertices, 0)
 #            for s in self.segm:
-#                print s
-#                print s[0]
-#            print self.vertices.shape
-#            print [self.vertices[s[0], :] for s in self.segm]
+#                print(s)
+#                print(s[0])
+#            print(self.vertices.shape)
+#            print([self.vertices[s[0], :] for s in self.segm])
             vert_segm = np.array([self.vertices[s[1], :] - self.vertices[s[0], :] for s in self.segm])
             # -np.array(self.vertices)[self.segm[:,0],:]
             nn = np.apply_along_axis(np.linalg.norm, 1, vert_segm)
@@ -148,7 +150,7 @@ class SulcalLine(object):
         tex_val_indices = list(np.where(atex == label)[0])
         Nv = len(tex_val_indices)
         if Nv is 0:
-            print 'no value ' + str(label) + ' in the input texture, return empty sulcalLine!!'
+            print('no value ' + str(label) + ' in the input texture, return empty sulcalLine!!')
         else:
             segm = vertsIndicesToEdges(mesh, tex_val_indices, neigh)
             # if neigh is None:
@@ -196,7 +198,7 @@ class SulcalLine(object):
 
     def clean(self):
         "clean the line using geodesic shortest path"
-        print 'TO DO : clean the line using geodesic shortest path!!!!'
+        print('TO DO : clean the line using geodesic shortest path!!!!')
         return self
 
     def plot(self, plt, color=None, modele=None):
@@ -256,11 +258,11 @@ class SulcalConstraint(SulcalLine):
                 plt.plot([self.vertices[v, 0], coord], [self.vertices[v, 1],self.vertices[v, 1]],'r')
 
     def printArgs(self):
-        print 'isLat = ', self.isLat
-        print 'isLon = ', self.isLon
-        print 'axisID = ', self.axisID
-        print 'vertexWeight = ', self.vertexWeight
-        print 'weight = ', self.weight
+        print('isLat = ', self.isLat)
+        print('isLon = ', self.isLon)
+        print('axisID = ', self.axisID)
+        print('vertexWeight = ', self.vertexWeight)
+        print('weight = ', self.weight)
         super(SulcalConstraint, self).printArgs()
 
     def cat(self, sc):

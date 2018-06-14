@@ -3,6 +3,8 @@ Created on Nov 16, 2012
 
 @author: toz
 '''
+from __future__ import print_function
+
 import numpy as np
 from soma import aims
 #from brainvisa.cortical_surface.parameterization import mapping as map
@@ -374,7 +376,7 @@ class Model(object):
     #         axisID = 92
     #         isLat = True
     #     else:
-    #         print 'no axis defined for label ', label
+    #         print('no axis defined for label ', label)
     #     return(axisID, isLon, isLat)
     
 ####################################################################
@@ -403,7 +405,7 @@ class Model(object):
             axisID = self.longitudeAxisSulci[sulc_name][0]
             slWeight = self.longitudeAxisSulci[sulc_name][1]
         else:
-            print 'no axis defined for sulcus ', sulc_name
+            print('no axis defined for sulcus ', sulc_name)
         return(axisID, isLon, isLat, slWeight)
 
 ####################################################################
@@ -413,7 +415,7 @@ class Model(object):
 ####################################################################
     def setAxisCoord(self, sulci=None, method=None):
         if method is None:  # setting axis coord as the weighted barycenter of corresponding sulci
-            print 'barycenter'
+            print('barycenter')
             # longitudes
             self.longitudeAxisCoord = self.longitudeAxisID[:]
             arrayLongitudeCstrAxis = np.array(sulci.longitudeCstrAxis)
@@ -452,7 +454,7 @@ class Model(object):
                     self.latitudeAxisCoord[ax_ind] = (np.sum(np.array(ax_weights) * np.array(ax_barys))) / np.sum(ax_weights)
 
         else:
-            print 'method ',method,' is not implemented yet!'
+            print('method ',method,' is not implemented yet!')
 
 ####################################################################
 #
@@ -518,7 +520,7 @@ class Model(object):
 # 
 #         SC_ind = full_sulci.names.index(('S.C._'+side))   
 #         SC_label = full_sulci.labels[SC_ind]
-#         print 'SC_label: ', SC_label
+#         print('SC_label: ', SC_label)
 #         full_sulci.sulcalLines[SC_ind].printArgs()
 #         translation = -full_sulci.sulcalLines[SC_ind].barycenter[0]
 #         vert = np.array(mesh.vertex())
@@ -529,7 +531,7 @@ class Model(object):
 # 
 #     model.setBoundary(vert[neoCortex_open_boundary[0][0], 0], vert[neoCortex_open_boundary[0][-1], 0], vert[neoCortex_open_boundary[2][0], 1], vert[neoCortex_open_boundary[0][0], 1])
 #     model.setAxisCoord(group_full_sulci)
-#     print 'model built from '+nb_mesh+' subjects'
+#     print('model built from '+nb_mesh+' subjects')
 #     model.printArgs()
 # 
 #     return model

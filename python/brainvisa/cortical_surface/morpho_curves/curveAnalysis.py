@@ -4,6 +4,7 @@ Created on Tue Jul 29 15:14:51 2014
 
 @author: olivier coulon
 """
+from __future__ import print_function
 
 from numpy import *
 
@@ -40,8 +41,8 @@ def GetL1L2(signal, t, species='human'):
     smooth=Diffusion(signal, dt, t)
     st=signal.std()
 
-    print 'signalSTD=', st
-    print 'signal range=', signal.max() - signal.min()
+    print('signalSTD=', st)
+    print('signal range=', signal.max() - signal.min())
     minP=100
     maxP=-100
     l1=0
@@ -63,11 +64,11 @@ def GetL1L2(signal, t, species='human'):
 #            if ((signal[i]-nextmin) > 0.1*st):
 #
             l2=i
-            print 'l2=', l2
+            print('l2=', l2)
             maxP=smooth[i]
             i=boundSup
 
-    print 'l2=', l2
+    print('l2=', l2)
 
     return l1, l2, smooth
  

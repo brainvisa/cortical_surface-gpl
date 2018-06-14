@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from brainvisa.cortical_surface.structural.blobManip import Node
 from brainvisa.cortical_surface.shell import db
 from soma import aims
@@ -93,7 +95,7 @@ def BuildAimsGroupGraph ( blobs, cliques, graphs ):
         e['similarity'] = each.overlap
         overlaps.append(each.overlap)
     import numpy as np
-    print min(overlaps), max(overlaps), np.mean(overlaps)
+    print(min(overlaps), max(overlaps), np.mean(overlaps))
     return graph
 
 def groupGraphInfo ( graph ) :
@@ -122,7 +124,7 @@ def getBucketFromVertex ( v ) :
         bucketmap = v['aims_glb']
     elif v.getSyntax() == 'ssb' :
         bucketmap = v['aims_ssb']
-    print v.getSyntax(), v.keys()
+    print(v.getSyntax(), v.keys())
        
     bucket = {}
     bucket['voxel_list'] = []
@@ -155,7 +157,7 @@ def getRepresentationFromSSB ( ssb ) :
     scales = list(set([each.scale for each in glb]))
     for each in glb:
         if each.scale == scales[len(scales)/3]:
-            print each.scale
+            print(each.scale)
             return getAimsBucketFromBucket (each.bucket)
             
     assert(False)
@@ -163,7 +165,7 @@ def getRepresentationFromSSB ( ssb ) :
 
 def getSSBFromGraph ( graph ) :
     ssb = []
-    print 'beware the result is a list of Vertex'
+    print('beware the result is a list of Vertex')
     for v in graph.vertices():
         if v.getSyntax() == 'ssb':
             ssb.append(v)
@@ -198,7 +200,7 @@ def AddSSBBuckets ( graph ) :
 
 def ScaleSpaceBlobsFromOneSubject ( graph, sujet ) :
     blobs = []
-    print 'Adding bucket to every ssblob from the graph...'
+    print('Adding bucket to every ssblob from the graph...')
     AddSSBBuckets( graph )
     for v in graph.vertices():
         if v.getSyntax() == 'ssb':
@@ -206,6 +208,6 @@ def ScaleSpaceBlobsFromOneSubject ( graph, sujet ) :
             for each in ['t', 'subject', 'tmin', 'tmax', 'index']:
                 n[each] = v[each]
             n['bucket'], n['bbmin'], n['bbmax'] = getBucketFromVertex(v)
-            print n['bbmin'], n['bbmax']
+            print(n['bbmin'], n['bbmax'])
             blobs.append(n)
     return blobs
