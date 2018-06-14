@@ -20,6 +20,8 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import print_function
+
 import numpy as np
 from scipy import sparse
 import scipy.stats.stats as sss
@@ -55,12 +57,12 @@ def meshFiedlerLength(mesh, dist_type='geodesic', fiedler=None):
     vert = np.array(mesh.vertex())
 
     if dist_type == 'geodesic':
-        print 'Computing GEODESIC distance between the max and min'
+        print('Computing GEODESIC distance between the max and min')
         g = aims.GeodesicPath(mesh, 3, 0)
         dist = g.shortestPath_1_1_len(int(imin), int(imax))
 
     else:
-        print 'Computing EUCLIDIAN distance between the max and min'
+        print('Computing EUCLIDIAN distance between the max and min')
         min_max = vert[imin, :]-vert[imax, :]
         dist = np.sqrt(np.sum(min_max * min_max, 0))
     return(dist, fiedler)
@@ -71,7 +73,7 @@ def meshFiedlerLength(mesh, dist_type='geodesic', fiedler=None):
 #
 ####################################################################
 def laplacianMeshSmoothing(mesh, Niter, dt):
-    print '    Smoothing mesh'
+    print('    Smoothing mesh')
     L, B = computeMeshLaplacian(mesh, lap_type='fem')
     avert = np.array(mesh.vertex())
     Mvert = laplacianSmoothing(avert, L, B, Niter, dt)
@@ -90,7 +92,7 @@ def laplacianMeshSmoothing(mesh, Niter, dt):
 #
 ####################################################################
 def laplacianTextureSmoothing(mesh, tex, Niter, dt):
-    print '    Smoothing texture'
+    print('    Smoothing texture')
     L, B = computeMeshLaplacian(mesh, lap_type='fem')
     return laplacianSmoothing(tex, L, B, Niter, dt)
 
@@ -101,7 +103,7 @@ def laplacianTextureSmoothing(mesh, tex, Niter, dt):
 #
 ####################################################################
 def laplacianPitsSmoothing(mesh, tex, Niter, dt):
-    print '    Smoothing pits'
+    print('    Smoothing pits')
     L, B = computeMeshLaplacian(mesh, lap_type='fem')
     inds_pits = np.where(tex == 1)[0]
     #dirichlet condition at the location of pits
@@ -126,8 +128,8 @@ def laplacianSmoothing(Mtex, L, B, Niter, dt):
         mod = 100
     if Niter > 1000:
         mod = 1000
-    #print tex.shape[0]
-    #print tex.ndim
+    #print(tex.shape[0])
+    #print(tex.ndim)
     #if tex.ndim < 2:
     #   Mtex = tex.reshape(tex.shape[0],1)
     #else:
@@ -143,7 +145,7 @@ def laplacianSmoothing(Mtex, L, B, Niter, dt):
         else:
             Mtex, infos = lgmres(M.tocsr(), Mtex, tol=solver_tolerance)
         if (i % mod == 0):
-            print i
+            print(i)
 
     # using Explicit scheme, convergence guaranteed only for dt<1 and not faster than implicit when using fem Laplacian
     # B(X^(n+1)-X^n)/dt+L(X^n)=0
@@ -152,8 +154,8 @@ def laplacianSmoothing(Mtex, L, B, Niter, dt):
     #     Mtex = M * Mtex
     #     Mtex, infos = lgmres(B.tocsr(), Mtex, tol=solver_tolerance)
     #     if (i % mod == 0):
-    #         print i
-    print '    OK'
+    #         print(i)
+    print('    OK')
     return Mtex
 
 ####################################################################
@@ -176,8 +178,8 @@ def laplacianSmoothing(Mtex, L, B, Niter, dt):
 ####################################################################
 def computeMeshWeights(mesh, weight_type='conformal', cot_threshold=None, z_threshold=None):
 #    cot_threshold=0.00001
- #   print 'angle threshold'
-    print '    Computing mesh weights'
+ #   print('angle threshold')
+    print('    Computing mesh weights')
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
 
@@ -208,7 +210,7 @@ def computeMeshWeights(mesh, weight_type='conformal', cot_threshold=None, z_thre
             if len(thersh_noqq) > 0:
                 noqq[thersh_noqq] = threshold
                 threshold_needed += len(thersh_noqq)
-    #        print np.min(noqq)
+    #        print(np.min(noqq))
             pp = pp / np.vstack((nopp, np.vstack((nopp, nopp)))).transpose()
             qq = qq / np.vstack((noqq, np.vstack((noqq, noqq)))).transpose()
             ang = np.arccos(np.sum(pp * qq, 1))
@@ -235,23 +237,23 @@ def computeMeshWeights(mesh, weight_type='conformal', cot_threshold=None, z_thre
             z_weights = sss.zscore(W.data)
             inds_out = np.where(np.abs(z_weights) > z_thresh)[0]
             W.data[inds_out] = np.mean(W.data)
-            print '    -Zscore threshold needed for ',len(inds_out),' values = ', 100*len(inds_out)/nnz,' %'
+            print('    -Zscore threshold needed for ',len(inds_out),' values = ', 100*len(inds_out)/nnz,' %')
         #inds_out_inf = np.where(z_weights < -z_thresh)[0]
         #inds_out_sup = np.where(z_weights > z_thresh)[0]
         #val_inf = np.max(W.data[inds_out_inf])
         #W.data[inds_out_inf] = val_inf
         #val_sup = np.min(W.data[inds_out_sup])
         #W.data[inds_out_sup] = val_sup
-        #print '    -Zscore threshold needed for ',len(inds_out_inf)+len(inds_out_sup),' values-'
-        print '    -edge length threshold needed for ',threshold_needed,' values = ', 100*threshold_needed/nnz,' %'
+        #print('    -Zscore threshold needed for ',len(inds_out_inf)+len(inds_out_sup),' values-')
+        print('    -edge length threshold needed for ',threshold_needed,' values = ', 100*threshold_needed/nnz,' %')
         if cot_threshold is not None:
-            print '    -cot threshold needed for ',threshold_needed_angle,' values = ', 100*threshold_needed_angle/nnz,' %'
+            print('    -cot threshold needed for ',threshold_needed_angle,' values = ', 100*threshold_needed_angle/nnz,' %')
 
     li = np.hstack(W.data)
     nb_Nan = len(np.where(np.isnan(li))[0])
     nb_neg = len(np.where(li<0)[0])
-    print '    -number of Nan in weights: ',nb_Nan ,' = ', 100*nb_Nan/nnz,' %'
-    print '    -number of Negative values in weights: ', nb_neg,' = ',100*nb_neg/nnz,' %'
+    print('    -number of Nan in weights: ',nb_Nan ,' = ', 100*nb_Nan/nnz,' %')
+    print('    -number of Negative values in weights: ', nb_neg,' = ',100*nb_neg/nnz,' %')
 
     return W.tocsr(),femB.tocsr()
 
@@ -261,7 +263,7 @@ def computeMeshWeights(mesh, weight_type='conformal', cot_threshold=None, z_thre
 #
 ####################################################################
 def computeMeshLaplacian(mesh, weights=None, femB=None, lap_type='conformal'):
-    print '    Computing Laplacian'
+    print('    Computing Laplacian')
     if weights is None:
         (weights, femB) = computeMeshWeights(mesh, weight_type=lap_type)
 
@@ -277,8 +279,8 @@ def computeMeshLaplacian(mesh, weights=None, femB=None, lap_type='conformal'):
     L = sparse.lil_matrix(dia - weights)
 
     li = np.hstack(L.data)
-    print '    -nb Nan in L : ', len(np.where(np.isnan(li))[0])
-    print '    -nb Inf in L : ', len(np.where(np.isinf(li))[0])   
+    print('    -nb Nan in L : ', len(np.where(np.isnan(li))[0]))
+    print('    -nb Inf in L : ', len(np.where(np.isinf(li))[0]))
 
     return L,B
 
@@ -291,7 +293,7 @@ def computeMeshLaplacian(mesh, weights=None, femB=None, lap_type='conformal'):
 #
 ####################################################################
 def vertexVoronoi(mesh, angs=None):
-    print '    Computing Vertex Voronoi'
+    print('    Computing Vertex Voronoi')
     vert = np.array(mesh.vertex())
     poly = np.array(mesh.polygon())
     if angs is None:
@@ -301,7 +303,7 @@ def vertexVoronoi(mesh, angs=None):
     areas = basicTls.meshPolygonArea(vert,poly)
     obt_angs = angs>np.pi/2
     obt_poly = obt_angs[:,0]|obt_angs[:,1]|obt_angs[:,2]
-    print '    -percent polygon with obtuse angle ',100.0*len(np.where(obt_poly)[0])/Nbp
+    print('    -percent polygon with obtuse angle ',100.0*len(np.where(obt_poly)[0])/Nbp)
     cot = 1 / np.tan(angs)
     vert_voronoi = np.zeros(Nbv)
     for ind_p,p in enumerate(poly):
@@ -319,14 +321,14 @@ def vertexVoronoi(mesh, angs=None):
             vert_voronoi[p[2]] = vert_voronoi[p[2]] + (d0*cot[ind_p,0] + d1*cot[ind_p,1])/8.0
 # 
 #         
-#     print cot.shape
+#     print(cot.shape)
 #     W = sparse.lil_matrix((Nbv, Nbv))
 #     W1 = sparse.lil_matrix((Nbv, Nbv))
 #     for i in range(3):
 #         i1 = np.mod(i, 3)
 #         i2 = np.mod(i + 1, 3)
 #         i3 = np.mod(i + 2, 3)
-#         print (i2,i3)
+#         print((i2,i3))
 #         d = np.sum( np.power(vert[poly[:, i2], :] - vert[poly[:, i3], :],2), 1)
 #         W1 = W1 + sparse.coo_matrix((d,(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
 #         W = W + sparse.coo_matrix((cot[:,i],(poly[:, i2],poly[:, i3])),shape=(Nbv, Nbv))
@@ -338,9 +340,9 @@ def vertexVoronoi(mesh, angs=None):
 #     vert_voronoi2 = vert_voronoi2/4
 #     vert_voronoi2 = np.array(vert_voronoi2.transpose()).squeeze()
 #     diff = vert_voronoi2-vert_voronoi
-#     print len(np.where(diff)[0])
-#     print vert_voronoi.sum()
-#     print vert_voronoi2.sum()
+#     print(len(np.where(diff)[0]))
+#     print(vert_voronoi.sum())
+#     print(vert_voronoi2.sum())
     return vert_voronoi
 
 ####################################################################

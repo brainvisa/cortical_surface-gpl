@@ -1,4 +1,6 @@
 
+from __future__ import print_function
+
 from brainvisa.cortical_surface.structural.graphManip import Graph
 from brainvisa.cortical_surface.shell import db
 from brainvisa.cortical_surface.structural.blobManip import Node
@@ -29,7 +31,7 @@ def Clusters ( db, raw_max_nodes, clustering_distance, hemis_side = 'L', data_ty
     textoutputpath = '/tmp/blobsCountTable_' + str(set_sujets[0]) + '.py'
     cluster_command = 'surfCreateClustersFromGLB -i  '+ str(clustergraphinpath) +'  -o '+ str(clustergraphoutpath) +' --dist '+ str(clustering_distance) + ' --textOutput ' + str(textouputpath)
     os.system( cluster_command )
-    print cluster_command
+    print(cluster_command)
     
     graph_out = aims.read ( clustergraphoutpath )
     nodes_out = []
@@ -37,14 +39,14 @@ def Clusters ( db, raw_max_nodes, clustering_distance, hemis_side = 'L', data_ty
     for v in graph_out.vertices():
         if v.getSyntax() == 'ssb':
             node = Node()
-            #print v
+            #print(v)
             node.defineFromArgs( nodes = v['nodes'], t = v['t'], subject = v['subject'], scale = max(v['scales']) - min(v['scales']) )
             node.maxnode = node.MaximumNode( tex )
             neigh = []
             for n in v.neighbours():
                 if n.getSyntax() == 'glb':
                     glb_node = Node ()
-                    #print n
+                    #print(n)
                     glb_node.defineFromArgs ( nodes = n['nodes'], t = n['t'], subject = n['subject'], scale = n['scale'] )
                     glb_node.maxnode = glb_node.MaximumNode ( tex )
                     neigh.append( glb_node  )
@@ -123,7 +125,7 @@ def ClustersOneSubjectAtVariousDistances ( db_path, raw_max_subject_nodes, hemis
     
     cluster_command = 'surfCreateClustersFromGLB -i  '+ str(clustergraphinpath) +'  -o '+ str(clustergraphoutpath) + ' --textOutput ' + str(textoutputpath)
     os.system ( cluster_command )
-    print cluster_command
+    print(cluster_command)
     charac_clusters = {}
     count_glb = {}
     execfile ( str(textoutputpath), locals(), globals() )
@@ -169,7 +171,7 @@ def ClustersOnSimulatedRegions ( db_path, radius = 25.0, hemis_side = 'L', data_
         #radius = 25.0
         random_command = 'surfRandomROI -m ' + str(pathes[sujet]['mesh'])  +' -o '+ str(pathes[sujet]['lat']) + ' --node ' + str(node) +' --radius '+ str(radius)
         os.system ( random_command )
-        print random_command
+        print(random_command)
         shutil.copy(pathes[sujet]['lat'], pathes[sujet]['lon'])
         
         primal_command = 'surfMesh2Graph -m  '+ str(pathes[sujet]['mesh']) +'  -t '+ str(pathes[sujet]['tex']) +' -g '+ str(pathes[sujet]['primal']) +' -s '+str(sujet) + \
@@ -182,7 +184,7 @@ def ClustersOnSimulatedRegions ( db_path, radius = 25.0, hemis_side = 'L', data_
     for sujet in sujets:
         nodes = SubjectNodes ( all_nodes, [sujet])
         #clusters[sujet], count[sujet], dist[sujet] = ClustersOneSubjectAtVariousDistances ( db, nodes, hemis_side, data_type )
-        print sujet
+        print(sujet)
         clus, coun = ClustersOneSubjectAtVariousDistances2 ( db, nodes, hemis_side, data_type )        
         clusters[sujet] = clus[sujet]
         count[sujet] = coun[sujet]

@@ -19,6 +19,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 import numpy as np
 from soma import aims
 from scipy import sparse
@@ -191,7 +193,7 @@ def edges2Boundary(li, lj):
 
     reverse = 1
     while (np.where(tag == 1)[0].size != tag.size):
-#        print boundary
+#        print(boundary)
         p = boundary[bound_ind][-1]
         curr_edge_i = np.where((li == p) & (tag == 0))[0]
         if (curr_edge_i.size == 0):
@@ -204,11 +206,11 @@ def edges2Boundary(li, lj):
 #                    if boundary[bound_ind][0] == boundary[bound_ind][-1]:
 #                        boundary[bound_ind].pop()
                     bound_ind += 1
-#                    print str(bound_ind+1)+' boundaries in this mesh'
+#                    print(str(bound_ind+1)+' boundaries in this mesh')
                     reverse = 1
                     new_first = np.where((tag == 0))[0][0]
-#                    print new_first
-#                    print [li[new_first], lj[new_first]]
+#                    print(new_first)
+#                    print([li[new_first], lj[new_first]])
                     boundary.append([li[new_first], lj[new_first]])
                     tag[new_first] = 1
             else:
@@ -220,9 +222,9 @@ def edges2Boundary(li, lj):
     "concatenate boundary pieces"
     bound_conn = boundariesIntersection(boundary)
     while len(bound_conn) > 0:  # while np.array(bound_conn)>0:
-#        print 'concatenate boundaries'
+#        print('concatenate boundaries')
         cat_bound = catBoundary(boundary[bound_conn[0][0]], boundary[bound_conn[0][1]], bound_conn[0][2])
-#        print  cat_bound
+#        print(cat_bound)
         boundary[bound_conn[0][0]] = cat_bound
         boundary.pop(bound_conn[0][1])
         bound_conn = boundariesIntersection(boundary)
@@ -236,26 +238,26 @@ def edges2Boundary(li, lj):
     for b_ind,bound in enumerate(boundary):
         occurence = listCount(bound)
         if max(occurence.keys()) > 1:
-            print 'complex boundary --> cut into simple parts'
+            print('complex boundary --> cut into simple parts')
             while max(occurence.keys()) > 1:
 #                 '''find the vertex that is taken more than one time in the boundary'''
-#                print bound
-#                print len(bound)
-#                print 'occurence',occurence
+#                print(bound)
+#                print(len(bound))
+#                print('occurence',occurence)
                 ite = occurence[max(occurence.keys())]
                 first_occ = bound.index(ite)
                 sec_occ = first_occ + 1 + bound[first_occ + 1:].index(ite)
-#                print 'first_occ',first_occ
-#                print 'sec_occ',sec_occ
+#                print('first_occ',first_occ)
+#                print('sec_occ',sec_occ)
                 '''create a new boundary that corresponds to the loop '''
-#                print '[len(b) for b in boundary]',[len(b) for b in boundary]
+#                print('[len(b) for b in boundary]',[len(b) for b in boundary])
                 boundary.append(bound[first_occ:sec_occ])
                 '''remove the loop from current boundary'''
                 bound[first_occ:sec_occ] = []
-#                print bound
+#                print(bound)
                 occurence = listCount(bound)
             boundary[b_ind] = bound
-#            print '[len(b) for b in boundary]',[len(b) for b in boundary]
+#            print('[len(b) for b in boundary]',[len(b) for b in boundary])
 
             
     "sort the boundaries the first the longest"
@@ -265,36 +267,36 @@ def edges2Boundary(li, lj):
 # < = >    inx = np.array(boundaries_len).argsort()
     sort_boundary = [boundary[i] for i in inx]
 #    boundary.sort()
-#    print 'in boundary boundaries_len = ',[len(bound) for bound in sort_boundary]
+#    print('in boundary boundaries_len = ',[len(bound) for bound in sort_boundary])
     return sort_boundary
 
 #    boundary_cat = {}
 #    nb_bound = bound_ind
 #    curr_bound = 0
 #    boundary_cat[curr_bound] = boundary[curr_bound]
-#    print boundary
+#    print(boundary)
 #    tag_bound = np.zeros((nb_bound,1))
 #    tag_bound[curr_bound] = 1
 #    while ( np.where(tag_bound == 1)[0].size ! =  tag_bound.size):
-#        print curr_bound
-#        print boundary[curr_bound]
+#        print(curr_bound)
+#        print(boundary[curr_bound])
 #        for bound_ind in range(curr_bound+1,nb_bound):
 #            common = set(boundary_cat[curr_bound]).intersection(set(boundary[bound_ind]))
 #            if common:
-#                print common
-#                print boundary_cat[curr_bound]
-#                print boundary[bound_ind]
+#                print(common)
+#                print(boundary_cat[curr_bound])
+#                print(boundary[bound_ind])
 #                boundary_cat[curr_bound].extend(boundary[bound_ind])
 #                tag_bound[bound_ind] = 1
-#                print bound_ind
-#        print boundary_cat
-#        print boundary
+#                print(bound_ind)
+#        print(boundary_cat)
+#        print(boundary)
 #        curr_bound+ = 1
-#        print tag_bound
+#        print(tag_bound)
 #        if np.where(tag_bound == 1)[0].size ! =  tag_bound.size:
-#            print np.where((tag_bound == 0))
+#            print(np.where((tag_bound == 0)))
 #            next = np.where((tag_bound == 0))[0][0]
-#            print next
+#            print(next)
 #            boundary_cat[curr_bound] = boundary[next]
 #            tag_bound[next] = 1
 
@@ -302,9 +304,9 @@ def edges2Boundary(li, lj):
 #    hist = np.bincount(np.hstack((li,lj)))
 #    c_pts = np.where(hist>2)[0]
 #    tag_c_pts = hist[c_pts]
-#    print c_pts
-#    print tag_c_pts
-#    print np.vstack((li,lj)).transpose()
+#    print(c_pts)
+#    print(tag_c_pts)
+#    print(np.vstack((li,lj)).transpose())
 #    tag = np.zeros(li.size)
 #    boundary = {}
 #    bound_ind = 0
@@ -319,14 +321,14 @@ def edges2Boundary(li, lj):
 #        curr_edge_i = 0
 #        boundary[bound_ind] = [li[curr_edge_i], lj[curr_edge_i]]
 #    tag[curr_edge_i] = 1
-#    print list(c_pts)
+#    print(list(c_pts))
 ##    reverse = 1
 #    c_pt = 0
 #    while ( np.where(tag == 1)[0].size ! =  tag.size):
-##        print boundary
+##        print(boundary)
 #        p = boundary[bound_ind][-1]
 #        if p in list(c_pts):
-#            print p
+#            print(p)
 #            c_pt = 1
 #        curr_edge_i = np.where((li == p) & (tag == 0))[0]
 #        if (curr_edge_i.size == 0):
@@ -340,11 +342,11 @@ def edges2Boundary(li, lj):
 #                    if boundary[bound_ind][0] == boundary[bound_ind][-1]:
 #                        boundary[bound_ind].pop()
 #                    bound_ind+ = 1
-##                    print str(bound_ind+1)+' boundaries in this mesh'
+##                    print(str(bound_ind+1)+' boundaries in this mesh')
 #                    reverse = 1
 #                    new_first = np.where((tag == 0))[0][0]
-##                    print new_first
-##                    print [li[new_first], lj[new_first]]
+##                    print(new_first)
+##                    print([li[new_first], lj[new_first]])
 #                    boundary[bound_ind] = [li[new_first], lj[new_first]]
 #                    tag[new_first] = 1
 #            else:
@@ -375,18 +377,18 @@ def edges2Boundary(li, lj):
 #        u_boundary.sort()
 #        dif_len = len(boundary[bound_ind])-len(u_boundary)
 #        while dif_len>0:
-#            print dif_len
+#            print(dif_len)
 #            pb_pt = diff_list(u_boundary,boundary[bound_ind])[0]
-#            print u_boundary
-#            print boundary[bound_ind]
-#            print pb_pt
+#            print(u_boundary)
+#            print(boundary[bound_ind])
+#            print(pb_pt)
 #            pb_pt_ind1 = boundary[bound_ind].index(pb_pt)
 #            pb_pt_ind2 = boundary[bound_ind].index(pb_pt,pb_pt_ind1+1)-1
-#            print pb_pt_ind1
-#            print pb_pt_ind2
+#            print(pb_pt_ind1)
+#            print(pb_pt_ind2)
 #            nb_bound = nb_bound+1
 #            boundary[nb_bound] = boundary[bound_ind][pb_pt_ind2:len(boundary[bound_ind])];
-#            print boundary[nb_bound]
+#            print(boundary[nb_bound])
 #            for i in range(pb_pt_ind2-pb_pt_ind1):
 #                boundary[bound_ind].pop();
 #            u_boundary = list(set(boundary[bound_ind]))
@@ -428,13 +430,13 @@ def listCount(l):
 
 
 def catBoundary(bound1, bound2, common_pts):
-#    print common_pts
+#    print(common_pts)
 #    ind_common_pts = []
 #    for x in common_pts:
 #        ind_common_pts.append([bound1.index(x),bound2.index(x)])
-#    print ind_common_pts
-#    print bound1
-#    print bound1[ind_common_pts[0][0]]
+#    print(ind_common_pts)
+#    print(bound1)
+#    print(bound1[ind_common_pts[0][0]])
     for x in bound2:
         bound1.append(x)
     return bound1
@@ -460,7 +462,7 @@ def edges2SimpleBoundary(li, lj):
 
     reverse = 1
     while (np.where(tag == 1)[0].size != tag.size):
-#        print boundary
+#        print(boundary)
         p = boundary[bound_ind][-1]
         curr_edge_i = np.where((li == p) & (tag == 0))[0]
         if (curr_edge_i.size == 0):
@@ -473,11 +475,11 @@ def edges2SimpleBoundary(li, lj):
                     if boundary[bound_ind][0] == boundary[bound_ind][-1]:
                         boundary[bound_ind].pop()
                     bound_ind += 1
-#                    print str(bound_ind+1)+' boundaries in this mesh'
+#                    print(str(bound_ind+1)+' boundaries in this mesh')
                     reverse = 1
                     new_first = np.where((tag == 0))[0][0]
-#                    print new_first
-#                    print [li[new_first], lj[new_first]]
+#                    print(new_first)
+#                    print([li[new_first], lj[new_first]])
                     boundary[bound_ind] = [li[new_first], lj[new_first]]
                     tag[new_first] = 1
             else:
@@ -503,7 +505,7 @@ def meshBoundaryMesh(mesh, boundary):
         bound_mesh.vertex(bound_ind).assign(vv)
         bound_mesh.polygon(bound_ind).assign(ee)
 #        pol = np.vstack( (np.zeros( len(boundary[bound_ind])-2, dtype = np.int32 ),boundary[bound_ind][0:-2],boundary[bound_ind][1:-1] )).transpose()
-#        print pol.dtype#astype(np.float32).dtype
+#        print(pol.dtype#astype(np.float32).dtype)
 #        bound_mesh.polygon(bound_ind).assign([ aims.AimsVector(x,'U32') for x in pol ])
     bound_mesh.updateNormals()
     return bound_mesh
@@ -521,7 +523,7 @@ def meshBoundary(mesh):
     lj = r[1][np.where(r[2] == 1)]
 
     if (li.size == 0):
-        print 'No holes in the surface !!!!'
+        print('No holes in the surface !!!!')
         return np.array()
     else:
         return edges2Boundary(li, lj)
@@ -535,11 +537,11 @@ def meshBoundary(mesh):
 def textureSimpleBoundary(mesh, atex, val, neigh=None):
     tex_val_indices = np.where(atex == val)[0]
     if not tex_val_indices.size:
-        print 'no value ' + str(val) + ' in the input texture!!'
+        print('no value ' + str(val) + ' in the input texture!!')
         return list()
     else:
         ####################################################################
-        # print 'the vertices on the boundary have the same texture value (boundary inside the patch)'
+        # print('the vertices on the boundary have the same texture value (boundary inside the patch)')
         ####################################################################
         if neigh is None:
             neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
@@ -549,8 +551,8 @@ def textureSimpleBoundary(mesh, atex, val, neigh=None):
         bound_verts = list()
         for i in tex_val_indices:
             ne_i = np.array(neigh[i].list())
-            #print ne_i.size
-            #print np.intersect1d_nu(ne_i, tex_val_indices).size
+            #print(ne_i.size)
+            #print(np.intersect1d_nu(ne_i, tex_val_indices).size)
             if np_ver < [ 1, 6 ]:
                 inters_size = np.intersect1d_nu(ne_i, tex_val_indices).size
             else:
@@ -568,7 +570,7 @@ def textureSimpleBoundary(mesh, atex, val, neigh=None):
 def textureBoundary(mesh, atex, val, neigh=None):
     tex_val_indices = np.where(atex == val)[0]
     if not tex_val_indices.size:
-        print 'no value ' + str(val) + ' in the input texture!!'
+        print('no value ' + str(val) + ' in the input texture!!')
         return list()
     else:
         bound_verts =  textureSimpleBoundary(mesh, atex, val, neigh)
@@ -576,17 +578,17 @@ def textureBoundary(mesh, atex, val, neigh=None):
         '''
         adja = meshAdjacencyMatrix(mesh)
         r = sparse.extract.find(adja)
-#        print bound_verts
-#        print bound_verts[0] in r[0]
-#        print r
+#        print(bound_verts)
+#        print(bound_verts[0] in r[0])
+#        print(r)
 #        inter = set(r[0]).intersection(set(bound_verts))
-#        print inter
-#        print set(r[0])-inter
-#        print np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts))
-#        print r[0] == bound_verts[0]
-#        print bound_verts[0:1]
-#        print np.intersect1d(r[0],bound_verts[0:1]).shape
-#        print np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts))    
+#        print(inter)
+#        print(set(r[0])-inter)
+#        print(np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts)))
+#        print(r[0] == bound_verts[0])
+#        print(bound_verts[0:1])
+#        print(np.intersect1d(r[0],bound_verts[0:1]).shape)
+#        print(np.intersect1d(np.intersect1d(r[0],bound_verts),np.intersect1d(r[1],bound_verts))    )
         inr0 = []
         inr1 = []
         for v in bound_verts:
@@ -596,9 +598,9 @@ def textureBoundary(mesh, atex, val, neigh=None):
         r[2][inr1] = r[2][inr1] + 1
         li = r[0][np.where(r[2] == 4)]
         lj = r[1][np.where(r[2] == 4)]
-#        print 'li lj = '
-#        print li
-#        print lj
+#        print('li lj = ')
+#        print(li)
+#        print(lj)
         return edges2Boundary(li, lj)
 
 ####################################################################
@@ -644,7 +646,7 @@ def subCutMesh(mesh, atex, val):
     tex_val_indices = np.where(atex == val)[0]
     I = ismember(poly, tex_val_indices)
     poly_set = poly[I[:, 0] & I[:, 1] & I[:, 2], :]
-#    print tex_val_indices
+#    print(tex_val_indices)
     if np_ver < [1, 6]:
         (uni, inds) = np.unique1d(poly_set, False, True)
     else:
@@ -722,7 +724,7 @@ def vertsIndicesToEdges(mesh, indices, neigh=None):
 ####################################################################
 
 def meshIsoLine(mesh, tex, vals):
-    #print 'Looking for isoLine'
+    #print('Looking for isoLine')
     points=np.array(mesh.vertex())
     values=np.array(tex[0])
     #print('isoLine: points:', points.shape)
@@ -773,7 +775,7 @@ def meshIsoLine(mesh, tex, vals):
 ####################################################################  
 
 def meshAlmostIsoLine(mesh, tex, val):
-     #print 'Looking for isoLine'
+     #print('Looking for isoLine')
      points=np.array(mesh.vertex())
      values=np.array(tex[0])
      #print('isoLine: points:', points.shape)

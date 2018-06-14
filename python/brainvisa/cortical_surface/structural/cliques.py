@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 
 def computeOverlap ( blob1, blob2 ) :
     bucket1 = blob1['bucket']['voxel_list']
@@ -30,7 +32,7 @@ def ComputeCliquesBetweenTwoSubjects ( blobs, sujet1, sujet2 ) :
     cliques = []
     for b1, blob1 in enumerate ( blobs[sujet1] ) :
         for b2, blob2 in enumerate ( blobs[sujet2] ):
-            print b1, len(blob1['bucket']['voxel_list']), b2, len(blob2['bucket']['voxel_list'])
+            print(b1, len(blob1['bucket']['voxel_list']), b2, len(blob2['bucket']['voxel_list']))
             if ( not ( blob1['bbmin'][0] > blob2['bbmax'][0] \
                 or blob1['bbmin'][1] > blob2['bbmax'][1] \
                 or blob1['bbmin'][2] > blob2['bbmax'][2] \
@@ -56,16 +58,16 @@ def ComputeCliques ( blobs, number_of_proc = 2 ):
     for i, sujet1 in enumerate ( subjects ):
         for j, sujet2 in enumerate ( subjects ):
             if i < j :
-                print sujet1,sujet2
+                print(sujet1,sujet2)
                 #jobs.append( (blobs, sujet1, sujet2) )
                 cliques.extend( convertCliques(ComputeCliquesBetweenTwoSubjects( blobs, sujet1, sujet2 ) ) )
 
-    #print 'JOBS:', len(jobs), 'proc:', number_of_proc
+    #print('JOBS:', len(jobs), 'proc:', number_of_proc)
     #results = MultiProcExecute ( ComputeCliquesBetweenTwoSubjects, jobs, number_of_proc )
 
     #for each in results :
         #(sujet1, sujet2, resultat) = each
-        #print len(resultat)
+        #print(len(resultat))
         #cliques.extend( convertCliques(resultat) )
 
     return cliques

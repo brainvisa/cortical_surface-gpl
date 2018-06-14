@@ -3,6 +3,8 @@ Created on 2 august 2012
 
 @author: toz
 '''
+from __future__ import print_function
+
 from soma import aims
 import numpy as np
 from brainvisa.cortical_surface.parameterization import sulcalLine as sln
@@ -30,7 +32,7 @@ class SulcalLinesSet(object):
             for sl in sls:
                 if isinstance(sl, sln.SulcalConstraint):
                     if sl.axisID == []:
-                        print 'should not happen!!'
+                        print('should not happen!!')
                         sl.label2Axis()
                     if sl.isLon:
                         self.longitudeCstrIndex.append(self.nbSulci)
@@ -55,7 +57,7 @@ class SulcalLinesSet(object):
                 self.nbSulci += 1
                 if isinstance(sl, sln.SulcalConstraint):
                     if sl.axisID == []:
-                        print 'should not happen!!'
+                        print('should not happen!!')
                         sl.label2Axis()
                     if sl.isLon:
                         self.longitudeCstrIndex.append(self.nbSulci)
@@ -81,9 +83,9 @@ class SulcalLinesSet(object):
 #                     # add a -1 to allow sulcalLine.updateIndices() to delete 
 #                     # the corresponding segment in self.segm
 #                     new_indices.append(-1)
-#                     print 'some vertices of sulcus nb ', sl_ind, ' are not in the new indices'
-# #            print new_indices
-# #            print 'max = ',np.max(new_indices)
+#                     print('some vertices of sulcus nb ', sl_ind, ' are not in the new indices')
+# #            print(new_indices)
+# #            print('max = ',np.max(new_indices))
 #             self.sulcalLines[sl_ind].updateIndices(np.array(new_indices, np.int32))
 
 #     def label2Axis(self):
@@ -92,22 +94,22 @@ class SulcalLinesSet(object):
 #             self.sulcalLines[sl_ind].label2Axis()
 
     def printArgs(self):
-        print 'SulcalLinesSet ::'
-        print '    labels = ', self.labels
-        print '    names = ', self.names
-        print '    longitudeCstrIndex = ', self.longitudeCstrIndex
-        print '    longitudeCstrAxis = ', self.longitudeCstrAxis
-        print '    latitudeCstrIndex = ', self.latitudeCstrIndex
-        print '    latitudeCstrAxis = ', self.latitudeCstrAxis
-        print '    nbSulci = ', self.nbSulci
-        print '    sulcalLines = ', self.sulcalLines
+        print('SulcalLinesSet ::')
+        print('    labels = ', self.labels)
+        print('    names = ', self.names)
+        print('    longitudeCstrIndex = ', self.longitudeCstrIndex)
+        print('    longitudeCstrAxis = ', self.longitudeCstrAxis)
+        print('    latitudeCstrIndex = ', self.latitudeCstrIndex)
+        print('    latitudeCstrAxis = ', self.latitudeCstrAxis)
+        print('    nbSulci = ', self.nbSulci)
+        print('    sulcalLines = ', self.sulcalLines)
 
     def extractFromTexture(self, atex, mesh, sulc_labels_dict=None, labels=None, neigh=None):
         if neigh is None:
             neigh = aims.SurfaceManip.surfaceNeighbours(mesh)
         if labels is None:
             if atex.dtype != 'int16':
-                print 'warning :: sulci texture type is not int16'
+                print('warning :: sulci texture type is not int16')
                 atex = np.around(atex)
             labels = np.unique(atex)
             labels = labels.tolist()
@@ -122,15 +124,15 @@ class SulcalLinesSet(object):
 
     def sulcalLine2SulcalConstraint(self, modele=None, names=None):
         if modele is None:
-            print 'no modele given, nothing to do!'
-            print 'try sulcalLine2SulcalConstraint(modele)'
+            print('no modele given, nothing to do!')
+            print('try sulcalLine2SulcalConstraint(modele)')
         else:
             if names is None:
                 names = self.names
             for name in names:
                 place = self.names.index(name)
                 if place is None:
-                    print 'sulcus ' + name + ' not present in this SulcalLinesSet object!!'
+                    print('sulcus ' + name + ' not present in this SulcalLinesSet object!!')
                 else:
                     (axisID, isLon, isLat, slWeight) = modele.sulcus2Axis(name)
                     if isLon:
@@ -142,7 +144,7 @@ class SulcalLinesSet(object):
                         self.latitudeCstrIndex.append(place)
                         self.latitudeCstrAxis.append(axisID)
                     else:
-                        print 'sulcalLine with name ', name, 'is not a constraint in the model given'
+                        print('sulcalLine with name ', name, 'is not a constraint in the model given')
 
     def toMesh(self):
 

@@ -1,6 +1,8 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
-import os, string, shutil, sys 
+from __future__ import print_function
+
+import os, string, shutil, sys
 from soma import aims
 from brainvisa.cortical_surface.multiprocessing.mproc import MultiProcExecute, os_system
 
@@ -25,10 +27,10 @@ def IterateAnalysis ( groupgraphpath, tmppathes, analyze, number_of_proc = 2 ) :
         ana += [ '--run', 'True' ]
 
         analyze_command = string.join( [ "'"+str(each)+"'" for each in ana ], ' ' )
-        print analyze_command
+        print(analyze_command)
         jobs.append ( (analyze_command, i, 'test') )
 
-    print "JOBS:", len(jobs)
+    print("JOBS:", len(jobs))
     results = MultiProcExecute ( os_system, jobs, number_of_proc )
 
 def DistributeIndividualGraphs ( indiv_commands, number_of_proc = 2 ) :
@@ -37,10 +39,10 @@ def DistributeIndividualGraphs ( indiv_commands, number_of_proc = 2 ) :
     jobs = []
     for i, indiv in enumerate( indiv_commands ) :
         indiv_command = string.join( [ "'"+str(each)+"'" for each in indiv ], ' ' )
-        print indiv_command
+        print(indiv_command)
         jobs.append ( (indiv_command, i, 'test') )
 
-    print "JOBS:", len(jobs)
+    print("JOBS:", len(jobs))
     results = MultiProcExecute ( os_system, jobs, number_of_proc )
 
 

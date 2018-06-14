@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 
 def InputParameters( arguments, messages_defaults ):
@@ -29,11 +31,11 @@ def InputParameters( arguments, messages_defaults ):
                 params.append(p)
             else :
                 params.append(defaults[ messages[i + nb_arguments] ])
-    print params
+    print(params)
 
-    print '\n params'
+    print('\n params')
     for i, p in enumerate(params):
-        print messages[i], p
+        print(messages[i], p)
         defaults[messages[i]] = p
 
     return params
