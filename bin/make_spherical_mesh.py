@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 ############################################################################
 # This software and supporting documentation are distributed by
 # CEA/NeuroSpin, Batiment 145, 91191 Gif-sur-Yvette cedex, France.
@@ -8,6 +8,8 @@
 # terms of the CeCILL license version 2 as circulated by CEA, CNRS
 # and INRIA at the following URL "http://www.cecill.info".
 ############################################################################
+
+from __future__ import print_function
 
 # python system modules
 import sys
@@ -72,14 +74,14 @@ def main():
         m = aims.read(options.mesh[index])
 
         # resample a mesh to the sphere.
-        print "inversion dans la commande", options.inversion
+        print("inversion dans la commande", options.inversion)
         resampled_mesh = resampling.resample_mesh_to_sphere(
             m, ico_sphere, lon, lat, inversion=options.inversion)
         distance_texture = aims.SurfaceManip.meshEdgeLengthRatioTexture(
             resampled_mesh, ico_sphere)
         # add all textures
         if index == 0:
-            print 
+            print()
             averaged_texture = numpy.asarray(
                 distance_texture[0], dtype=numpy.float32)
         else:

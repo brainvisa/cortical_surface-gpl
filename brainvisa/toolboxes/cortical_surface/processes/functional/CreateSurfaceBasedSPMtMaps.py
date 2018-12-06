@@ -29,6 +29,9 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
+
+from __future__ import print_function
+
 from brainvisa.processes import *
 import numpy as np
 from soma import aims
@@ -182,7 +185,7 @@ class contrast:
             if type is 't':
                 type = 'F'
         self.type = type
-        print type
+        print(type)
         self._stat = None
         self._pvalue = None
         self._baseline = 0
@@ -258,9 +261,9 @@ def getContrastName(self, data):
         for mesh in self.meshes:
             attributes = mesh.hierarchyAttributes()
             attributes[ 'contrast' ] = str(self.contrast_name)
-            print attributes[ 'contrast' ]
+            print(attributes[ 'contrast' ])
             res = self.signature[ 'spmt_maps' ].findValue( attributes )
-            print res[0]
+            print(res[0])
             result.append( res[0] )
         return result
     return None
@@ -271,9 +274,9 @@ def getBetaName(self, data):
         for mesh in self.meshes:
             attributes = mesh.hierarchyAttributes()
             attributes[ 'contrast' ] = str(self.contrast_name)
-            print attributes[ 'contrast' ]
+            print(attributes[ 'contrast' ])
             res = self.signature[ 'beta' ].findValue( attributes )
-            print res[0]
+            print(res[0])
             result.append( res[0] )
         return result
     return None
@@ -325,7 +328,7 @@ def HrfFunction ( sampling_rate ) :
 
     dxA = np.linspace ( 1.0, duration_hrf + 1, number_of_samples, endpoint=False)
     dxB = np.linspace ( 1.0, duration_hrf + 1, number_of_samples, endpoint=False)
-    print dxA, dxB
+    print(dxA, dxB)
     A = GammaPdf ( dxA, tp1 )
     B = GammaPdf ( dxB, tp2 )
 
@@ -351,7 +354,7 @@ def PreRegressor ( condition, types, times, conversion_factor ):
             mode = 'EPOCH'
     except TypeError :
         mode = 'EVENT'
-    print 'mode:', mode
+    print('mode:', mode)
     ''' A specific mode is triggered according to the syntax used in the protocol file
         times = [(onset1,duration1), ...] triggers the EPOCH omde
         times = [onset1, onset2, ...] triggers the EVENT mode'''
@@ -387,7 +390,7 @@ def execution ( self, context ) :
     context.write ( 'types:', nptypes )
 
     for index in xrange (len(self.boldtextures) ) :
-        print 'texture number ', index
+        print('texture number ', index)
         #meshpath = self.meshes[index].fullPath()
         boldtexpath = self.boldtextures[index].fullPath()
         betapath = self.betamaps[index].fullPath()
@@ -409,8 +412,8 @@ def execution ( self, context ) :
 
         nb_cond = nptypes.max() + 1
         lentype = len(types)
-        print nb_cond
-        print lentype
+        print(nb_cond)
+        print(lentype)
         sampling_rate = 0.1 #in (10x)seconds, depends on how the onsets are defined
         # multiplying onsets by this factor should still give integers. If not,
         # then the sampling_rate is too high.
@@ -452,14 +455,14 @@ def execution ( self, context ) :
             t.assign(list(b[j,:]))
         aims.write ( tex, betapath )
 
-        print self.contrast
+        print(self.contrast)
         # motor contrast : 0 0 1 -1 -1 1
         # audio - video contrast : 0 0 1 1 -1 -1 1 -1 -1 1
         c = [int(i) for i in string.split(str(self.contrast))]
-        print len(c), nb_cond
+        print(len(c), nb_cond)
         c.extend ( np.zeros ( max( nb_cond + 1 - len(c), 0 ) ) )
         assert(len(c) == nb_cond + 1)
-        print len(c), nb_cond
+        print(len(c), nb_cond)
         tcon = m.contrast(c)
 
         tex = aims.TimeTexture_FLOAT()

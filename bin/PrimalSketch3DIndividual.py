@@ -1,4 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+
+from __future__ import print_function
 
 import os, sys
 from soma import aims
@@ -46,10 +48,10 @@ if __name__ == '__main__':
         res[sujet] = {}
         primal_command = 'volIma2Graph -i  '+ str(pathes[sujet]['fMRI']) +'  -m '+ str(pathes[sujet]['mask']) +' -g ' \
             + str(pathes[sujet]['primal']) +' --subject '+str(sujet)+' --ss '+ str(pathes[sujet]['scale']) +' --recover False '
-        print primal_command
+        print(primal_command)
         jobs.append ( (primal_command, sujet, 'test') )
 
-    print "JOBS:", len(jobs)
+    print("JOBS:", len(jobs))
     results = MultiProcExecute ( os_system, jobs, number_of_proc )
 
     for each in results :
