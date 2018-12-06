@@ -30,6 +30,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 from brainvisa.processes import *
 from soma import aims
 import numpy as np
@@ -70,9 +72,9 @@ def initialization( self ):
 def execution( self, context ):
     def nearest_neighbor(vert_template,vert_pits):
         vertex_number1=vert_template.shape[0]
-        print 'vert_template.shape', vert_template.shape[0]
+        print('vert_template.shape', vert_template.shape[0])
         v_number=vert_pits.shape[0]
-        print 'vert_pits.shape', vert_pits.shape[0]
+        print('vert_pits.shape', vert_pits.shape[0])
         nn=[]
         for v in vert_pits:
                 nn_tmp = np.argmin(np.sum(np.square(np.tile(v,(vertex_number1,1))-vert_template),1))

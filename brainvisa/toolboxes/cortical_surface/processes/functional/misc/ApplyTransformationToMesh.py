@@ -31,6 +31,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 from brainvisa.processes import *
 
 name = 'Apply A Transformation To a White Mesh'
@@ -50,5 +52,5 @@ def initialization ( self ):
 
 def execution( self, context ):
     command = [ 'AimsMeshTransform', '-i', self.input, '-o', self.output, '-t', self.transformation]
-    print command
+    print(command)
     context.system( *command )

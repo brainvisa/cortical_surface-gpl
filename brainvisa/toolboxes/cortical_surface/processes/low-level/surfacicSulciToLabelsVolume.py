@@ -32,6 +32,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 
 from brainvisa.processes import *
 from brainvisa.tools import aimsGlobals
@@ -137,7 +138,7 @@ def execution( self, context ):
           self.dilation_size )
         avol = aimsalgosip.AimsMorphoErosion( avol, self.erosion_size )
         arrvol[ avol.volume().arraydata()[0:1,1:-1,1:-1,1:-1]==32767 ] = oindex
-    except Exception, e:
+    except Exception as e:
       context.warning( 'node failed:', e )
       pass
 
@@ -146,4 +147,4 @@ def execution( self, context ):
   if self.output_translation:
     f = open( self.output_translation.fullPath(), 'w' )
     for x, y in labelsmap.items():
-      print >> f, x, y
+      print(x, y, file=f)

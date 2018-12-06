@@ -19,6 +19,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 
 def validation():
     try:
@@ -68,7 +70,7 @@ def execution( self, context ):
     context.write(self.alphas)
     dpf = pdeTls.depthPotentialFunction(mesh, k, self.alphas)
     for ind,alpha in enumerate(self.alphas):
-        print 'alpha :',alpha
+        print('alpha :',alpha)
         tex_dpf[ind].assign(dpf[ind])
 
     ws.write(tex_dpf, self.DPF_texture.fullPath())

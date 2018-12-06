@@ -30,6 +30,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 from brainvisa.processes import *
 import math
 from numpy import *
@@ -88,7 +90,7 @@ def initialization( self ):
 
 def computeMeshWeights( mesh ):
      
-     print '    Computing mesh weights'
+     print('    Computing mesh weights')
      vert=array(mesh.vertex())
      poly=array(mesh.polygon())
      
@@ -103,7 +105,7 @@ def computeMeshWeights( mesh ):
           i1=mod(i,3)
           i2=mod(i+1,3)
           i3=mod(i+2,3)
-          print '    ', 3-i1
+          print('    ', 3-i1)
           pp=vert[poly[:,i2], :] - vert[poly[:,i1], :]
           qq=vert[poly[:,i3], :] - vert[poly[:,i1], :]
           np=apply_along_axis(linalg.norm, 1, pp)
@@ -119,7 +121,7 @@ def computeMeshWeights( mesh ):
                W[ind2, ind3]=W[ind2, ind3]+1/tan(ang[j])
                W[ind3, ind2]=W[ind3, ind2]+1/tan(ang[j])
                
-     print '    OK'
+     print('    OK')
                
      return W
                
@@ -130,7 +132,7 @@ def computeMeshWeights( mesh ):
 ####################################################################
                
 def computeMeshLaplacian( mesh ):
-     print '    Computing Laplacian'
+     print('    Computing Laplacian')
                     
      weights=computeMeshWeights( mesh )
      N=weights.shape[0]
@@ -139,7 +141,7 @@ def computeMeshLaplacian( mesh ):
      dia.setdiag(s)
      L = dia - weights
                     
-     print '    OK'
+     print('    OK')
                     
      return L
      
@@ -152,9 +154,9 @@ def computeMeshLaplacian( mesh ):
 
 def sphereConformalMapping( mesh, lap, ps, pn, radius ):
 
-     print '    Spherical mapping'
+     print('    Spherical mapping')
      L=sparse.lil_matrix(lap)
-     #print 'Laplacian : ', L
+     #print('Laplacian : ', L)
      
      L[ps,:]=0
      L[ps,ps]=1
@@ -177,13 +179,13 @@ def sphereConformalMapping( mesh, lap, ps, pn, radius ):
      Ry=sparse.lil_matrix(Nor[:,1]).tocsr()
      Rz=sparse.lil_matrix(Nor[:,2]).tocsr()
 
-     print '    Solving linear system'
+     print('    Solving linear system')
 
      x=spsolve(L,Rx)
      y=spsolve(L,Ry)
      z=spsolve(L,Rz)     
      
-     print '    OK'
+     print('    OK')
      vv=aims.vector_POINT3DF()
      for i in range(Nv):
           no=sqrt(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])
@@ -202,7 +204,7 @@ def sphereConformalMapping( mesh, lap, ps, pn, radius ):
 ####################################################################  
 
 def meshIsoLine(mesh, tex, val):
-     #print 'Looking for isoLine'
+     #print('Looking for isoLine')
      points=array(mesh.vertex())
      values=array(tex[0])
      #print('isoLine: points:', points.shape)
@@ -248,7 +250,7 @@ def meshIsoLine(mesh, tex, val):
 # it sends back a list of vertex indices closest to the iso-line
 
 def meshAlmostIsoLine(mesh, tex, val):
-     #print 'Looking for isoLine'
+     #print('Looking for isoLine')
      points=array(mesh.vertex())
      values=array(tex[0])
      #print('isoLine: points:', points.shape)
@@ -441,10 +443,10 @@ def execution( self, context ):
      N= mesh.vertex().size()
      parameter=zeros(N)
      
-     print 'Computing Laplacian'
+     print('Computing Laplacian')
      L=computeMeshLaplacian(mesh)
      Lap=0.5*(L+L.transpose())
-     print 'Computing fiedler vector'
+     print('Computing fiedler vector')
      w,v=alg.eigsh(Lap, 6, which='SM')
  
      texOut=aims.TimeTexture_FLOAT(1,N)
@@ -492,7 +494,7 @@ def execution( self, context ):
           texOther2[0][i]=other2[i] 
           texOther3[0][i]=other3[i]
           texOther4[0][i]=other4[i]
-     #print 'Writing texture', self.texture_param1.fullName()
+     #print('Writing texture', self.texture_param1.fullName())
      ws=aims.Writer()
  
      ws.write( texOut, tempParam.fullPath() )
@@ -530,12 +532,12 @@ def execution( self, context ):
      vec=points[100] - points[99]
      dist[100]=dist[99]+sqrt( vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2] )
      
-     #print 'Dist:', dist
+     #print('Dist:', dist)
      newCoord[0]=0.0
      newCoord[100]=100.0
      for i in range(1, 100):
           newCoord[i]=(dist[i]/dist[100]) *100.0
-     #print 'newCoord:', newCoord
+     #print('newCoord:', newCoord)
 
      for i in range(0, 100):
           a[i]=(newCoord[i+1]-newCoord[i])

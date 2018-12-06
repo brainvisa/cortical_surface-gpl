@@ -1,4 +1,6 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+
+from __future__ import print_function
 
 import os,sys
 from soma import aims
@@ -47,7 +49,7 @@ def ComputeCliquesBetweenTwoSubjects ( blobs, sujet1, sujet2 ) :
     cliques = []
     for b1, blob1 in enumerate(blobs[sujet1]):
         for b2, blob2 in enumerate(blobs[sujet2]):
-            print b1, len(blob1['bucket']['voxel_list']), b2, len(blob2['bucket']['voxel_list'])
+            print(b1, len(blob1['bucket']['voxel_list']), b2, len(blob2['bucket']['voxel_list']))
             if ( not ( blob1['bbmin'][0] > blob2['bbmax'][0] \
                 or blob1['bbmin'][1] > blob2['bbmax'][1] \
                 or blob1['bbmin'][2] > blob2['bbmax'][2] \
@@ -73,18 +75,18 @@ def ComputeCliquesBetweenTwoSubjects ( blobs, sujet1, sujet2 ) :
     #for i, sujet1 in enumerate(subjects):
         #for j, sujet2 in enumerate(subjects):
             #if i < j :
-                #print sujet1,sujet2
+                #print(sujet1,sujet2)
                 #jobs.append( (blobs, sujet1, sujet2) )
 
-    #print 'JOBS:', len(jobs), 'proc:', number_of_proc
+    #print('JOBS:', len(jobs), 'proc:', number_of_proc)
     #results = MultiProcExecute ( ComputeCliquesBetweenTwoSubjects, jobs, number_of_proc )
 
     #for each in results :
         #(sujet1, sujet2, resultat) = each
-        #print len(resultat)
+        #print(len(resultat))
         #cliques.extend( convertCliques(resultat) )
                 ##cliques_sujets = ComputeCliquesBetweenTwoSubjects ( blobs, sujet1, sujet2 )
-                ##print len(cliques_sujets)
+                ##print(len(cliques_sujets))
                 ##cliques.extend ( cliques_sujets )
     #return cliques
 
@@ -96,16 +98,16 @@ def ComputeCliques ( blobs, number_of_proc = 2 ):
     for i, sujet1 in enumerate(subjects):
         for j, sujet2 in enumerate(subjects):
             if i < j :
-                print sujet1,sujet2
+                print(sujet1,sujet2)
                 #jobs.append( (blobs, sujet1, sujet2) )
                 cliques.extend( oo.convertCliques(ComputeCliquesBetweenTwoSubjects( blobs, sujet1, sujet2 ) ) )
 
-    #print 'JOBS:', len(jobs), 'proc:', number_of_proc
+    #print('JOBS:', len(jobs), 'proc:', number_of_proc)
     #results = MultiProcExecute ( ComputeCliquesBetweenTwoSubjects, jobs, number_of_proc )
 
     #for each in results :
         #(sujet1, sujet2, resultat) = each
-        #print len(resultat)
+        #print(len(resultat))
         #cliques.extend( convertCliques(resultat) )
 
     return cliques
@@ -138,7 +140,7 @@ def BuildAimsGroupGraph ( blobs, cliques ):
         e['similarity'] = each.overlap
         overlaps.append(each.overlap)
     import numpy as np
-    print min(overlaps), max(overlaps), np.mean(overlaps)
+    print(min(overlaps), max(overlaps), np.mean(overlaps))
     return graph
     
 messages_defaults = [ ('db path', '/home/go224932/data/structural/database_miccai09'),
@@ -164,21 +166,21 @@ if __name__ == '__main__' :
     sum = 0
     for sujet in sujets :
         sum = sum + len(blobs[sujet])
-    print sum, ' blobs'
+    print(sum, ' blobs')
     filteredblobs = FilterSSBOnT ( blobs, threshold )
     resetIndices ( filteredblobs )
     sum = 0
     for sujet in sujets :
-        print sujet, len( filteredblobs[sujet])
+        print(sujet, len( filteredblobs[sujet]))
         sum = sum + len( filteredblobs[sujet])
-    print sum, ' filteredblobs'
+    print(sum, ' filteredblobs')
     
 
     #distmatrix = getDistanceMatrix ( aims.read(pathes[sujets[0]]['fMRI']) )
     cliques = ComputeCliques ( filteredblobs, number_of_proc )
     graph = BuildAimsGroupGraph ( filteredblobs, cliques )
     groupgraphpath = os.path.join( os.path.split( db )[0], 'groupgraphs', 'groupgraph_%s.arg' %(os.path.split( db )[1]) )
-    print groupgraphpath
+    print(groupgraphpath)
     aims.write ( graph, groupgraphpath )
 
         

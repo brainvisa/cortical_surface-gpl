@@ -17,6 +17,9 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
+
+from __future__ import print_function
+
 from brainvisa.processes import *
 from soma import aims
 import numpy as np
@@ -54,10 +57,10 @@ def initialization( self ):
 def execution( self, context ):
 #    sys.path.append('/home/toz/workspace/MyTestProject/cortical_surface')
     for p in sys.path:
-        print p
-    print np.__version__ 
+        print(p)
+    print(np.__version__ )
     from brainvisa.cortical_surface.parameterization.mapping import hipHop
-    print 'mapping imported'
+    print('mapping imported')
    
   
     re = aims.Reader()
