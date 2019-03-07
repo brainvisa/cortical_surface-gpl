@@ -31,6 +31,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 from brainvisa.processes import *
 
 name = 'Creation of Kernels for fMRI data projection'
@@ -75,7 +77,7 @@ def execution( self, context ):
       context.write( 'Adding decay parameters in the header...' )
       reader = aims.Reader()
       object = reader.read ( str(self.output) )
-      print 'file:', object
+      print('file:', object)
       h = object.header()
       h['geod_decay'] = str(self.geod_decay) 
       h['norm_decay'] = str(self.norm_decay) 
