@@ -37,36 +37,37 @@ name = 'Create an Average Volume from a 4D-Volume'
 userLevel = 0
 
 signature = Signature(
-	  'input', ReadDiskItem('4D Volume', 'BrainVISA volume formats'),
-	  'output', WriteDiskItem('3D Volume', 'BrainVISA volume formats')
+    'input', ReadDiskItem('4D Volume', 'BrainVISA volume formats'),
+    'output', WriteDiskItem('3D Volume', 'BrainVISA volume formats')
 )
+
 def initialization( self ):
-  pass
+    pass
 
 def execution( self, context ):
-     import numpy as np
-     from soma import aims
-     ima = aims.read(self.input.fullPath())
-     arr = np.array(ima, order='F')
-     arr3 = np.mean(arr, 3)
-     sx=ima.getSizeX()
-     sy=ima.getSizeY()
-     sz=ima.getSizeZ()
-	
-     ima_out = aims.Volume_FLOAT(sx,sy,sz,1)
-     h=ima.header()
-     ho=ima_out.header()
+    import numpy as np
+    from soma import aims
+    ima = aims.read(self.input.fullPath())
+    arr = np.array(ima, order='F')
+    arr3 = np.mean(arr, 3)
+    sx=ima.getSizeX()
+    sy=ima.getSizeY()
+    sz=ima.getSizeZ()
 
-     ho['voxel_size']=[h['voxel_size'][0],h['voxel_size'][1],h['voxel_size'][2]]
-     ho['volume_dimension']=[sx, sy, sz, 1]
-     ho['transformations']=h['transformations']
-     ho['referentials']=h['referentials']
-	
-     for z in range(sz):
-	    for y in range(sy):
-	         for x in range(sx):
-	              ima_out.setValue(arr3[x,y,z], x, y, z)
-     
-     
-     aims.write(ima_out, self.output.fullPath())
-     context.write("Finished")
+    ima_out = aims.Volume_FLOAT(sx,sy,sz,1)
+    h=ima.header()
+    ho=ima_out.header()
+
+    ho['voxel_size']=[h['voxel_size'][0],h['voxel_size'][1],h['voxel_size'][2]]
+    ho['volume_dimension']=[sx, sy, sz, 1]
+    ho['transformations']=h['transformations']
+    ho['referentials']=h['referentials']
+
+    for z in range(sz):
+        for y in range(sy):
+            for x in range(sx):
+                ima_out.setValue(arr3[x,y,z], x, y, z)
+
+
+    aims.write(ima_out, self.output.fullPath())
+    context.write("Finished")

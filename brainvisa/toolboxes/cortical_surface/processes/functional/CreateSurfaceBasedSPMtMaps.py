@@ -81,7 +81,7 @@ class glm:
     def fit ( self, Y, X, formula = None, axis = 0, model = 'spherical', method = None, niter = 2 ) :
 
         if Y.shape[axis] != X.shape[0]:
-            raise ValueError, 'Response and predictors are inconsistent'
+            raise ValueError('Response and predictors are inconsistent')
 
         # Find model type
         self._axis = axis
@@ -94,9 +94,9 @@ class glm:
             elif models[model].count(method):
                 self.method = method
             else:
-                raise ValueError, 'Unknown method'
+                raise ValueError('Unknown method')
         else:
-            raise ValueError, 'Unknown model'
+            raise ValueError('Unknown model')
 
         # Initialize fields
         constants = []
@@ -211,7 +211,7 @@ class contrast:
                 t = t**2
         # Unknwon stat
         else:
-            raise ValueError, 'Unknown statistic type'
+            raise ValueError('Unknown statistic type')
 
         self._stat = t
         return t
@@ -227,7 +227,7 @@ class contrast:
         if self.type in ['t']:
             p = sps.t.sf(self._stat, np.minimum(self.dof, self._dofmax))
         else:
-            raise ValueError, 'Unknown statistic type'
+            raise ValueError('Unknown statistic type')
         self._pvalue = p
         return p
 
