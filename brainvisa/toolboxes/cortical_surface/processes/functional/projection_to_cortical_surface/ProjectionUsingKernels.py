@@ -32,6 +32,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from brainvisa.processes import *
+import six
 
 name = 'Projection using Convolution Kernels'
 
@@ -190,7 +191,7 @@ def execution( self, context ):
       #T = aims.TimeTexture_FLOAT(len(nf), len(nf[0]) )
       #for i, n in enumerate(nf):
           #t = aims.Texture_FLOAT(np.array(n).astype(np.float32))
-          #for j in xrange(len(t)):
+          #for j in six.moves.xrange(len(t)):
               #T[i][j] = t[j]
       
       #context.write('Finished')

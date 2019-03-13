@@ -32,6 +32,7 @@
 
 from brainvisa.processes import *
 from math import *
+import six
 
 name = 'Texture Value By Click'
 userLevel = 2
@@ -57,8 +58,8 @@ def execution( self, context ):
   distance = 0.0
   mini = 0
   distmini=1000.0
-  for t in xrange(mesh.size()):
-    for v in xrange(len(mesh.vertex(t))):
+  for t in six.moves.xrange(mesh.size()):
+    for v in six.moves.xrange(len(mesh.vertex(t))):
       vert = mesh.vertex(t)[v]
       distance = sqrt(pow(vert[0]-point[0],2)+pow(vert[1]-point[1],2)+pow(vert[2]-point[2],2))
       if (distance < distmini):
@@ -67,7 +68,7 @@ def execution( self, context ):
   context.write("L'indice du noeud le plus proche du point clique est : " + str(mini))
   context.write("La distance calculee entre ce noeud et le point clique est : " + str(distmini))
   context.write("Les valeurs de ce noeud dans la texture donnee sont : ")
-  for t in xrange(texture.size()):
+  for t in six.moves.xrange(texture.size()):
     context.write(texture[t][mini])
   
   

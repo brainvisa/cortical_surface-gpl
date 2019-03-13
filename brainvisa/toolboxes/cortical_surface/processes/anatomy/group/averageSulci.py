@@ -36,6 +36,7 @@ import sys
 import os
 import numpy
 import operator
+import six
 
 name = 'Average Sulci'
 userLevel = 0
@@ -47,8 +48,8 @@ def sulcus2vector(mesh) :
      nodes=mesh.vertex(0)
      v=[]
      nn=nodes.size()
-     for i in xrange(3) :
-          for j in xrange(nn) :
+     for i in six.moves.xrange(3) :
+          for j in six.moves.xrange(nn) :
                v.append(nodes[j][i])
      return v
           
@@ -59,7 +60,7 @@ def vector2vertices(coord) :
      # d'un maillage
      N=len(coord)/3
      vertOut=[ ]
-     for i in xrange(N) :
+     for i in six.moves.xrange(N) :
           p=aims.vector_POINT3DF()
           p=[coord[i], coord[i+N], coord[i+2*N]]
           vertOut.append(p)
@@ -74,13 +75,13 @@ def pcaSulci(sulci) :
      mean=[]
      
      # on calcule le vecteur moyen et on centre les vecteurs de sillons
-     for i in xrange(N) :
+     for i in six.moves.xrange(N) :
           a=0
-          for j in xrange(s) :
+          for j in six.moves.xrange(s) :
                a=a+sulci[j][i]
           m=a/s
           mean.append(m)
-          for j in xrange(s) :
+          for j in six.moves.xrange(s) :
                sulci[j][i]=sulci[j][i] - m
 
      D=numpy.asmatrix(sulci)
@@ -100,12 +101,12 @@ def pcaSulci(sulci) :
      eigenv=numpy.dot(D.T, vect)
      evect=numpy.asarray(eigenv.T)
      
-     for i in xrange(len(evect)) :
+     for i in six.moves.xrange(len(evect)) :
           tot=0
-          for j in xrange(len(evect[i])) :
+          for j in six.moves.xrange(len(evect[i])) :
                tot += evect[i][j]*evect[i][j]
           if (tot>0) :
-               for j in xrange(len(evect[i])) :
+               for j in six.moves.xrange(len(evect[i])) :
                     evect[i][j] /= sqrt(tot)
      
      return mean, val, evect
@@ -131,7 +132,7 @@ def execution ( self, context ):
      v=[]
      av=[]
      context.write("Found ", ns, " sulci")
-     for i in xrange(ns) :
+     for i in six.moves.xrange(ns) :
           context.write("Reading ", self.sulci[i].fullPath())
           sulcus.append(reader.read(self.sulci[i].fullPath()))
           v.append(sulcus2vector(sulcus[i]))
@@ -146,7 +147,7 @@ def execution ( self, context ):
      vertM=vector2vertices(meanS)
      nv=len(vertM)
      vmap=sulcus[0].vertex(0)
-     for i in xrange(nv) :
+     for i in six.moves.xrange(nv) :
           vmap[i][0]=vertM[i][0]
           vmap[i][1]=vertM[i][1]
           vmap[i][2]=vertM[i][2]
@@ -159,12 +160,12 @@ def execution ( self, context ):
      lmax=0
      ltot=0
      valS2=[ ]
-     for i in xrange(len(valS)) :
+     for i in six.moves.xrange(len(valS)) :
           valS2.append((i,valS[i]))
      valS2_sorted=sorted(valS2, key=operator.itemgetter(1), reverse=True)
      context.write('List of sorted eigenvalues with sorted ', valS2_sorted)
      valTot=0
-     for i in xrange(len(valS)) :
+     for i in six.moves.xrange(len(valS)) :
           valTot+=valS[i]
      i=0;
      eigval=0.0
@@ -179,18 +180,18 @@ def execution ( self, context ):
      modeS=aims.AimsTimeSurface_3_VOID()
      context.write("Computing variations")
 
-     for k in xrange(imax) :
+     for k in six.moves.xrange(imax) :
           context.write("mode ", k+1)
           eigval=valS2_sorted[k][1]/valTot*100.0
           context.write("Eigenvalue :", valS2_sorted[k][1], " -> ", valS2_sorted[k][0],  " -> ", eigval, "%")
           vmax=vectS[valS2_sorted[k][0]]
           vertMax=vector2vertices(vmax)
-          for i in xrange(200) :
+          for i in six.moves.xrange(200) :
                dt=(i-100)*5.0
                modeS.polygon(i).assign(sulcus[0].polygon(0))
                modeS.vertex(i).assign(sulcus[0].vertex(0))
                vmap=modeS.vertex(i)
-               for j in xrange(nv) :
+               for j in six.moves.xrange(nv) :
                     vmap[j][0]=vmap[j][0] + dt*vertMax[j][0]
                     vmap[j][1]=vmap[j][1] + dt*vertMax[j][1]
                     vmap[j][2]=vmap[j][2] + dt*vertMax[j][2]

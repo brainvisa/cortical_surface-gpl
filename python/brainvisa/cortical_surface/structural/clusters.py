@@ -5,6 +5,7 @@ from brainvisa.cortical_surface.structural.graphManip import Graph
 from brainvisa.cortical_surface.shell import db
 from brainvisa.cortical_surface.structural.blobManip import Node
 import os
+import six
 
 
 def Clusters ( db, raw_max_nodes, clustering_distance, hemis_side = 'L', data_type = 'curv' ) :
@@ -140,9 +141,9 @@ def ClustersOnSimulatedRegions ( db_path, radius = 25.0, hemis_side = 'L', data_
         distance = 0.0
         mini = 0
         distmini = 1000.0
-        for v in xrange ( len( mesh.vertex()) ):
+        for v in six.moves.xrange ( len( mesh.vertex()) ):
             vert = mesh.vertex()[v]
-            d = [ math.pow(each, 2) for each in [vert[i] - point[i] for i in xrange(3)] ]
+            d = [ math.pow(each, 2) for each in [vert[i] - point[i] for i in six.moves.xrange(3)] ]
             distance = math.sqrt( d[0] + d[1] + d[2] )
 
             if ( distance < distmini ):

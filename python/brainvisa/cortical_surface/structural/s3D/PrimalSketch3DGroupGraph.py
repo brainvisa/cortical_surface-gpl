@@ -9,6 +9,7 @@ import math
 import brainvisa.cortical_surface.structural.blobManip as oo
 from brainvisa.cortical_surface.multiprocessing.mproc import MultiProcExecute
 from brainvisa.cortical_surface.shell.inputParameters import *
+import six
 
 
 
@@ -65,12 +66,12 @@ def getBucketFromVertex ( v ):
     bucket['voxel_list'] = []
     assert(len(bucketmap[0].keys())>0)
     for each in bucketmap[0].keys() :
-        bucket['voxel_list'].append([int(each[x]) for x in xrange(3)])
+        bucket['voxel_list'].append([int(each[x]) for x in six.moves.xrange(3)])
     assert(len(bucket['voxel_list']) > 0 )
     bucket['voxel_size'] = [bucketmap.sizeX(), bucketmap.sizeY(), bucketmap.sizeZ(), bucketmap.sizeT()]
 
-    maxpoints = [ int(max([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
-    minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
+    maxpoints = [ int(max([each[x] for each in bucket['voxel_list']])) for x in six.moves.xrange(3)]
+    minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in six.moves.xrange(3)]
     return bucket, minpoints, maxpoints
     
 def getAimsBucketFromBucket ( b ):

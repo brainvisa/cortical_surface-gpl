@@ -5,6 +5,7 @@ from __future__ import print_function
 import os, string, shutil, sys
 from soma import aims
 from brainvisa.cortical_surface.multiprocessing.mproc import MultiProcExecute, os_system
+import six
 
 
 def IterateAnalysis ( groupgraphpath, tmppathes, analyze, number_of_proc = 2 ) :
@@ -19,7 +20,7 @@ def IterateAnalysis ( groupgraphpath, tmppathes, analyze, number_of_proc = 2 ) :
     energies = []
     jobs = []
     
-    for i in xrange ( nb_iter ) :
+    for i in six.moves.xrange ( nb_iter ) :
         ana = [each for each in analyze]
         tmppath = tmppathes[i]
         ana += [ '-i', str(groupgraphpath) ]
