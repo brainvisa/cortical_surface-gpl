@@ -1,4 +1,5 @@
 import os
+import six
 
 def SubjectsSubset ( subjects, nb ) :
     '''Returns a random subset of size nb from a set of subjects names'''
@@ -6,7 +7,7 @@ def SubjectsSubset ( subjects, nb ) :
     new_data = [d for d in subjects]
     assert ( nb <= len(subjects) )
     comp = []
-    for n in xrange ( nb ) :
+    for n in six.moves.xrange ( nb ) :
         pos = randrange ( len(new_data) )
         elem = new_data[pos]
         new_data[pos] = new_data[-1]

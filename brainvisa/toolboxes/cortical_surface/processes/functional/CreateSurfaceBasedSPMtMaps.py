@@ -36,6 +36,7 @@ from brainvisa.processes import *
 import numpy as np
 from soma import aims
 import sys, os
+import six
 
 name = 'Create Surface-Based Statistical Parametric Maps'
 userLevel = 0
@@ -362,7 +363,7 @@ def PreRegressor ( condition, types, times, conversion_factor ):
 
     if ( mode == 'EVENT' ) :
         prereg = np.zeros ( int ( times[-1] * conversion_factor ) + 1 , float )
-        for j in xrange( len(types) ):
+        for j in six.moves.xrange( len(types) ):
             if int(types[j]) == int(condition) :
                 prereg [ int(times[j] * conversion_factor ) ] = 1
 
@@ -371,10 +372,10 @@ def PreRegressor ( condition, types, times, conversion_factor ):
         durations = [ each[1] for each in times ]
         size_prereg = int ( ( onsets[-1] + durations[-1] ) * conversion_factor ) + 1
         prereg = np.zeros ( size_prereg, float )
-        for j in xrange ( len(types) ):
+        for j in six.moves.xrange ( len(types) ):
             if int(types[j]) == int(condition) :
                 prereg [ int(onsets[j] * conversion_factor ) ] = 1
-                for k in xrange ( int( durations[j] * conversion_factor ) ) :
+                for k in six.moves.xrange ( int( durations[j] * conversion_factor ) ) :
                     prereg [ int(onsets[j] * conversion_factor + k ) ] = 1
     return prereg
 
@@ -389,7 +390,7 @@ def execution ( self, context ) :
     context.write ( 'times (must be in ms):', nptimes )
     context.write ( 'types:', nptypes )
 
-    for index in xrange (len(self.boldtextures) ) :
+    for index in six.moves.xrange (len(self.boldtextures) ) :
         print('texture number ', index)
         #meshpath = self.meshes[index].fullPath()
         boldtexpath = self.boldtextures[index].fullPath()
@@ -403,8 +404,8 @@ def execution ( self, context ) :
         tab = np.zeros ( float ( nb_nodes * nb_scans ) ).reshape ( nb_nodes, nb_scans )
         baseline = np.zeros ( nb_scans )
 
-        for i in xrange ( nb_nodes ) :
-            for j in xrange ( nb_scans ) :
+        for i in six.moves.xrange ( nb_nodes ) :
+            for j in six.moves.xrange ( nb_scans ) :
                 tab[i,j] = texture[j][i]
                 baseline[j] += texture[j][i]
 
@@ -424,7 +425,7 @@ def execution ( self, context ) :
 
         reg = np.zeros ( ( nb_cond + 1 ) * nb_scans, float ).reshape ( nb_scans, ( nb_cond + 1 ) )
 
-        for condition_index in xrange ( nb_cond ):
+        for condition_index in six.moves.xrange ( nb_cond ):
             prereg = PreRegressor ( condition_index, types, times, conversion_factor )
             '''prereg contains a pre-version of the regressor made of boxcars or diracs'''
             hrf_aux = np.convolve ( hrf, prereg )
@@ -450,7 +451,7 @@ def execution ( self, context ) :
         b = m.beta
         context.write ( 'DOF :', m.dof )
         tex = aims.TimeTexture_FLOAT()
-        for j in xrange(b.shape[0]):
+        for j in six.moves.xrange(b.shape[0]):
             t = tex[j]
             t.assign(list(b[j,:]))
         aims.write ( tex, betapath )

@@ -33,6 +33,7 @@
 from brainvisa.processes import *
 from numpy import *
 from soma import aims
+import six
 
 
 name = 'Average Sulcus Morphological Curves'
@@ -54,7 +55,7 @@ def execution( self, context ):
     context.write("ldepth shape", ldepth.shape)
     context.write("lprof shape", lprof.shape)
     context.write("Found ", ns, " profiles")
-    for i in xrange(ns) :
+    for i in six.moves.xrange(ns) :
         context.write('i= ', i)
         context.write("Reading ", self.depth_profiles[i].fullPath())
         data=loadtxt(self.depth_profiles[i].fullPath())

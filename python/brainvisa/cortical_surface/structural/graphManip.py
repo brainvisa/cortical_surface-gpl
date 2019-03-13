@@ -4,6 +4,7 @@ from brainvisa.cortical_surface.structural.blobManip import Node
 from brainvisa.cortical_surface.shell import db
 from soma import aims
 import os
+import six
 
 def Graph ( db_path, nodes, hemis_side = 'L', data_type = 'curv' ):
     ''' Creates an Aims Graph given a list of nodes (vertex indices + subjects).
@@ -130,12 +131,12 @@ def getBucketFromVertex ( v ) :
     bucket['voxel_list'] = []
     assert(len(bucketmap[0].keys())>0)
     for each in bucketmap[0].keys() :
-        bucket['voxel_list'].append([int(each[x]) for x in xrange(3)])
+        bucket['voxel_list'].append([int(each[x]) for x in six.moves.xrange(3)])
     assert(len(bucket['voxel_list']) > 0 )
     bucket['voxel_size'] = [bucketmap.sizeX(), bucketmap.sizeY(), bucketmap.sizeZ(), bucketmap.sizeT()]
     #assert(bucket['voxel_size'] == [3.0,3.0,3.0,1.0]
-    maxpoints = [ int(max([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
-    minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in xrange(3)]
+    maxpoints = [ int(max([each[x] for each in bucket['voxel_list']])) for x in six.moves.xrange(3)]
+    minpoints = [ int(min([each[x] for each in bucket['voxel_list']])) for x in six.moves.xrange(3)]
     return bucket, minpoints, maxpoints
     
 def getAimsBucketFromBucket ( b ) :

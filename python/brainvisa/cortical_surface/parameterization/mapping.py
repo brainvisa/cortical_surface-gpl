@@ -28,6 +28,7 @@ from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
 from scipy import sparse
 import scipy
+import six
 
 
 #########################################################
@@ -599,7 +600,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     other_verts = neigh_verts.difference(neoCortex_open_boundary[1])
 #     tex_out = aims.TimeTexture_S16()
 #     tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(neoCortex_mesh.vertex().size()):
+#     for i in six.moves.xrange(neoCortex_mesh.vertex().size()):
 #         if i in other_verts:
 #             tex_out[0].append(1)
 #         else:
@@ -1513,19 +1514,19 @@ def hip_multi_path(mesh, insula_tex_clean, cingular_tex_clean, length, width,Npa
 #     ws = aims.Writer()
 #     tex_out = aims.TimeTexture_S16()
 #     tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
+#     for i in six.moves.xrange(mesh.vertex().size()):
 #         if i in poles_path:
 #              tex_out[0].append(1)
 #         else:
 #              tex_out[0].append(0)
 #     tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
+#     for i in six.moves.xrange(mesh.vertex().size()):
 #         if i in cing_tex_boundary[-1]:
 #              tex_out[1].append(1)
 #         else:
 #              tex_out[1].append(0)
 #     tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
+#     for i in six.moves.xrange(mesh.vertex().size()):
 #         if i in ins_tex_boundary[-1]:
 #              tex_out[2].append(1)
 #         else:
@@ -1615,19 +1616,19 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 #     ws = aims.Writer()
 #     tex_out = aims.TimeTexture_S16()
 #     tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
+#     for i in six.moves.xrange(mesh.vertex().size()):
 #         if i in poles_path:
 #              tex_out[0].append(1)
 #         else:
 #              tex_out[0].append(0)
 #     tex_out[1].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
+#     for i in six.moves.xrange(mesh.vertex().size()):
 #         if i in cing_tex_boundary[-1]:
 #              tex_out[1].append(1)
 #         else:
 #              tex_out[1].append(0)
 #     tex_out[2].reserve(mesh.vertex().size())  # pre-allocates memory
-#     for i in xrange(mesh.vertex().size()):
+#     for i in six.moves.xrange(mesh.vertex().size()):
 #         if i in ins_tex_boundary[-1]:
 #              tex_out[2].append(1)
 #         else:
@@ -1658,7 +1659,7 @@ def hip(mesh, insula_tex_clean, cingular_tex_clean, length, width):
 #         print(neocortex_poles_path)
 #         tex_out = aims.TimeTexture_S16()
 #         tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
-#         for i in xrange(neoCortex_mesh.vertex().size()):
+#         for i in six.moves.xrange(neoCortex_mesh.vertex().size()):
 #             if i in neocortex_poles_path:
 #                 tex_out[0].append(1)
 #             else:
@@ -1799,7 +1800,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, side, mode
         print(poles_path)
         tex_out = aims.TimeTexture_S16()
         tex_out[0].reserve(mesh.vertex().size())  # pre-allocates memory
-        for i in xrange(mesh.vertex().size()):
+        for i in six.moves.xrange(mesh.vertex().size()):
             if i in poles_path:
                 tex_out[0].append(1)
             else:
@@ -1808,7 +1809,7 @@ def hipHop(mesh, insula_tex_clean, cingular_tex_clean, texture_sulci, side, mode
         print(neocortex_poles_path)
         tex_out = aims.TimeTexture_S16()
         tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
-        for i in xrange(neoCortex_mesh.vertex().size()):
+        for i in six.moves.xrange(neoCortex_mesh.vertex().size()):
             if i in neocortex_poles_path:
                 tex_out[0].append(1)
             else:
