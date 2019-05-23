@@ -35,6 +35,7 @@ from __future__ import print_function
 from brainvisa.processes import *
 import numpy as np
 from soma import aims
+import soma.importer
 import sys, os
 import six
 
@@ -382,7 +383,7 @@ def PreRegressor ( condition, types, times, conversion_factor ):
 
 def execution ( self, context ) :
 
-    execfile ( self.protocolfile.fullPath(), locals(), globals() )
+    soma.importer.execfile(self.protocolfile.fullPath(), locals(), globals())
     nptimes = np.array(times)
     nptypes = np.array(types)
 

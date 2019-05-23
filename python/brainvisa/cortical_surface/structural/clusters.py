@@ -4,6 +4,7 @@ from __future__ import print_function
 from brainvisa.cortical_surface.structural.graphManip import Graph
 from brainvisa.cortical_surface.shell import db
 from brainvisa.cortical_surface.structural.blobManip import Node
+import soma.importer
 import os
 import six
 
@@ -129,7 +130,7 @@ def ClustersOneSubjectAtVariousDistances ( db_path, raw_max_subject_nodes, hemis
     print(cluster_command)
     charac_clusters = {}
     count_glb = {}
-    execfile ( str(textoutputpath), locals(), globals() )
+    soma.importer.execfile(str(textoutputpath), locals(), globals())
 
     return charac_clusters, count_glb
 
