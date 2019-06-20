@@ -98,12 +98,14 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
 
     # First pit: deepest node
     pitsAll.append(sorted_nodes[0])
-    labels[sorted_nodes[0,0]]=0
-    labels_unmerged[sorted_nodes[0,0]]=0
+    print('sorted_nodes:', sorted_nodes, sorted_nodes.dtype, sorted_nodes[0, 0])
+    labels[int(sorted_nodes[0,0])]=0
+    labels_unmerged[int(sorted_nodes[0,0])]=0
 
     for node in sorted_nodes[1:]:
         
-        neighbors=neigh[node[0]] # indices of neighbors
+        nind = int(node[0])
+        neighbors=neigh[nind] # indices of neighbors
         neigh_labels=[]
         neigh_nodes=[]
 
@@ -117,8 +119,8 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
         ## Case 1: all of its neighbors are unlabeled. Then, this node corresponds to the deepest point of a new catchment basin.
         if (len(NL)==0):
             #print 'new pit:', len(pitsAll)
-            labels[node[0]]=len(pitsAll)
-            labels_unmerged[node[0]]=len(pitsAll)
+            labels[nind]=len(pitsAll)
+            labels_unmerged[nind]=len(pitsAll)
             pitsAll.append(node)
             # Allocation of space for a new potential ridge point (and parent)
             ridges=np.concatenate((ridges,np.zeros((1,len(ridges)))),axis=0)
@@ -128,8 +130,8 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
         ## Case 2: the node is the neighbor of only one catchment basin. Then, this node is assigned to the corresponding basin.
         elif (len(NL)==1):
             lab=NL
-            labels[node[0]]=lab
-            labels_unmerged[node[0]]=lab
+            labels[nind]=lab
+            labels_unmerged[nind]=lab
             
         ## Case 3: the node is the neighbor of two or more catchment basins. Then, this node is a ridge point where each pair of basins join.
         # It is assigned to the basin represented by the deepest neighbor vertex, or the lowest label if same depth.
@@ -137,7 +139,7 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
         else:
             indx_max=np.argmax(depthArray[neigh_nodes])
             lab=np.min(np.array(neigh_labels)[indx_max]) # lowest label
-            labels[node[0]]=lab
+            labels[nind]=lab
             
             # MERGING between pairs of neighbor catchment basins
             # NB: by construction, labels are ordered by pits depth (if i<j, pit(i) deeper than pit(j)).
@@ -153,7 +155,7 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
                     for label_j in NL[X:]:
                         if (ridges[label_i][label_j]==0):
                             # create the ridge point
-                            ridges[label_i][label_j]=ridges[label_j][label_i]=int(node[0])
+                            ridges[label_i][label_j] = ridges[label_j][label_i] = nind
                             # compute ridge height
                             ridge_height=abs(pitsAll[label_j][1]-node[1])
                             
@@ -172,7 +174,7 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
                                     # Exception: new node has been assigned to a label different from the two that are merging.
                                     # This leads to a wrong frontier between the two former basins. Solution: re-assign the node to the merged basin.
                                     if (label_i!=lab and label_j!=lab):
-                                        labels[node[0]]=label_i
+                                        labels[nind]=label_i
                     X+=1
 
 

@@ -70,23 +70,34 @@ def execution( self, context ):
     for ex in extrema:
         spheres_mesh += gen.sphere(vert[ex], self.sphere_size,10)
         spheres_texture.extend(extrema_tex[ex]*np.ones((nb_vert_s,1),np.int16))
-    aims.write(spheres_mesh, spheres_mesh_file.fullPath())
 
     a_tex_out = np.array(spheres_texture)
     tex_out = aims.TimeTexture_S16()
     tex_out[0].assign(a_tex_out)
-    aims.write(tex_out, spheres_texture_file.fullPath())
     a = anatomist.Anatomist()
     win = a.createWindow( 'Axial' )
-    anamesh = a.loadObject( spheres_mesh_file.fullPath() )
-    anatex = a.loadObject( spheres_texture_file.fullPath() )
-    anatex.setPalette('GREEN-RED-ufusion')
-    fusionTexSurf = a.fusionObjects( [anamesh, anatex], method='FusionTexSurfMethod' )
-    win.addObjects( fusionTexSurf )
-    anamesh2 = a.loadObject( self.white_mesh.fullPath() )
-    anatex2 = a.loadObject( self.texture.fullPath() )
+    objects = [win]
+    if len(spheres_mesh.vertex()) != 0:
+        anamesh = a.toAObject(spheres_mesh)
+        anamesh.releaseAppRef()
+        anatex = a.toAObject(tex_out)
+        anatex.releaseAppRef()
+        anatex.setPalette('GREEN-RED-ufusion')
+        fusionTexSurf = a.fusionObjects([anamesh, anatex],
+                                        method='FusionTexSurfMethod')
+        fusionTexSurf.releaseAppRef()
+        win.addObjects( fusionTexSurf )
+        objects += [fusionTexSurf]
+    anamesh2 = a.toAObject(white_mesh)
+    anamesh2.releaseAppRef()
+    anatex2 = a.toAObject(texture)
+    anatex2.releaseAppRef()
     anatex2.setPalette('Purple-Red + Stripes')
-    fusionTexSurf2 = a.fusionObjects( [anamesh2, anatex2], method='FusionTexSurfMethod' )
+    fusionTexSurf2 = a.fusionObjects([anamesh2, anatex2],
+                                     method='FusionTexSurfMethod')
+    fusionTexSurf2.releaseAppRef()
+    objects.append(fusionTexSurf2)
     win.addObjects( fusionTexSurf2 )
-    return [win, anamesh,anatex,fusionTexSurf,anamesh2,fusionTexSurf2]
+    return objects
+    #return [win, anamesh,anatex,fusionTexSurf,anamesh2,fusionTexSurf2]
 
