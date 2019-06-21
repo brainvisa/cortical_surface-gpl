@@ -157,25 +157,24 @@ def execution( self, context ):
     # Saving
     # texture of basins
     labelsTexture = aims.TimeTexture_S16(1, len(labels))
-    context.write('labels type:', labels.dtype, labels.shape) ## FIXME DEBUG
     labelsTexture[0].assign(labels.astype(np.int16).ravel())
     ws.write( labelsTexture, self.basins_texture.fullPath() )
     # texture of pits
     atex_pits = np.zeros((len(labels), 1))
     for pit in pitsKept:
-        atex_pits[pit[0]] = 1
+        atex_pits[int(pit[0])] = 1
     pitsTexture = aims.TimeTexture_S16(1,len(labels))
-    pitsTexture[0].assign(atex_pits)
+    pitsTexture[0].assign(atex_pits.astype(np.int16).ravel())
     ws.write( pitsTexture, self.pits_texture.fullPath() )
     # texture of noisy pits
-    atex_noisypits = np.zeros((len(labels),1))
+    atex_noisypits = np.zeros((len(labels),), dtype=np.int16)
     for pit in pitsRemoved:
-        atex_noisypits[pit[0]] = 1
+        atex_noisypits[int(pit[0])] = 1
     noisypitsTexture = aims.TimeTexture_S16(1, len(labels))
     noisypitsTexture[0].assign(atex_noisypits)
     ws.write( noisypitsTexture, self.noisypits_texture.fullPath() )
     # texture of ridges
-    atex_ridges = np.zeros((len(labels), 1))
+    atex_ridges = np.zeros((len(labels), ), dtype=np.int16)
     for ridge in ridgePoints:
         atex_ridges[ridge[2]] = 1
     ridgesTexture = aims.TimeTexture_S16(1, len(labels))
