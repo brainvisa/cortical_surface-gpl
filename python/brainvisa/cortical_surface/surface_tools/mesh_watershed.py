@@ -94,11 +94,10 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
     labels_unmerged=np.zeros((vert.size/3,1),dtype=np.int)-1
     labels_merged=[]
     parent=np.zeros((1,1),dtype=np.int)-1 # List of each pit's direct parent (set to -1)
-    ridges=np.zeros((1,1)) #List of ridge points
+    ridges=np.zeros((1,1), dtype=np.int) #List of ridge points
 
     # First pit: deepest node
     pitsAll.append(sorted_nodes[0])
-    print('sorted_nodes:', sorted_nodes, sorted_nodes.dtype, sorted_nodes[0, 0])
     labels[int(sorted_nodes[0,0])]=0
     labels_unmerged[int(sorted_nodes[0,0])]=0
 
@@ -123,8 +122,12 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
             labels_unmerged[nind]=len(pitsAll)
             pitsAll.append(node)
             # Allocation of space for a new potential ridge point (and parent)
-            ridges=np.concatenate((ridges,np.zeros((1,len(ridges)))),axis=0)
-            ridges=np.concatenate((ridges,np.zeros((len(ridges),1))),axis=1)
+            ridges=np.concatenate((ridges,
+                                   np.zeros((1,len(ridges)),
+                                             dtype=np.int)),axis=0)
+            ridges=np.concatenate((ridges,np.
+                                   zeros((len(ridges),1),
+                                         dtype=np.int)),axis=1)
             parent=np.concatenate((parent,np.zeros((1,1),dtype=np.int)-1),axis=0)
             
         ## Case 2: the node is the neighbor of only one catchment basin. Then, this node is assigned to the corresponding basin.
@@ -242,12 +245,12 @@ def areaFiltering(mesh, vert_area, labels, pitsKept, parent, threshArea):
     tmp=np.unique(labels)
     tmp=np.delete(tmp, np.where(tmp==-1)[0])
     tmp=np.reshape(tmp,(len(tmp),1))
-    basinsArray=np.concatenate((tmp,np.zeros((len(tmp),2))),axis=1) # will contain [label, area, pit]
+    basinsArray=np.concatenate((tmp,np.zeros((len(tmp),2), dtype=int)),axis=1) # will contain [label, area, pit]
     # Compute basins area
     #print 'basins area'
     for b in basinsArray:
         b[1]=np.sum(vert_area[np.where(labels==b[0])[0]])
-        b[2]=pitsKept[np.where(labels[pitsKept[:,0].tolist()]==b[0])[0][0]][0]
+        b[2]=pitsKept[np.where(labels[pitsKept[:,0].astype(int).tolist()]==b[0])[0][0]][0]
     # sort by area
     sorted_basins=np.array(sorted(basinsArray, key=lambda area: area[1], reverse=False))
     basins2merge=sorted_basins[np.where(sorted_basins[:,1]<=threshArea)[0]]
@@ -279,7 +282,7 @@ def areaFiltering(mesh, vert_area, labels, pitsKept, parent, threshArea):
         indx=np.argmax(borders_length)
         parent_basin=NL[np.min(indx)]
         #print 'merging of', int(basin[0]), 'into', int(parent_basin)
-        pitsRemoved.append(pitsKept[np.where(pitsKept[:,0].tolist()==basin[2])[0]][0])
+        pitsRemoved.append(pitsKept[np.where(pitsKept[:,0].astype(int).tolist()==basin[2])[0]][0])
         labels[np.where(labels==basin[0])[0]]=parent_basin
         parent[basin[0]]=parent_basin
         # update basins2merge
@@ -297,7 +300,7 @@ def areaFiltering(mesh, vert_area, labels, pitsKept, parent, threshArea):
 
     indx=[]
     for pit in pitsRemoved:
-        indx.append(np.where(pitsKept[:,0]==pit[0])[0])
+        indx.append(np.where(pitsKept[:,0].astype(int)==pit[0])[0])
     tmp=np.delete(pitsKept,indx,axis=0)
     pitsKept=tmp
     
@@ -305,7 +308,7 @@ def areaFiltering(mesh, vert_area, labels, pitsKept, parent, threshArea):
     #print 'Number of pits kept after filtering:', nbFinalPits
     
     # Array of final basins info [label, pit's index, pit's depth, basin area]
-    basins=labels[pitsKept[:,0].tolist()].reshape((1,len(labels[pitsKept[:,0].tolist()])))[0]
+    basins=labels[pitsKept[:,0].astype(int).tolist()].reshape((1,len(labels[pitsKept[:,0].astype(int).tolist()])))[0]
     infoBasins=np.zeros((len(pitsKept),4))
     for i in range(len(pitsKept)):
         infoBasins[i][0]=int(basins[i])

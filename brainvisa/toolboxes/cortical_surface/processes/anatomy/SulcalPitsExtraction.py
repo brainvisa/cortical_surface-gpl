@@ -157,7 +157,8 @@ def execution( self, context ):
     # Saving
     # texture of basins
     labelsTexture = aims.TimeTexture_S16(1, len(labels))
-    labelsTexture[0].assign(labels)
+    context.write('labels type:', labels.dtype, labels.shape) ## FIXME DEBUG
+    labelsTexture[0].assign(labels.astype(np.int16).ravel())
     ws.write( labelsTexture, self.basins_texture.fullPath() )
     # texture of pits
     atex_pits = np.zeros((len(labels), 1))
