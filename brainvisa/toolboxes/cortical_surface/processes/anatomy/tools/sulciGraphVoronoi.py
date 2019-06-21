@@ -50,6 +50,8 @@ signature = Signature(
     'labels_translation_map',ReadDiskItem( 'Label Translation' ,'Label Translation'),
     'bucket_label_type', Choice('All', 'aims_junction', 'aims_bottom', 'aims_ss', 'aims_other'),
     'sulci_voronoi',WriteDiskItem( 'sulci voronoi texture', 'aims Texture formats'),
+    'input_int_to_label_translation', ReadDiskItem('log file', 'text file'),
+    'int_to_label_translation', WriteDiskItem('log file', 'text file'),
 
 
 )
@@ -65,8 +67,12 @@ def initialization( self ):
     self.linkParameters( 'sulci_voronoi', 'white_mesh' )
     self.linkParameters( 'side', 'graph', linkSide )
     self.findValue( 'labels_translation_map', {'filename_variable' : 'sulci_model_2008'} )
+    self.linkParameters('input_int_to_label_translation', 'graph')
+    self.linkParameters('int_to_label_translation', 'graph')
     self.bucket_label_type = 'All'
     self.sulcus_identification = 'label'
+    self.setOptional('input_int_to_label_translation')
+    self.setOptional('int_to_label_translation')
 
 
 def execution( self, context ):
@@ -81,28 +87,32 @@ def execution( self, context ):
                 nn.append(nn_tmp)
         return nn
 
-    graph_label_basins=context.temporary(  'GIS image' )
     volumeGraphLabelBasins=context.temporary('NIFTI-1 image')
 
     context.write('computing Graph Label Volume')
 
     if (self.bucket_label_type=='aims_junction'):
         graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_junction', '-ot', graph_label_basins.fullPath()]
+      '-b', 'aims_junction']
     elif (self.bucket_label_type=='aims_bottom'):
         graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_bottom', '-ot', graph_label_basins.fullPath()]
+      '-b', 'aims_bottom']
     elif (self.bucket_label_type=='aims_ss'):
         graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_ss', '-ot', graph_label_basins.fullPath()]
+      '-b', 'aims_ss']
     elif (self.bucket_label_type=='aims_other'):
         graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_other', '-ot', graph_label_basins.fullPath()]
+      '-b', 'aims_other']
     else :
         graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
-      '-b', 'aims_junction','-b', 'aims_bottom','-b', 'aims_ss', '-b', 'aims_other', '-ot', graph_label_basins.fullPath()]
+      '-b', 'aims_junction','-b', 'aims_bottom','-b', 'aims_ss', '-b', 'aims_other']
 
-    apply( context.system, graphBucketLabel )
+    if self.input_int_to_label_translation is not None:
+        graphBucketLabel += ['-it', self.input_int_to_label_translation]
+    if self.int_to_label_translation:
+        graphBucketLabel += ['-ot', self.int_to_label_translation]
+
+    context.system(*graphBucketLabel)
 
     context.write('nearest-neighbor interpolation between mesh and Graph Label Volume')
     vol_sulci = aims.read(volumeGraphLabelBasins.fullPath())
