@@ -34,7 +34,7 @@
 from brainvisa.processes import *
 from brainvisa.data.neuroHierarchy import databases
 
-name = 'Create Label Texture'
+name = 'Surface Sulci Projection - nearest method'
 
 userLevel = 1
 
