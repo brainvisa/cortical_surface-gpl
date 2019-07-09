@@ -36,9 +36,10 @@ from soma import aims
 import numpy as np
 from brainvisa.cortical_surface.surface_tools import texture_tools as texTls
 
-name = 'Anatomist Show Texture Extram As Spheres'
+name = 'Anatomist Show Texture Extrama As Spheres'
 roles = ('viewer',)
 userLevel = 0
+allowed_processes = ()
 
 def validation():
   anatomist.validation()
