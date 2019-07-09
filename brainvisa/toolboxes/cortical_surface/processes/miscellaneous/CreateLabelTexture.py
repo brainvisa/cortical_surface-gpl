@@ -46,13 +46,15 @@ signature = Signature(
     'mri_corrected', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims readable volume formats' ),
     'left_white_mesh',ReadDiskItem( 'Left Hemisphere White Mesh' , 'aims Mesh Formats'),
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
-    'MNI', Choice("No","Yes"),
+    'MNI', Boolean(),
     'mni_mesh', ReadDiskItem('MNI Cortex Mesh', 'Aims mesh formats'),
     'left_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'aims texture formats',requiredAttributes={ 'side': 'left' } ),
     'right_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'aims texture formats',requiredAttributes={ 'side': 'right' } ),
     'translation',ReadDiskItem('Label Translation','Label Translation' ),
     'left_sulci_label_to_sulci_name',WriteDiskItem( 'Sulci To White Texture Translation', 'Text File',requiredAttributes={ 'side': 'left' }),
     'right_sulci_label_to_sulci_name',WriteDiskItem( 'Sulci To White Texture Translation', 'Text File',requiredAttributes={ 'side': 'right' }),
+    'labels_mode', Choice('gyri', 'all'),
+    'keep_unknown_label', Boolean(),
     'gyri_model',ReadDiskItem('Gyri Model','Gyri Model' ),
     'Metric',Choice('Euclidean','Internode')
 )
@@ -71,38 +73,109 @@ def initialization( self ):
      self.sulcus_identification = 'label'
      self.translation = ReadDiskItem('Label Translation','Label Translation' ).findValue( { 'filename_variable' : 'gyri' } )
      self.gyri_model = databases.getDiskItemFromUuid( '172c4168-a9d3-dc41-464c-1226ad07c19c' )
+     self.setOptional('gyri_model')
+     self.MNI = False
+     self.keep_unknown_label = False
+
 
 def execution( self, context ):
-     Min_points_in_connected_component = 5
-     Affine_estimation_coef = 0.9
-     Distance_Euclidienne = 20
-     Distance_au_plan     = 1
-     Volume_Closing = 1
-     Mesh_Closing = 2
-     if self.MNI == 'Yes':
-          self.left_white_mesh = self.mni_mesh
-          self.right_white_mesh = self.mni_mesh
-          lmesh = 'mni_mesh'
-          rmesh = 'mni_mesh'
-     else:
-          lmesh = 'left_white_mesh'
-          rmesh = 'right_white_mesh'
+    Min_points_in_connected_component = 5
+    Affine_estimation_coef = 0.9
+    Distance_Euclidienne = 20
+    Distance_au_plan     = 1
+    Volume_Closing = 1
+    Mesh_Closing = 2
+    if self.MNI:
+        self.left_white_mesh = self.mni_mesh
+        self.right_white_mesh = self.mni_mesh
+        lmesh = 'mni_mesh'
+        rmesh = 'mni_mesh'
+    else:
+        lmesh = 'left_white_mesh'
+        rmesh = 'right_white_mesh'
 
-     if self.Metric == 'Euclidean':
-          if self.Side in ('Left','Both'):
-               if not self.Lgraph or not self.left_white_mesh or not self.left_white_sulci:
-                 raise ValidationError( 'Lgraph, ' + lmesh + ' and left_white_sulci are required to process the right hemisphere' )
-               context.system('siMeshSulciProjection', '-i', self.left_white_mesh.fullPath() ,  '-g' , self.Lgraph.fullPath(), '-l' , self.translation.fullPath() , '-m', self.gyri_model.fullPath() , '-s' , self.sulcus_identification, '-v' , self.mri_corrected.fullPath(), '-o' ,self.left_white_sulci.fullPath() ,'-V' , Volume_Closing,'-M',Mesh_Closing,'-n',Min_points_in_connected_component,'-a', Affine_estimation_coef, '-e', Distance_Euclidienne,'-t', self.left_sulci_label_to_sulci_name.fullPath() ,'-p',Distance_au_plan )
-          if self.Side in ('Right','Both'):
-               if not self.Rgraph or not self.right_white_mesh or not self.right_white_sulci:
-                 raise ValidationError( 'Rgraph, ' + rmesh + ' and right_white_sulci are required to process the right hemisphere' )
-               context.system('siMeshSulciProjection', '-i', self.right_white_mesh.fullPath() ,  '-g' , self.Rgraph.fullPath(), '-l' , self.translation.fullPath() , '-m', self.gyri_model.fullPath() , '-s' , self.sulcus_identification, '-v' , self.mri_corrected.fullPath(), '-o' ,self.right_white_sulci.fullPath() ,'-V', Volume_Closing,'-M',Mesh_Closing,'-n',Min_points_in_connected_component,'-a', Affine_estimation_coef, '-e', Distance_Euclidienne,'-t',self.right_sulci_label_to_sulci_name.fullPath()  ,'-p',Distance_au_plan )
-     else:
-          if self.Side in ('Left','Both'):
-               if not self.Lgraph or not self.left_white_mesh or not self.left_white_sulci:
-                 raise ValidationError( 'Lgraph, ' + lmesh + ' and left_white_sulci are required to process the right hemisphere' )
-               context.system('siMeshSulciProjection', '-i', self.left_white_mesh.fullPath() ,  '-g' , self.Lgraph.fullPath(), '-l' , self.translation.fullPath() , '-m', self.gyri_model.fullPath() , '-s' , self.sulcus_identification, '-v' , self.mri_corrected.fullPath(), '-o' ,self.left_white_sulci.fullPath() ,'-V' , Volume_Closing,'-M',Mesh_Closing,'-n',Min_points_in_connected_component,'-a', Affine_estimation_coef, '-e', Distance_Euclidienne,'-t',self.left_sulci_label_to_sulci_name.fullPath() ,'--connexity','-p',Distance_au_plan )
-          if self.Side in ('Right','Both'):
-               if not self.Rgraph or not self.right_white_mesh or not self.right_white_sulci:
-                 raise ValidationError( 'Rgraph, ' + rmesh + ' and right_white_sulci are required to process the right hemisphere' )
-               context.system('siMeshSulciProjection', '-i', self.right_white_mesh.fullPath() ,  '-g' , self.Rgraph.fullPath(), '-l' , self.translation.fullPath() , '-m', self.gyri_model.fullPath() , '-s' , self.sulcus_identification, '-v' , self.mri_corrected.fullPath(), '-o' ,self.right_white_sulci.fullPath() ,'-V', Volume_Closing,'-M',Mesh_Closing,'-n',Min_points_in_connected_component,'-a', Affine_estimation_coef, '-e', Distance_Euclidienne,'-t', self.right_sulci_label_to_sulci_name.fullPath() ,'--connexity','-p',Distance_au_plan )
+    extra_params = []
+    if self.labels_mode == 'gyri':
+        if self.gyri_model is None:
+            raise ValueError('when labels_mode is "gyri", the parameter '
+                             '"gyri_model" is mandatory')
+        extra_params += ['-m', self.gyri_model]
+    if self.keep_unknown_label:
+        extra_params.append('-u')
+
+    if self.Metric == 'Euclidean':
+        if self.Side in ('Left','Both'):
+              if not self.Lgraph or not self.left_white_mesh or not self.left_white_sulci:
+                raise ValueError( 'Lgraph, ' + lmesh + ' and left_white_sulci are required to process the right hemisphere' )
+              context.system('siMeshSulciProjection',
+                             '-i', self.left_white_mesh,
+                             '-g', self.Lgraph,
+                             '-l' , self.translation,
+                             '-s', self.sulcus_identification,
+                             '-v', self.mri_corrected,
+                             '-o', self.left_white_sulci,
+                             '-V', Volume_Closing,
+                             '-M', Mesh_Closing,
+                             '-n', Min_points_in_connected_component,
+                             '-a', Affine_estimation_coef,
+                             '-e', Distance_Euclidienne,
+                             '-t', self.left_sulci_label_to_sulci_name,
+                             '-p', Distance_au_plan,
+                             *extra_params)
+        if self.Side in ('Right','Both'):
+              if not self.Rgraph or not self.right_white_mesh or not self.right_white_sulci:
+                raise ValueError( 'Rgraph, ' + rmesh + ' and right_white_sulci are required to process the right hemisphere' )
+              context.system('siMeshSulciProjection',
+                             '-i', self.right_white_mesh,
+                             '-g', self.Rgraph,
+                             '-l', self.translation,
+                             '-s', self.sulcus_identification,
+                             '-v', self.mri_corrected,
+                             '-o', self.right_white_sulci,
+                             '-V', Volume_Closing,
+                             '-M', Mesh_Closing,
+                             '-n', Min_points_in_connected_component,
+                             '-a', Affine_estimation_coef,
+                             '-e', Distance_Euclidienne,
+                             '-t', self.right_sulci_label_to_sulci_name,
+                             '-p', Distance_au_plan,
+                             *extra_params)
+    else:
+        if self.Side in ('Left','Both'):
+              if not self.Lgraph or not self.left_white_mesh or not self.left_white_sulci:
+                raise ValueError( 'Lgraph, ' + lmesh + ' and left_white_sulci are required to process the right hemisphere' )
+              context.system('siMeshSulciProjection',
+                             '-i', self.left_white_mesh,
+                             '-g', self.Lgraph,
+                             '-l', self.translation,
+                             '-s', self.sulcus_identification,
+                             '-v', self.mri_corrected,
+                             '-o', self.left_white_sulci,
+                             '-V', Volume_Closing,
+                             '-M', Mesh_Closing,
+                             '-n', Min_points_in_connected_component,
+                             '-a', Affine_estimation_coef,
+                             '-e', Distance_Euclidienne,
+                             '-t',self.left_sulci_label_to_sulci_name,
+                             '--connectivity',
+                             '-p', Distance_au_plan,
+                             *extra_params)
+        if self.Side in ('Right','Both'):
+              if not self.Rgraph or not self.right_white_mesh or not self.right_white_sulci:
+                raise ValueError( 'Rgraph, ' + rmesh + ' and right_white_sulci are required to process the right hemisphere' )
+              context.system('siMeshSulciProjection',
+                             '-i', self.right_white_mesh,
+                             '-g' , self.Rgraph,
+                             '-l' , self.translation,
+                             '-s' , self.sulcus_identification,
+                             '-v' , self.mri_corrected,
+                             '-o' ,self.right_white_sulci,
+                             '-V', Volume_Closing,
+                             '-M',Mesh_Closing,
+                             '-n',Min_points_in_connected_component,
+                             '-a', Affine_estimation_coef,
+                             '-e', Distance_Euclidienne,
+                             '-t', self.right_sulci_label_to_sulci_name,
+                             '--connectivity',
+                             '-p',Distance_au_plan,
+                             *extra_params)
