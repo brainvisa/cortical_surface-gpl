@@ -112,7 +112,7 @@ def execution( self, context ):
          
      if self.Side in ('Left','Both'):
           if ( self.Projection == 'Yes' ):
-               context.runProcess( 'CreateLabelTexture', 
+               context.runProcess( 'surface_sulci_projection_nearest',
                                    Side = 'Left',
                                    Lgraph = self.Lgraph,
                                    Rgraph = self.Rgraph,
@@ -145,7 +145,7 @@ def execution( self, context ):
 
      if self.Side in ('Right','Both'):
           if ( self.Projection == 'Yes' ):
-               context.runProcess( 'CreateLabelTexture', 
+               context.runProcess( 'surface_sulci_projection_nearest',
                                    Side = 'Right',
                                    Lgraph = self.Lgraph,
                                    Rgraph = self.Rgraph,

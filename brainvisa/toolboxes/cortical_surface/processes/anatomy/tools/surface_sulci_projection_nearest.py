@@ -34,7 +34,7 @@
 from brainvisa.processes import *
 from brainvisa.data.neuroHierarchy import databases
 
-name = 'Create Label Texture'
+name = 'Surface Sulci Projection - nearest method'
 
 userLevel = 1
 
@@ -48,8 +48,8 @@ signature = Signature(
     'right_white_mesh',ReadDiskItem( 'Right Hemisphere White Mesh' , 'aims Mesh Formats'),
     'MNI', Boolean(),
     'mni_mesh', ReadDiskItem('MNI Cortex Mesh', 'Aims mesh formats'),
-    'left_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'aims texture formats',requiredAttributes={ 'side': 'left' } ),
-    'right_white_sulci',WriteDiskItem( 'Sulci White Texture' ,'aims texture formats',requiredAttributes={ 'side': 'right' } ),
+    'left_white_sulci',WriteDiskItem('Sulci White Texture' ,'aims texture formats', _debug=sys.stdout),
+    'right_white_sulci',WriteDiskItem('Sulci White Texture' ,'aims texture formats'),
     'translation',ReadDiskItem('Label Translation','Label Translation' ),
     'left_sulci_label_to_sulci_name',WriteDiskItem( 'Sulci To White Texture Translation', 'Text File',requiredAttributes={ 'side': 'left' }),
     'right_sulci_label_to_sulci_name',WriteDiskItem( 'Sulci To White Texture Translation', 'Text File',requiredAttributes={ 'side': 'right' }),

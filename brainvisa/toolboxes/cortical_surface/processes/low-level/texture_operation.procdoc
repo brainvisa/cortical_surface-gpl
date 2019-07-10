@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Apply a formula over a list of textures to build a new one</xhtml>
+    <d name="parameters">
+      <xhtml name="textures"/>
+      <xhtml name="formula"/>
+      <xhtml name="operation"/>
+      <xhtml name="output_texture"/>
+      <xhtml name="output_is_first_input"/>
+    </d>
+    <xhtml name="long"><p>This process can be used in various situations to build a texture from a list of existing ones. It may perform min/max operations, or custom ones given as a formula. One can typically use it to perform masking, averaging, etc.</p>
+
+<p>All input textures should have the same size and order, they are expected to all match the same mesh.</p>
+
+<p>The formuma is a python expression.</p>
+
+<p>The formula can perform either on aims.TimeTexture objects, or on their numpy wrapings: both can be used under different python variable names. Texture objects are named <tt>T0</tt>, <tt>T1</tt> etc., or as a list <tt>T[0]</tt>, <tt>T[1]</tt> etc. Numpy arrays are found under <tt>NT0</tt>, <tt>NT1</tt> etc., or as a list <tt>NT[0]</tt>, <tt>NT[1]</tt> etc.</p>
+
+<p>Note that numpy arrays only bind the 1st timestep of each texture.</p>
+
+<p>When the <tt>output_is_first_input</tt>  parameter is <em>False</em>, the result of the formula is the output. It may be either an aims.TimeTexture object, or a numpy array (which will be converted into a texture).</p>
+
+<p>Ex:</p>
+<blockquote>
+    NT0 + NT1 - 2 * NT3
+</blockquote>
+<blockquote>
+    np.sum(NT)
+</blockquote>
+
+<p>When the <tt>output_is_first_input</tt>  parameter is <em>True</em>, then the formula is expected to modify the first texture object or array, and this modiifed texture will be saved as the result.</p>
+
+<p>Ex: masking</p>
+<blockquote>
+    NT0[NT1 != 0] = 0
+</blockquote>
+</xhtml>
+  </d>
+</d>
+</minf>
