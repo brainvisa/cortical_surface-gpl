@@ -237,7 +237,7 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh',
 )
 
 
-insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh/surface_analysis', 
+insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh/surface_analysis',
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface    
     '<subject>_L_gyriGraph', SetType( 'Left Gyri Graph' ), SetWeakAttr( 'side', 'left' ),
     '<subject>_R_gyriGraph', SetType( 'Right Gyri Graph' ), SetWeakAttr( 'side', 'right' ),
@@ -250,7 +250,10 @@ insert( '{center}/{subject}/t1mri/{acquisition}/{analysis}/segmentation/mesh/sur
     '<subject>_Rwhite_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'right', 'mesh', 'white'),
     '<subject>_Lhemi_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'left', 'mesh', 'hemi'),
     '<subject>_Rhemi_thickness', SetType('Cortical thickness'), SetWeakAttr('side', 'right', 'mesh', 'hemi'), 
-        
+
+    #"<subject>_Lwhite_sulci", SetType('Sulci White Texture'), SetWeakAttr('side', 'left', 'labelled', 'No'),
+    #"<subject>_Rwhite_sulci", SetType('Sulci White Texture'), SetWeakAttr('side', 'right', 'labelled', 'No'),
+
     ## Arnaud -> analyse de surface et structurelle -> a verifier
     ## utilise dans le traitement 2DGeodesicPrimalSketch de la toolbox cortical_surface
     "<subject>_Rwhite_primal",SetType( 'Primal Sketch' ),SetWeakAttr( 'side', 'right' ),
@@ -328,6 +331,10 @@ insert( *_insertWhiteTexture( 'manual' ) )
 insert( *_insertWhiteTextureGraph( 'best' ) )
 insert( *_insertWhiteTexture( 'best' ) )
 del _insertWhiteTexture, _insertWhiteTextureGraph
+insert('{center}/{subject}/t1mri/{acquisition}/{analysis}/folds/{graph_version}',
+    "<subject>_Lwhite_sulci", SetType('Sulci White Texture'), SetWeakAttr('side', 'left', 'labelled', 'No'),
+    "<subject>_Rwhite_sulci", SetType('Sulci White Texture'), SetWeakAttr('side', 'right', 'labelled', 'No'),
+)
 
 insert( '{center}/{subject}',
   #'sulci', SetContent(
