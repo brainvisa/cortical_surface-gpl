@@ -55,15 +55,13 @@ def initialization( self ):
     self.linkParameters( 'boundary_texture','input_texture')
     self.linkParameters( 'output_texture','input_texture')
 
-    
+
 def execution( self, context ):
-  
-    re = aims.Reader()
-    ws = aims.Writer()
+
     context.write('Reading textures and mesh')
-    input_tex = re.read(self.input_texture.fullPath())
-    tex_corresp_indices = re.read(self.corresp_indices_texture.fullPath())
-    boundary_tex = re.read(self.boundary_texture.fullPath())
+    input_tex = aims.read(self.input_texture.fullPath())
+    tex_corresp_indices = aims.read(self.corresp_indices_texture.fullPath())
+    boundary_tex = aims.read(self.boundary_texture.fullPath())
     context.write('Texture to flat mesh')
     
     '''
@@ -86,7 +84,8 @@ def execution( self, context ):
         insula_indices in time 1
         cingular_indices in time 2
     '''
-    rectangular_mesh_indices = np.where( tex_corresp_indices[0].arraydata() )[0]
+    rectangular_mesh_indices = np.where(
+        tex_corresp_indices[0].arraydata() != 0)[0]
     nb_vert_square = len(rectangular_mesh_indices) + len(boundary[3])
     output_tex = aims.TimeTexture(input_tex)
     for t in  range( input_tex.size() ):
@@ -97,5 +96,5 @@ def execution( self, context ):
         tmp_tex[boundary[3]] = tmp_tex[boundary[1]]
         output_tex[t].assign(tmp_tex)
 
-    ws.write(output_tex, self.output_texture.fullPath())
+    aims.write(output_tex, self.output_texture.fullPath())
     context.write('Done')
