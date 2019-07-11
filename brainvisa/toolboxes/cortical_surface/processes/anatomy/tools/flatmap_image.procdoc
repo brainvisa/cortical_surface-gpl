@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Save a 2D image from a planar, rectangular mesh, and a texture</xhtml>
+    <d name="parameters">
+      <xhtml name="image_2d"/>
+      <xhtml name="palette"/>
+      <xhtml name="rgb_interpolation"/>
+      <xhtml name="background_value"/>
+      <xhtml name="keep_aspect_ratio"/>
+      <xhtml name="flat_mesh"/>
+      <xhtml name="height"/>
+      <xhtml name="width"/>
+      <xhtml name="flat_texture"/>
+      <xhtml name="output_rgb_image"/>
+    </d>
+    <xhtml name="long"><p>The goal is to get rid of the mesh triangular structure and to get to an image pixels grid.</p>
+<p>To do so, a rendering of the textured mesh will be done in Anatomist, a snapshot is taken from it, and the resulting image will be saved.</p>
+<p>The <b>RGB mode</b> (which is actually RGBA) will save the pixels of the snapshot without changing them.</p>
+<p>The <b>non-RGB mode</b> will use the pixels intensities to map the values back into the input texture values space. But in the process, two unwanted phenomenons will happen:
+  <ul>
+    <li><b>Values quantization:</b>  RGB pixels intensities are 8 bit ints in the range 0-255, so values will be rounded to these 256 values, then scaled back into the input values space. It should be possible to improve this by rendering a "depth map" (a mesh with vertices depth changed to that of the texture) and by using a snapshot of the depth buffer, which also suffers quantization effects but with a higher resolution.
+    </li>
+    <li><b>Values interpolation:</b> colors are interpolated in the OpenGL rendering (either in palette space or in RGB space), so a "label texture" with int values will get intermediate values. We don't have a simple solution for that.
+    </li>
+  </ul>
+</p>
+</xhtml>
+  </d>
+</d>
+</minf>
