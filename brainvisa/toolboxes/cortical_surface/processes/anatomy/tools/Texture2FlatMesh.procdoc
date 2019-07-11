@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="en">
+    <xhtml name="short">Truncate a texture to fit the HIP flat mesh (which has fewer vertices than the original white mesh it is built from)</xhtml>
+    <d name="parameters">
+      <xhtml name="output_texture"/>
+      <xhtml name="input_texture"/>
+      <xhtml name="boundary_texture"/>
+      <xhtml name="corresp_indices_texture"/>
+    </d>
+    <xhtml name="long">Transforms an hemisphere white texture so that it can be mapped on the rectangular mesh output by HIP.
+</xhtml>
+  </d>
+</d>
+</minf>
