@@ -33,7 +33,7 @@ def execution(self, context):
         NT.append(ntex)
         tex['NT%d' % i] = NT[-1]
 
-    context.write(tex)
+    #context.write(tex)
 
     if self.operation == 'Formula':
         if self.output_is_first_input:
