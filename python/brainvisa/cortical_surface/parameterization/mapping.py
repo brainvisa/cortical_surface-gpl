@@ -917,13 +917,12 @@ def recantgleFlip(rect_mesh):
     rect_mesh.vertex().assign(vv)
     return rect_mesh
 
-def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=None):
+def parcelsFromCoordinates(template_lat,template_lon,model,
+                           parcellation_type=None,
+                           between_poles_parcel_anterior_coord=130,
+                           between_poles_parcel_posterior_coord=250):
     if parcellation_type is None:
         parcellation_type == 'model' # default resolution
-
-    between_poles_parcell_central_value = 190
-    between_poles_parcell_width = 120
-    temporal_pole_parcell_width = 40
     
     (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree()
 #    print(longitude_axis_coords)
@@ -936,8 +935,17 @@ def parcelsFromCoordinates(template_lat,template_lon,model,parcellation_type=Non
     for f in longitude_axis_coords[:-1]:#[360 - f for f in model.longitudeAxisID]
         if f is not None:
             sort_axes_lon.append(f)
-    sort_axes_lon.append(between_poles_parcell_central_value - between_poles_parcell_width / 2)
-    sort_axes_lon.append(between_poles_parcell_central_value + between_poles_parcell_width / 2)    
+    # additional longitude axes that delimitate the 'trash' region between
+    # the insular and cingular poles
+    '''
+    old fashioned: a central value and a  width parameter
+    between_poles_parcel_central_value = 190
+    between_poles_parcel_width = 120
+    sort_axes_lon.append(between_poles_parcel_central_value - between_poles_parcel_width / 2)
+    sort_axes_lon.append(between_poles_parcel_central_value + between_poles_parcel_width / 2)
+    '''
+    sort_axes_lon.append(between_poles_parcel_anterior_coord)
+    sort_axes_lon.append(between_poles_parcel_posterior_coord)
 
     sort_axes_lat = [0, model.insularPoleBoundaryCoord]
     for f in latitude_axis_coords:
