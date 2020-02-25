@@ -105,6 +105,7 @@ def execution(self, context):
     complete_vol = copy_ROI(vol_parcels_L, vol_parcels_R, vol_aseg, labels, context)
 
     outVol = aims.Volume_S16(complete_vol)
+    outVol.header().update(vol_parcels_L.header())
 
     aims.write( outVol, self.complete_Parcels_volume.fullPath() )
     context.write('... Done')
