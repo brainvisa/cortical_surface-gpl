@@ -11,6 +11,7 @@
 ############################################################################
 
 # BrainVisa modules
+from __future__ import absolute_import
 from brainvisa.processes import *
 from soma import aims
 from soma.aimsalgo import mesh_coordinates_sphere_resampling

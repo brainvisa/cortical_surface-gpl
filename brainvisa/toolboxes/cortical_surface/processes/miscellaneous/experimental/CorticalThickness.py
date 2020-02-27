@@ -30,6 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 
 name = 'Create Cortical Thickness Texture'
@@ -85,7 +86,7 @@ def execution( self, context ):
          '-o', self.outtex_white,
          '-m', medianpath
       ]
-      apply( context.system, createInt2Extmesh0 )
+      context.system(*createInt2Extmesh0)
 
       context.write("Process e/i :" , varextmesh , ";" , varintmesh , ";" , self.neighbours_white, ";" , self.outtex_hemi )
 
@@ -96,7 +97,7 @@ def execution( self, context ):
          '-d', 1,
          '-o', self.outtex_hemi
       ]
-      apply( context.system, createExt2Intmesh0 )
+      context.system(*createExt2Intmesh0)
 
       
       

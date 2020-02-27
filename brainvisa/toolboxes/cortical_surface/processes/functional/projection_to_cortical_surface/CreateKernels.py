@@ -33,6 +33,7 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 
 name = 'Creation of Kernels for fMRI data projection'
@@ -73,7 +74,7 @@ def execution( self, context ):
           '-t', 0
       ]
       context.write( projection )
-      apply( context.system, projection)
+      context.system(*projection)
       context.write( 'Adding decay parameters in the header...' )
       reader = aims.Reader()
       object = reader.read ( str(self.output) )

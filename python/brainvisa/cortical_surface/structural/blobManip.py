@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from __future__ import absolute_import
 import os
 from soma import aims
 from brainvisa.cortical_surface.shell import db
@@ -35,7 +36,7 @@ class Node:
         self.scale = float(scale)
         
     def defineFromVertex ( self, v ) :
-        if v.has_key('nodes'):
+        if 'nodes' in v:
             self.nodes = list(v['nodes'])
         self.index = int( v['index'] )
         self.subject = str(v['subject'])
@@ -118,7 +119,7 @@ def JointDistrib ( db_path, hemis_side = 'L' ) :
                     depthnodes[int(n)] = v['t'], v['subject']
 
         for n, curv in curvnodes.items():
-            if depthnodes.has_key(n):
+            if n in depthnodes:
                 sujets.append(str(curv[1]))
                 nodes.append(n)
                 curvlist.append(curv[0])
@@ -200,10 +201,10 @@ def SimpleStatsFromCountTable ( count, subjects = None ) :
     ct_ave = []
     ct_std = []
     if subjects is None :
-        sujets = count.keys()
+        sujets = list(count.keys())
     else :
         sujets = subjects
-    distances = list ( np.sort(count[sujets[0]].keys()) )
+    distances = list(np.sort(count[sujets[0]].keys()))
     for dist in distances :
         ct_ave.append ( np.mean( [len(count[sujet][dist]) for sujet in sujets]) )
         ct_std.append ( np.std( [len(count[sujet][dist]) for sujet in sujets]) )

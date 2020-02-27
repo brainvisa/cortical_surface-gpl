@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 import os,sys
 from soma import aims
 import numpy as np
@@ -10,6 +11,7 @@ import brainvisa.cortical_surface.structural.blobManip as oo
 from brainvisa.cortical_surface.multiprocessing.mproc import MultiProcExecute
 from brainvisa.cortical_surface.shell.inputParameters import *
 import six
+from six.moves import input
 
 
 
@@ -60,11 +62,11 @@ def getBucketFromVertex ( v ):
         bucketmap = v['aims_glb']
     elif v.getSyntax() == 'ssb' :
         bucketmap = v['aims_ssb']
-    print(v.getSyntax(), v.keys())
+    print(v.getSyntax(), list(v.keys()))
        
     bucket = {}
     bucket['voxel_list'] = []
-    assert(len(bucketmap[0].keys())>0)
+    assert(len(list(bucketmap[0].keys()))>0)
     for each in bucketmap[0].keys() :
         bucket['voxel_list'].append([int(each[x]) for x in six.moves.xrange(3)])
     assert(len(bucket['voxel_list']) > 0 )
@@ -79,7 +81,7 @@ def getAimsBucketFromBucket ( b ):
     bucket = bucketMap[0]
     for each in b['voxel_list']:
         bucket[each] = 1
-    assert(len(bucket.keys())>0)
+    assert(len(list(bucket.keys()))>0)
     bucketMap.setSizeXYZT (*b['voxel_size'])
     return bucketMap
     
@@ -117,7 +119,7 @@ def AddSSBBuckets ( graph ) :
                     bucketmap = n['aims_glb']
                     node.bucket = {}
                     node.bucket['voxel_list'] = []
-                    assert( len(bucketmap[0].keys()) > 0 )
+                    assert( len(list(bucketmap[0].keys())) > 0 )
                     for each in bucketmap[0].keys() :
                         node.bucket['voxel_list'].append(each)
                     assert(len(node.bucket['voxel_list']) > 0 )
@@ -128,9 +130,9 @@ def AddSSBBuckets ( graph ) :
                 if each.scale == scales[len(scales)/2]:
                     bucketMap = getAimsBucketFromBucket(each.bucket)
                     
-            assert ( len(bucketMap[0].keys()) > 0 )
+            assert ( len(list(bucketMap[0].keys())) > 0 )
             aims.GraphManip.storeAims( graph, v, 'aims_ssb', aims.rc_ptr_BucketMap_VOID(bucketMap) )
-            assert ( v.has_key('aims_ssb') )
+            assert ( 'aims_ssb' in v )
 
 def ScaleSpaceBlobsFromOneSubject ( graph, sujet ) :
     blobs = []
@@ -196,7 +198,7 @@ def GreyLevelBlobs ( db, contrast ) :
     return blobs
 
 def resetIndices ( blobs ):
-    sujets = blobs.keys()
+    sujets = list(blobs.keys())
     i=0
     for sujet in sujets:
         for each in blobs[sujet]:
@@ -205,7 +207,7 @@ def resetIndices ( blobs ):
 
 def FilterBlobsOnT ( blobs, threshold ) :
     filtered_blobs = {}
-    subjects = blobs.keys()
+    subjects = list(blobs.keys())
     for sujet in subjects:
         filtered_blobs[sujet] = []
         for blob in blobs[sujet] :
@@ -260,7 +262,7 @@ def ComputeCliquesBetweenTwoSubjects ( blobs, sujet1, sujet2 ) :
     #return cliques
 
 def ComputeCliques ( blobs, number_of_proc = 2 ):
-    subjects = blobs.keys()
+    subjects = list(blobs.keys())
     cliques = []
     jobs = []
     
@@ -287,7 +289,7 @@ def BuildAimsGroupGraph ( blobs, cliques ):
     graph['boundingbox_max'] = [10.0, 10.0, 10.0]
     graph['voxel_size'] = [3.0, 3.0, 3.0]
     graph['filename_base'] = "*"
-    sujets = blobs.keys()
+    sujets = list(blobs.keys())
     
     graph['subjects'] = sujets
     
@@ -322,7 +324,7 @@ messages_defaults = [ ('db path', '/home/go224932/data/structural/database_micca
 if __name__ == '__main__' :
     
     params = InputParameters( sys.argv[1:], messages_defaults )
-    if (raw_input('OK? y/n') != 'y'):
+    if (input('OK? y/n') != 'y'):
         sys.exit(0)
 
     db = str(params[0])

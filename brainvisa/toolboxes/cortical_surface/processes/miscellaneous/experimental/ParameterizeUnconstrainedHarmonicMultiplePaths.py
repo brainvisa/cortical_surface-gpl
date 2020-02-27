@@ -20,6 +20,8 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import absolute_import
+from six.moves import range
 def validation():
   try:
     import brainvisa.cortical_surface.parameterization.mapping
@@ -155,7 +157,7 @@ def execution( self, context ):
         angles = []
         for p in range(len(neoCortex_mesh_p)):
             tex_square_sulci_p = np.zeros(len(neoCortex_square_p[p].vertex()), sulcal_lines[0].arraydata().dtype )
-            tex_square_sulci_p[range( len(neocortex_indices) )] = output_tex_tmp
+            tex_square_sulci_p[list(range( len(neocortex_indices)))] = output_tex_tmp
             full_sulci = slSet.SulcalLinesSet()
             full_sulci.extractFromTexture(tex_square_sulci_p, neoCortex_square_p[p], sulc_labels_dict)
             SC_ind = full_sulci.names.index(('S.C._'+self.side))
@@ -198,7 +200,7 @@ def execution( self, context ):
     if SC_present:
         context.write('Translating the barycenter of S.C. to 0')
         tex_square_sulci = np.zeros(len(neoCortex_square.vertex()), sulcal_lines[0].arraydata().dtype )
-        tex_square_sulci[range( len(neocortex_indices) )] = output_tex_tmp
+        tex_square_sulci[list(range( len(neocortex_indices)))] = output_tex_tmp
         vert = np.array(neoCortex_square.vertex())
         full_sulci = slSet.SulcalLinesSet()
         full_sulci.extractFromTexture(tex_square_sulci, neoCortex_square, sulc_labels_dict)
@@ -261,7 +263,7 @@ def execution( self, context ):
     tex_boundary = aims.TimeTexture_S16()
     for ind,bound in enumerate(neoCortex_open_boundary):
         tmp_tex = np.zeros(len(neoCortex_square.vertex()))
-        tmp_tex[bound] = range(1, len(bound)+1)
+        tmp_tex[bound] = list(range(1, len(bound)+1))
         tex_boundary[ind].assign(tmp_tex)
     aims.write(tex_boundary, self.boundary_texture.fullPath())
     '''

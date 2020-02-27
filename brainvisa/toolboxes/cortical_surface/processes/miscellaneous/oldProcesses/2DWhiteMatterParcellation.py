@@ -31,6 +31,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 import brainvisa.tools.aimsGlobals as shfjGlobals
 from brainvisa.data.neuroHierarchy import databases
@@ -174,7 +175,7 @@ def execution( self, context ):
                 'are mandatory' ) )
               io += ['-V',self.left_grey_white.fullPath()]
 
-          apply( context.system, call_list+io )
+          context.system(*call_list+io)
           tm = registration.getTransformationManager()
           tm.copyReferential( self.Lgraph, self.left_gyri_graph )
 
@@ -211,6 +212,6 @@ def execution( self, context ):
                 'are mandatory' ) )
               io += ['-V',self.right_grey_white.fullPath()]
 
-          apply( context.system, call_list+io )
+          context.system(*call_list+io)
           tm = registration.getTransformationManager()
           tm.copyReferential( self.Rgraph, self.right_gyri_graph )

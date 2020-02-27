@@ -19,6 +19,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
 import os, sys
 from brainvisa.processes import *
 #from freesurfer.brainvisaFreesurfer import launchFreesurferCommand
@@ -105,6 +106,7 @@ def execution(self, context):
     complete_vol = copy_ROI(vol_parcels_L, vol_parcels_R, vol_aseg, labels, context)
 
     outVol = aims.Volume_S16(complete_vol)
+    outVol.header().update(vol_parcels_L.header())
 
     aims.write( outVol, self.complete_Parcels_volume.fullPath() )
     context.write('... Done')

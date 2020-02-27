@@ -1,7 +1,9 @@
 from __future__ import print_function
 
+from __future__ import absolute_import
 import multiprocessing, os
 import six.moves.queue as queue
+from six.moves import range
 
 def os_system ( primal_command, sujet, keyword ) :
     os.system ( primal_command )

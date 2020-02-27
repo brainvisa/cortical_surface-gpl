@@ -1,7 +1,9 @@
 from __future__ import print_function
 
+from __future__ import absolute_import
 import os
 import six
+from six.moves import input
 
 def InputParameters( arguments, messages_defaults ):
     params = []
@@ -20,7 +22,7 @@ def InputParameters( arguments, messages_defaults ):
         inputs = []
         for i in six.moves.xrange( len(defaults) - nb_arguments) :
             if (doAsk):
-                inp = raw_input(messages[i + nb_arguments] + str( ' ? (%s) '%defaults[messages[ i + nb_arguments ] ] ) )
+                inp = input(messages[i + nb_arguments] + str( ' ? (%s) '%defaults[messages[ i + nb_arguments ] ] ) )
             else :
                 inp = ''
             if inp in ['OK', 'ok', 'Ok']:

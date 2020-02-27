@@ -5,8 +5,10 @@ Created on Nov 16, 2012
 '''
 from __future__ import print_function
 
+from __future__ import absolute_import
 import numpy as np
 from soma import aims
+from six.moves import range
 #from brainvisa.cortical_surface.parameterization import mapping as map
 class Model(object):
     '''
@@ -396,11 +398,11 @@ class Model(object):
         else:
             sulc_name = sulc_name_in
 
-        if self.latitudeAxisSulci.has_key(sulc_name):
+        if sulc_name in self.latitudeAxisSulci:
             isLat = True
             axisID = self.latitudeAxisSulci[sulc_name][0]
             slWeight = self.latitudeAxisSulci[sulc_name][1]
-        elif self.longitudeAxisSulci.has_key(sulc_name):
+        elif sulc_name in self.longitudeAxisSulci:
             isLon = True
             axisID = self.longitudeAxisSulci[sulc_name][0]
             slWeight = self.longitudeAxisSulci[sulc_name][1]

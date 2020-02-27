@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+from __future__ import absolute_import
 from brainvisa.cortical_surface.structural.blobManip import Node
 from brainvisa.cortical_surface.shell import db
 from soma import aims
@@ -73,7 +74,7 @@ def BuildAimsGroupGraph ( blobs, cliques, graphs ):
     graph['boundingbox_max'] = [10.0, 10.0, 10.0]
     graph['voxel_size'] = [3.0, 3.0, 3.0]
     graph['filename_base'] = "*"
-    sujets = blobs.keys()
+    sujets = list(blobs.keys())
     
     graph['subjects'] = sujets
 
@@ -109,9 +110,9 @@ def groupGraphInfo ( graph ) :
     for e in graph.edges() :
         if e.getSyntax() == 'b2b' :
             how_many_similarity_cliques += 1
-            if e.has_key('distance') and e['distance'] > 0.0 :
+            if 'distance' in e and e['distance'] > 0.0 :
                 distances.append(e['distance'])
-            elif e.has_key('similarity') and e['similarity'] > 0.0 :
+            elif 'similarity' in e and e['similarity'] > 0.0 :
                 overlaps.append ( e['similarity'] )
     for v in graph.vertices() :
         if v.getSyntax() == 'ssb' :
@@ -125,11 +126,11 @@ def getBucketFromVertex ( v ) :
         bucketmap = v['aims_glb']
     elif v.getSyntax() == 'ssb' :
         bucketmap = v['aims_ssb']
-    print(v.getSyntax(), v.keys())
+    print(v.getSyntax(), list(v.keys()))
        
     bucket = {}
     bucket['voxel_list'] = []
-    assert(len(bucketmap[0].keys())>0)
+    assert(len(list(bucketmap[0].keys()))>0)
     for each in bucketmap[0].keys() :
         bucket['voxel_list'].append([int(each[x]) for x in six.moves.xrange(3)])
     assert(len(bucket['voxel_list']) > 0 )
@@ -144,7 +145,7 @@ def getAimsBucketFromBucket ( b ) :
     bucket = bucketMap[0]
     for each in b['voxel_list']:
         bucket[each] = 1
-    assert(len(bucket.keys())>0)
+    assert(len(list(bucket.keys()))>0)
     bucketMap.setSizeXYZT (*b['voxel_size'])
     return bucketMap
     
@@ -183,7 +184,7 @@ def AddSSBBuckets ( graph ) :
                     bucketmap = n['aims_glb']
                     node.bucket = {}
                     node.bucket['voxel_list'] = []
-                    assert( len(bucketmap[0].keys()) > 0 )
+                    assert( len(list(bucketmap[0].keys())) > 0 )
                     for each in bucketmap[0].keys() :
                         node.bucket['voxel_list'].append(each)
                     assert(len(node.bucket['voxel_list']) > 0 )
@@ -194,10 +195,10 @@ def AddSSBBuckets ( graph ) :
                 if each.scale == scales[len(scales)/3]:
                     bucketMap = getAimsBucketFromBucket(each.bucket)
                     
-            assert( len(bucketMap[0].keys())>0)
+            assert( len(list(bucketMap[0].keys()))>0)
             aims.GraphManip.storeAims( graph, v, 'aims_ssb', aims.rc_ptr_BucketMap_VOID(bucketMap) )
 
-            assert(v.has_key('aims_ssb'))
+            assert('aims_ssb' in v)
 
 def ScaleSpaceBlobsFromOneSubject ( graph, sujet ) :
     blobs = []

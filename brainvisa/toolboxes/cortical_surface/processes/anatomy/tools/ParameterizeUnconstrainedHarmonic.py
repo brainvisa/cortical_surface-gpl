@@ -20,6 +20,8 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import absolute_import
+from six.moves import range
 def validation():
   try:
     import brainvisa.cortical_surface.parameterization.mapping
@@ -134,7 +136,7 @@ def execution( self, context ):
     output_SL_tex = aims.TimeTexture(sulcal_lines)
     output_tex_tmp = sulcal_lines[0].arraydata()[neocortex_indices]
     tex_square_sulci = np.zeros(len(neoCortex_square.vertex()), sulcal_lines[0].arraydata().dtype )
-    tex_square_sulci[range( len(neocortex_indices) )] = output_tex_tmp
+    tex_square_sulci[list(range( len(neocortex_indices)))] = output_tex_tmp
     for b in neoCortex_open_boundary:
         tex_square_sulci[b] = 0
     output_SL_tex[0].assign(tex_square_sulci)
@@ -203,7 +205,7 @@ def execution( self, context ):
     tex_boundary = aims.TimeTexture_S16()
     for ind,bound in enumerate(neoCortex_open_boundary):
         tmp_tex = np.zeros(len(neoCortex_square.vertex()))
-        tmp_tex[bound] = range(1, len(bound)+1)
+        tmp_tex[bound] = list(range(1, len(bound)+1))
         tex_boundary[ind].assign(tmp_tex.astype(np.int16))
     ws.write(tex_boundary, self.boundary_texture.fullPath())
     '''

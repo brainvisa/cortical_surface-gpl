@@ -21,12 +21,14 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 import numpy as np
 from scipy import sparse
 from soma import aims
 from soma import aimsalgo
 from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
+from six.moves import range
 ####################################################################
 #
 # ensure the texture corresponding to the value tex_val has only one connex component with simple boundary

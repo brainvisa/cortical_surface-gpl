@@ -32,6 +32,7 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 import math
 from numpy import *
@@ -39,6 +40,7 @@ from scipy import sparse
 import scipy.sparse.linalg as alg
 from scipy.sparse.linalg import spsolve
 from soma import aims
+from six.moves import range
 
 name = 'Sulcus Parameterization 2015'
 
@@ -402,14 +404,14 @@ def execution( self, context ):
                  '-o', dilatedIm.fullPath(),
                  '-r', self.dilation ]
 
-     apply( context.system, dilating )
+     context.system(*dilating)
 
      closing = [ 'AimsMorphoMath', '-m', 'clo',
                  '-i', dilatedIm.fullPath(),
                  '-o', closedIm.fullPath(),
                  '-r', 2 ]
 
-     apply( context.system, closing )
+     context.system(*closing)
 
      context.write('Remeshing sulcus')
 
@@ -420,7 +422,7 @@ def execution( self, context ):
                  '--smooth', '1',
                  '--smoothType', 'laplacian']
                 # '--smoothIt', '20' ]
-     apply( context.system, meshing )
+     context.system(*meshing)
 
      test=self.sulcus_mesh.fullName()
      sulcusMname=test + '_1_0.mesh'
@@ -562,8 +564,8 @@ def execution( self, context ):
      conc = [ 'AimsZCat',
               '-i', isoL.fullPath(),
               '-o', self.coordinates_grid.fullPath() ]
-     apply(context.system, iso)
-     apply(context.system, conc)
+     context.system(*iso)
+     context.system(*conc)
      
      i=i+5
      while (i<=100):
@@ -575,8 +577,8 @@ def execution( self, context ):
           conc = [ 'AimsZCat',
                    '-i', isoL.fullPath(), self.coordinates_grid.fullPath(),
                    '-o', self.coordinates_grid.fullPath() ]
-          apply(context.system, iso)
-          apply(context.system, conc)
+          context.system(*iso)
+          context.system(*conc)
           i=i+5
           
      read=aims.Reader()

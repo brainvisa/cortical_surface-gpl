@@ -1,12 +1,14 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 from brainvisa.cortical_surface.structural.graphManip import Graph
 from brainvisa.cortical_surface.shell import db
 from brainvisa.cortical_surface.structural.blobManip import Node
 import soma.importer
 import os
 import six
+from six.moves import range
 
 
 def Clusters ( db, raw_max_nodes, clustering_distance, hemis_side = 'L', data_type = 'curv' ) :

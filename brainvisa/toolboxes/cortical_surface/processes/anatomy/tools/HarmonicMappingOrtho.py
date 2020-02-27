@@ -19,6 +19,8 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import absolute_import
+from six.moves import range
 def validation():
   try:
     import brainvisa.cortical_surface.parameterization.mapping

@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 # python system modules
+from __future__ import absolute_import
 import sys
 import optparse
 
