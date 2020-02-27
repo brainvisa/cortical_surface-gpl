@@ -5,10 +5,12 @@ Created on 2 august 2012
 '''
 from __future__ import print_function
 
+from __future__ import absolute_import
 import numpy as np
 from soma import aims
 from scipy import sparse
 from brainvisa.cortical_surface.surface_tools.basic_tools import vertsIndicesToEdges
+from six.moves import range
 
 np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
 

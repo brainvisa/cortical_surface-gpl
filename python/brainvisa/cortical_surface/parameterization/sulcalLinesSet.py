@@ -5,9 +5,11 @@ Created on 2 august 2012
 '''
 from __future__ import print_function
 
+from __future__ import absolute_import
 from soma import aims
 import numpy as np
 from brainvisa.cortical_surface.parameterization import sulcalLine as sln
+from six.moves import range
 
 
 class SulcalLinesSet(object):

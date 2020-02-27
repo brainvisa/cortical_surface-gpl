@@ -32,6 +32,7 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 import numpy as np
 from soma import aims
@@ -89,7 +90,7 @@ class glm:
         self._axis = axis
         if isinstance(formula, str):
             model = 'mfx'
-        if models.has_key(model):
+        if model in models:
             self.model = model
             if method == None:
                 self.method = models[model][0]

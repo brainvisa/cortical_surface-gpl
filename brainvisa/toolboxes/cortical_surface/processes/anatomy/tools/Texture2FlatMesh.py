@@ -20,6 +20,8 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import absolute_import
+from six.moves import range
 def validation():
   try:
     import brainvisa.cortical_surface.parameterization.mapping
@@ -91,7 +93,7 @@ def execution( self, context ):
     for t in  range( input_tex.size() ):
         output_tex_tmp = input_tex[t].arraydata()[rectangular_mesh_indices]
         tmp_tex = np.zeros(nb_vert_square, input_tex[t].arraydata().dtype )
-        tmp_tex[range( len(rectangular_mesh_indices) )] = output_tex_tmp
+        tmp_tex[list(range( len(rectangular_mesh_indices)))] = output_tex_tmp
         #for b in boundary:
         tmp_tex[boundary[3]] = tmp_tex[boundary[1]]
         output_tex[t].assign(tmp_tex)

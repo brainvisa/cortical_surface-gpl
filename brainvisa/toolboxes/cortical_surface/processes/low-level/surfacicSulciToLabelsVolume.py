@@ -34,8 +34,10 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 from brainvisa.tools import aimsGlobals
+from six.moves import zip
 
 name = 'Surfacic Sulci To Labels Volume'
 userLevel = 2
@@ -79,7 +81,7 @@ def execution( self, context ):
   if self.input_translation:
     if os.path.exists( self.input_translation.fullPath() ):
       f = open( self.input_translation.fullPath() )
-      for line in f.xreadlines():
+      for line in f:
         el = line.split()
         if len( el ) >= 2:
           labelsmap[ ' '.join( el[:-1] ) ] = int( el[-1] )

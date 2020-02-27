@@ -22,12 +22,14 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 import numpy as np
 from scipy import sparse
 import scipy.stats.stats as sss
 from scipy.sparse.linalg import lgmres
 from brainvisa.cortical_surface.surface_tools import basic_tools as basicTls
 from soma import aims
+from six.moves import range
 ########################
 ## error tolerance for lgmres solver #
 solver_tolerance = 1e-6                      #

@@ -51,7 +51,7 @@ def ComputeCliquesBetweenTwoSubjects ( blobs, sujet1, sujet2 ) :
     return cliques
 
 def ComputeCliques ( blobs, number_of_proc = 2 ):
-    subjects = blobs.keys()
+    subjects = list(blobs.keys())
     cliques = []
     jobs = []
     

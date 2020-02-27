@@ -20,6 +20,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import absolute_import
 def validation():
   try:
     from brainvisa.cortical_surface.surface_tools import texture_tools

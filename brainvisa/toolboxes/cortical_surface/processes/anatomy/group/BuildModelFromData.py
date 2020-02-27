@@ -19,6 +19,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import absolute_import
 def validation():
   try:
     import brainvisa.cortical_surface.parameterization.model
@@ -92,11 +93,11 @@ def execution( self, context ):
         model_sulci_dict = {}
         for s in model.longitudeAxisSulci.keys():
             sulci_dict_key = s+'_'+self.side
-            if sulci_dict.has_key(sulci_dict_key):
+            if sulci_dict_key in sulci_dict:
                 model_sulci_dict[sulci_dict[sulci_dict_key]] = sulci_dict_key
         for s in model.latitudeAxisSulci.keys():
             sulci_dict_key = s+'_'+self.side
-            if sulci_dict.has_key(sulci_dict_key):
+            if sulci_dict_key in sulci_dict:
                 model_sulci_dict[sulci_dict[sulci_dict_key]] = sulci_dict_key
         full_sulci = slSet.SulcalLinesSet()
         full_sulci.extractFromTexture(tex_square_sulci[0].arraydata(), mesh, model_sulci_dict)

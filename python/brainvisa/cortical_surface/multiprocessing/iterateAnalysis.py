@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 import os, string, shutil, sys
 from soma import aims
 from brainvisa.cortical_surface.multiprocessing.mproc import MultiProcExecute, os_system

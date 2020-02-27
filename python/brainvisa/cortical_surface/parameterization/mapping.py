@@ -21,6 +21,7 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 from brainvisa.cortical_surface.parameterization import sulcalLine as sln
 from brainvisa.cortical_surface.parameterization import sulcalLinesSet as slSet
 from brainvisa.cortical_surface.parameterization import model as md
@@ -29,6 +30,7 @@ from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls
 from scipy import sparse
 import scipy
 import six
+from six.moves import range
 
 
 #########################################################
@@ -646,7 +648,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     added_poly = poly[list(added_poly_inds), :]
 
     nb_new_verts = len(neoCortex_open_boundary[1])
-    new_verts_inds = range(vert.shape[0], vert.shape[0] + nb_new_verts)
+    new_verts_inds = list(range(vert.shape[0], vert.shape[0] + nb_new_verts))
     for i in range(nb_new_verts):
         places = np.where(added_poly == neoCortex_open_boundary[1][i])
         added_poly[places[0], places[1]] = new_verts_inds[i]

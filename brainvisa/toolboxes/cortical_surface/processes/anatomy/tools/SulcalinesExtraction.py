@@ -18,6 +18,7 @@
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
+from __future__ import absolute_import
 from brainvisa.processes import *
 #from brainvisa import anatomist
 
@@ -79,7 +80,7 @@ def execution( self, context ):
                 '-o', curvatureIm.fullPath(),
                 '-m', 'barycenter' ]
 
-    apply( context.system, curv )
+    context.system(*curv)
     context.write('Done')
 
     context.write('smoothing curvature texture')
@@ -90,7 +91,7 @@ def execution( self, context ):
                 '-s', 2,
                 '-t', 0.01
                 ]
-    apply( context.system, smooth )
+    context.system(*smooth)
     context.write('Done')
 
     depthIm=context.temporary( 'GIS image')
@@ -103,7 +104,7 @@ def execution( self, context ):
                 '-e', 8,
                 '-o', depthIm.fullPath()
                 ]
-    apply( context.system, depth )
+    context.system(*depth)
     context.write('Done')
 
     volumeGraphLabelBasins=context.temporary('NIFTI-1 image')
@@ -125,7 +126,7 @@ def execution( self, context ):
     else : graphBucketLabel = [ 'siGraph2Label','-g', self.graph.fullPath(),'-a', self.sulcus_identification,'-tv', self.mri.fullPath(),'-tr', self.labels_translation_map.fullPath(),'-o', volumeGraphLabelBasins.fullPath(),
       '-b', 'aims_junction','-b', 'aims_bottom','-b', 'aims_ss', '-b', 'aims_other', '-ot', self.graph_label_basins.fullPath()]
 #
-    apply( context.system, graphBucketLabel )
+    context.system(*graphBucketLabel)
 
 #      context.runProcess
     context.write('Done')
@@ -152,7 +153,7 @@ def execution( self, context ):
                 '-sb', self.basin_min_size,
                 '-cv', 1#constraintValue
                 ]
-    apply( context.system, sulcalines )
+    context.system(*sulcalines)
 
     context.write('Done')
 

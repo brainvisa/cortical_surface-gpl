@@ -26,6 +26,8 @@ Created on Mon May 12 2014
 
 """
 
+from __future__ import absolute_import
+from six.moves import range
 def validation():
     try:
         from brainvisa.cortical_surface.surface_tools import PDE_tools as pdeTls

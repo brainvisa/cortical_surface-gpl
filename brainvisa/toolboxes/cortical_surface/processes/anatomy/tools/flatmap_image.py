@@ -1,4 +1,6 @@
+from __future__ import absolute_import
 from brainvisa.processes import *
+from six.moves import range
 try:
     from brainvisa import anatomist
 except ImportError:

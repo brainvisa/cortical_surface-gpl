@@ -12,6 +12,7 @@
 from __future__ import print_function
 
 # python system modules
+from __future__ import absolute_import
 import sys
 import numpy
 import optparse

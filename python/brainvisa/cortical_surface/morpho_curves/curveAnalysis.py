@@ -6,7 +6,9 @@ Created on Tue Jul 29 15:14:51 2014
 """
 from __future__ import print_function
 
+from __future__ import absolute_import
 from numpy import *
+from six.moves import range
 
 # Laplacian of a 1D signal
 def Laplacien(signal):

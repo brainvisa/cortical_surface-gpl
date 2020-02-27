@@ -30,6 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 
 name = 'Create Mesh Median Surface'
@@ -92,7 +93,7 @@ def execution( self, context ):
          '-vout', tmpVoisinsExt,
          '-o', tmpInt2Ext
       ]
-      apply( context.system, createInt2Extmesh0 )
+      context.system(*createInt2Extmesh0)
 
       context.write("Premier process e/i :" , varextmesh , ";" , varintmesh , ";" , self.neighbours_white , ";", tmpVoisinsInt , ";" , tmpExt2Int )
       if self.iterations > 1 :
@@ -104,7 +105,7 @@ def execution( self, context ):
             '-vout', tmpVoisinsInt,
             '-o', tmpExt2Int
          ]
-         apply( context.system, createExt2Intmesh0 )
+         context.system(*createExt2Intmesh0)
       if tmpVoisinsInt == "" :
          tmpVoisinsInt = self.neighbours_white
       if tmpVoisinsExt == "" :
@@ -127,7 +128,7 @@ def execution( self, context ):
             '-d', 0,
             '-o', tmpInt2Ext
          ]
-         apply( context.system, createInt2Extmesh )
+         context.system(*createInt2Extmesh)
          if i < self.iterations - 1 :
             context.write(j , "eme process e/i :" , varextmesh , ";" , varintmesh , ";" , tmpVoisinsInt , ";" , tmpExt2Int )
             createExt2Intmesh = [ 'AimsMeshMedianSurface',
@@ -137,7 +138,7 @@ def execution( self, context ):
                '-d', 1,
                '-o', tmpExt2Int
             ]
-            apply( context.system, createExt2Intmesh )
+            context.system(*createExt2Intmesh)
          i=i+1
       
       context.write('Finished')

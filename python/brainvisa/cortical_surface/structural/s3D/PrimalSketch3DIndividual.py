@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os, sys
 from soma import aims
 import brainvisa.cortical_surface.structural.blobManip as oo
 from brainvisa.cortical_surface.shell.inputParameters import *
 from brainvisa.cortical_surface.multiprocessing import MultiProcExecute, os_system
+from six.moves import input
 
 
 def getfMRIPathes ( db, contrast, subjects = None ) :
@@ -29,7 +32,7 @@ messages_defaults = [ ('db path', '/home/go224932/data/structural/database_micca
 if __name__ == '__main__':
 
     params = InputParameters( sys.argv[1:], messages_defaults )
-    if (raw_input('OK? y/n') != 'y'):
+    if (input('OK? y/n') != 'y'):
         sys.exit(0)
 
     db = str(params[0])

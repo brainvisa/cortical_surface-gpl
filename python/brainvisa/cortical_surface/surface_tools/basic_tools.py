@@ -21,9 +21,11 @@
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 import numpy as np
 from soma import aims
 from scipy import sparse
+from six.moves import range
 np_ver = [1,6]#[ int(x) for x in np.__version__.split( '.' ) ]
 
 def ismember(ar1, ar2):
@@ -262,7 +264,7 @@ def edges2Boundary(li, lj):
             
     "sort the boundaries the first the longest"
     boundaries_len = [len(bound) for bound in boundary]
-    inx = range(len(boundaries_len))
+    inx = list(range(len(boundaries_len)))
     inx.sort(lambda x, y: boundaries_len[x] - boundaries_len[y])
 # < = >    inx = np.array(boundaries_len).argsort()
     sort_boundary = [boundary[i] for i in inx]

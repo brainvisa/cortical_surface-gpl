@@ -30,8 +30,10 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
 from brainvisa.processes import *
 from numpy import *
+from six.moves import range
 
 name = 'Sulcus Parameterization'
 
@@ -131,7 +133,7 @@ def execution( self, context ):
                  '-o', dilatedIm.fullPath(),
                  '-r', self.dilation ]
 
-     apply( context.system, dilating )
+     context.system(*dilating)
 
 #     context.write('Dilating ridges with 3.0')
 
@@ -154,7 +156,7 @@ def execution( self, context ):
                  '-o', closedIm.fullPath(),
                  '-r', 2 ]
 
-     apply( context.system, closing )
+     context.system(*closing)
 
      context.write('Remeshing sulcus')
 
@@ -165,7 +167,7 @@ def execution( self, context ):
                  '-l', '32767',
                  '--smooth',
                  '--smoothIt', '20' ]
-     apply( context.system, meshing )
+     context.system(*meshing)
 
      test=self.sulcus_mesh.fullName()
      sulcusMname=test + '_32767_0.mesh'
@@ -177,7 +179,7 @@ def execution( self, context ):
           decimating = ['AimsMeshDecimation',
                     '-i', sulcusMname,
                     '-o', self.sulcus_mesh.fullPath() ]
-          apply(context.system, decimating)
+          context.system(*decimating)
 
 
      context.write('Starting parameterisation')
@@ -193,7 +195,7 @@ def execution( self, context ):
                         '-d', self.deltaT,
                         '-s', self.stop ]
 
-     apply(context.system, parameterising )
+     context.system(*parameterising)
 
      context.write('Computing coordinate grid')
 
@@ -206,8 +208,8 @@ def execution( self, context ):
      conc = [ 'AimsZCat',
               '-i', isoL.fullPath(),
               '-o', self.coordinates_grid.fullPath() ]
-     apply(context.system, iso)
-     apply(context.system, conc)
+     context.system(*iso)
+     context.system(*conc)
      iso = [ 'AimsMeshIsoLine',
               '-i', self.sulcus_mesh.fullPath(),
               '-t', self.texture_param1.fullPath(),
@@ -216,8 +218,8 @@ def execution( self, context ):
      conc = [ 'AimsZCat',
               '-i', isoL.fullPath(),
               '-o', self.coordinates_grid.fullPath() ]
-     apply(context.system, iso)
-     apply(context.system, conc)
+     context.system(*iso)
+     context.system(*conc)
      i=i+10
      while (i<=100):
           iso = [ 'AimsMeshIsoLine',
@@ -228,8 +230,8 @@ def execution( self, context ):
           conc = [ 'AimsZCat',
                    '-i', isoL.fullPath(), self.coordinates_grid.fullPath(),
                    '-o', self.coordinates_grid.fullPath() ]
-          apply(context.system, iso)
-          apply(context.system, conc)
+          context.system(*iso)
+          context.system(*conc)
           i=i+10
      i=10
      while (i<=200):
@@ -241,8 +243,8 @@ def execution( self, context ):
           conc = [ 'AimsZCat',
                    '-i', isoL.fullPath(), self.coordinates_grid.fullPath(),
                    '-o', self.coordinates_grid.fullPath() ]
-          apply(context.system, iso)
-          apply(context.system, conc)
+          context.system(*iso)
+          context.system(*conc)
           i=i+10
           
           
@@ -279,7 +281,7 @@ def execution( self, context ):
                '-y', self.texture_param2.fullPath(),
                '-d', distToPlan.fullPath(),
                '-o', self.depth_profile.fullPath() ]
-     apply(context.system, depth)
+     context.system(*depth)
 
      context.write('Finished')
 

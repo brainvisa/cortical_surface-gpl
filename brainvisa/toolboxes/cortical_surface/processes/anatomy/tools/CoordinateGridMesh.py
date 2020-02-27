@@ -32,6 +32,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
+from six.moves import range
 def validation():
     try:
         from brainvisa.cortical_surface.surface_tools import basic_tools as bsTls
@@ -86,8 +88,8 @@ def execution( self, context ):
         (longitude_axis_coords, latitude_axis_coords) = model.axisCoordToDegree()
         latitude_axis_coords = np.append(latitude_axis_coords, [180-model.cingularPoleBoundaryCoord, model.insularPoleBoundaryCoord])
     else:
-        longitude_axis_coords = range(1, 360, self.interval)
-        latitude_axis_coords =  range(1, 180, self.interval)
+        longitude_axis_coords = list(range(1, 360, self.interval))
+        latitude_axis_coords =  list(range(1, 180, self.interval))
     context.write('isocoordinates to be extracted:')
     context.write(longitude_axis_coords)
     context.write(latitude_axis_coords)
