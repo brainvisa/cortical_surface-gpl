@@ -179,7 +179,7 @@ def execution( self, context ):
                   #f[i]=np.sum(np.sum(np.sum(n[x-3:x+4,y-3:y+4,z-3:z+4]*k[i])))
               #except IndexError:
                   #print x, y, z
-                  #raise "toto"
+                  #raise RuntimeError("toto")
             ## TODO: utiliser la taille des matrices des kernels ici !!!
           #nf.append(f)
 	  #if j > 5:
