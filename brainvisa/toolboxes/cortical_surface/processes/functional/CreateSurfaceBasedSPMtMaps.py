@@ -71,7 +71,7 @@ def ols(Y, X, axis=0):
     dof = float(X.shape[0] - X.shape[1])
     return beta, nvbeta, s2, dof
 
-class glm:
+class glm(object):
     def __init__ ( self, Y = None, X = None, formula = None, axis = 0,
               model = 'spherical', method = None, niter = 2 ) :
 
@@ -177,7 +177,7 @@ class glm:
         c.dof = self.dof
         return c
 
-class contrast:
+class contrast(object):
     def __init__(self, dim, type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
         """ tiny is a numerical constant for computations. """
         self.dim = dim

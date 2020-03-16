@@ -49,7 +49,7 @@ def convertCliques( rawcliques ) :
         cliques.append(c)
     return cliques
 
-class Clique:
+class Clique(object):
     def __init__( self ):
         pass
     def define ( self, c ):

@@ -6,7 +6,7 @@ from soma import aims
 from brainvisa.cortical_surface.shell import db
 
 
-class Node:
+class Node(object):
     ''' Node class (with node, subject and t fields)
     remember : t is supposed to be the value at the max node on the original data'''
     def MaximumNode ( self, data ) :        
