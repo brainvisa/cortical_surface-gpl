@@ -265,7 +265,7 @@ def edges2Boundary(li, lj):
     "sort the boundaries the first the longest"
     boundaries_len = [len(bound) for bound in boundary]
     inx = list(range(len(boundaries_len)))
-    inx.sort(lambda x, y: boundaries_len[x] - boundaries_len[y])
+    inx.sort(key=lambda x: boundaries_len[x])
 # < = >    inx = np.array(boundaries_len).argsort()
     sort_boundary = [boundary[i] for i in inx]
 #    boundary.sort()
