@@ -113,8 +113,7 @@ def execution( self, context ):
   vol.getPropertySet()[ 'voxel_size' ] = vs
   arrvol = vol.arraydata()
   arrvol.fill( 0 )
-  alvol = aims.AimsData_S16( *( dims[:3] + [ 1, 1 ] ) )
-  lvol = alvol.volume()
+  lvol = aims.Volume_S16( *( dims[:3] + [ 1, 1 ] ) )
   lvol.getPropertySet()[ 'voxel_size' ] = vs
   arrlvol = lvol.arraydata()
 
@@ -136,7 +135,7 @@ def execution( self, context ):
         for p in mesh.vertex():
           lvol.setValue( 32767,
             *[ int( round(x/s) ) for x,s in zip(p,vs) ] )
-        avol = aimsalgosip.AimsMorphoChamferDilation( alvol,
+        avol = aimsalgosip.AimsMorphoChamferDilation( lvol,
           self.dilation_size )
         avol = aimsalgosip.AimsMorphoErosion( avol, self.erosion_size )
         arrvol[ avol.volume().arraydata()[0:1,1:-1,1:-1,1:-1]==32767 ] = oindex
