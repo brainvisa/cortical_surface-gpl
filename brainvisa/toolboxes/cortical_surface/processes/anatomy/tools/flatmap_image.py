@@ -70,9 +70,9 @@ def execution_mainthread(self, context):
         bg_val = tmin
     elif bg_val > tmax:
         bg_val = tmax
-    bg = atex.palette().refPalette().volume().at(
+    bg = atex.palette().refPalette().at(
         int(round(bg_val / (tmax - tmin)
-                  * atex.palette().refPalette().volume().getSizeX())))
+                  * atex.palette().refPalette().getSizeX())))
     bg = [float(x) / 255. for x in bg]
     win.windowConfig(cursor_visibility=0, light={'background': bg})
     win.addObjects(tmesh)

@@ -138,7 +138,7 @@ def execution( self, context ):
         avol = aimsalgosip.AimsMorphoChamferDilation( lvol,
           self.dilation_size )
         avol = aimsalgosip.AimsMorphoErosion( avol, self.erosion_size )
-        arrvol[ avol.volume().arraydata()[0:1,1:-1,1:-1,1:-1]==32767 ] = oindex
+        arrvol[avol.arraydata()[0:1,1:-1,1:-1,1:-1]==32767] = oindex
     except Exception as e:
       context.warning( 'node failed:', e )
       pass
