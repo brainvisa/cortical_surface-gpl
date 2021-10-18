@@ -29,7 +29,6 @@ def validation():
 
 
 from brainvisa.processes import *
-import sigraph
 from soma import aims
 from brainvisa.cortical_surface.parameterization import model as md
 import numpy as np
