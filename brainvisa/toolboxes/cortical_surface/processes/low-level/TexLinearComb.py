@@ -56,10 +56,11 @@ def initialization( self ):
 
 def execution( self, context ):
 
-   context.system('AimsLinearComb','-i',self.texture1.fullPath(),'-j',self.texture2.fullPath(),
-                  '-o',self.output.fullPath(),
-                  '-a',self.num1, '-b',self.den1,
-                  '-c',self.num2, '-d',self.den2,
-                  '-e',self.cst)
+   context.pythonSystem('cartoLinearComb.py','-i',self.texture1.fullPath(),
+                        '-i',self.texture2.fullPath(),
+                        '-o',self.output.fullPath(),
+                        '-f', 'I1 * %f / %f + I2 * %f / %f + %f'
+                        % (self.num1, self.den1, self.num2, self.den2,
+                           self.cst))
 
 
