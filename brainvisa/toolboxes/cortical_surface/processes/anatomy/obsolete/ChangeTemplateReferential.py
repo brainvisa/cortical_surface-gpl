@@ -77,7 +77,9 @@ def execution( self, context ):
     param = 0
     context.system('AimsInvertTransformation', '-i', self.transformation_input, '-o', self.talairach_to_subject )
     context.system('AimsComposeTransformation', '-i', self.talairach_to_subject, '-j', self.template_pole_transformation, '-o', self.subject_to_template )
-    context.system('VipSplineResamp', '-i', self.pole_template, '-o', self.output_template, '-t', self.mri_corrected, '-d', self.subject_to_template, '-ord', param )
+    context.system('AimsApplyTransform', '-i', self.pole_template,
+                   '-o', self.output_template, '-r', self.mri_corrected,
+                   '-d', self.subject_to_template, '-n', param )
     tm = registration.getTransformationManager()
     tm.copyReferential( self.mri_corrected, self.output_template )
 
