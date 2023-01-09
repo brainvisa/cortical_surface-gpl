@@ -461,7 +461,7 @@ def execution ( self, context ) :
         print(self.contrast)
         # motor contrast : 0 0 1 -1 -1 1
         # audio - video contrast : 0 0 1 1 -1 -1 1 -1 -1 1
-        c = [int(i) for i in string.split(str(self.contrast))]
+        c = [int(i) for i in str(self.contrast).split()]
         print(len(c), nb_cond)
         c.extend ( np.zeros ( max( nb_cond + 1 - len(c), 0 ) ) )
         assert(len(c) == nb_cond + 1)
