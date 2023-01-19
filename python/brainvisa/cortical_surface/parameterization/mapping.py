@@ -598,7 +598,7 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
 
     neoCortex_open_boundary = boundaryReordering(neoCortex_boundary, neocortex_poles_path, vert)
 
-    neigh_verts = set(np.hstack(list(neigh[v]) for v in neoCortex_open_boundary[1]))
+    neigh_verts = set(np.hstack([list(neigh[v]) for v in neoCortex_open_boundary[1]]))
     other_verts = neigh_verts.difference(neoCortex_open_boundary[1])
 #     tex_out = aims.TimeTexture_S16()
 #     tex_out[0].reserve(neoCortex_mesh.vertex().size())  # pre-allocates memory
@@ -641,8 +641,8 @@ def path2Boundary(neoCortex_mesh, neoCortex_boundary, neocortex_poles_path, neig
     "add the new vertices and poly to the mesh"
     poly = np.array(neoCortex_mesh.polygon())
 
-    posterior_cluster_ind_poly = np.hstack(np.where(poly == i)[0] for i in posterior_cluster)
-    poles_path_ind_poly = np.hstack(np.where(poly == i)[0] for i in neoCortex_open_boundary[1])
+    posterior_cluster_ind_poly = np.hstack([np.where(poly == i)[0] for i in posterior_cluster])
+    poles_path_ind_poly = np.hstack([np.where(poly == i)[0] for i in neoCortex_open_boundary[1]])
 
     added_poly_inds = set(posterior_cluster_ind_poly).intersection(poles_path_ind_poly)
     added_poly = poly[list(added_poly_inds), :]

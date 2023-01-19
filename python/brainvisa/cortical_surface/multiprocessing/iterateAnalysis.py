@@ -28,7 +28,7 @@ def IterateAnalysis ( groupgraphpath, tmppathes, analyze, number_of_proc = 2 ) :
         ana += [ '-o', str(tmppath) ]
         ana += [ '--run', 'True' ]
 
-        analyze_command = string.join( [ "'"+str(each)+"'" for each in ana ], ' ' )
+        analyze_command = ' '.join( [ "'"+str(each)+"'" for each in ana ] )
         print(analyze_command)
         jobs.append ( (analyze_command, i, 'test') )
 
@@ -40,7 +40,7 @@ def DistributeIndividualGraphs ( indiv_commands, number_of_proc = 2 ) :
     graphs on various processors '''
     jobs = []
     for i, indiv in enumerate( indiv_commands ) :
-        indiv_command = string.join( [ "'"+str(each)+"'" for each in indiv ], ' ' )
+        indiv_command = ' '.join( [ "'"+str(each)+"'" for each in indiv ] )
         print(indiv_command)
         jobs.append ( (indiv_command, i, 'test') )
 
