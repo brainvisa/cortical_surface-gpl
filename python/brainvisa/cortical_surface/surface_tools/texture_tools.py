@@ -38,7 +38,7 @@ def textureTopologicalCorrection(mesh, atex, tex_val, background_val=0, neigh=No
     tex_val_indices = np.where(atex == tex_val)[0]
     if not tex_val_indices.size:
         print('no value ' + str(tex_val) + ' in the input texture!!')
-        return list()
+        return tuple()
     else:
         print(str(tex_val_indices.size) + ' vertices have the texture value ' + str(tex_val))
         if neigh is None:

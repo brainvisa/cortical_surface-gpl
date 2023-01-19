@@ -634,7 +634,7 @@ def cutMesh(mesh, atex):
         sub_meshes.append(sub_mesh)
         sub_indexes.append(sub_index.tolist())
         boundary = textureBoundary(mesh, atex, labels[label_ind])
-        atex2[boundary] = last_label
+        atex2[tuple(boundary)] = last_label
     (sub_mesh, sub_index) = subCutMesh(mesh, atex2, last_label)
     sub_meshes.append(sub_mesh)
     sub_indexes.append(sub_index.tolist())
