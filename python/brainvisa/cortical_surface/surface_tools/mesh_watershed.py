@@ -73,11 +73,11 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
     
     #print 'Distance between 2 pits:', threshDist, 'mm - Ridge height:', threshRidge, 'mm'
     
-    vert=np.array(white.vertex()) # vertices coordinates
-    neigh=aims.SurfaceManip.surfaceNeighbours(white) # vertices neighborhood
-    g=aims.GeodesicPath(white, 3, 0) # compute shortest path between each pair of vertex
-    idx=np.arange((vert.size)/3).reshape((vert.size)/3,1) # vertices index
-    depthArray = depthArray.reshape((vert.size)/3,1)
+    vert = np.array(white.vertex()) # vertices coordinates
+    neigh = aims.SurfaceManip.surfaceNeighbours(white) # vertices neighborhood
+    g = aims.GeodesicPath(white, 3, 0) # compute shortest path between each pair of vertex
+    idx = np.arange(vert.shape[0]).reshape(vert.shape[0], 1) # vertices index
+    depthArray = depthArray.reshape(vert.shape[0], 1)
     nodes=np.concatenate((idx,depthArray),axis=1)
 
     ## Apply exclusion mask
@@ -92,8 +92,8 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
     ## Flooding & Merging step
     pitsAll=[] # List of pits. Will contain [pit's index, pit's depth]
     pitsRemoved=[]
-    labels=np.zeros((vert.size/3,1),dtype=np.int)-1 # List of vertex labels (set to -1). Will be set to pit's index of basin
-    labels_unmerged=np.zeros((vert.size/3,1),dtype=np.int)-1
+    labels=np.zeros((vert.shape[0], 1), dtype=np.int)-1 # List of vertex labels (set to -1). Will be set to pit's index of basin
+    labels_unmerged=np.zeros((vert.shape[0],1),dtype=np.int)-1
     labels_merged=[]
     parent=np.zeros((1,1),dtype=np.int)-1 # List of each pit's direct parent (set to -1)
     ridges=np.zeros((1,1), dtype=np.int) #List of ridge points
