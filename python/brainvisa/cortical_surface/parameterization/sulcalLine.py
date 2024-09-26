@@ -3,9 +3,6 @@ Created on 2 august 2012
 
 @author: toz
 '''
-from __future__ import print_function
-
-from __future__ import absolute_import
 import numpy as np
 from soma import aims
 from scipy import sparse
@@ -151,7 +148,7 @@ class SulcalLine(object):
         atex = np.around(tex)
         tex_val_indices = list(np.where(atex == label)[0])
         Nv = len(tex_val_indices)
-        if Nv is 0:
+        if Nv == 0:
             print('no value ' + str(label) + ' in the input texture, return empty sulcalLine!!')
         else:
             segm = vertsIndicesToEdges(mesh, tex_val_indices, neigh)
