@@ -833,7 +833,7 @@ def invertedPolygon(mesh, shape=None):
         shape = 'square'
 #    norms = np.array(mesh.normal())
     norms = basicTls.meshPolygonNormal(mesh)
-    if shape is 'sphere':
+    if shape == 'sphere':
         print('sphere not available yet')
 #N(1,:)=FaceNormal(1,:)+FaceCenter(1,:);
 #N(2,:)=FaceNormal(2,:)+FaceCenter(2,:);
