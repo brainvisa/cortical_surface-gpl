@@ -1,7 +1,7 @@
 package:
   name: cortical-surface
 
-soma-dev:
+soma-env:
   components:
     cortical_surface-nonfree: ["https://github.com/brainvisa/cortical_surface-nonfree.git", "master"]
 
