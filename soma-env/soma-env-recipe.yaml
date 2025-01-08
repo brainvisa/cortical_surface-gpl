@@ -3,7 +3,7 @@ package:
 
 soma-env:
   components:
-    cortical_surface-nonfree: ["https://github.com/brainvisa/cortical_surface-nonfree.git", "master"]
+    cortical_surface-nonfree: ["https://github.com/brainvisa/cortical_surface-nonfree.git", "soma-env-6.0"]
 
   internal-dependencies:
     - morphologist
