@@ -2,6 +2,7 @@ package:
   name: cortical-surface
 
 soma-env:
+  publication: neuro-forge
   components:
     cortical_surface-nonfree: ["https://github.com/brainvisa/cortical_surface-nonfree.git", "master"]
 
