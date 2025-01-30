@@ -4,7 +4,8 @@ package:
 soma-env:
   publication: neuro-forge
   components:
-    cortical_surface-nonfree: ["https://github.com/brainvisa/cortical_surface-nonfree.git", "soma-env-6.0"]
+    - cortical_surface-gpl
+    - cortical_surface-nonfree
 
   internal-dependencies:
     - morphologist
