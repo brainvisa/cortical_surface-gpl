@@ -10,5 +10,6 @@ soma-env:
   internal-dependencies:
     - morphologist
     - soma-freesurfer
+    - axon
 
   type: compiled
