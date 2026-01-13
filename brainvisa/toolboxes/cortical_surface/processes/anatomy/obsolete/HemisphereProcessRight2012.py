@@ -65,7 +65,7 @@ def initialization( self ):
     
     eNode.addLink(  'CingularPoleRight.right_pole_template','ChangeTemplateReferential.output_template' )
     eNode.addLink(  'CingularPoleRight.right_white_mesh','SulcalinesExtractionRight.Rwhite_mesh')
-    eNode.addLink(  'CingularPoleRight.right_white_mesh','ParameterizeUnconstrainedHarmonicRight.Rwhite_mesh')
+    eNode.addLink(  'CingularPoleRight.right_white_mesh','ParameterizeUnconstrainedHarmonicRight.white_mesh')
     eNode.addLink(  'CingularPoleRight.right_white_mesh','HarmonicMappingOrthoRight.Rwhite_mesh')
 
     eNode.addLink(  'SulcalinesExtractionRight.Rwhite_mesh','CingularPoleRight.right_white_mesh')
