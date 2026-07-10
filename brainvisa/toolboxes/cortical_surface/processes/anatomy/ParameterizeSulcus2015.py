@@ -33,6 +33,7 @@
 
 from brainvisa.processes import *
 import math
+import numpy as np
 from numpy import *
 from scipy import sparse
 import scipy.sparse.linalg as alg
@@ -96,63 +97,64 @@ def initialization( self ):
 #
 ####################################################################
 
-def computeMeshWeights( mesh ):
-     
-     print('    Computing mesh weights')
-     vert=array(mesh.vertex())
-     poly=array(mesh.polygon())
-     
-     Nv=vert.shape[0]
-     Np=poly.shape[0]
-     
-     W=sparse.lil_matrix((Nv,Nv))
-     #W=zeros((Nv,Nv))
-     # this old numpy array representation cannot handle big meshes in memory
-     
-     for i in range(3):
-          i1=mod(i,3)
-          i2=mod(i+1,3)
-          i3=mod(i+2,3)
-          print('    ', 3-i1)
-          pp=vert[poly[:,i2], :] - vert[poly[:,i1], :]
-          qq=vert[poly[:,i3], :] - vert[poly[:,i1], :]
-          np=apply_along_axis(linalg.norm, 1, pp)
-          nq=apply_along_axis(linalg.norm, 1, qq)
-          pp=pp / vstack( (np,vstack((np,np))) ).transpose()
-          qq=qq / vstack( (nq,vstack((nq,nq))) ).transpose()
-          ang = arccos(sum(pp*qq,1))
-          
-          for j in range(Np):
-               ind1=poly[j,i1]
-               ind2=poly[j,i2]
-               ind3=poly[j,i3]
-               W[ind2, ind3]=W[ind2, ind3]+1/tan(ang[j])
-               W[ind3, ind2]=W[ind3, ind2]+1/tan(ang[j])
-               
-     print('    OK')
-               
-     return W
-               
+def computeMeshWeights(mesh):
+
+    print('    Computing mesh weights')
+    vert = np.array(mesh.vertex())
+    poly = np.array(mesh.polygon())
+
+    Nv = vert.shape[0]
+    Np = poly.shape[0]
+
+    W = sparse.lil_matrix((Nv, Nv))
+    # W = zeros((Nv,Nv))
+    # this old numpy array representation cannot handle big meshes in memory
+
+    for i in range(3):
+        i1 = np.mod(i, 3)
+        i2 = np.mod(i+1, 3)
+        i3 = np.mod(i+2, 3)
+        print('    ', 3-i1)
+        pp = vert[poly[:, i2], :] - vert[poly[:, i1], :]
+        qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]
+        np0 = np.apply_along_axis(np.linalg.norm, 1, pp)
+        nq = np.apply_along_axis(np.linalg.norm, 1, qq)
+        pp = pp / np.vstack((np0, np.vstack((np0, np0)))).transpose()
+        qq = qq / np.vstack((nq, np.vstack((nq, nq)))).transpose()
+        ang = np.arccos(sum(pp*qq, 1))
+
+        for j in range(Np):
+            # ind1 = poly[j, i1]
+            ind2 = poly[j, i2]
+            ind3 = poly[j, i3]
+            W[ind2, ind3] = W[ind2, ind3]+1 / np.tan(ang[j])
+            W[ind3, ind2] = W[ind3, ind2]+1 / np.tan(ang[j])
+
+    print('    OK')
+
+    return W
+
+
 ####################################################################
 # 
 # compute laplacian of a mesh
 #
 ####################################################################
-               
-def computeMeshLaplacian( mesh ):
-     print('    Computing Laplacian')
-                    
-     weights=computeMeshWeights( mesh )
-     N=weights.shape[0]
-     s=weights.sum(axis=1)
-     dia=sparse.lil_matrix((N,N))
-     dia.setdiag(s)
-     L = dia - weights
-                    
-     print('    OK')
-                    
-     return L
-     
+
+def computeMeshLaplacian(mesh):
+    print('    Computing Laplacian')
+
+    weights = computeMeshWeights(mesh)
+    N = weights.shape[0]
+    s = weights.sum(axis=1)
+    dia = sparse.lil_matrix((N, N))
+    dia.setdiag(s)
+    L = dia - weights
+
+    print('    OK')
+
+    return L
+
 ####################################################################
 # 
 # compute comformal mapping of the mesh to a sphere
