@@ -34,12 +34,12 @@
 from brainvisa.processes import *
 import math
 import numpy as np
-from numpy import *
 from scipy import sparse
 import scipy.sparse.linalg as alg
 from scipy.sparse.linalg import spsolve
 from soma import aims
 from six.moves import range
+import os
 
 name = 'Sulcus Parameterization 2015'
 
@@ -132,9 +132,9 @@ def computeMeshWeights(mesh):
         qq = vert[poly[:, i3], :] - vert[poly[:, i1], :]
         np0 = np.apply_along_axis(np.linalg.norm, 1, pp)
         nq = np.apply_along_axis(np.linalg.norm, 1, qq)
-        pp = pp / np.vstack((np0, np.vstack((np0, np0)))).transpose()
-        qq = qq / np.vstack((nq, np.vstack((nq, nq)))).transpose()
-        ang = np.arccos(sum(pp*qq, 1))
+        pp = pp / np.expand_dims(np0, 1)
+        qq = qq / np.expand_dims(nq, 1)
+        ang = np.arccos(np.sum(pp*qq, 1))
 
         for j in range(Np):
             # ind1 = poly[j, i1]
@@ -188,7 +188,7 @@ def sphereConformalMapping(mesh, lap, ps, pn, radius):
 
     L = L.tocsr()
 
-    vert = np.array(mesh.vertex())
+    # vert = np.array(mesh.vertex())
     Nv = np.array(mesh.vertex()).shape[0]
     mesh.updateNormals()
     Nor = np.array(mesh.normal())
@@ -276,7 +276,7 @@ def meshIsoLine(mesh, tex, val):
 
 def meshAlmostIsoLine(mesh, tex, val):
     # print('Looking for isoLine')
-    points = np.array(mesh.vertex())
+    # points = np.array(mesh.vertex())
     values = np.array(tex[0])
     # print('isoLine: points:', points.shape)
     # print('isoLine: values:', values.shape)
@@ -451,7 +451,11 @@ def execution(self, context):
     context.system(*meshing)
 
     test = self.sulcus_mesh.fullName()
-    sulcusMname = test + '_1_0.mesh'
+    ext = self.sulcus_mesh.fullPath()[len(test):]
+    sulcusMname = test + '_1_0' + ext
+    context.write('moving file:', sulcusMname)
+    if not os.path.exists(sulcusMname):
+        raise ValueError(f'file {sulcusMname} has not been written.')
 
     shelltools.mv(sulcusMname, self.sulcus_mesh.fullPath())
     shelltools.mv(sulcusMname + '.minf', self.sulcus_mesh.fullPath() + '.minf')
@@ -583,7 +587,7 @@ def execution(self, context):
     ########################################################
     context.write('Computing coordinate grid')
 
-    i = 0
+    i = 5
     iso = ['AimsMeshIsoLine',
            '-i', self.sulcus_mesh.fullPath(),
            '-t', self.texture_param1.fullPath(),
@@ -596,7 +600,7 @@ def execution(self, context):
     context.system(*conc)
 
     i = i+5
-    while (i <= 100):
+    while (i <= 95):
         iso = ['AimsMeshIsoLine',
                '-i', self.sulcus_mesh.fullPath(),
                '-t', self.texture_param1.fullPath(),

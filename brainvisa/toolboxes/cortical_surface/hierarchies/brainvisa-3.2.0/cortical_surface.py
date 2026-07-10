@@ -348,8 +348,8 @@ insert( '{center}/{subject}',
           '<subject>_R_{sulcus_name}-y', SetType( 'Sulcus y coordinate texture' ), SetWeakAttr( 'side', 'right' ),
           '<subject>_L_{sulcus_name}-depth', SetType( 'Sulcus depth profile' ), SetWeakAttr( 'side', 'left' ),
           '<subject>_R_{sulcus_name}-depth', SetType( 'Sulcus depth profile' ), SetWeakAttr( 'side', 'right' ),
-          '<subject>_L_{sulcus_name}-grid.mesh', SetType( 'Sulcus coordinate grid mesh' ), SetWeakAttr( 'side', 'left'),
-          '<subject>_R_{sulcus_name}-grid.mesh', SetType( 'Sulcus coordinate grid mesh' ), SetWeakAttr( 'side', 'right')
+          '<subject>_L_{sulcus_name}-grid', SetType( 'Sulcus coordinate grid mesh' ), SetWeakAttr( 'side', 'left'),
+          '<subject>_R_{sulcus_name}-grid', SetType( 'Sulcus coordinate grid mesh' ), SetWeakAttr( 'side', 'right')
      ),
   #),
 )

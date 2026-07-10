@@ -47,19 +47,19 @@ def validation():
 
 signature = Signature(
     'texture', ReadDiskItem('texture', 'aims Texture formats'),
-    'white_mesh',ReadDiskItem( 'Hemisphere White Mesh', 'aims mesh formats' ),
+    'mesh',ReadDiskItem( 'Sulcus Mesh', 'aims mesh formats' ),
     'sphere_size', Float(),
 )
 
 def initialization( self ):
-    self.linkParameters('white_mesh','texture' )
+    self.linkParameters('mesh','texture' )
     self.sphere_size = 1.0
 
 def execution( self, context ):
     context.write('use temporary files...')
     spheres_mesh_file = context.temporary(  'GIFTI file' )
     spheres_texture_file = context.temporary(  'GIFTI file' )
-    white_mesh = aims.read(self.white_mesh.fullPath())
+    white_mesh = aims.read(self.mesh.fullPath())
     texture = aims.read(self.texture.fullPath())
     atex = np.array(texture[0])
     gen = aims.SurfaceGenerator()
