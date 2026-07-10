@@ -30,9 +30,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from __future__ import print_function
 
-from __future__ import absolute_import
 from brainvisa.processes import *
 import math
 from numpy import *
@@ -47,28 +45,36 @@ name = 'Sulcus Parameterization 2015'
 userLevel = 0
 
 signature = Signature(
-    'graph', ReadDiskItem( 'Cortical folds graph', 'Graph' ),
-    'mri', ReadDiskItem( 'T1 MRI Bias Corrected', 'Aims readable volume formats' ),
-    'label_attributes', Choice( 'label', 'name' ),
+    'graph', ReadDiskItem('Cortical folds graph', 'Graph'),
+    'mri', ReadDiskItem('T1 MRI Bias Corrected', 'Aims readable volume formats'),
+    'label_attributes', Choice('label', 'name'),
     'label_values', String(),
-    'orientation', Choice( 'Top->Bottom', 'Front->Back' ),
-    'sulcus_mesh', WriteDiskItem( 'Sulcus mesh', 'MESH mesh' ),
-    'texture_param1', WriteDiskItem( 'Sulcus y coordinate texture', 'Texture' ),
-    'coordinates_grid', WriteDiskItem( 'Sulcus coordinate grid mesh', 'MESH mesh' ),
-    'depth_profile', WriteDiskItem( 'Sulcus depth profile', 'Text file' ),
+    'orientation', Choice('Top->Bottom', 'Front->Back'),
+    'sulcus_mesh', WriteDiskItem('Sulcus mesh', 'AIMS mesh formats'),
+    'texture_param1', WriteDiskItem('Sulcus y coordinate texture', 'AIMS Texture formats'),
+    'coordinates_grid', WriteDiskItem('Sulcus coordinate grid mesh', 'AIMS mesh formats'),
+    'depth_profile', WriteDiskItem('Sulcus depth profile', 'Text file'),
     'dilation', Float(),
     'offset', Integer(),
 )
 
+
 def initialization( self ):
-     self.linkParameters( 'mri', 'graph' )
-     self.linkParameters( 'sulcus_mesh', 'graph' )
-     self.linkParameters( 'texture_param1', 'sulcus_mesh' )
-     self.linkParameters( 'coordinates_grid', 'sulcus_mesh' )
-     self.linkParameters( 'depth_profile', 'sulcus_mesh' )
-     self.label_attributes = 'name'
-     self.dilation = 1.0
-     self.offset = 0
+    def link_sulc_mesh(self, proc):
+        if self.graph is not None and self.label_values is not None:
+            lv = '-'.join(self.label_values.split(' '))
+            atts = dict(self.graph.hierarchyAttributes())
+            atts['sulcus_name'] = lv
+            return self.signature['sulcus_mesh'].findValue(atts)
+
+    self.linkParameters('mri', 'graph')
+    self.linkParameters('sulcus_mesh', ('graph', 'label_values'), link_sulc_mesh)
+    self.linkParameters('texture_param1', 'sulcus_mesh')
+    self.linkParameters('coordinates_grid', 'sulcus_mesh')
+    self.linkParameters('depth_profile', 'sulcus_mesh')
+    self.label_attributes = 'name'
+    self.dilation = 1.0
+    self.offset = 0
 
 
 ##################################################################
