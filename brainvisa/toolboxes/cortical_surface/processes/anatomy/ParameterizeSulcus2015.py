@@ -71,13 +71,22 @@ def initialization(self):
             atts['sulcus_name'] = lv
             return self.signature['sulcus_mesh'].findValue(atts)
 
+    def link_label_attrib(self, proc):
+        if self.graph is not None:
+            auto_label = self.graph.hierarchyAttributes().get(
+                'automatically_labelled')
+            if auto_label == 'No':
+                return 'name'
+        return 'label'
+
+    self.label_attributes = 'name'
     self.linkParameters('mri', 'graph')
     self.linkParameters(
         'sulcus_mesh', ('graph', 'label_values'), link_sulc_mesh)
     self.linkParameters('texture_param1', 'sulcus_mesh')
     self.linkParameters('coordinates_grid', 'sulcus_mesh')
     self.linkParameters('depth_profile', 'sulcus_mesh')
-    self.label_attributes = 'name'
+    self.linkParameters('label_attributes', 'graph', link_label_attrib)
     self.dilation = 1.0
     self.offset = 0
 
@@ -179,10 +188,10 @@ def sphereConformalMapping(mesh, lap, ps, pn, radius):
 
     L = L.tocsr()
 
-    vert = array(mesh.vertex())
-    Nv = array(mesh.vertex()).shape[0]
+    vert = np.array(mesh.vertex())
+    Nv = np.array(mesh.vertex()).shape[0]
     mesh.updateNormals()
-    Nor = array(mesh.normal())
+    Nor = np.array(mesh.normal())
     Nor[ps, 0] = 0
     Nor[ps, 1] = 0
     Nor[ps, 2] = -1
@@ -202,7 +211,7 @@ def sphereConformalMapping(mesh, lap, ps, pn, radius):
     print('    OK')
     vv = aims.vector_POINT3DF()
     for i in range(Nv):
-        no = sqrt(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])
+        no = np.sqrt(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])
         vv.append([x[i]/no, y[i]/no, z[i]/no])
 
     sphere = aims.AimsTimeSurface_3_VOID()
@@ -220,18 +229,18 @@ def sphereConformalMapping(mesh, lap, ps, pn, radius):
 
 def meshIsoLine(mesh, tex, val):
     # print('Looking for isoLine')
-    points = array(mesh.vertex())
-    values = array(tex[0])
+    points = np.array(mesh.vertex())
+    values = np.array(tex[0])
     # print('isoLine: points:', points.shape)
     # print('isoLine: values:', values.shape)
-    sign = zeros(values.size)
-    sign[where(values < val)[0]] = 10
-    sign[where(values >= val)[0]] = 20
+    sign = np.zeros(values.size)
+    sign[np.where(values < val)[0]] = 10
+    sign[np.where(values >= val)[0]] = 20
     line = aims.AimsTimeSurface_2_VOID()
     isoV = aims.vector_POINT3DF()
     isoP = aims.vector_AimsVector_U32_2()
 
-    triangles = array(mesh.polygon())
+    triangles = np.array(mesh.polygon())
     for tr in triangles:
         count = sign[tr].sum()
         if (count == 40):
@@ -267,17 +276,17 @@ def meshIsoLine(mesh, tex, val):
 
 def meshAlmostIsoLine(mesh, tex, val):
     # print('Looking for isoLine')
-    points = array(mesh.vertex())
-    values = array(tex[0])
+    points = np.array(mesh.vertex())
+    values = np.array(tex[0])
     # print('isoLine: points:', points.shape)
     # print('isoLine: values:', values.shape)
-    sign = zeros(values.size)
-    sign[where(values < val)[0]] = 10
-    sign[where(values >= val)[0]] = 20
+    sign = np.zeros(values.size)
+    sign[np.where(values < val)[0]] = 10
+    sign[np.where(values >= val)[0]] = 20
 
     si = set()
 
-    triangles = array(mesh.polygon())
+    triangles = np.array(mesh.polygon())
     for tr in triangles:
         count = sign[tr].sum()
         if (count == 40):
@@ -304,7 +313,7 @@ def meshAlmostIsoLine(mesh, tex, val):
                 i2 = bestVertex(tr[2], tr[1], values, val)
             si.add(i1)
             si.add(i2)
-    return array(list(si))
+    return np.array(list(si))
 
 
 def interpolateVertices(v1, v2, points, texture, valeur):
@@ -330,10 +339,10 @@ def addSegment(v1, v2, vert, seg):
         v = vert[i]
         d1 = v-v1
         d2 = v-v2
-        if (sqrt(d1[0]*d1[0] + d1[1]*d1[1] + d1[2]*d1[2])) < 0.0001:
+        if (np.sqrt(d1[0]*d1[0] + d1[1]*d1[1] + d1[2]*d1[2])) < 0.0001:
             i1 = i
             a1 = 1
-        if (sqrt(d2[0]*d2[0] + d2[1]*d2[1] + d2[2]*d2[2])) < 0.0001:
+        if (np.sqrt(d2[0]*d2[0] + d2[1]*d2[1] + d2[2]*d2[2])) < 0.0001:
             i2 = i
             a2 = 1
 
@@ -355,7 +364,7 @@ def addSegment(v1, v2, vert, seg):
 
 def closerVert(p, mesh):
     diff = p-mesh
-    return (dot(diff, diff.transpose()).diagonal().argmin())
+    return (np.dot(diff, diff.transpose()).diagonal().argmin())
 
 ######################################################################
 
@@ -370,11 +379,11 @@ def execution(self, context):
     simplesurf = context.temporary('GIS image')
     dilatedIm = context.temporary('GIS image')
     isoL = context.temporary('MESH mesh')
-    meshNonDec = context.temporary('MESH mesh')
+    # meshNonDec = context.temporary('MESH mesh')
 
-    distToPlan = context.temporary('Texture')
+    # distToPlan = context.temporary('Texture')
     tempParam = context.temporary('Texture')
-    transform = ''
+    # transform = ''
 
     if (self.orientation == 'Top->Bottom'):
         orient = 0
@@ -458,9 +467,9 @@ def execution(self, context):
     re = aims.Reader()
 
     mesh = re.read(self.sulcus_mesh.fullPath())
-    vert = array(mesh.vertex())
+    vert = np.array(mesh.vertex())
     N = mesh.vertex().size()
-    parameter = zeros(N)
+    parameter = np.zeros(N)
 
     print('Computing Laplacian')
     L = computeMeshLaplacian(mesh)
@@ -527,29 +536,31 @@ def execution(self, context):
     # Computing medial axis et reparametrisation isometrique
     # (par morceaux) a partir de sa longueur
     ########################################################
-    axis = aims.AimsSurfaceTriangle()
-    gen = aims.SurfaceGenerator()
-    vx = 0
-    vy = 0
-    vz = 0
+    # axis = aims.AimsSurfaceTriangle()
+    # gen = aims.SurfaceGenerator()
+    # vx = 0
+    # vy = 0
+    # vz = 0
 
-    points = zeros((101, 3))
-    dist = zeros(101)
-    newCoord = zeros(101)
-    a = zeros(101)
-    b = zeros(101)
+    points = np.zeros((101, 3))
+    dist = np.zeros(101)
+    newCoord = np.zeros(101)
+    a = np.zeros(101)
+    b = np.zeros(101)
     points[0] = vert[top]
     points[100] = vert[bot]
 
     for i in range(1, 100):
         cont = meshIsoLine(mesh, texOut, i)
-        vertC = array(cont.vertex())
+        vertC = np.array(cont.vertex())
         bary = vertC.mean(axis=0)
         points[i] = bary
         vec = points[i] - points[i-1]
-        dist[i] = dist[i-1]+sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])
+        dist[i] = dist[i-1] + np.sqrt(vec[0]*vec[0] + vec[1]*vec[1]
+                                      + vec[2]*vec[2])
     vec = points[100] - points[99]
-    dist[100] = dist[99]+sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])
+    dist[100] = dist[99] + np.sqrt(vec[0]*vec[0] + vec[1]*vec[1]
+                                   + vec[2]*vec[2])
 
     # print('Dist:', dist)
     newCoord[0] = 0.0
@@ -598,66 +609,64 @@ def execution(self, context):
         context.system(*conc)
         i = i+5
 
-    read = aims.Reader()
-
     # here we compute the signed distance to the inertia plane
     # inertia plane is computed with a PCA of the vertices.
     # extremities (defined with 'offset') are removed.
 
     offset = self.offset
-    vert2 = vert[where((parameter >= offset) & (
+    vert2 = vert[np.where((parameter >= offset) & (
         parameter <= (100-offset)))].copy()
-    bary = mean(vert2, axis=0)
+    bary = np.mean(vert2, axis=0)
     vert2 = vert2-bary
     vert = vert-bary
     tvert2 = vert2.transpose()
-    coord = dot(tvert2, vert2)
+    coord = np.dot(tvert2, vert2)
 
-    val, vect = linalg.eig(coord)
-    i = argmin(val)
-    k = argmax(val)
-    for t in range(3):
-        if (t != i) and (t != k):
-            j = t
+    val, vect = np.linalg.eig(coord)
+    i = np.argmin(val)
+    # k = np.argmax(val)
+    # for t in range(3):
+        # if (t != i) and (t != k):
+            # j = t
 
     u1 = vect[:, i]
-    u2 = vect[:, j]
-    u3 = vect[:, k]
+    # u2 = vect[:, j]
+    # u3 = vect[:, k]
 
     texturex = aims.TimeTexture_FLOAT()
     nn = vert.shape[0]
     for i in range(nn):
-        texturex.push_back(dot(vert[i], -u1))
+        texturex.push_back(np.dot(vert[i], -u1))
 
-    dist = array(texturex[0])
+    dist = np.array(texturex[0])
     context.write('Computing morphological curves (depth and profile)')
 
     # Computing curves for depth and profile
 
-    morpho = zeros((101, 3))
-    vert = array(mesh.vertex())
+    morpho = np.zeros((101, 3))
+    vert = np.array(mesh.vertex())
     for i in range(101):
         line = meshIsoLine(mesh, isoParam, i)
         vline = meshAlmostIsoLine(mesh, isoParam, i)
         depth = 0
         prof = 0
-        prof2 = 0
-        vl = array(line.vertex())
-        pl = array(line.polygon())
+        # prof2 = 0
+        vl = np.array(line.vertex())
+        pl = np.array(line.polygon())
         for p in pl:
             i1 = p[0]
             i2 = p[1]
-            depth += sqrt(dot((vl[i2]-vl[i1]), (vl[i2]-vl[i1])))
+            depth += np.sqrt(np.dot((vl[i2] - vl[i1]), (vl[i2] - vl[i1])))
         for v in vline:
             prof += dist[v]
         depth = depth/2.0
         if (depth == 0):
             prof = 0
-            prof2 = 0
+            # prof2 = 0
         else:
-            prof2 = prof/vl.size
-            prof = prof/(2.0*depth)
-        morpho[i] = array([i, depth, prof])
-    savetxt(self.depth_profile.fullPath(), morpho, delimiter='\t')
+            # prof2 = prof/vl.size
+            prof = prof / (2.0*depth)
+        morpho[i] = np.array([i, depth, prof])
+    np.savetxt(self.depth_profile.fullPath(), morpho, delimiter='\t')
 
     context.write('Finished')
